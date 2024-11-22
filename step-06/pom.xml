@@ -44,7 +44,7 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-embeddings-bge-small-en-q</artifactId>
-            <version>0.35.0</version>
+            <version>0.36.2</version>
         </dependency>
         <!-- -8<- [end:embedding-bge]       -->
         <!-- -8<- [start:pgvector]       -->
