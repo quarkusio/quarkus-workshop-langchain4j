@@ -1,4 +1,4 @@
-# Step 06 - Function calling and Tools
+# Step 07 - Function calling and Tools
 
 The RAG pattern allows passing knowledge to the LLM based on your own data.
 It's a very popular pattern, but not the only one that can be used.
