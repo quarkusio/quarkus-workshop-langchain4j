@@ -17,7 +17,7 @@
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
 
         <quarkus.platform.version>3.17.6</quarkus.platform.version>
-        <quarkus-langchain4j.version>0.21.0</quarkus-langchain4j.version>
+        <quarkus-langchain4j.version>0.23.3</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -29,6 +29,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>io.quarkiverse.langchain4j</groupId>
+                <artifactId>quarkus-langchain4j-bom</artifactId>
+                <version>${quarkus-langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -37,7 +44,6 @@
         <dependency>
             <groupId>io.quarkiverse.langchain4j</groupId>
             <artifactId>quarkus-langchain4j-openai</artifactId>
-            <version>${quarkus-langchain4j.version}</version>
         </dependency>
 
         <dependency>

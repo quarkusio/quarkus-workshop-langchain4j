@@ -117,7 +117,6 @@ If you open the `pom.xml` file, you will see that the project is a Quarkus appli
 <dependency>
     <groupId>io.quarkiverse.langchain4j</groupId>
     <artifactId>quarkus-langchain4j-openai</artifactId>
-    <version>${quarkus-langchain4j.version}</version>
 </dependency>
 ```
 

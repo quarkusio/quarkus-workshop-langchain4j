@@ -49,12 +49,18 @@ In this step, we will use the [bge-small-en-q](https://huggingface.co/neuralmagi
 --8<-- "../../step-06/pom.xml:embedding-bge"
 ```
 
-!!! tip
-    You could also open another terminal and run
+[//] FIXME: Can this still be used now that we import the dependency version from quarkus-langchain4j-bom???
 
-    ```shell
-    ./mvnw quarkus:add-extension -Dextension=dev.langchain4j:langchain4j-embeddings-bge-small-en-q:0.35.0
-    ```
+[//]: # (!!! tip)
+
+[//]: # (    You could also open another terminal and run)
+
+[//]: # ()
+[//]: # (    ```shell)
+
+[//]: # (    ./mvnw quarkus:add-extension -Dextension=dev.langchain4j:langchain4j-embeddings-bge-small-en-q:0.35.0)
+
+[//]: # (    ```)
 
 This dependency provides the `bge-small-en-q` embedding model.
 It will run locally, on your machine.
