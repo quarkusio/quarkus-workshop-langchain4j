@@ -38,7 +38,6 @@ The `log-requests` property enables logging of all requests made to the model,
 while the `log-responses` property enables logging of all responses received from the model.
 These logs provide valuable insights into how the LLM is interacting with your application and any issues that arise.
 Go ahead and start up Quarkus Dev Mode if you haven't already with `./mvnw quarkus:dev` go to [http://localhost:8080](http://localhost:8080/){target="_blank"}
-Go ahead and start up Quarkus Dev Mode if you haven't already with `./mvnw quarkus:dev` go to [http://localhost:8080](http://localhost:8080/){target="_blank"}
 and open the chat interface in the bottom right of your screen. Send an instruction to the bot and then come
 back to your console. You'll see a series requests/responses to/from the LLM with a bunch of information such as
 the url, headers, and in the body, the model you called, the messages, temperature, tokens and more.
