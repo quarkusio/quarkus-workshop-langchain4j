@@ -298,7 +298,6 @@ in the background.
 
 After you've generated some data, let's go and explore this data in Grafana. The Dev Service exposes a random port.
 The easiest way to find it is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}) and click on the "Dev Services" menu item.
-The easiest way to find it is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}) and click on the "Dev Services" menu item.
 
 ![Quarkus Dev Services](images/dev-services-observability.png)
 
@@ -312,7 +311,6 @@ create some more chat requests.
 
 ![Grafana Dashboard](images/grafana-dashboard.png)
 
-You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore > Metrics:
 You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore > Metrics:
 
 ![Prometheus Metrics graphs](images/prometheus-metrics.png)
@@ -328,7 +326,6 @@ based on what typical calls to ChatGPT cost.
 
 Let's now take a look at how we can get our traces from Tempo. In the same Query window next the "Outline",
 select `Tempo` instead of Prometheus. Then, click on `Search` next to Query type. You will see a table appear
-below with a list of the latest trace IDs and the service they relate to.
 below with a list of the latest trace IDs and the service they relate to.
 
 ![Tempo search](images/tempo-search.png)
@@ -356,9 +353,7 @@ In this next section, we're going to add Fault Tolerance to our application's LL
 should something go wrong, we are able to handle it gracefully.
 
 Ultimately, calling an LLM is not much different than making traditional REST calls.
-If you're familiar with [MicroProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification
-If you're familiar with [MicroProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification
-for how to implement Fault Tolerance. Quarkus implements this feature with the `quarkus-smallrye-fault-tolerance`
+If you're familiar with [MicroProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification for how to implement Fault Tolerance. Quarkus implements this feature with the `quarkus-smallrye-fault-tolerance`
 extension. Go ahead and add it to the your pom.xml:
 
 ```xml title="pom.xml"
@@ -380,12 +375,10 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 following annotations:
 
 ```java hl_lines="6 8-9 29-31" title="CustomerSupportAgentWebSocket.java"
-```java hl_lines="6 8-9 29-31" title="CustomerSupportAgentWebSocket.java"
 --8<-- "../../step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 We also need to add the fallback method to the file:
-```java hl_lines="5 7 34-42" title="CustomerSupportAgentWebSocket.java"
 ```java hl_lines="5 7 34-42" title="CustomerSupportAgentWebSocket.java"
 --8<-- "../../step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
@@ -407,7 +400,6 @@ It's up to you to decide what your preferred way to create chaos is :).  Once yo
 In this step, we introduced observability to retrieve useful information about the application's state, performance
 and behavior. This is a vital piece for a production-grade application, regardless of whether it's using AI or not.
 We also learned that Quarkus LangChain4j provides relatively straightforward ways to not only add observability
-to the application, but also to consult the data produces by it.
 to the application, but also to consult the data produces by it.
 
 We also introduced chaos engineering techniques to simulate failures in our application and observe how our 
