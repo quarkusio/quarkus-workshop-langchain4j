@@ -331,7 +331,7 @@ create some more chat requests.
 
 ![Grafana Dashboard](images/grafana-dashboard.png)
 
-You can also find an aggregation of all metrics (including the langchain4j relevant ones) by going to Explore > Metrics:
+You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore > Metrics:
 
 ![Prometheus Metrics graphs](images/prometheus-metrics.png)
 
