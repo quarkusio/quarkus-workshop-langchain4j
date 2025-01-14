@@ -373,7 +373,7 @@ In this next section, we're going to add Fault Tolerance to our application's LL
 should something go wrong, we are able to handle it gracefully.
 
 Ultimately, calling an LLM is not much different than making traditional REST calls.
-If you're familiar with [MicrProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification
+If you're familiar with [MicroProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification
 for how to implement Fault Tolerance. Quarkus implements this feature with the `quarkus-smallrye-fault-tolerance`
 extension. Go ahead and add it to the your pom.xml:
 
