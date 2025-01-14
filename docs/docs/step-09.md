@@ -178,18 +178,9 @@ we can create meaningful graphs, dashboards and alerts.
 The (currently) preferred way to gather metrics in Quarkus is to use the micrometer project.
 You can add metrics collection with micrometer by adding the `quarkus-micrometer` extension to the pom.xml.
 You then need to add a collector specific extension to format the metrics accordingly. In the below example
-we have included extensions for Prometheus and general purpose OpenTelemetry.
+we have included the `quarkus-micrometer-registry-otlp` extension for the general purpose OpenTelemetry. This extension imports the quarkus-micrometer as well, so no need to specify it implicitly. Add the following dependency to your code:
 
 ```xml title="pom.xml"
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-micrometer</artifactId>
-        </dependency>
-        <!-- Automatically format metrics for Prometheus -->
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
-        </dependency>
         <!-- Export metrics for OpenTelemetry compatible collectors -->
         <dependency>
             <groupId>io.quarkiverse.micrometer.registry</groupId>
@@ -198,7 +189,7 @@ we have included extensions for Prometheus and general purpose OpenTelemetry.
         </dependency>
 ```
 
-By Quarkus default will collect a variety of useful metrics for you by default,
+By default Quarkus will collect a variety of useful metrics for you by default,
 eg., CPU & memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
 about the LLM interactions as well. Such as eg.:
 
@@ -275,20 +266,9 @@ In our case however, we're going to use a Quarkus Dev Service to capture and vis
 In production, your organization will likely already have tools set up to collect observability data,
 however Quarkus offers a few ways to visualize and search the collected data on your local machine.
 
-#### Quarkus Dev UI
-
-Let's start with the Quarkus Dev UI. Go ahead and open it at [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}.
-If you've added the micrometer and micrometer-registry-prometheus extensions, you will see a "Micrometer metrics" card
-in the extensions menu.
-
-![Micrometer card in Quarkus Dev UI](images/micrometer-card.png)
-
-Go ahead and click on the Prometheus (raw output), and search for "langchain4j". Notice all the metrics collected by
-the LangChain4j extension. Feel free to play around with the application and refresh the metrics to see how they're affected.
-
 #### Quarkus Otel LGTM Dev Service
 
-Quarkus also provides an experimental new Dev Service to help visualize all your OpenTelemetry observability data in a central place.
+Quarkus provides an experimental new Dev Service to help visualize all your OpenTelemetry observability data in a central place.
 It is based on the open source LGTM stack, which stands for Loki (log aggregation), Grafana (graph tool), Tempo (traces aggregation)
 and Prometheus (metrics aggregation). By adding the `quarkus-observability-devservices-gtm` extension, this set of tools will
 automatically (or may we say 'automagically'?) start up in their respective containers and wire up to your application's observability endpoints.
