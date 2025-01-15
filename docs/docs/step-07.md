@@ -148,7 +148,7 @@ Hello, I would like to cancel a booking.
 My name is Speedy McWheels. But, I don't remember the booking ID. Can you list all my future bookings?
 ```
 
-**AI**: Here are your upcoming bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-14 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 3. Booking ID: 3 - From: 2025-10-01 - To: 2025-10-07 Please let me know which booking you would like to cancel.
+**AI**: Here are your upcoming bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 3. Booking ID: 3 - From: 2025-10-01 - To: 2025-10-07 Please let me know which booking you would like to cancel.
 
 ```text title="You"
 I would like to cancel the last one.
@@ -156,7 +156,7 @@ I would like to cancel the last one.
 
 **AI**: Your booking from 2025-10-01 to 2025-10-07 has been successfully cancelled. If you need any further assistance, feel free to let me know!
 
-Here are your current bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-14 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 If you need any further assistance, please let me know!
+Here are your current bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 If you need any further assistance, please let me know!
 
 Alright, let's try now to cancel an invalid booking:
 

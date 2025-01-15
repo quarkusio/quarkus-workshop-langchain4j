@@ -6,7 +6,7 @@ INSERT INTO customer (id, firstName, lastName) VALUES (5, 'Drifty', 'Skidmark');
 
 ALTER SEQUENCE customer_seq RESTART WITH 5;
 
-INSERT INTO booking (id, customer_id, dateFrom, dateTo) VALUES (1, 1, '2025-07-10', '2025-07-14');
+INSERT INTO booking (id, customer_id, dateFrom, dateTo) VALUES (1, 1, '2025-07-10', '2025-07-12');
 INSERT INTO booking (id, customer_id, dateFrom, dateTo) VALUES (2, 1, '2025-08-05', '2025-08-12');
 INSERT INTO booking (id, customer_id, dateFrom, dateTo) VALUES (3, 1, '2025-10-01', '2025-10-07');
 
