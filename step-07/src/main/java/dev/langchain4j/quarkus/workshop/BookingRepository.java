@@ -32,6 +32,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
     }
 
     @Tool("List booking for a customer")
+    @Transactional
     public List<Booking> listBookingsForCustomer(String customerName, String customerSurname) {
         var found = Customer.findByFirstAndLastName(customerName, customerSurname);
 
@@ -42,6 +43,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
 
 
     @Tool("Get booking details")
+    @Transactional
     public Booking getBookingDetails(long bookingId, String customerFirstName, String customerLastName) {
         var found = findByIdOptional(bookingId)
           .orElseThrow(() -> new BookingNotFoundException(bookingId));
