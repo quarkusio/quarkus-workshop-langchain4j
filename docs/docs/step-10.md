@@ -121,10 +121,12 @@ and to launch the jar containing the web application using again all the flag ne
 java -jar --enable-preview --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector target/quarkus-app/quarkus-run.jar
 ```
 
-Now we can go back again to our chatbot and test the RAG pattern as we did in the step 05, but this time running the LLM inference engine directly embedded in our Java application and without using any external services. Open the browser at [http://localhost:8080](http://localhost:8080) and ask a question related to the cancellation policy.
+Now we can go back again to our chatbot and test the RAG pattern as we did in the step 05, but this time running the LLM inference engine directly embedded in our Java application and without using any external services. Open the browser at [http://localhost:8080](http://localhost:8080){target="_blank"} and ask a question related to the cancellation policy.
 
 ```
 What can you tell me about your cancellation policy?
 ```
+
+Note that it might take a bit longer than ChatGPT to answer the question.
 
 ![RAG with Jlama](images/chat-rag-with-jlama.png)
