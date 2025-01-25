@@ -190,8 +190,8 @@ we have included the `quarkus-micrometer-registry-otlp` extension for the genera
 ```
 
 By default Quarkus will collect a variety of useful metrics for you by default,
-eg., CPU & memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
-about the LLM interactions as well. Such as eg.:
+e.g., CPU & memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
+about the LLM interactions as well. Such as:
 
 ```bash title="Example of some of the LangChain4j metrics"
 # HELP langchain4j_aiservices_seconds_max 
@@ -245,7 +245,7 @@ By adding these extensions to your applications, Quarkus does a lot of heavy lif
 and configuring the OpenTelemetry API, including sending traces to a tracing service. Quarkus LangChain4j automatically
 integrates with the OpenTelemetry extension to collect traces regarding your interactions with LLMs as well.
 
-You can configure the opentelemetry tracing functionality by eg. setting
+You can configure the opentelemetry tracing functionality by e.g. setting
 the endpoint and headers for your tracing service, as well as the format of the traces:
 
 ```properties
@@ -374,17 +374,12 @@ and what delay there should be in between the calls
 Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the
 following annotations:
 
-```java hl_lines="6 8-9 29-31" title="CustomerSupportAgentWebSocket.java"
---8<-- "../../step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
-```
-
-We also need to add the fallback method to the file:
-```java hl_lines="5 7 34-42" title="CustomerSupportAgentWebSocket.java"
+```java hl_lines="6 8-9 29-31" title="CustomerSupportAgent.java"
 --8<-- "../../step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 That's all. To test the implemented fault tolerance, we'll need to 'break' our application.
-You can either turn off your wifi, set the @Timeout value to something very low (eg. 10), or
+You can either turn off your wifi, set the @Timeout value to something very low (e.g. 10), or
 you could set the inference server url to something that won't resolve, eg:
 
 ```properties

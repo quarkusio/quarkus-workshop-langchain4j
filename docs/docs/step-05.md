@@ -12,7 +12,7 @@ The RAG pattern is composed of two parts:
 - **Ingestion**: This is the part that stores data in the knowledge base.
 - **Augmentation**: This is the part that adds the retrieved information to the input of the LLM.
 
-We will see these two parts in the next steps, but first let's use [EasyRag](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){target="_blank"} to get started and understand the RAG pattern.
+We will see these two parts in the next steps, but first let's use [EasyRag](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){:target="_blank"} to get started and understand the RAG pattern.
 EasyRag abstracts most of the complexity of implementing the RAG pattern.
 Basically, you drop your data in a configured directory, and _voilà_!
 

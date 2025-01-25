@@ -49,7 +49,7 @@ then set the temperature to`1.5` and ask the question again, observing the diffe
 Applications that require deterministic responses should set the temperature to 0.
 Note that it will note guarantee the same response for the same input, but it will make the responses more predictable.
 
-Applications that require a bit more creativity (eg. to generate text for a story) can set the temperature to 0.3 or higher.
+Applications that require a bit more creativity (e.g. to generate text for a story) can set the temperature to 0.3 or higher.
 
 For now, set the temperature to `1.0`.
 

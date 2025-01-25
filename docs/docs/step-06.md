@@ -49,8 +49,6 @@ In this step, we will use the [bge-small-en-q](https://huggingface.co/neuralmagi
 --8<-- "../../step-06/pom.xml:embedding-bge"
 ```
 
-[//] FIXME: Can this still be used now that we import the dependency version from quarkus-langchain4j-bom???
-
 [//]: # (!!! tip)
 
 [//]: # (    You could also open another terminal and run)
