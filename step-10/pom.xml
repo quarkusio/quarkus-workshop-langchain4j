@@ -83,6 +83,14 @@
     </dependencies>
 
     <build>
+         <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+        
         <plugins>
 
             <plugin>
@@ -158,7 +166,7 @@
                     <artifactId>jlama-native</artifactId>
                     <version>${jlama.version}</version>
                     <!-- set the following classifier to your system's architecture -->
-                    <classifier>linux-x86_64</classifier>
+                    <classifier>${os.detected.classifier}</classifier>
                 </dependency>
             </dependencies>
         </profile>
