@@ -23,6 +23,18 @@ For this reason the first step to do is enabling the `quarkus-maven-plugin` in o
 </configuration>
 ```
 
+We also need to add the `os-maven-plugin` extension under the `build` section in our pom file.
+
+```xml title="pom.xml"
+<extensions>
+    <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+    </extension>
+</extensions>
+```
+
 Then in the same file we must add the necessary dependencies to Jlama and the corresponding quarkus-langchain4j extension. This extension has to be used as an alternative to the openai one, so we could move that dependency in a profile (active by default) and put the Jlama ones into a different profile.
 
 ```xml title="pom.xml"
