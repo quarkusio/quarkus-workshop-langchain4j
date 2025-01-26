@@ -65,7 +65,7 @@ Then in the same file we must add the necessary dependencies to Jlama and the co
                 <groupId>com.github.tjake</groupId>
                 <artifactId>jlama-native</artifactId>
                 <version>${jlama.version}</version>
-                <classifier>linux-x86_64</classifier>
+                <classifier>${os.detected.classifier}</classifier>
             </dependency>
         </dependencies>
     </profile>
