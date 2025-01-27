@@ -1,6 +1,6 @@
 # Quarkus LangChain4j Workshop
 
-Welcome to the Quarkus Lanchchain4j Workshop! 
+Welcome to the Quarkus LangChain4j Workshop! 
 This workshop is designed to help you get started with AI-Infused applications using Quarkus and LangChain4j.
 You are going to learn about:
 
