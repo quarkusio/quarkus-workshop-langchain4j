@@ -142,7 +142,7 @@ The `FileSystemDocumentLoader.loadDocumentsRecursively(documents)` method loads 
 The `EmbeddingStoreIngestor` class is used to ingest the documents into the vector store.
 This is the cornerstone of the ingestion process.
 Configuring it correctly is crucial to the accuracy of the RAG pattern.
-Here, we use a recursive document splitter with a segment size of 100 and an overlap size of 25 (like we had in the previous step).
+Here, we use a recursive document splitter with a segment size of 100 tokens and an overlap size of 25 tokens (like we had in the previous step).
 
 !!! important
     The splitter, the segment size, and the overlap size are crucial to the accuracy of the RAG pattern.
