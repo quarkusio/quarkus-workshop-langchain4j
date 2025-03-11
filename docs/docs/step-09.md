@@ -270,7 +270,7 @@ however Quarkus offers a few ways to visualize and search the collected data on 
 
 Quarkus provides an experimental new Dev Service to help visualize all your OpenTelemetry observability data in a central place.
 It is based on the open source LGTM stack, which stands for Loki (log aggregation), Grafana (graph tool), Tempo (traces aggregation)
-and Prometheus (metrics aggregation). By adding the `quarkus-observability-devservices-gtm` extension, this set of tools will
+and Prometheus (metrics aggregation). By adding the `quarkus-observability-devservices-lgtm` extension, this set of tools will
 automatically (or may we say 'automagically'?) start up in their respective containers and wire up to your application's observability endpoints.
 
 Add the following dependencies in your `pom.xml`:
