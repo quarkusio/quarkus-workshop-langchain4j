@@ -12,9 +12,9 @@ nav:
   - Step 5 - Introduction to the RAG pattern: 'step-05.md'
   - Step 6 - Deconstructing the RAG: 'step-06.md'
   - Step 7 - Function calling and tools: 'step-07.md'
-  - Step 8 - Guardrails: 'step-08.md'
-  - Step 9 - Observability and Fault Tolerance: 'step-09.md'
-  - Step 10 - Serving the model in pure Java with Jlama: 'step-10.md'
+  - Step 8 - Guardrails: 'step-09.md'
+  - Step 9 - Observability and Fault Tolerance: 'step-10.md'
+  - Step 10 - Serving the model in pure Java with Jlama: 'step-11.md'
   - Conclusion: 'conclusion.md'
 
 

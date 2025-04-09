@@ -3,7 +3,6 @@ package dev.langchain4j.quarkus.workshop;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
-import io.quarkiverse.langchain4j.guardrails.OutputGuardrails;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @RegisterAiService
@@ -56,6 +55,5 @@ public interface PromptInjectionDetectionService {
             
             User query: {userQuery}
             """)
-    @OutputGuardrails(NumericOutputSanitizerGuard.class)
     double isInjection(String userQuery);
 }
