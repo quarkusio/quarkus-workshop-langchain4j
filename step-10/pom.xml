@@ -16,7 +16,7 @@
 
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
 
-        <quarkus.platform.version>3.21.4</quarkus.platform.version>
+        <quarkus.platform.version>3.22.1</quarkus.platform.version>
         <quarkus-langchain4j.version>0.26.2</quarkus-langchain4j.version>
         <jlama.version>0.8.4</jlama.version>
     </properties>
