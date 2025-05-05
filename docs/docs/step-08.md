@@ -20,16 +20,15 @@ As before, we recommend you follow the step-by-step guide to understand how it w
 
 ## Create a new MCP Weather Server project
 
-Let's create a Quarkus MCP server from scratch. We're going to add the Quarkus MCP server dependency, and the Rest Client dependency so we can call a remote weather service to retrieve current weather conditions for a given location.
+Let's create a Quarkus MCP server from scratch (or, you can use the step-08-mc-server project directly). We're going to add the Quarkus MCP server dependency, and the Rest Client dependency so we can call a remote weather service to retrieve current weather conditions for a given location.
 
 In your terminal, make sure you're in the main directory of the workshop, and then execute the following command:
 
-TODO: add proper project id and artifact id
 ```shell
- quarkus create app step-08-mcp-server -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson --dry-run
+ quarkus create app dev.langchain4j.quarkus.workshop:quarkus-langchain4j-workshop-08-mcp-server:1.0-SNAPSHOT -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson
 ```
 
-You should now see a new `step-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file in the  folder. This will be our rest client to call the remote weather API. Populate it with the below code:
+You should now see a new `quarkus-langchain4j-workshop-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file in the  folder. This will be our rest client to call the remote weather API. Populate it with the below code:
 
 ```java title="WeatherClient.java
 --8<-- "../../step-08-mcp-server/src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java"
@@ -62,6 +61,8 @@ quarkus.rest-client."weatherclient".uri=https://api.open-meteo.com/
 Easy right? With just a few lines of code, we were able to build a full-blown MCP server that would require much more work with any other stack or language out there! Quarkus FTW!
 
 Now, let's configure our client app to use the newly built MCP server.
+
+
 
 ## A new MCP client dependency
 
@@ -118,8 +119,13 @@ Hello, I would like to retrieve information about my booking.
 My name is Speedy McWheels and my booking id is 2.
 ```
 
-**AI**: TODO add answer
+**AI**: The booking details for Speedy McWheels are as follows: - **Booking ID:** 2 - **Customer Name:** Speedy McWheels - **Rental Dates:** From August 5, 2024, to August 12, 2024 - **Location:** Los Angeles, California Would you like information about the weather for this location, or is there anything else I can assist you with regarding this booking?
 
+```text title="You"
+yes I would like to know if I need any additional equipment
+```
+
+**AI**: The weather in Los Angeles, California, for your rental period is expected to be warm with no snowfall or significant precipitation. Temperatures are likely to vary between 14°C and 30°C. Given this forecast, here’s what you might need: - **Air Conditioning:** As the temperatures can rise up to 30°C, having air conditioning in your rental car would ensure a comfortable drive. - **No Snow Chains Needed:** Since there is no snow forecasted, snow chains won't be needed. If there's anything else you need help with, feel free to ask!
 
 [//]: # (![type:video]&#40;images/chat-booking.mp4&#41;{: style='width: 80%'})
 
