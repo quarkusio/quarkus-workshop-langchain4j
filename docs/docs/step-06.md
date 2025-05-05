@@ -171,7 +171,7 @@ The `create` method handles both the retrieval and the prompt augmentation.
 It uses the `PgVectorEmbeddingStore` bean to retrieve the embeddings and the `BgeSmallEnQuantizedEmbeddingModel` bean to generate the embeddings.
 
 !!! important Using the same embedding model
-        It's crucial to use the same embedding model for the retriever and the ingestor.
+        is crucial to use the same embedding model for the retriever and the ingestor.
         Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.
 
 The `EmbeddingStoreContentRetriever` class is used to retrieve the most relevant segments.
