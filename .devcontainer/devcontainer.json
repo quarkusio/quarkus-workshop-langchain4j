@@ -1,0 +1,26 @@
+{
+    "name": "Devcontainer + Devbox",
+    "image": "mcr.microsoft.com/devcontainers/java",
+    "features": {
+        "ghcr.io/dlouwers/devcontainer-features/devbox:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2.12.0": {}
+    },
+    "forwardPorts": [
+        8080
+    ],
+    "postCreateCommand": "devbox install",
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "jetpack-io.devbox",
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-java-dependency",
+                "vscjava.vscode-java-test",
+                "vscjava.vscode-maven",
+                "redhat.java"
+            ]
+        }
+    }
+}
