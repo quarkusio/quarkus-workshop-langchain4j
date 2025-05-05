@@ -15,113 +15,90 @@ developers can either make their data accessible via MCP servers or construct AI
 
 In this step, we are going to see how to implement both MCP servers and clients in our application. The MCP client will be integrated with our existing code, while the MCP server will be a standalone application that the MCP client's agent will call to retrieve additional context.
 
-The final code is available in the `step-08` folder.
-However, we recommend you follow the step-by-step guide to understand how it works, and the different steps to implement this pattern.
+The final code is available in the `step-08` folder for the client application (the one we've been working on). You will find the MCP server application in the `step-08-mcp-server` folder.
+As before, we recommend you follow the step-by-step guide to understand how it works, and the different steps to implement this pattern.
 
-## A couple of new dependencies
+## Create a new MCP Weather Server project
 
-Before starting, we need to install a couple of new dependencies.
-==Open the `pom.xml` file and add the following dependencies:==
+Let's create a Quarkus MCP server from scratch. We're going to add the Quarkus MCP server dependency, and the Rest Client dependency so we can call a remote weather service to retrieve current weather conditions for a given location.
+
+In your terminal, make sure you're in the main directory of the workshop, and then execute the following command:
+
+TODO: add proper project id and artifact id
+```shell
+ quarkus create app step-08-mcp-server -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson --dry-run
+```
+
+You should now see a new `step-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file in the  folder. This will be our rest client to call the remote weather API. Populate it with the below code:
+
+```java title="WeatherClient.java
+--8<-- "../../step-08-mcp-server/src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java"
+```
+
+Now create an MCP server class that will contain methods annotated with @Tool, just like we did in the previous step for our local function calling. The only difference is that in this case, the MCP Tools we define will be available over the wire using the MCP protocol and a given transport type.
+
+```java title="Weather.java
+--8<-- "../../step-08-mcp-server/src/main/java/dev/langchain4j/quarkus/workshop/Weather.java"
+```
+
+Great! All that's left is to add some configurations to our project. To the application.properties, add the following:
+
+```properties title="application.properties"
+# run the MCP server on a different port than the client
+quarkus.http.port=8081
+
+# Configure MCP server
+quarkus.mcp.server.server-info.name=Weather Service
+quarkus.mcp.server.traffic-logging.enabled=true
+quarkus.mcp.server.traffic-logging.text-limit=100
+
+# Configure the Rest Client
+quarkus.rest-client.logging.scope=request-response
+quarkus.rest-client.follow-redirects=true
+quarkus.rest-client.logging.body-limit=50
+quarkus.rest-client."weatherclient".uri=https://api.open-meteo.com/
+```
+
+Easy right? With just a few lines of code, we were able to build a full-blown MCP server that would require much more work with any other stack or language out there! Quarkus FTW!
+
+Now, let's configure our client app to use the newly built MCP server.
+
+## A new MCP client dependency
+
+Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to install a new dependency.
+==Open the `pom.xml` file and add the following dependency:==
 
 ```xml title="pom.xml"
---8<-- "../../step-07/pom.xml:step-7"
+--8<-- "../../step-08/pom.xml:step-8"
 ```
 
 !!! tip
     You could also open another terminal and run
 
     ```shell
-    ./mvnw quarkus:add-extension -Dextensions="hibernate-orm-panache,jdbc-postgresql"
+    ./mvnw quarkus:add-extension -Dextensions="quarkus-langchain4j-mcp"
     ```
 
-If you are not familiar with Panache, it's a layer on top of Hibernate ORM that simplifies the interaction with the database.
-You can find more information about Panache [here](https://quarkus.io/guides/hibernate-orm-panache){target="_blank"}.
+The LangChain4j MCP dependency will allow us to call remote MCP servers. Remember, MCP servers can be written in Java, like the one we created above, but in fact they can be any kind of technology that exposes the MCP protocol.
 
-## Preparing the entities
+## Configuring the MCP client
 
-Now that we have the dependencies, we can create a couple of entities.
-We are going to store a list of bookings in the database.
-Each booking is associated with a customer.
-A customer can have multiple bookings.
+Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the application.properties file:
 
-==Create the `dev.langchain4j.quarkus.workshop.Customer` entity class with the following content:==
-
-```java title="Customer.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Customer.java"
+```properties title="application.properties"
+quarkus.langchain4j.mcp.generate-tool-provider.transport-type=http
+quarkus.langchain4j.mcp.generate-tool-provider.url=http://localhost:8081/mcp/sse/
 ```
 
-==Then create the `dev.langchain4j.quarkus.workshop.Booking` entity class with the following content:==
+Technically this is all we need to do to enable the LLM interactions to (potentially) use the MCP server. 
 
-```java title="Booking.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Booking.java"
+Let's just add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.
+
+In the CustomerSupportAgent.java file, update the SystemMessage with the following:
+
+```java title="CustomerSupportAgent.java
+--8<-- "../../step-08/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
-
-==While we are at it, let's create the `dev.langchain4j.quarkus.workshop.Exceptions` class containing a set of `Exception`s we will be using:==
-
-```java title="Exceptions.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Exceptions.java"
-```
-
-Alright, we have our entities and exceptions.
-Let's add some data to the database.
-
-==Create the `src/main/resources/import.sql` file with the following content:==
-
-```sql title="import.sql"
---8<-- "../../step-07/src/main/resources/import.sql"
-```
-
-This file will be executed when the application starts, and will insert some data into the database.
-Without specific configuration, it will only be applied in dev mode (`./mvnw quarkus:dev`).
-
-## Defining Tools
-
-Alright, we now have everything we need to create a function that allows the LLM to retrieve data from the database.
-We are going to create a `BookingRepository` class that will contain a set of functions to interact with the database.
-
-==Create the `dev.langchain4j.quarkus.workshop.BookingRepository` class with the following content:==
-
-```java title="BookingRepository.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/BookingRepository.java"
-```
-
-The _repository_ defines three methods:
-
-- `cancelBooking` to cancel a booking. It checks if the booking can be cancelled and deletes it from the database.
-- `listBookingsForCustomer` to list all bookings for a customer.
-- `getBookingDetails` to retrieve the details of a booking.
-
-Each method is annotated with the `@Tool` annotation.
-That is how we tell the LLM that these methods can be called.
-The optional value of the annotation can gives more information about the tool, so the LLM can pick the right one.
-
-## Giving a toolbox to the LLM
-
-==Let's now modify our AI service interface (`dev.langchain4j.quarkus.workshop.CustomerSupportAgent`):==
-
-```java hl_lines="7 18 20-21" title="CustomerSupportAgent.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
-```
-
-We have added the `@Toolbox` annotation to the `chat` method.
-It lists the classes that contain the tools that the LLM can call.
-
-Also note that we have added a new placeholder `{current_date}` in the system prompt, so the LLM knows the current date (and can apply the cancellation policy).
-
-!!! note "Prompt and templates"
-    The system message and user messages can contain placeholders.
-    The placeholders are replaced by the values provided by the application.
-    You can pass parameters to AI service methods and include them in the prompt.
-    It uses the [Qute](https://quarkus.io/guides/qute) template engine underneath.
-    This is a powerful feature to allow you to have advanced template logic.
-
-!!! bug "Tools and streaming responses"
-    There is a known limitation currently when using (blocking) tools with streaming responses.
-    Replace `Multi<String>` with `String` in the AI service method signature to avoid this issue and change the call in the `dev.langchain4j.quarkus.workshop.CustomerSupportAgentWebSocket` accordingly:
-
-    ```java hl_lines="2" title="CustomerSupportAgentWebSocket.java"
-    --8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java:tools"
-    ```
 
 ## Testing the function calling
 
@@ -132,43 +109,26 @@ Open your browser and go to [http://localhost:8080](http://localhost:8080).
 In the chatbot, let's try the following interactions:
 
 ```text title="You"
-Hello, I would like to cancel a booking.
+Hello, I would like to retrieve information about my booking.
 ```
 
 **AI**: Sure, I can help with that. I'll need a bit more information to proceed: 1. Your first and last name to look up the booking. 2. The booking ID associated with your reservation. Please provide these details so I can assist you further.
 
 ```text title="You"
-My name is Speedy McWheels. But, I don't remember the booking ID. Can you list all my future bookings?
+My name is Speedy McWheels and my booking id is 2.
 ```
 
-**AI**: Here are your upcoming bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 3. Booking ID: 3 - From: 2025-10-01 - To: 2025-10-07 Please let me know which booking you would like to cancel.
+**AI**: TODO add answer
 
-```text title="You"
-I would like to cancel the last one.
-```
 
-**AI**: Your booking from 2025-10-01 to 2025-10-07 has been successfully cancelled. If you need any further assistance, feel free to let me know!
-
-Here are your current bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 If you need any further assistance, please let me know!
-
-Alright, let's try now to cancel an invalid booking:
-
-```text title="You"
-Can you cancel my booking starting on 2025-07-10?
-```
-
-**AI**:  Unfortunately, I cannot cancel your booking starting on 2025-07-10 because the booking period is less than 4 days, and cancellations are not permitted for such bookings. If you have any other questions or need further assistance, please let me know!
-
-![type:video](images/chat-booking.mp4){: style='width: 80%'}
+[//]: # (![type:video]&#40;images/chat-booking.mp4&#41;{: style='width: 80%'})
 
 ## Conclusion
 
-In this step, we explored how to implement function calling within our application, enabling us to create _agents_—LLMs that can not only reason but also interact dynamically with the system.
+In this step, we explored how to work with MCP servers and clients within our application, enabling us to create versatile _agents_ that can not only reason but also interact dynamically with remote systems that can provide additional functionality and data to our application.
 
-A function in this context is simply a method from your application annotated with `@Tool`. 
-The actual implementation of the function is entirely customizable.
-For instance, you could extend your chatbot with tools for weather forecasting (by integrating with a remote service), personalized recommendations, or other external data sources.
-Additionally, you can leverage more specialized LLMs, routing specific queries—such as legal or insurance-related questions—to models trained in those domains.
+An MCP server in this context is very similar to the concept of local function calling we explored previously, except it's running in a remote application.
+The actual implementation of the MCP server is entirely customizable.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
 In the [next step](./step-09), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
