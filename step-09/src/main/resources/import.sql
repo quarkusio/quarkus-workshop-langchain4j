@@ -7,7 +7,7 @@ VALUES (3, 'Vroom', 'Lightyear');
 INSERT INTO customer (id, firstName, lastName)
 VALUES (4, 'Turbo', 'Gearshift');
 INSERT INTO customer (id, firstName, lastName)
-VALUES (5, 'Drifty', 'Skidmark');
+VALUES (5, 'Drifty', 'Skiddy');
 
 ALTER SEQUENCE customer_seq RESTART WITH 5;
 
