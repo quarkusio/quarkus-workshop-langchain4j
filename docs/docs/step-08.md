@@ -28,7 +28,7 @@ In your terminal, make sure you're in the main directory of the workshop, and th
  quarkus create app dev.langchain4j.quarkus.workshop:quarkus-langchain4j-workshop-08-mcp-server:1.0-SNAPSHOT -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson
 ```
 
-You should now see a new `quarkus-langchain4j-workshop-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file in the  folder. This will be our rest client to call the remote weather API. Populate it with the below code:
+You should now see a new `quarkus-langchain4j-workshop-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file. This will be our REST client to call the remote weather API. Populate it with the below code:
 
 ```java title="WeatherClient.java
 --8<-- "../../step-08-mcp-server/src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java"
