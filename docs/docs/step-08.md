@@ -133,8 +133,9 @@ yes I would like to know if I need any additional equipment
 
 In this step, we explored how to work with MCP servers and clients within our application, enabling us to create versatile _agents_ that can not only reason but also interact dynamically with remote systems that can provide additional functionality and data to our application.
 
-An MCP server in this context is very similar to the concept of local function calling we explored previously, except it's running in a remote application.
-The actual implementation of the MCP server is entirely customizable.
+An MCP server in this context is very similar to the concept of local function calling we explored previously, except it's running in a remote application. This allows us to interface with (and build) reusable components.
+
+As you could see, the actual implementation of the MCP server is also entirely customizable.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
 In the [next step](./step-09), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
