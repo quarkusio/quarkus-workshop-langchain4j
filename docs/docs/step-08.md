@@ -6,7 +6,7 @@ Basically, we will allow the LLM to act as a true agent, calling a predefined se
 
 ## Model Context Protocol
 
-The Model Context Protocol serves as an open standard, facilitating the creation of secure,
+The [Model Context Protocol](https://modelcontextprotocol.io/introduction) serves as an open standard, facilitating the creation of secure,
 bidirectional links between data repositories and AI-driven tools. The design is uncomplicated;
 developers can either make their data accessible via MCP servers or construct AI applications
 (MCP clients) that interface with these servers.
@@ -60,14 +60,20 @@ quarkus.rest-client."weatherclient".uri=https://api.open-meteo.com/
 
 Easy right? With just a few lines of code, we were able to build a full-blown MCP server that would require much more work with any other stack or language out there! Quarkus FTW!
 
+Go ahead and start the server from the `quarkus-langchain4j-workshop-08-mcp-server` folder in a separate terminal window/tab:
+
+```shell
+ ./mvnw quarkus:dev"
+```
+
 Now, let's configure our client app to use the newly built MCP server.
 
 
 
 ## A new MCP client dependency
 
-Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to install a new dependency.
-==Open the `pom.xml` file and add the following dependency:==
+Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to install a new MCP client dependency.
+==Open the `pom.xml` file in your **main project** (ie. NOT the one containing the MCP Server) and add the following dependency:==
 
 ```xml title="pom.xml"
 --8<-- "../../step-08/pom.xml:step-8"
