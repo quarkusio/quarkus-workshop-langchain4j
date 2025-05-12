@@ -87,8 +87,8 @@ The LangChain4j MCP dependency will allow us to call remote MCP servers. Remembe
 Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the application.properties file:
 
 ```properties title="application.properties"
-quarkus.langchain4j.mcp.generate-tool-provider.transport-type=http
-quarkus.langchain4j.mcp.generate-tool-provider.url=http://localhost:8081/mcp/sse/
+quarkus.langchain4j.mcp.weather.transport-type=http
+quarkus.langchain4j.mcp.weather.url=http://localhost:8081/mcp/sse/
 ```
 
 Technically this is all we need to do to enable the LLM interactions to (potentially) use the MCP server. 
