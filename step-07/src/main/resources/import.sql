@@ -1,13 +1,9 @@
-INSERT INTO customer (id, firstName, lastName)
-VALUES (1, 'Speedy', 'McWheels');
-INSERT INTO customer (id, firstName, lastName)
-VALUES (2, 'Zoom', 'Thunderfoot');
-INSERT INTO customer (id, firstName, lastName)
-VALUES (3, 'Vroom', 'Lightyear');
-INSERT INTO customer (id, firstName, lastName)
-VALUES (4, 'Turbo', 'Gearshift');
-INSERT INTO customer (id, firstName, lastName)
-VALUES (5, 'Drifty', 'Skidmark');
+INSERT INTO customer (id, firstName, lastName) VALUES (1, 'Speedy', 'McWheels');
+INSERT INTO customer (id, firstName, lastName) VALUES (2, 'Zoom', 'Thunderfoot');
+INSERT INTO customer (id, firstName, lastName) VALUES (3, 'Vroom', 'Lightyear');
+INSERT INTO customer (id, firstName, lastName) VALUES (4, 'Turbo', 'Gearshift');
+INSERT INTO customer (id, firstName, lastName) VALUES (5, 'Drifty', 'Skiddy');
+
 
 ALTER SEQUENCE customer_seq RESTART WITH 5;
 
