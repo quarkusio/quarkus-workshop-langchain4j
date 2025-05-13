@@ -36,6 +36,7 @@ jobs:
           - step-08
           - step-09
           - step-10
+          - step-11
 
     name: "Build ${{ matrix.app }}"
     steps:
