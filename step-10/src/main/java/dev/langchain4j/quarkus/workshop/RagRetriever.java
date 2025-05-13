@@ -2,6 +2,7 @@ package dev.langchain4j.quarkus.workshop;
 
 import java.util.List;
 
+import dev.langchain4j.data.message.ChatMessage;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
@@ -29,8 +30,8 @@ public class RagRetriever {
                 .contentRetriever(contentRetriever)
                 .contentInjector(new ContentInjector() {
                     @Override
-                    public UserMessage inject(List<Content> list, UserMessage userMessage) {
-                        StringBuilder prompt = new StringBuilder(userMessage.singleText());
+                    public UserMessage inject(List<Content> list, ChatMessage chatMessage) {
+                        StringBuffer prompt = new StringBuffer(((UserMessage)chatMessage).singleText());
                         prompt.append("\nPlease, only use the following information:\n");
                         list.forEach(content -> prompt.append("- ").append(content.textSegment().text()).append("\n"));
                         return new UserMessage(prompt.toString());

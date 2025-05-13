@@ -30,12 +30,8 @@ public class RagRetriever {
                 .contentRetriever(contentRetriever)
                 .contentInjector(new ContentInjector() {
                     @Override
-                    public ChatMessage inject(List<Content> list, ChatMessage chatMessage) {
-                        return chatMessage;
-                    }
-
-                    public UserMessage inject(List<Content> list, UserMessage userMessage) {
-                        StringBuffer prompt = new StringBuffer(userMessage.singleText());
+                    public UserMessage inject(List<Content> list, ChatMessage chatMessage) {
+                        StringBuffer prompt = new StringBuffer(((UserMessage)chatMessage).singleText());
                         prompt.append("\nPlease, only use the following information:\n");
                         list.forEach(content -> prompt.append("- ").append(content.textSegment().text()).append("\n"));
                         return new UserMessage(prompt.toString());
