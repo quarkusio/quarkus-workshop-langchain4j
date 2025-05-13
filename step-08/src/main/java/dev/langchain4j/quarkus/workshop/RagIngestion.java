@@ -5,7 +5,7 @@ import static dev.langchain4j.data.document.splitter.DocumentSplitters.recursive
 import java.nio.file.Path;
 import java.util.List;
 
-import dev.langchain4j.model.embedding.onnx.HuggingFaceTokenizer;
+import dev.langchain4j.model.embedding.onnx.HuggingFaceTokenCountEstimator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 
@@ -40,7 +40,7 @@ public class RagIngestion {
                 .embeddingStore(store)
                 .embeddingModel(embeddingModel)
                 .documentSplitter(recursive(100, 25,
-                        new HuggingFaceTokenizer()))
+                        new HuggingFaceTokenCountEstimator()))
                 .build();
         ingestor.ingest(list);
         Log.info("Documents ingested successfully");
