@@ -5,7 +5,6 @@ import jakarta.enterprise.context.SessionScoped;
 import dev.langchain4j.service.SystemMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import io.quarkiverse.langchain4j.ToolBox;
-import io.quarkiverse.langchain4j.guardrails.InputGuardrails;
 
 @SessionScoped
 @RegisterAiService
@@ -16,9 +15,14 @@ public interface CustomerSupportAgent {
             You are friendly, polite and concise.
             If the question is unrelated to car rental, you should politely redirect the customer to the right department.
             
+            You will get the location for a booking from the booking table in the database.
+            Figure out the coordinates for that location,
+            and based on the coordinates, call a tool to get the weather for that specific location.
+            You should provide information about specific equipment the car rental booking might need based on the weather, 
+            such as snow chains or air conditioning.
+            
             Today is {current_date}.
             """)
-    @InputGuardrails(PromptInjectionGuard.class)
     @ToolBox(BookingRepository.class)
     String chat(String userMessage);
 }

@@ -19,12 +19,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
     @Tool("Cancel a booking")
     @Transactional
     public void cancelBooking(long bookingId, String customerFirstName, String customerLastName) {
-        Booking booking;
-        try {
-            booking = getBookingDetails(bookingId, customerFirstName, customerLastName);
-        } catch (BookingNotFoundException e) {
-            return;
-        }
+        Booking booking = getBookingDetails(bookingId, customerFirstName, customerLastName);
         // too late to cancel
         if (booking.dateFrom.minusDays(11).isBefore(LocalDate.now())) {
             throw new BookingCannotBeCancelledException(bookingId);

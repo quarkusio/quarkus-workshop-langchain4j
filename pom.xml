@@ -18,7 +18,9 @@
         <module>step-06</module>
         <module>step-07</module>
         <module>step-08</module>
+        <module>step-08-mcp-server</module>
         <module>step-09</module>
         <module>step-10</module>
+        <module>step-11</module>
     </modules>
 </project>

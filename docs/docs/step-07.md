@@ -6,7 +6,7 @@ It's a very popular pattern, but not the only one that can be used.
 In this step, we are going to see another way to give superpowers to the LLM: [Function Calling](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agent-and-tools.html){target="_blank"}.
 Basically, we will allow the LLM to call a function that you have defined in your code.
 The LLM will decide when and with which parameters to call the function.
-Of course, makes sure that you do not allow the LLM to call a function that could be harmful to your system, and make sure to sanitize any input data.
+Of course, make sure that you do not allow the LLM to call a function that could be harmful to your system, and make sure to sanitize any input data.
 
 ## Function calling
 
@@ -178,4 +178,4 @@ For instance, you could extend your chatbot with tools for weather forecasting (
 Additionally, you can leverage more specialized LLMs, routing specific queries—such as legal or insurance-related questions—to models trained in those domains.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
-In the [next step](./step-08.md), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
+In the [next step](./step-08), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.
