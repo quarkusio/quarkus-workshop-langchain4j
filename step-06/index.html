@@ -466,6 +466,21 @@ You are not viewing the latest version.
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Ingesting documents into the vector store">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-memory-embedding-store-for-users-who-cant-use-dev-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      In-memory embedding store (for users who can&rsquo;t use Dev Services)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -672,6 +687,21 @@ You are not viewing the latest version.
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Ingesting documents into the vector store">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-memory-embedding-store-for-users-who-cant-use-dev-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      In-memory embedding store (for users who can&rsquo;t use Dev Services)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -782,7 +812,8 @@ It’s a small model, but it’s enough for our use case.</p>
 In the previous step, we used an <em>in memory</em> store.
 Now we will use a persistent store to keep the embeddings between restarts.</p>
 <p>There are many options to store the embeddings, like <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/redis-store.html" target="_blank">Redis</a>, <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/infinispan-store.html" target="_blank">Infinispan</a>, specialized databases (like <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/chroma-store.html" target="_blank">Chroma</a>), etc.
-Here, we will use the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/pgvector-store.html" target="_blank">PostgreSQL pgVector store</a>, a popular relational database.</p>
+Here, we will use the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/pgvector-store.html" target="_blank">PostgreSQL pgVector store</a>, a popular relational database. If you are not able to run Dev Services with Docker or Podman, you can use 
+<a href="#in-memory-embedding-store">an in-memory embedding store</a>.</p>
 <p><mark>Add the following dependency to your <code>pom.xml</code> file:</mark></p>
 <div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">&lt;dependency&gt;</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.langchain4j<span class="nt">&lt;/groupId&gt;</span>
@@ -882,44 +913,76 @@ There is no one-size-fits-all solution.
 You may need to experiment with different configurations to find the best one for your use case.</p>
 </div>
 <p>Finally, we trigger the ingestion process and log a message when it’s done.</p>
+<h3 id="in-memory-embedding-store-for-users-who-cant-use-dev-services">In-memory embedding store (for users who can’t use Dev Services)<a class="headerlink" href="#in-memory-embedding-store-for-users-who-cant-use-dev-services" title="Permanent link"></a></h3>
+<p>If you are not able to run Dev Services with Docker or Podman, feel free to use the in-memory
+embedding store provided by LangChain4j.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This is just an emergency solution. If you are able to run Dev Services, please do so.</p>
+</div>
+<p>If you followed previous section, remove the pgVector changes. Namely, you have to remove the pgVector dependency from the <code>pom.xml</code> so the in-memory embedding store can be used:</p>
+<div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">&lt;dependency&gt;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.langchain4j<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>quarkus-langchain4j-pgvector<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<p>And create an <code>EmbeddingStore</code> producer in a new class <code>InMemoryEmbeddingStoreProvider</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.EmbeddingStore</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="p">;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.inject.Produces</span><span class="p">;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="nd">@ApplicationScoped</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">InMemoryEmbeddingStoreProvider</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="nd">@Produces</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="nd">@ApplicationScoped</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="n">EmbeddingStore</span><span class="w"> </span><span class="nf">embeddingStore</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InMemoryEmbeddingStore</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>RagIngestion</code> will now work with the in-memory embedding store.</p>
 <h2 id="the-retriever-and-augmentor">The retriever and augmentor<a class="headerlink" href="#the-retriever-and-augmentor" title="Permanent link"></a></h2>
 <p>Now that we have our documents ingested into the vector store, we need to implement the retriever.
 The retriever is responsible for finding the most relevant segments for a given query.
 The augmentor is responsible for extending the prompt with the retrieved segments.</p>
 <p><img alt="The augmentation process" src="../images/augmentation.png"></p>
 <p><mark>Create the <code>dev.langchain4j.quarkus.workshop.RagRetriever</code> class with the following content:</mark></p>
-<div class="highlight"><span class="filename">RagRetriever.java</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="p">;</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.inject.Produces</span><span class="p">;</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.data.message.UserMessage</span><span class="p">;</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.model.embedding.EmbeddingModel</span><span class="p">;</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.DefaultRetrievalAugmentor</span><span class="p">;</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.RetrievalAugmentor</span><span class="p">;</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.Content</span><span class="p">;</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.injector.ContentInjector</span><span class="p">;</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever</span><span class="p">;</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.EmbeddingStore</span><span class="p">;</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RagRetriever</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="nd">@Produces</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">    </span><span class="nd">@ApplicationScoped</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RetrievalAugmentor</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">EmbeddingStore</span><span class="w"> </span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="n">EmbeddingModel</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">contentRetriever</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EmbeddingStoreContentRetriever</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingStore</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">                </span><span class="p">.</span><span class="na">maxResults</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>
-<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">DefaultRetrievalAugmentor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="w">                </span><span class="p">.</span><span class="na">contentRetriever</span><span class="p">(</span><span class="n">contentRetriever</span><span class="p">)</span>
-<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">RagRetriever.java</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="p">;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.inject.Produces</span><span class="p">;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.data.message.UserMessage</span><span class="p">;</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.model.embedding.EmbeddingModel</span><span class="p">;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.DefaultRetrievalAugmentor</span><span class="p">;</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.RetrievalAugmentor</span><span class="p">;</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.Content</span><span class="p">;</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.injector.ContentInjector</span><span class="p">;</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever</span><span class="p">;</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.EmbeddingStore</span><span class="p">;</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RagRetriever</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">    </span><span class="nd">@Produces</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">    </span><span class="nd">@ApplicationScoped</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RetrievalAugmentor</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">EmbeddingStore</span><span class="w"> </span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="n">EmbeddingModel</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">contentRetriever</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EmbeddingStoreContentRetriever</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingStore</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">                </span><span class="p">.</span><span class="na">maxResults</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">DefaultRetrievalAugmentor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="w">                </span><span class="p">.</span><span class="na">contentRetriever</span><span class="p">(</span><span class="n">contentRetriever</span><span class="p">)</span>
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="p">}</span>
 </code></pre></div>
 <p>The <code>create</code> method handles both the retrieval and the prompt augmentation.
 It uses the <code>PgVectorEmbeddingStore</code> bean to retrieve the embeddings and the <code>BgeSmallEnQuantizedEmbeddingModel</code> bean to generate the embeddings.</p>
@@ -946,7 +1009,7 @@ But let’s keep it simple for now.</p>
 <h2 id="testing-the-application">Testing the application<a class="headerlink" href="#testing-the-application" title="Permanent link"></a></h2>
 <p>Let’s see if everything works as expected.
 <mark>If you stopped the application, restart it with the following command:</mark></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>./mvnw<span class="w"> </span>quarkus:dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>./mvnw<span class="w"> </span>quarkus:dev
 </code></pre></div>
 <div class="admonition important">
 <p class="admonition-title">Podman or Docker</p>
@@ -958,7 +1021,7 @@ So make sure you have one of them installed and running.</p>
 This time, let’s test with the chatbot instead:
 <mark>Open your browser and go to <code>http://localhost:8080</code>.
 Ask the question to the chatbot and see if it retrieves the relevant segments and builds a cohesive answer:</mark></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>What can you tell me about your cancellation policy?
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>What can you tell me about your cancellation policy?
 </code></pre></div>
 <h2 id="advanced-rag">Advanced RAG<a class="headerlink" href="#advanced-rag" title="Permanent link"></a></h2>
 <p>In this step, we deconstructed the RAG pattern to understand how it works under the hood.
@@ -970,87 +1033,87 @@ The process can also be extended, especially the retrieval and the augmentation 
 When using multiple retrievers, you can combine the results, use the best one, etc.</p>
 <p>Just to give an example, we are going to customize the content injector, i.e., how the segments are injected into the prompt.
 Right now, you get something like:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&lt;user query&gt;
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Answer using the following information:
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>&lt;segment 1&gt;
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>&lt;segment 2&gt;
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>&lt;segment 3&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>&lt;user query&gt;
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Answer using the following information:
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>&lt;segment 1&gt;
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>&lt;segment 2&gt;
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>&lt;segment 3&gt;
 </code></pre></div>
 <p>We are going to change it to:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>&lt;user query&gt;
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Please, only use the following information:
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>- &lt;segment 1&gt;
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>- &lt;segment 2&gt;
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>- &lt;segment 3&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>&lt;user query&gt;
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>Please, only use the following information:
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>- &lt;segment 1&gt;
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>- &lt;segment 2&gt;
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>- &lt;segment 3&gt;
 </code></pre></div>
 <p><mark>Edit the <code>create</code> method in the <code>RagRetriever</code> class to:</mark></p>
-<div class="highlight"><span class="filename">RagRetriever.java</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="p">;</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.inject.Produces</span><span class="p">;</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.data.message.UserMessage</span><span class="p">;</span>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.model.embedding.EmbeddingModel</span><span class="p">;</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.DefaultRetrievalAugmentor</span><span class="p">;</span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.RetrievalAugmentor</span><span class="p">;</span>
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.Content</span><span class="p">;</span>
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.injector.ContentInjector</span><span class="p">;</span>
-<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever</span><span class="p">;</span>
-<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.EmbeddingStore</span><span class="p">;</span>
-<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RagRetriever</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>
-<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">    </span><span class="nd">@Produces</span>
-<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="w">    </span><span class="nd">@ApplicationScoped</span>
-<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RetrievalAugmentor</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">EmbeddingStore</span><span class="w"> </span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="n">EmbeddingModel</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">contentRetriever</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EmbeddingStoreContentRetriever</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingStore</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a><span class="w">                </span><span class="p">.</span><span class="na">maxResults</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>
-<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">DefaultRetrievalAugmentor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a><span class="w">                </span><span class="p">.</span><span class="na">contentRetriever</span><span class="p">(</span><span class="n">contentRetriever</span><span class="p">)</span>
-<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a><span class="hll"><span class="p">.</span><span class="na">contentInjector</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ContentInjector</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a><span class="hll"><span class="w">    </span><span class="nd">@Override</span>
-</span><a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a><span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">UserMessage</span><span class="w"> </span><span class="nf">inject</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Content</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">UserMessage</span><span class="w"> </span><span class="n">userMessage</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a><span class="hll"><span class="w">        </span><span class="n">StringBuffer</span><span class="w"> </span><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuffer</span><span class="p">(</span><span class="n">userMessage</span><span class="p">.</span><span class="na">singleText</span><span class="p">());</span>
-</span><a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a><span class="hll"><span class="w">        </span><span class="n">prompt</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"\nPlease, only use the following information:\n"</span><span class="p">);</span>
-</span><a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a><span class="hll"><span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">content</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">prompt</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"- "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">content</span><span class="p">.</span><span class="na">textSegment</span><span class="p">().</span><span class="na">text</span><span class="p">()).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">));</span>
-</span><a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a><span class="hll"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserMessage</span><span class="p">(</span><span class="n">prompt</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
-</span><a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
-</span><a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a><span class="hll"><span class="p">})</span>
-</span><a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-15-40" name="__codelineno-15-40" href="#__codelineno-15-40"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-15-41" name="__codelineno-15-41" href="#__codelineno-15-41"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">RagRetriever.java</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="p">;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.inject.Produces</span><span class="p">;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.data.message.UserMessage</span><span class="p">;</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.model.embedding.EmbeddingModel</span><span class="p">;</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.DefaultRetrievalAugmentor</span><span class="p">;</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.RetrievalAugmentor</span><span class="p">;</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.Content</span><span class="p">;</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.injector.ContentInjector</span><span class="p">;</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever</span><span class="p">;</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.store.embedding.EmbeddingStore</span><span class="p">;</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RagRetriever</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="w">    </span><span class="nd">@Produces</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="w">    </span><span class="nd">@ApplicationScoped</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RetrievalAugmentor</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">EmbeddingStore</span><span class="w"> </span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="n">EmbeddingModel</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">contentRetriever</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EmbeddingStoreContentRetriever</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="w">                </span><span class="p">.</span><span class="na">embeddingStore</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a><span class="w">                </span><span class="p">.</span><span class="na">maxResults</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a>
+<a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">DefaultRetrievalAugmentor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a><span class="w">                </span><span class="p">.</span><span class="na">contentRetriever</span><span class="p">(</span><span class="n">contentRetriever</span><span class="p">)</span>
+<a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a><span class="hll"><span class="p">.</span><span class="na">contentInjector</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ContentInjector</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a><span class="hll"><span class="w">    </span><span class="nd">@Override</span>
+</span><a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a><span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">UserMessage</span><span class="w"> </span><span class="nf">inject</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Content</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">UserMessage</span><span class="w"> </span><span class="n">userMessage</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-17-33" name="__codelineno-17-33" href="#__codelineno-17-33"></a><span class="hll"><span class="w">        </span><span class="n">StringBuffer</span><span class="w"> </span><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuffer</span><span class="p">(</span><span class="n">userMessage</span><span class="p">.</span><span class="na">singleText</span><span class="p">());</span>
+</span><a id="__codelineno-17-34" name="__codelineno-17-34" href="#__codelineno-17-34"></a><span class="hll"><span class="w">        </span><span class="n">prompt</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"\nPlease, only use the following information:\n"</span><span class="p">);</span>
+</span><a id="__codelineno-17-35" name="__codelineno-17-35" href="#__codelineno-17-35"></a><span class="hll"><span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">content</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">prompt</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"- "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">content</span><span class="p">.</span><span class="na">textSegment</span><span class="p">().</span><span class="na">text</span><span class="p">()).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">));</span>
+</span><a id="__codelineno-17-36" name="__codelineno-17-36" href="#__codelineno-17-36"></a><span class="hll"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserMessage</span><span class="p">(</span><span class="n">prompt</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+</span><a id="__codelineno-17-37" name="__codelineno-17-37" href="#__codelineno-17-37"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-17-38" name="__codelineno-17-38" href="#__codelineno-17-38"></a><span class="hll"><span class="p">})</span>
+</span><a id="__codelineno-17-39" name="__codelineno-17-39" href="#__codelineno-17-39"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-17-40" name="__codelineno-17-40" href="#__codelineno-17-40"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-17-41" name="__codelineno-17-41" href="#__codelineno-17-41"></a><span class="p">}</span>
 </code></pre></div>
 <p>Now if you ask the question to the chatbot, you will get a different prompt. You can see this if you examine the latest logs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>INFO<span class="w">  </span><span class="o">[</span>io.qua.lan.ope.OpenAiRestApi<span class="nv">$OpenAiClientLogger</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>vert.x-eventloop-thread-0<span class="o">)</span><span class="w"> </span>Request:
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>-<span class="w"> </span>method:<span class="w"> </span>POST
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>-<span class="w"> </span>url:<span class="w"> </span>https://api.openai.com/v1/chat/completions
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>-<span class="w"> </span>headers:<span class="w"> </span><span class="o">[</span>Accept:<span class="w"> </span>text/event-stream<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Authorization:<span class="w"> </span>Be...1f<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Content-Type:<span class="w"> </span>application/json<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>User-Agent:<span class="w"> </span>langchain4j-openai<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>content-length:<span class="w"> </span><span class="m">886</span><span class="o">]</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>-<span class="w"> </span>body:<span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="s2">"model"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"gpt-4o"</span>,
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="s2">"messages"</span><span class="w"> </span>:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="s2">"role"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"system"</span>,
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">    </span><span class="s2">"content"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n"</span>
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">  </span><span class="o">}</span>,<span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="s2">"role"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"user"</span>,
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="hll"><span class="w">    </span><span class="s2">"content"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"What can you tell me about your cancellation policy?\nPlease, only use the following information:\n- 4. Cancellation Policy\n- 4. Cancellation Policy 4.1 Reservations can be cancelled up to 11 days prior to the start of the\n- booking period.\n4.2 If the booking period is less than 4 days, cancellations are not permitted.\n"</span>
-</span><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">  </span><span class="o">}</span><span class="w"> </span><span class="o">]</span>,
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">  </span><span class="s2">"temperature"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.3,
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">  </span><span class="s2">"top_p"</span><span class="w"> </span>:<span class="w"> </span><span class="m">1</span>.0,
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">  </span><span class="s2">"stream"</span><span class="w"> </span>:<span class="w"> </span>true,
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w">  </span><span class="s2">"stream_options"</span><span class="w"> </span>:<span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">    </span><span class="s2">"include_usage"</span><span class="w"> </span>:<span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">  </span><span class="o">}</span>,
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="w">  </span><span class="s2">"max_tokens"</span><span class="w"> </span>:<span class="w"> </span><span class="m">1000</span>,
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="w">  </span><span class="s2">"presence_penalty"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.0,
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="w">  </span><span class="s2">"frequency_penalty"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.0
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="o">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>INFO<span class="w">  </span><span class="o">[</span>io.qua.lan.ope.OpenAiRestApi<span class="nv">$OpenAiClientLogger</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>vert.x-eventloop-thread-0<span class="o">)</span><span class="w"> </span>Request:
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>-<span class="w"> </span>method:<span class="w"> </span>POST
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>-<span class="w"> </span>url:<span class="w"> </span>https://api.openai.com/v1/chat/completions
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>-<span class="w"> </span>headers:<span class="w"> </span><span class="o">[</span>Accept:<span class="w"> </span>text/event-stream<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Authorization:<span class="w"> </span>Be...1f<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Content-Type:<span class="w"> </span>application/json<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>User-Agent:<span class="w"> </span>langchain4j-openai<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>content-length:<span class="w"> </span><span class="m">886</span><span class="o">]</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>-<span class="w"> </span>body:<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="s2">"model"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"gpt-4o"</span>,
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="s2">"messages"</span><span class="w"> </span>:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="s2">"role"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"system"</span>,
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="s2">"content"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n"</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="o">}</span>,<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="s2">"role"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"user"</span>,
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="hll"><span class="w">    </span><span class="s2">"content"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"What can you tell me about your cancellation policy?\nPlease, only use the following information:\n- 4. Cancellation Policy\n- 4. Cancellation Policy 4.1 Reservations can be cancelled up to 11 days prior to the start of the\n- booking period.\n4.2 If the booking period is less than 4 days, cancellations are not permitted.\n"</span>
+</span><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="o">}</span><span class="w"> </span><span class="o">]</span>,
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">  </span><span class="s2">"temperature"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.3,
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">  </span><span class="s2">"top_p"</span><span class="w"> </span>:<span class="w"> </span><span class="m">1</span>.0,
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">  </span><span class="s2">"stream"</span><span class="w"> </span>:<span class="w"> </span>true,
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">  </span><span class="s2">"stream_options"</span><span class="w"> </span>:<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="s2">"include_usage"</span><span class="w"> </span>:<span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">  </span><span class="o">}</span>,
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">  </span><span class="s2">"max_tokens"</span><span class="w"> </span>:<span class="w"> </span><span class="m">1000</span>,
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">  </span><span class="s2">"presence_penalty"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.0,
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">  </span><span class="s2">"frequency_penalty"</span><span class="w"> </span>:<span class="w"> </span><span class="m">0</span>.0
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="o">}</span>
 </code></pre></div>
 <p>This injector is a simple example.
 It does not change the behavior of the RAG pattern.
