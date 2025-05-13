@@ -558,7 +558,7 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 8 - Guardrails
+    Step 8 - Model Context Protocol
   </span>
   
 
@@ -578,7 +578,7 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 9 - Observability and Fault Tolerance
+    Step 9 - Guardrails
   </span>
   
 
@@ -598,7 +598,27 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 10 - Serving the model in pure Java with Jlama
+    Step 10 - Observability and Fault Tolerance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 11 - Serving the model in pure Java with Jlama
   </span>
   
 
@@ -988,7 +1008,7 @@ The augmentor is responsible for extending the prompt with the retrieved segment
 It uses the <code>PgVectorEmbeddingStore</code> bean to retrieve the embeddings and the <code>BgeSmallEnQuantizedEmbeddingModel</code> bean to generate the embeddings.</p>
 <div class="admonition important using the same embedding model">
 <p class="admonition-title">Important</p>
-<div class="highlight"><pre><span></span><code>It's crucial to use the same embedding model for the retriever and the ingestor.
+<div class="highlight"><pre><span></span><code>is crucial to use the same embedding model for the retriever and the ingestor.
 Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.
 </code></pre></div>
 </div>

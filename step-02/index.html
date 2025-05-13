@@ -516,7 +516,7 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 8 - Guardrails
+    Step 8 - Model Context Protocol
   </span>
   
 
@@ -536,7 +536,7 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 9 - Observability and Fault Tolerance
+    Step 9 - Guardrails
   </span>
   
 
@@ -556,7 +556,27 @@ You are not viewing the latest version.
         
   
   <span class="md-ellipsis">
-    Step 10 - Serving the model in pure Java with Jlama
+    Step 10 - Observability and Fault Tolerance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 11 - Serving the model in pure Java with Jlama
   </span>
   
 
@@ -688,6 +708,12 @@ You are not viewing the latest version.
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">quarkus.langchain4j.openai.chat-model.model-name</span><span class="o">=</span><span class="s">gpt-4o</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="na">quarkus.langchain4j.openai.chat-model.log-requests</span><span class="o">=</span><span class="s">true</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="na">quarkus.langchain4j.openai.chat-model.log-responses</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># If you want to use a different provider or run an LLM on your local machine,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># uncomment this line and update the url/port accordingly.</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">#quarkus.langchain4j.openai.base-url=http://localhost:35000/v1</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="na">quarkus.langchain4j.timeout</span><span class="o">=</span><span class="s">1m</span>
 </code></pre></div>
 <p>The <code>quarkus.langchain4j.openai.api-key</code> property is the OpenAI API key. In our case we are configuring it to read from the <code>OPENAI_API_KEY</code> environment variable.</p>
 <p>The rest of the configuration indicates which model is used (<code>gpt-4o</code>) and whether to log the requests and responses to the model in the terminal.</p>
