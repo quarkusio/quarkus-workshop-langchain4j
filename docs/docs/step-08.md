@@ -76,7 +76,7 @@ Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need t
 --8<-- "../../step-08/pom.xml:step-8"
 ```
 
-==!!! tip
+!!! tip
     You could also open another terminal and run
 
     ```shell
@@ -94,7 +94,7 @@ quarkus.langchain4j.mcp.weather.transport-type=http
 quarkus.langchain4j.mcp.weather.url=http://localhost:8081/mcp/sse/
 ```
 
-Notice that we have used the "weather" name. This is just about all we need to do to enable the LLM interactions to (potentially) use the MCP server. 
+Notice that we have used the "weather" name. We will reference this in the AI service to use this particular MCP server. 
 
 We'll add a @McpToolBox("weather") annotation to our AI Service to reference the available MCP server. And we'll add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.
 
