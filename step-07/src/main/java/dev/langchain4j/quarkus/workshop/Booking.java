@@ -13,4 +13,5 @@ public class Booking extends PanacheEntity {
     Customer customer;
     LocalDate dateFrom;
     LocalDate dateTo;
+    String location;
 }

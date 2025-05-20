@@ -25,8 +25,8 @@ public interface CustomerSupportAgent {
             Today is {current_date}.
             """)
     @InputGuardrails(PromptInjectionGuard.class)
-//    @ToolBox(BookingRepository.class)
-    @Timeout(120000)
+    @ToolBox(BookingRepository.class)
+    @Timeout(5000)
     @Retry(maxRetries = 3, delay = 100)
     @Fallback(CustomerSupportAgentFallback.class)
     String chat(String userMessage);

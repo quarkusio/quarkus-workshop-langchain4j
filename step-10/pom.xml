@@ -1,7 +1,7 @@
-<?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.langchain4j</groupId>
@@ -16,9 +16,8 @@
 
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
 
-        <quarkus.platform.version>3.22.1</quarkus.platform.version>
-        <quarkus-langchain4j.version>0.26.2</quarkus-langchain4j.version>
-        <jlama.version>0.8.4</jlama.version>
+        <quarkus.platform.version>3.22.2</quarkus.platform.version>
+        <quarkus-langchain4j.version>0.27.0.CR2</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -43,8 +42,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-embeddings-bge-small-en-q</artifactId>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-openai</artifactId>
         </dependency>
 
         <dependency>
@@ -127,14 +126,6 @@
     </dependencies>
 
     <build>
-         <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.7.1</version>
-            </extension>
-        </extensions>
-        
         <plugins>
 
             <plugin>
@@ -162,56 +153,7 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <jvmArgs>--enable-preview --enable-native-access=ALL-UNNAMED</jvmArgs>
-                    <modules>
-                        <module>jdk.incubator.vector</module>
-                    </modules>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>openai</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>openai</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>io.quarkiverse.langchain4j</groupId>
-                    <artifactId>quarkus-langchain4j-openai</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jlama</id>
-            <activation>
-                <property>
-                    <name>jlama</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>io.quarkiverse.langchain4j</groupId>
-                    <artifactId>quarkus-langchain4j-jlama</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>com.github.tjake</groupId>
-                    <artifactId>jlama-core</artifactId>
-                    <version>${jlama.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.github.tjake</groupId>
-                    <artifactId>jlama-native</artifactId>
-                    <version>${jlama.version}</version>
-                    <classifier>${os.detected.classifier}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

@@ -80,7 +80,8 @@ In the previous step, we used an _in memory_ store.
 Now we will use a persistent store to keep the embeddings between restarts.
 
 There are many options to store the embeddings, like [Redis](https://docs.quarkiverse.io/quarkus-langchain4j/dev/redis-store.html){target="_blank"}, [Infinispan](https://docs.quarkiverse.io/quarkus-langchain4j/dev/infinispan-store.html){target="_blank"}, specialized databases (like [Chroma](https://docs.quarkiverse.io/quarkus-langchain4j/dev/chroma-store.html){target="_blank"}), etc.
-Here, we will use the [PostgreSQL pgVector store](https://docs.quarkiverse.io/quarkus-langchain4j/dev/pgvector-store.html){target="_blank"}, a popular relational database.
+Here, we will use the [PostgreSQL pgVector store](https://docs.quarkiverse.io/quarkus-langchain4j/dev/pgvector-store.html){target="_blank"}, a popular relational database. If you are not able to run Dev Services with Docker or Podman, you can use 
+[an in-memory embedding store](#in-memory-embedding-store).
 
 ==Add the following dependency to your `pom.xml` file:==
 
@@ -151,6 +152,43 @@ Here, we use a recursive document splitter with a segment size of 100 tokens and
     You may need to experiment with different configurations to find the best one for your use case.
 
 Finally, we trigger the ingestion process and log a message when it's done.
+
+### In-memory embedding store (for users who can't use Dev Services)
+
+If you are not able to run Dev Services with Docker or Podman, feel free to use the in-memory
+embedding store provided by LangChain4j.
+
+!!! important
+    This is just an emergency solution. If you are able to run Dev Services, please do so.
+
+If you followed previous section, remove the pgVector changes. Namely, you have to remove the pgVector dependency from the `pom.xml` so the in-memory embedding store can be used:
+
+```xml title="pom.xml"
+--8<-- "../../step-06/pom.xml:pgvector"
+```
+
+And create an `EmbeddingStore` producer in a new class `InMemoryEmbeddingStoreProvider`:
+
+```java
+package dev.langchain4j.quarkus.workshop;
+
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class InMemoryEmbeddingStoreProvider {
+
+    @Produces
+    @ApplicationScoped
+    EmbeddingStore embeddingStore() {
+        return new InMemoryEmbeddingStore<>();
+    }
+}
+```
+
+`RagIngestion` will now work with the in-memory embedding store.
 
 ## The retriever and augmentor
 
