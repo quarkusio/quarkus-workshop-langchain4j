@@ -729,134 +729,137 @@ As before, we recommend you follow the step-by-step guide to understand how it w
 <p>In your terminal, make sure you’re in the main directory of the workshop, and then execute the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w"> </span>quarkus<span class="w"> </span>create<span class="w"> </span>app<span class="w"> </span>dev.langchain4j.quarkus.workshop:quarkus-langchain4j-workshop-08-mcp-server:1.0-SNAPSHOT<span class="w"> </span>-x<span class="w"> </span>quarkus-mcp-server-sse<span class="w"> </span>-x<span class="w"> </span>quarkus-rest-client-jackson
 </code></pre></div>
-<p>You should now see a new <code>quarkus-langchain4j-workshop-08-mcp-server</code> folder. In it, create a new <code>src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java</code> file. This will be our REST client to call the remote weather API. Populate it with the below code:</p>
-<p>```java title=”WeatherClient.java
-package dev.langchain4j.quarkus.workshop;</p>
-<p>import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;</p>
-<p>@Path(“/v1/forecast”)
-@RegisterRestClient(configKey=”weatherclient”)
-public interface WeatherClient {</p>
-<div class="highlight"><pre><span></span><code>@GET
-public String getForecast(
-        @QueryParam("latitude") double latitude,
-        @QueryParam("longitude") double longitude,
-        @QueryParam("forecastdays") int forecastDays,
-        @QueryParam("hourly") String hourly
-);
+<p>You should now see a new <code>quarkus-langchain4j-workshop-08-mcp-server</code> folder. In it, create a new <code>src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java</code> file. This will be our REST client to call the remote weather API. <mark>Populate it with the below code:</mark></p>
+<p></p><div class="highlight"><span class="filename">WeatherClient.java</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.GET</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.Path</span><span class="p">;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.QueryParam</span><span class="p">;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.eclipse.microprofile.rest.client.inject.RegisterRestClient</span><span class="p">;</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nd">@Path</span><span class="p">(</span><span class="s">"/v1/forecast"</span><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nd">@RegisterRestClient</span><span class="p">(</span><span class="n">configKey</span><span class="o">=</span><span class="s">"weatherclient"</span><span class="p">)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">WeatherClient</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="nd">@GET</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getForecast</span><span class="p">(</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">            </span><span class="nd">@QueryParam</span><span class="p">(</span><span class="s">"latitude"</span><span class="p">)</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">latitude</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">            </span><span class="nd">@QueryParam</span><span class="p">(</span><span class="s">"longitude"</span><span class="p">)</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">longitude</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">            </span><span class="nd">@QueryParam</span><span class="p">(</span><span class="s">"forecastdays"</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">forecastDays</span><span class="p">,</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">            </span><span class="nd">@QueryParam</span><span class="p">(</span><span class="s">"hourly"</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">hourly</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
 </code></pre></div>
-<p>}
-<code>Now create an MCP server class that will contain methods annotated with @Tool, just like we did in the previous step for our local function calling. The only difference is that in this case, the MCP Tools we define will be available over the wire using the MCP protocol and a given transport type.</code>java title=”Weather.java
-package dev.langchain4j.quarkus.workshop;
-
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-
-import io.quarkiverse.mcp.server.Tool;
-import io.quarkiverse.mcp.server.ToolArg;
-
-public class Weather {
-
-    @RestClient
-    WeatherClient weatherClient;
-
-    @Tool(description = “Get weather forecast for a location.”)
-    String getForecast(@ToolArg(description = “Latitude of the location”) double latitude,
-                       @ToolArg(description = “Longitude of the location”) double longitude) {
-        return weatherClient.getForecast(
-                latitude,
-                longitude,
-                16,
-                “temperature_2m,snowfall,rain,precipitation,precipitation_probability”);
-    }
-}
-```</p>
-<p>Great! All that’s left is to add some configurations to our project. To the application.properties, add the following:</p>
-<div class="highlight"><span class="filename">application.properties</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># run the MCP server on a different port than the client</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">quarkus.http.port</span><span class="o">=</span><span class="s">8081</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Configure MCP server</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="na">quarkus.mcp.server.server-info.name</span><span class="o">=</span><span class="s">Weather Service</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="na">quarkus.mcp.server.traffic-logging.enabled</span><span class="o">=</span><span class="s">true</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="na">quarkus.mcp.server.traffic-logging.text-limit</span><span class="o">=</span><span class="s">100</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Configure the Rest Client</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="na">quarkus.rest-client.logging.scope</span><span class="o">=</span><span class="s">request-response</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="na">quarkus.rest-client.follow-redirects</span><span class="o">=</span><span class="s">true</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="na">quarkus.rest-client.logging.body-limit</span><span class="o">=</span><span class="s">50</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="na">quarkus.rest-client."weatherclient".uri</span><span class="o">=</span><span class="s">https://api.open-meteo.com/</span>
+Now create an MCP server class that will contain methods annotated with @Tool, just like we did in the previous step for our local function calling. The only difference is that in this case, the MCP Tools we define will be available over the wire using the MCP protocol and a given transport type.
+<div class="highlight"><span class="filename">Weather.java</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.eclipse.microprofile.rest.client.inject.RestClient</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.mcp.server.Tool</span><span class="p">;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.mcp.server.ToolArg</span><span class="p">;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Weather</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="nd">@RestClient</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">WeatherClient</span><span class="w"> </span><span class="n">weatherClient</span><span class="p">;</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nd">@Tool</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Get weather forecast for a location."</span><span class="p">)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">getForecast</span><span class="p">(</span><span class="nd">@ToolArg</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Latitude of the location"</span><span class="p">)</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">latitude</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">                       </span><span class="nd">@ToolArg</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Longitude of the location"</span><span class="p">)</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">longitude</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">weatherClient</span><span class="p">.</span><span class="na">getForecast</span><span class="p">(</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">                </span><span class="n">latitude</span><span class="p">,</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">                </span><span class="n">longitude</span><span class="p">,</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">                </span><span class="mi">16</span><span class="p">,</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">                </span><span class="s">"temperature_2m,snowfall,rain,precipitation,precipitation_probability"</span><span class="p">);</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="p">}</span>
+</code></pre></div>
+<p>Great! All that’s left is to add some configurations to our project. <mark>To the application.properties, add the following:</mark></p>
+<div class="highlight"><span class="filename">application.properties</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># run the MCP server on a different port than the client</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">quarkus.http.port</span><span class="o">=</span><span class="s">8081</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Configure MCP server</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="na">quarkus.mcp.server.server-info.name</span><span class="o">=</span><span class="s">Weather Service</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="na">quarkus.mcp.server.traffic-logging.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="na">quarkus.mcp.server.traffic-logging.text-limit</span><span class="o">=</span><span class="s">100</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Configure the Rest Client</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="na">quarkus.rest-client.logging.scope</span><span class="o">=</span><span class="s">request-response</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="na">quarkus.rest-client.follow-redirects</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="na">quarkus.rest-client.logging.body-limit</span><span class="o">=</span><span class="s">50</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="na">quarkus.rest-client."weatherclient".uri</span><span class="o">=</span><span class="s">https://api.open-meteo.com/</span>
 </code></pre></div>
 <p>Easy right? With just a few lines of code, we were able to build a full-blown MCP server that would require much more work with any other stack or language out there! Quarkus FTW!</p>
-<p>Go ahead and start the server from the <code>quarkus-langchain4j-workshop-08-mcp-server</code> folder in a separate terminal window/tab:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w"> </span>./mvnw<span class="w"> </span>quarkus:dev<span class="s2">"</span>
+<p><mark>Go ahead and start the server from the <code>quarkus-langchain4j-workshop-08-mcp-server</code> folder in a separate terminal window/tab:</mark></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w"> </span>./mvnw<span class="w"> </span>quarkus:dev<span class="s2">"</span>
 </code></pre></div>
 <p>Now, let’s configure our client app to use the newly built MCP server.</p>
 <h2 id="a-new-mcp-client-dependency">A new MCP client dependency<a class="headerlink" href="#a-new-mcp-client-dependency" title="Permanent link"></a></h2>
 <p>Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to install a new MCP client dependency.
 <mark>Open the <code>pom.xml</code> file in your <strong>main project</strong> (ie. NOT the one containing the MCP Server) and add the following dependency:</mark></p>
-<div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;dependency&gt;</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.langchain4j<span class="nt">&lt;/groupId&gt;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>quarkus-langchain4j-mcp<span class="nt">&lt;/artifactId&gt;</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">&lt;/dependency&gt;</span>
+<div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">&lt;dependency&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.langchain4j<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>quarkus-langchain4j-mcp<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>You could also open another terminal and run</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>./mvnw<span class="w"> </span>quarkus:add-extension<span class="w"> </span>-Dextensions<span class="o">=</span><span class="s2">"quarkus-langchain4j-mcp"</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./mvnw<span class="w"> </span>quarkus:add-extension<span class="w"> </span>-Dextensions<span class="o">=</span><span class="s2">"quarkus-langchain4j-mcp"</span>
 </code></pre></div>
 </div>
 <p>The LangChain4j MCP dependency will allow us to call remote MCP servers. Remember, MCP servers can be written in Java, like the one we created above, but in fact they can be any kind of technology that exposes the MCP protocol.</p>
 <h2 id="configuring-the-mcp-client">Configuring the MCP client<a class="headerlink" href="#configuring-the-mcp-client" title="Permanent link"></a></h2>
 <p>Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the application.properties file:</p>
-<div class="highlight"><span class="filename">application.properties</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="na">quarkus.langchain4j.mcp.weather.transport-type</span><span class="o">=</span><span class="s">http</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="na">quarkus.langchain4j.mcp.weather.url</span><span class="o">=</span><span class="s">http://localhost:8081/mcp/sse/</span>
+<div class="highlight"><span class="filename">application.properties</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="na">quarkus.langchain4j.mcp.weather.transport-type</span><span class="o">=</span><span class="s">http</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="na">quarkus.langchain4j.mcp.weather.url</span><span class="o">=</span><span class="s">http://localhost:8081/mcp/sse/</span>
 </code></pre></div>
-<p>Technically this is all we need to do to enable the LLM interactions to (potentially) use the MCP server. </p>
-<p>Let’s just add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.</p>
-<p>In the CustomerSupportAgent.java file, update the SystemMessage with the following:</p>
-<p>```java title=”CustomerSupportAgent.java
-package dev.langchain4j.quarkus.workshop;</p>
-<p>import jakarta.enterprise.context.SessionScoped;</p>
-<p>import dev.langchain4j.service.SystemMessage;
-import io.quarkiverse.langchain4j.RegisterAiService;
-import io.quarkiverse.langchain4j.ToolBox;</p>
-<p>@SessionScoped
-@RegisterAiService
-public interface CustomerSupportAgent {</p>
-<div class="highlight"><pre><span></span><code>@SystemMessage("""
-        You are a customer support agent of a car rental company 'Miles of Smiles'.
-        You are friendly, polite and concise.
-        If the question is unrelated to car rental, you should politely redirect the customer to the right department.
-
-        You will get the location for a booking from the booking table in the database.
-        Figure out the coordinates for that location,
-        and based on the coordinates, call a tool to get the weather for that specific location.
-        You should provide information about specific equipment the car rental booking might need based on the weather, 
-        such as snow chains or air conditioning.
-
-        Today is {current_date}.
-        """)
-@ToolBox(BookingRepository.class)
-String chat(String userMessage);
+<p>Notice that we have used the “weather” name. We will reference this in the AI service to use this particular MCP server. </p>
+<p>We’ll add a @McpToolBox(“weather”) annotation to our AI Service to reference the available MCP server. And we’ll add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.</p>
+<p><mark>In the CustomerSupportAgent.java file, update the SystemMessage with the following:</mark></p>
+<div class="highlight"><span class="filename">CustomerSupportAgent.java</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.mcp.runtime.McpToolBox</span><span class="p">;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.SessionScoped</span><span class="p">;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.RegisterAiService</span><span class="p">;</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.ToolBox</span><span class="p">;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nd">@SessionScoped</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nd">@RegisterAiService</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CustomerSupportAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="s">            You are a customer support agent of a car rental company 'Miles of Smiles'.</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="s">            You are friendly, polite and concise.</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="s">            If the question is unrelated to car rental, you should politely redirect the customer to the right department.</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="s">            You will get the location for a booking from the booking table in the database.</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="s">            Figure out the coordinates for that location,</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="s">            and based on the coordinates, call a tool to get the weather for that specific location.</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="s">            You should provide information about specific equipment the car rental booking might need based on the weather, </span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="s">            such as snow chains or air conditioning.</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="s">            Today is {current_date}.</span>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="s">            """</span><span class="p">)</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">BookingRepository</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">    </span><span class="nd">@McpToolBox</span><span class="p">(</span><span class="s">"weather"</span><span class="p">)</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">userMessage</span><span class="p">);</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="p">}</span>
 </code></pre></div>
-<p>}
-```
-</p>
 <h2 id="testing-the-function-calling">Testing the function calling<a class="headerlink" href="#testing-the-function-calling" title="Permanent link"></a></h2>
 <p>Let’s test the function calling.
-<mark>Make sure the application is running (<code>./mvnw quarkus:dev</code>).</mark>
-
-Open your browser and go to <a href="http://localhost:8080">http://localhost:8080</a>.
-In the chatbot, let’s try the following interactions:
-
-<code>text title="You"
-Hello, I would like to retrieve information about my booking.</code></p>
+<mark>Make sure the application is running (<code>./mvnw quarkus:dev</code>).</mark></p>
+<p>Open your browser and go to <a href="http://localhost:8080">http://localhost:8080</a>.
+In the chatbot, let’s try the following interactions:</p>
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Hello, I would like to retrieve information about my booking.
+</code></pre></div>
 <p><strong>AI</strong>: Sure, I can help with that. I’ll need a bit more information to proceed: 1. Your first and last name to look up the booking. 2. The booking ID associated with your reservation. Please provide these details so I can assist you further.</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>My name is Speedy McWheels and my booking id is 2.
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>My name is Speedy McWheels and my booking id is 2.
 </code></pre></div>
 <p><strong>AI</strong>: The booking details for Speedy McWheels are as follows: - <strong>Booking ID:</strong> 2 - <strong>Customer Name:</strong> Speedy McWheels - <strong>Rental Dates:</strong> From August 5, 2024, to August 12, 2024 - <strong>Location:</strong> Los Angeles, California Would you like information about the weather for this location, or is there anything else I can assist you with regarding this booking?</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>yes I would like to know if I need any additional equipment
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>yes I would like to know if I need any additional equipment
 </code></pre></div>
 <p><strong>AI</strong>: The weather in Los Angeles, California, for your rental period is expected to be warm with no snowfall or significant precipitation. Temperatures are likely to vary between 14°C and 30°C. Given this forecast, here’s what you might need: - <strong>Air Conditioning:</strong> As the temperatures can rise up to 30°C, having air conditioning in your rental car would ensure a comfortable drive. - <strong>No Snow Chains Needed:</strong> Since there is no snow forecasted, snow chains won’t be needed. If there’s anything else you need help with, feel free to ask!</p>
 <h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link"></a></h2>
