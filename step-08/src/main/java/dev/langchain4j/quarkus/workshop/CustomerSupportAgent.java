@@ -1,5 +1,6 @@
 package dev.langchain4j.quarkus.workshop;
 
+import io.quarkiverse.langchain4j.mcp.runtime.McpToolBox;
 import jakarta.enterprise.context.SessionScoped;
 
 import dev.langchain4j.service.SystemMessage;
@@ -24,5 +25,6 @@ public interface CustomerSupportAgent {
             Today is {current_date}.
             """)
     @ToolBox(BookingRepository.class)
+    @McpToolBox("weather")
     String chat(String userMessage);
 }
