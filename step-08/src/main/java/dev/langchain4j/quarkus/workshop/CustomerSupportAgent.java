@@ -16,9 +16,9 @@ public interface CustomerSupportAgent {
             You are friendly, polite and concise.
             If the question is unrelated to car rental, you should politely redirect the customer to the right department.
             
-            You will get the location for a booking from the booking table in the database.
+            You will get the location and start dates for a booking from the booking table in the database.
             Figure out the coordinates for that location,
-            and based on the coordinates, call a tool to get the weather for that specific location.
+            and based on the coordinates and the date, call a tool to get the weather for that specific location on the give date.
             You should provide information about specific equipment the car rental booking might need based on the weather, 
             such as snow chains or air conditioning.
             
