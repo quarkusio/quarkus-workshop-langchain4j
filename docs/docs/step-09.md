@@ -87,13 +87,12 @@ We use an arbitrary threshold of 0.7 to determine whether the user message is li
 
 ==Let's now edit the `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service to use the guardrail:==
 
-<<<<<<< Updated upstream
 ```xml title="pom.xml"
         <!-- Export metrics for OpenTelemetry compatible collectors -->
         <dependency>
             <groupId>io.quarkiverse.micrometer.registry</groupId>
             <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.1</version>
         </dependency>
 ```
 
