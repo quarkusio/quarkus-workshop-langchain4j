@@ -74,26 +74,6 @@
             <artifactId>quarkus-websockets-next</artifactId>
         </dependency>
 
-        <!-- Export metrics for OpenTelemetry compatible collectors -->
-        <dependency>
-            <groupId>io.quarkiverse.micrometer.registry</groupId>
-            <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-opentelemetry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.instrumentation</groupId>
-            <artifactId>opentelemetry-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-observability-devservices-lgtm</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- UI -->
         <dependency>
             <groupId>org.mvnpm</groupId>
