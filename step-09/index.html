@@ -953,12 +953,11 @@ It calls the <code>isInjection</code> method of the AI service with the user mes
 We use an arbitrary threshold of 0.7 to determine whether the user message is likely to be a prompt injection attack.</p>
 <h2 id="using-the-guardrail">Using the guardrail<a class="headerlink" href="#using-the-guardrail" title="Permanent link"></a></h2>
 <p><mark>Let’s now edit the <code>dev.langchain4j.quarkus.workshop.CustomerSupportAgent</code> AI service to use the guardrail:</mark></p>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream
-</p><div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">        </span><span class="cm">&lt;!-- Export metrics for OpenTelemetry compatible collectors --&gt;</span>
+<div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">        </span><span class="cm">&lt;!-- Export metrics for OpenTelemetry compatible collectors --&gt;</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="nt">&lt;dependency&gt;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">            </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.micrometer.registry<span class="nt">&lt;/groupId&gt;</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>quarkus-micrometer-registry-otlp<span class="nt">&lt;/artifactId&gt;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">&lt;version&gt;</span>3.2.4<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">&lt;version&gt;</span>3.3.1<span class="nt">&lt;/version&gt;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
 <p>By default Quarkus will collect a variety of useful metrics for you by default,

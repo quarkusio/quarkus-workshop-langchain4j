@@ -907,7 +907,8 @@ injection attack, but often small models do not take in any consideration the pr
 <a id="__codelineno-6-61" name="__codelineno-6-61" href="#__codelineno-6-61"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="running-the-llm-inference-locally">Running the LLM inference locally<a class="headerlink" href="#running-the-llm-inference-locally" title="Permanent link"></a></h2>
-<p>Now we can go back again to our chatbot and test the RAG pattern as we did in the step 05, but this time running the LLM inference engine directly embedded in our Java application and without using any external services. Open the browser at <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> and ask a question related to the cancellation policy.</p>
+<p>Note that it could take a bit longer for the application to start up with the Quarkus <code>observability and lgtm</code> extensions.
+Feel free to uncomment the extensions from the <code>pom.xml</code> if you want to observe the telemetry data between the AI application and the local model.at <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> and ask a question related to the cancellation policy.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>What can you tell me about your cancellation policy?
 </code></pre></div>
 <p>Note that it might take a bit longer than ChatGPT to answer the question.</p>
