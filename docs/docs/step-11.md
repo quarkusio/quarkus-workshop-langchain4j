@@ -123,7 +123,7 @@ Then, exactly as we did in step 8 for the input guardrail, we can use the output
 ## Running the LLM inference locally
 
 Note that it could take a bit longer for the application to start up with the Quarkus `observability and lgtm` extensions.
-Feel free to uncomment the extensions from the `pom.xml` if you want to observe the telemetry data between the AI application and the local model.at [http://localhost:8080](http://localhost:8080){target="_blank"} and ask a question related to the cancellation policy.
+Feel free to uncomment the extensions from the `pom.xml` if you want to observe the telemetry data between the AI application and the local model at [http://localhost:8080](http://localhost:8080){target="_blank"} and ask a question related to the cancellation policy.
 
 ```
 What can you tell me about your cancellation policy?
