@@ -383,7 +383,7 @@ You can either turn off your wifi, set the @Timeout value to something very low 
 you could set the inference server url to something that won't resolve, eg:
 
 ```properties
-quarkus.langchain4j.openai.base-url=https://api.nonsenseurl.com/v1/
+quarkus.langchain4j.openai.base-url=https://api.example.com/v1/
 ```
 
 It's up to you to decide what your preferred way to create chaos is :).  Once you've done that, run your application and test it with different inputs. You should see that the fallback method is called when the LLM fails to produce a response within the specified timeout. This demonstrates the fault tolerance of our application.
