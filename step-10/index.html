@@ -1126,7 +1126,7 @@ following annotations:</p>
 <p>That’s all. To test the implemented fault tolerance, we’ll need to ‘break’ our application.
 You can either turn off your wifi, set the @Timeout value to something very low (e.g. 10), or
 you could set the inference server url to something that won’t resolve, eg:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="na">quarkus.langchain4j.openai.base-url</span><span class="o">=</span><span class="s">https://api.nonsenseurl.com/v1/</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="na">quarkus.langchain4j.openai.base-url</span><span class="o">=</span><span class="s">https://api.example.com/v1/</span>
 </code></pre></div>
 <p>It’s up to you to decide what your preferred way to create chaos is :).  Once you’ve done that, run your application and test it with different inputs. You should see that the fallback method is called when the LLM fails to produce a response within the specified timeout. This demonstrates the fault tolerance of our application.</p>
 <p><img alt="Fallback is being called when an error occurs" src="../images/fallback.png"></p>
