@@ -282,9 +282,6 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 following annotations:
 
 ```java hl_lines="6 8-9 29-31" title="CustomerSupportAgent.java"
-=======
-```java hl_lines="8 21" title="CustomerSupportAgent.java"
->>>>>>> Stashed changes
 --8<-- "../../step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
