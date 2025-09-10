@@ -1096,33 +1096,30 @@ and what delay there should be in between the calls</li>
 </ul>
 <p>Now all we have to do is annotate our <code>dev.langchain4j.quarkus.workshop.CustomerSupportAgent</code> AI service with the
 following annotations:</p>
-<div class="highlight"><span class="filename">CustomerSupportAgent.java</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="o">=======</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="err">```</span><span class="n">java</span><span class="w"> </span><span class="n">hl_lines</span><span class="o">=</span><span class="s">"8 21"</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">"CustomerSupportAgent.java"</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span><span class="w"> </span><span class="n">Stashed</span><span class="w"> </span><span class="n">changes</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="hll"><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.SessionScoped</span><span class="p">;</span>
-</span><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="hll"><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
-</span><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="hll"><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.RegisterAiService</span><span class="p">;</span>
-</span><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.ToolBox</span><span class="p">;</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.guardrails.InputGuardrails</span><span class="p">;</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="nd">@SessionScoped</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="nd">@RegisterAiService</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CustomerSupportAgent</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="s">            You are a customer support agent of a car rental company 'Miles of Smiles'.</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">            You are friendly, polite and concise.</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">            If the question is unrelated to car rental, you should politely redirect the customer to the right department.</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="s">            Today is {current_date}.</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="s">            """</span><span class="p">)</span>
-<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">    </span><span class="nd">@InputGuardrails</span><span class="p">(</span><span class="n">PromptInjectionGuard</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
-<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">BookingRepository</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
-<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">userMessage</span><span class="p">);</span>
-<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">CustomerSupportAgent.java</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">dev.langchain4j.quarkus.workshop</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.enterprise.context.SessionScoped</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="hll"><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.RegisterAiService</span><span class="p">;</span>
+</span><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.ToolBox</span><span class="p">;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="hll"><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkiverse.langchain4j.guardrails.InputGuardrails</span><span class="p">;</span>
+</span><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="hll">
+</span><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="nd">@SessionScoped</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="nd">@RegisterAiService</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CustomerSupportAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="s">            You are a customer support agent of a car rental company 'Miles of Smiles'.</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s">            You are friendly, polite and concise.</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="s">            If the question is unrelated to car rental, you should politely redirect the customer to the right department.</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">            Today is {current_date}.</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">            """</span><span class="p">)</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">    </span><span class="nd">@InputGuardrails</span><span class="p">(</span><span class="n">PromptInjectionGuard</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">BookingRepository</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">userMessage</span><span class="p">);</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="p">}</span>
 </code></pre></div>
 <p>Basically, we only added the <code>@InputGuardrails(PromptInjectionGuard.class)</code> annotation to the <code>chat</code> method.</p>
 <p>When the application invokes the <code>chat</code> method, the <code>PromptInjectionGuard</code> guardrail will be executed first.
