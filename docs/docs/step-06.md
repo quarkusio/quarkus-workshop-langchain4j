@@ -305,7 +305,7 @@ INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread
 - url: https://api.openai.com/v1/chat/completions
 - headers: [Accept: text/event-stream], [Authorization: Be...1f], [Content-Type: application/json], [User-Agent: langchain4j-openai], [content-length: 886]
 - body: {
-  "model" : "gpt-4o",
+  "model" : "gpt-4o-mini",
   "messages" : [ {
     "role" : "system",
     "content" : "You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n"
