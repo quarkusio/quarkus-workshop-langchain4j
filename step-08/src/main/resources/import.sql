@@ -14,7 +14,7 @@ ALTER SEQUENCE customer_seq RESTART WITH 5;
 INSERT INTO booking (id, customer_id, dateFrom, dateTo, location)
 VALUES (1, 1, '2025-09-13', '2025-09-15', 'Verbier, Switzerland');
 INSERT INTO booking (id, customer_id, dateFrom, dateTo, location)
-VALUES (2, 1, '2025-09-17', '2025-09-19', 'Sao Paul, Brazil');
+VALUES (2, 1, '2025-09-17', '2025-09-19', 'Sao Paulo, Brazil');
 INSERT INTO booking (id, customer_id, dateFrom, dateTo, location)
 VALUES (3, 1, '2025-10-06', '2025-10-10', 'Antwerp, Belgium');
 
