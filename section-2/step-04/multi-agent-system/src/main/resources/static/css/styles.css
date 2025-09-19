@@ -1,0 +1,228 @@
+/* Car Management UI Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.section {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+.feedback-input {
+    width: 200px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.return-button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.return-button:hover {
+    background-color: #45a049;
+}
+
+/* Status pills */
+.status-pill {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.85em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10rem;
+    color: white;
+}
+
+.status-pill-rented {
+    background-color: #ff9800; /* Orange */
+}
+
+.status-pill-carwash {
+    background-color: #03a9f4; /* Blue */
+}
+
+.status-pill-maintenance {
+    background-color: #f44336; /* Red */
+}
+
+.status-pill-available {
+    background-color: #4caf50; /* Green */
+}
+
+.status-pill-disposition {
+    background-color: #9c27b0; /* Purple */
+}
+
+/* Section background colors matching status colors */
+#rental-return-section {
+    border-left: 5px solid #ffecb3;
+}
+
+#car-wash-section {
+    border-left: 5px solid #b3e0ff;
+}
+
+#maintenance-section {
+    border-left: 5px solid #ffb3b3;
+}
+
+#disposition-section {
+    border-left: 5px solid #e1bee7;
+}
+
+/* Tabs styling */
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+    padding: 10px 15px;
+    background-color: #f2f2f2;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+}
+
+.tab-button:hover {
+    background-color: #e9e9e9;
+}
+
+.tab-button.active {
+    background-color: white;
+    color: #333;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tab content border colors */
+#rental-return-section.tab-content {
+    border-top: 3px solid #ffecb3;
+}
+
+#car-wash-section.tab-content {
+    border-top: 3px solid #b3e0ff;
+}
+
+#maintenance-section.tab-content {
+    border-top: 3px solid #ffb3b3;
+}
+
+/* Sortable table styles */
+.sortable {
+    cursor: pointer;
+    position: relative;
+}
+
+.sortable:hover {
+    background-color: #e6e6e6;
+}
+
+.sort-icon {
+    font-size: 0.8em;
+    margin-left: 5px;
+    opacity: 0.5;
+}
+
+.sort-asc .sort-icon::after {
+    content: "↑";
+}
+
+.sort-desc .sort-icon::after {
+    content: "↓";
+}
+
+.sort-asc .sort-icon, .sort-desc .sort-icon {
+    opacity: 1;
+}
+
+/* Filter styles */
+.filter-container {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 14px;
+}
+
+.filter-button {
+    padding: 8px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-button:hover {
+    background-color: #d32f2f;
+}
