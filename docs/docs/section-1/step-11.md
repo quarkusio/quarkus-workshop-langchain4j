@@ -111,13 +111,13 @@ and return together with that number a long explanation of how it calculated the
 The [output guardrails](https://docs.quarkiverse.io/quarkus-langchain4j/dev/guardrails.html#_output_guardrails) provided by the Quarkus-LangChain4j extension are functions invoked once the LLM has produced its output, allowing to rewrite, or even block, that output before passing it downstream. In our case we can try to sanitize the hallucinated LLM response and extract a single number from it by creating the `dev.langchain4j.quarkus.workshop.NumericOutputSanitizerGuard` class with the following content:==
 
 ```java title="NumericOutputSanitizerGuard.java"
---8<-- "../../step-11/src/main/java/dev/langchain4j/quarkus/workshop/NumericOutputSanitizerGuard.java"
+--8<-- "../../section-1/step-11/src/main/java/dev/langchain4j/quarkus/workshop/NumericOutputSanitizerGuard.java"
 ```
 
 Then, exactly as we did in step 8 for the input guardrail, we can use the output guardrail that we just created in the `PromptInjectionDetectionService` by simply annotating its `isInjection` method with `@OutputGuardrails(NumericOutputSanitizerGuard.class)`.
 
 ```java hl_lines="6 59" title="PromptInjectionDetectionService.java"
---8<-- "../../step-11/src/main/java/dev/langchain4j/quarkus/workshop/PromptInjectionDetectionService.java"
+--8<-- "../../section-1/step-11/src/main/java/dev/langchain4j/quarkus/workshop/PromptInjectionDetectionService.java"
 ```
 
 ## Running the LLM inference locally
@@ -131,4 +131,4 @@ What can you tell me about your cancellation policy?
 
 Note that it might take a bit longer than ChatGPT to answer the question.
 
-![RAG with Jlama](images/chat-rag-with-jlama.png)
+![RAG with Jlama](../images/chat-rag-with-jlama.png)

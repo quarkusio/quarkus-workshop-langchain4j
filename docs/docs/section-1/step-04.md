@@ -1,4 +1,4 @@
-# Step 04 - System messages
+# Step 4 - System messages
 
 In [step 1](step-01.md), we saw two types of messages:
 
@@ -22,7 +22,7 @@ To add a system message, we need to enhance our `CustomerSupportAgent` interface
 ==Update the `CustomerSupportAgent` interface content to become:==
 
 ```java hl_lines="12-16" title="CustomerSupportAgent.java"
---8<-- "../../step-04/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-04/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 If you do not follow the workshop, the `step-04` directory already contains the updated `CustomerSupportAgent`
@@ -55,7 +55,7 @@ Make sure the application is running and open the browser at [http://localhost:8
 ```
 Tell me a story
 ```
-![Out of context](images/out-of-context.png)
+![Out of context](../images/out-of-context.png)
 
 The AI should respond with a message that it is out of context.
 You can relatively easily work around this by asking for a _car rental story_, but there are other solution to this

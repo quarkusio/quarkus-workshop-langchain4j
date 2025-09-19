@@ -5,17 +5,18 @@ docs_dir: docs
 
 nav:
   - Requirements: 'requirements.md'
-  - Step 1 - Introduction to Quarkus LangChain4j: 'step-01.md'
-  - Step 2 - Playing with model parameters: 'step-02.md'
-  - Step 3 - Streaming responses: 'step-03.md'
-  - Step 4 - Using system messages: 'step-04.md'
-  - Step 5 - Introduction to the RAG pattern: 'step-05.md'
-  - Step 6 - Deconstructing the RAG: 'step-06.md'
-  - Step 7 - Function calling and tools: 'step-07.md'
-  - Step 8 - Model Context Protocol: 'step-08.md'
-  - Step 9 - Guardrails: 'step-09.md'
-  - Step 10 - Observability and Fault Tolerance: 'step-10.md'
-  - Step 11 - Serving the model in pure Java with Jlama: 'step-11.md'
+  - Section 1 - AI Apps:
+    - Step 1 - Introduction to Quarkus LangChain4j: 'section-1/step-01.md'
+    - Step 2 - Playing with model parameters: 'section-1/step-02.md'
+    - Step 3 - Streaming responses: 'section-1/step-03.md'
+    - Step 4 - Using system messages: 'section-1/step-04.md'
+    - Step 5 - Introduction to the RAG pattern: 'section-1/step-05.md'
+    - Step 6 - Deconstructing the RAG: 'section-1/step-06.md'
+    - Step 7 - Function calling and tools: 'section-1/step-07.md'
+    - Step 8 - Model Context Protocol: 'section-1/step-08.md'
+    - Step 9 - Guardrails: 'section-1/step-09.md'
+    - Step 10 - Observability and Fault Tolerance: 'section-1/step-10.md'
+    - Step 11 - Serving the model in pure Java with Jlama: 'section-1/step-11.md'
   - Conclusion: 'conclusion.md'
 
 

@@ -133,6 +133,6 @@ To download the Docker images, you can run one of the following commands:
 
 ### Import the project in your IDE
 
-Then, open the project from the `step-01` directory in your IDE and use that directory throughout the workshop. If you get stuck anywhere and would like to move on, simply switch to the `step-xx` directory of the last step you completed.
+Then, open the project from the `section-1/step-01` directory in your IDE and use that directory throughout the workshop. If you get stuck anywhere and would like to move on, simply switch to the `step-xx` directory of the last step you completed.
 
-Once done, you can move on to the next step: [Step 1](step-01.md).
+Once done, you can move on to the next step: [Step 1](section-1/step-01.md).

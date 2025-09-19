@@ -1,8 +1,8 @@
-# Step 02 - LLM configuration
+# Step 2 - LLM configuration
 
 In this step, we will play with various configurations of the language model (LLM) that we will use in the subsequent steps.
 
-You can either use the code from the step-01 and continue from there, or check the final code of the step located in the `step-02` directory.
+You can either use the code from `step-01` and continue from there, or check the final code of the step located in the `step-02` directory.
 
 ??? important "Do not forget to close the application"
     If you have the application running from the previous step and decide to use the `step-02` directory, make sure to stop it (CTRL+C) before continuing.
@@ -12,7 +12,7 @@ You can either use the code from the step-01 and continue from there, or check t
 The application is configured from the `src/main/resources/application.properties` file:
 
 ```properties title="application.properties"
---8<-- "../../step-01/src/main/resources/application.properties"
+--8<-- "../../section-1/step-01/src/main/resources/application.properties"
 ```
 
 The `quarkus.langchain4j.openai.api-key` property is the OpenAI API key. In our case we are configuring it to read from the `OPENAI_API_KEY` environment variable.
@@ -99,7 +99,7 @@ Change the value to `0` and you will likely see the model repeat the word 50 tim
 ==After playing with the configuration, you can set it to the following values:==
 
 ```properties title="application.properties"
---8<-- "../../step-02/src/main/resources/application.properties"
+--8<-- "../../section-1/step-02/src/main/resources/application.properties"
 ```
 
 Let's now switch to the [next step](./step-03.md)!
