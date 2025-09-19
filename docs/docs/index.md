@@ -16,12 +16,12 @@ You are going to learn about:
 ## Workshop Structure
 
 During this workshop we will create an LLM-powered customer support agent chatbot for a car rental company.
-The workshop is divided into 10 steps.
+The workshop is divided into 2 sections. The first section is focused on building AI apps and has 11 steps. The second section focuses on build agentic workflows and has 4 steps.
 Each step builds on the previous one, adding new features and functionality.
 
-We start from the base functionality (step 1) and add features in the subsequent steps.
+In each section, we start from the base functionality (step-01) and add features in the subsequent steps.
 The result after each step is located in a separate directory (`step-XX`).
-The final solution is in the `step-09` directory.
+The final solution for `section-1` is in the `section-1/step-11` directory. The final solution for `section-2` is in the `section-2/step-04` directory.
 
 We recommend to start by checking out the _main_ branch and then opening the project from `step-01` in your IDE and using that directory throughout the workshop.
 The other option is to make a copy of it.
