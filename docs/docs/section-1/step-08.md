@@ -1,4 +1,4 @@
-# Step 8 - Agentic AI - Model Context Protocol
+# Step 08 - Agentic AI - Model Context Protocol
 
 Building on top of the Function Calling concept of the previous step, let's explore how we can make this idea more distributed with the [Model Context Protocol](https://docs.quarkiverse.io/quarkus-mcp-server/dev/index.html) pattern.
 

@@ -1,4 +1,4 @@
-# Step 4 - System messages
+# Step 04 - System messages
 
 In [step 1](step-01.md), we saw two types of messages:
 

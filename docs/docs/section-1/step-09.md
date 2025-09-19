@@ -1,4 +1,4 @@
-# Step 9 - Guardrails
+# Step 09 - Guardrails
 
 In the previous step we introduced function calling, enabling the LLM to interact with the application.
 While this feature provides a powerful mechanism to extend the chatbot's capabilities, it also introduces new risks,
