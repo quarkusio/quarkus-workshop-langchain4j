@@ -1,4 +1,4 @@
-# Step 2 - Composing Simple Agent Workflows
+# Step 02 - Composing Simple Agent Workflows
 
 ## Tracking the Condition of Cars
 
