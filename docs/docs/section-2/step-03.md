@@ -1,4 +1,4 @@
-# Step 3 - Building nested agent workflows
+# Step 03 - Building nested agent workflows
 
 ## Expanding requirements
 

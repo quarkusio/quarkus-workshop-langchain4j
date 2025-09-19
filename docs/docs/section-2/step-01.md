@@ -1,4 +1,4 @@
-# Step 1 - Implementing AI Agents
+# Step 01 - Implementing AI Agents
 
 ## A new challenge
 
