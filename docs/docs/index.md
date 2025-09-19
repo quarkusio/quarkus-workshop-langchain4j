@@ -16,7 +16,7 @@ You are going to learn about:
 ## Workshop Structure
 
 During this workshop we will create an LLM-powered customer support agent chatbot for a car rental company.
-The workshop is divided into 2 sections. The first section is focused on building AI apps and has 11 steps. The second section focuses on build agentic workflows and has 4 steps.
+The workshop is divided into 2 sections. The first section is focused on building AI apps and has 11 steps. The second section focuses on building agentic workflows and has 4 steps.
 Each step builds on the previous one, adding new features and functionality.
 
 In each section, we start from the base functionality (step-01) and add features in the subsequent steps.
