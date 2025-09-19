@@ -6,6 +6,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+// --8<-- [start:car-management]
 /**
  * REST resource for car management operations.
  */
@@ -64,5 +65,5 @@ public class CarManagementResource {
         }
     }
 }
-
+// --8<-- [end:car-management]
 

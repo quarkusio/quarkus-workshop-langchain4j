@@ -14,6 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.annotation.PostConstruct;
 
+// --8<-- [start:carManagementService]
 /**
  * Service for managing car returns from various operations.
  */
@@ -116,5 +117,6 @@ public class CarManagementService {
         return required;
     }
 }
+// --8<-- [end:carManagementService]
 
 

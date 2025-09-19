@@ -64,9 +64,10 @@ public class CarManagementResource {
         }
     }
     
+    // --8<-- [start:maintenanceReturn]
     /**
      * Process a car return from maintenance.
-     * 
+     *
      * @param carNumber The car number
      * @param maintenanceFeedback Optional maintenance feedback
      * @return Result of the processing
@@ -86,6 +87,7 @@ public class CarManagementResource {
                     .build();
         }
     }
+    // --8<-- [end:maintenanceReturn]
 }
 
 

@@ -40,6 +40,7 @@ public class CarManagementService {
         carWashAgent = createCarWashAgent();
     }
 
+// --8<-- [start:createCarWashAgent]
     private CarWashAgent createCarWashAgent() {
         // CarWashAgent
         CarWashAgent carWashAgent = AgenticServices
@@ -51,6 +52,7 @@ public class CarManagementService {
 
         return carWashAgent;
     }
+// --8<-- [end:createCarWashAgent]
 
     /**
      * Process a car return from any operation.

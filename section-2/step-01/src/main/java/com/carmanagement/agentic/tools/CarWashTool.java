@@ -7,6 +7,7 @@ import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
+// --8<-- [start:CarWashTool]
 /**
  * Tool for requesting car wash operations.
  */
@@ -57,6 +58,7 @@ public class CarWashTool {
         System.out.println("CarWashTool result: " + result);
         return result;
     }
+// --8<-- [end:CarWashTool]
 
     private String generateCarWashSummary(
             Integer carNumber,

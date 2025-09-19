@@ -11,6 +11,7 @@ public interface ActionWorkflow {
     /**
      * Runs the appropriate action agent based on the feedback analysis.
      */
+    // --8<-- [start:actionWorkflow]
     @Agent
     String processAction(
             @V("carMake") String carMake,
@@ -21,6 +22,7 @@ public interface ActionWorkflow {
             @V("carWashRequest") String carWashRequest,
             @V("maintenanceRequest") String maintenanceRequest,
             @V("dispositionRequest") String dispositionRequest);
+    // --8<-- [end:actionWorkflow]
 
 }
 

@@ -119,12 +119,14 @@ public class CarManagementService {
                 .build();
 
 
+        // --8<-- [start:sequenceWorkflow]
         // CarProcessingWorkflow
         CarProcessingWorkflow carProcessingWorkflow = AgenticServices
                 .sequenceBuilder(CarProcessingWorkflow.class)
                 .subAgents(feedbackWorkflow, actionWorkflow, carConditionFeedbackAgent)
                 .outputName("carProcessingAgentResult")
                 .build();
+        // --8<-- [end:sequenceWorkflow]
 
         return carProcessingWorkflow;
     }
