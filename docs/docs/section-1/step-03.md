@@ -1,4 +1,4 @@
-# Step 03 - Streaming responses
+# Step 3 - Streaming responses
 
 LLM responses can be long.
 Imagine asking the model to generate a story. It could potentially produce hundreds of lines of text.
@@ -19,14 +19,14 @@ The first step is to ask the LLM to return the response in chunks.
 Initially, our AI service looked like this:
 
 ```java title="CustomerSupportAgent.java"
---8<-- "../../step-02/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-02/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 Note that the return type of the `chat` method is `String`.
 ==We will change it to `Multi<String>` to indicate that the response will be streamed instead of returned synchronously.==
 
 ```java title="CustomerSupportAgent.java"
---8<-- "../../step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 A `Multi<String>` is a stream of strings.
@@ -42,13 +42,13 @@ But, we need to modify our websocket endpoint to handle this stream and send it 
 Currently, our websocket endpoint looks like this:
 
 ```java title="CustomerSupportAgentWebSocket.java"
---8<-- "../../step-02/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
+--8<-- "../../section-1/step-02/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
 ```
 
 ==Let's modify the `onTextMessage` method to send the response to the client as it arrives.==
 
 ```java hl_lines="22-25" title="CustomerSupportAgentWebSocket.java"
---8<-- "../../step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
+--8<-- "../../section-1/step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
 ```
 
 That's it!
@@ -69,6 +69,6 @@ Tell me a story containing 500 words
 
 and you will see the response being displayed as it arrives.
 
-![type:video](images/streaming.mp4){autoplay=true}
+![type:video](../images/streaming.mp4){autoplay=true}
 
 Let's now switch to the [next step](./step-04.md)!

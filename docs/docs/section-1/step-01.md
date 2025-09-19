@@ -1,4 +1,4 @@
-# Step 01 - Introduction to Quarkus LangChain4j
+# Step 1 - Introduction to Quarkus LangChain4j
 
 To get started, make sure you use the `step-01` directory.
 
@@ -23,7 +23,7 @@ Run the application with the following command:
 This will bring up the page at [http://localhost:8080](http://localhost:8080){target="_blank"}. 
 Open it and click the red robot icon in the bottom right corner to start chatting with the chatbot.
 
-![Miles of Smiles UI](images/ui-no-chatbot.png)
+![Miles of Smiles UI](../images/ui-no-chatbot.png)
 
 ## Chatting with the chatbot
 
@@ -38,7 +38,7 @@ User: What is my name?
 AI: Your name is Clement.
 ```
 
-![An example of discussion with the chatbot](images/ui.png)
+![An example of discussion with the chatbot](../images/ui.png)
 
 This is how memory is built up for LLMs.
 ==In the terminal, you can observe the calls that are made to OpenAI behind the scenes. Notice the roles 'user' (`UserMessage`) and 'assistant' (`AiMessage`).==
@@ -137,7 +137,7 @@ It uses a _WebSocket_, this is why you can also see the following dependency in 
 If you now open the `src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java`  file, you can see how the web socket is implemented:
 
 ```java title="CustomerSupportAgentWebSocket.java"
---8<-- "../../step-01/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
+--8<-- "../../section-1/step-01/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java"
 ```
 
 Basically, it:
@@ -148,7 +148,7 @@ Basically, it:
 Let's now look at the cornerstone of the application, the `CustomerSupportAgent` interface.
 
 ```java title="CustomerSupportAgent.java"
---8<-- "../../step-01/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-01/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 This interface is annotated with `@RegisterAiService` to indicate that it is an AI service.

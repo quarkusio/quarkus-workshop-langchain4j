@@ -1,4 +1,4 @@
-# Step 07 - Function calling and Tools
+# Step 7 - Function calling and Tools
 
 The RAG pattern allows passing knowledge to the LLM based on your own data.
 It's a very popular pattern, but not the only one that can be used.
@@ -17,7 +17,7 @@ Then the LLM can decide, if it wants, to call one of these functions with the pa
 The application receives the method invocation request and executes the function with the parameters provided by the LLM.
 The result is sent back to the LLM, which can use it to continue the conversation, and compute the next message.
 
-![Function calling](./images/function-calling.png)
+![Function calling](../images/function-calling.png)
 
 In this step, we are going to see how to implement function calling in our application.
 We will set up a database and create a function that allows the LLM to retrieve data (bookings, customers...) from the database.
@@ -31,7 +31,7 @@ Before starting, we need to install a couple of new dependencies.
 ==Open the `pom.xml` file and add the following dependencies:==
 
 ```xml title="pom.xml"
---8<-- "../../step-07/pom.xml:step-7"
+--8<-- "../../section-1/step-07/pom.xml:step-7"
 ```
 
 !!! tip
@@ -54,19 +54,19 @@ A customer can have multiple bookings.
 ==Create the `dev.langchain4j.quarkus.workshop.Customer` entity class with the following content:==
 
 ```java title="Customer.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Customer.java"
+--8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/Customer.java"
 ```
 
 ==Then create the `dev.langchain4j.quarkus.workshop.Booking` entity class with the following content:==
 
 ```java title="Booking.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Booking.java"
+--8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/Booking.java"
 ```
 
 ==While we are at it, let's create the `dev.langchain4j.quarkus.workshop.Exceptions` class containing a set of `Exception`s we will be using:==
 
 ```java title="Exceptions.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/Exceptions.java"
+--8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/Exceptions.java"
 ```
 
 Alright, we have our entities and exceptions.
@@ -75,7 +75,7 @@ Let's add some data to the database.
 ==Create the `src/main/resources/import.sql` file with the following content:==
 
 ```sql title="import.sql"
---8<-- "../../step-07/src/main/resources/import.sql"
+--8<-- "../../section-1/step-07/src/main/resources/import.sql"
 ```
 
 This file will be executed when the application starts, and will insert some data into the database.
@@ -89,7 +89,7 @@ We are going to create a `BookingRepository` class that will contain a set of fu
 ==Create the `dev.langchain4j.quarkus.workshop.BookingRepository` class with the following content:==
 
 ```java title="BookingRepository.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/BookingRepository.java"
+--8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/BookingRepository.java"
 ```
 
 The _repository_ defines three methods:
@@ -107,7 +107,7 @@ The optional value of the annotation can gives more information about the tool, 
 ==Let's now modify our AI service interface (`dev.langchain4j.quarkus.workshop.CustomerSupportAgent`):==
 
 ```java hl_lines="7 18 20-21" title="CustomerSupportAgent.java"
---8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 We have added the `@Toolbox` annotation to the `chat` method.
@@ -127,7 +127,7 @@ Also note that we have added a new placeholder `{current_date}` in the system pr
     Replace `Multi<String>` with `String` in the AI service method signature to avoid this issue and change the call in the `dev.langchain4j.quarkus.workshop.CustomerSupportAgentWebSocket` accordingly:
 
     ```java hl_lines="2" title="CustomerSupportAgentWebSocket.java"
-    --8<-- "../../step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java:tools"
+    --8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java:tools"
     ```
 
 ## Testing the function calling
@@ -166,7 +166,7 @@ Can you cancel my booking starting on 2025-07-10?
 
 **AI**:  Unfortunately, I cannot cancel your booking starting on 2025-07-10 because the booking period is less than 4 days, and cancellations are not permitted for such bookings. If you have any other questions or need further assistance, please let me know!
 
-![type:video](images/chat-booking.mp4){: style='width: 80%'}
+![type:video](../images/chat-booking.mp4){: style='width: 80%'}
 
 ## Conclusion
 

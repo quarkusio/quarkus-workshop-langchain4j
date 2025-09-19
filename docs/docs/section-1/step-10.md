@@ -8,7 +8,7 @@ For this,
 we will add observability to our LLM interactions by implementing logging, tracing, and metrics to our application.
 In addition, we will add fault tolerance to our LLM interactions by implementing retries and fallback mechanisms.
 
-<!--![Observability](images/observability.png)-->
+<!--![Observability](../images/observability.png)-->
 
 ## Observability
 
@@ -299,7 +299,7 @@ in the background.
 After you've generated some data, let's go and explore this data in Grafana. The Dev Service exposes a random port.
 The easiest way to find it is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}) and click on the "Dev Services" menu item.
 
-![Quarkus Dev Services](images/dev-services-observability.png)
+![Quarkus Dev Services](../images/dev-services-observability.png)
 
 Find the `grafana.endpoint` and open the url in another browser tab. Use admin/admin to log in if you need to.
 
@@ -309,11 +309,11 @@ registry extensions? They're both reflected here. Feel free to explore the dashb
 If you don't see much data data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
 create some more chat requests.
 
-![Grafana Dashboard](images/grafana-dashboard.png)
+![Grafana Dashboard](../images/grafana-dashboard.png)
 
 You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore > Metrics:
 
-![Prometheus Metrics graphs](images/prometheus-metrics.png)
+![Prometheus Metrics graphs](../images/prometheus-metrics.png)
 
 Now let's explore the Query functionality to find specific data. Click on the `Explore` menu item.
 An interactive query window will open up.
@@ -322,13 +322,13 @@ Then, in label filters, select `currency` and value `USD`. Finally, click the Ru
 You should see an estimated cost aggregation of the latest calls to the model. This is an experimental feature
 based on what typical calls to ChatGPT cost.
 
-![Estimated Cost Graph](images/genai-estimated-cost.png)
+![Estimated Cost Graph](../images/genai-estimated-cost.png)
 
 Let's now take a look at how we can get our traces from Tempo. In the same Query window next the "Outline",
 select `Tempo` instead of Prometheus. Then, click on `Search` next to Query type. You will see a table appear
 below with a list of the latest trace IDs and the service they relate to.
 
-![Tempo search](images/tempo-search.png)
+![Tempo search](../images/tempo-search.png)
 
 Click on any one of the traces to open more details about them. You will see a list of spans that represent different
 parts of the request and response, and potentially also the database query, based on which trace you have selected.
@@ -339,7 +339,7 @@ Finally, expand one (or more) of the span elements. You will see details about a
 and you'll also see a button "Logs for this span". This allows you to see the logs related to that particular
 span. If you don't see any logs, try another span.
 
-![type:video](images/lc4jLGTM.mp4){autoplay=true}
+![type:video](../images/lc4jLGTM.mp4){autoplay=true}
 
 ## Fault Tolerance
 
@@ -375,7 +375,7 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 following annotations:
 
 ```java hl_lines="6 8-9 29-31" title="CustomerSupportAgent.java"
---8<-- "../../step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
+--8<-- "../../section-1/step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 That's all. To test the implemented fault tolerance, we'll need to 'break' our application.
@@ -388,7 +388,7 @@ quarkus.langchain4j.openai.base-url=https://api.example.com/v1/
 
 It's up to you to decide what your preferred way to create chaos is :).  Once you've done that, run your application and test it with different inputs. You should see that the fallback method is called when the LLM fails to produce a response within the specified timeout. This demonstrates the fault tolerance of our application.
 
-![Fallback is being called when an error occurs](images/fallback.png)
+![Fallback is being called when an error occurs](../images/fallback.png)
 
 ## Conclusion
 

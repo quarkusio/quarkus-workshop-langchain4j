@@ -30,4 +30,4 @@ If you later need to reset to a particular step, either overwrite your working d
 ## Let's get started!
 
 Go to the [requirements](./requirements.md) page to prepare for the workshop.
-Once ready, you can start with [Step 1](./step-01.md).
+Once ready, you can start with [Step 1](./section-1/step-01.md).
