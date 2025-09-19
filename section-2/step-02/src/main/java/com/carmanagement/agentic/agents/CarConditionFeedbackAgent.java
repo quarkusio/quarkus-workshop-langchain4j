@@ -5,6 +5,7 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import dev.langchain4j.agentic.Agent;
 
+// --8<-- [start:carConditionFeedbackAgent]
 /**
  * Agent that analyzes feedback to update the car condition.
  */
@@ -37,5 +38,6 @@ public interface CarConditionFeedbackAgent {
             @V("rentalFeedback") String rentalFeedback,
             @V("carWashFeedback") String carWashFeedback);
 }
+// --8<-- [end:carConditionFeedbackAgent]
 
 

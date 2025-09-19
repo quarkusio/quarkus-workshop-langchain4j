@@ -5,6 +5,7 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import dev.langchain4j.agentic.Agent;
 
+// --8<-- [start:carWashAgent]
 /**
  * Agent that determines what car wash services to request.
  */
@@ -37,5 +38,5 @@ public interface CarWashAgent {
             @V("rentalFeedback") String rentalFeedback,
             @V("carWashFeedback") String carWashFeedback);
 }
-
+// --8<-- [end:carWashAgent]
 

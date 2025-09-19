@@ -17,6 +17,7 @@ public interface CarConditionFeedbackAgent {
         Always provide a concise condition description, even if there's minimal feedback.
         Do not add any headers or prefixes to your response.
         """)
+    // --8<-- [start:carConditionFeedbackSnippet]
     @UserMessage("""
             Car Information:
             Make: {{carMake}}
@@ -37,6 +38,7 @@ public interface CarConditionFeedbackAgent {
             @V("carCondition") String carCondition,
             @V("carWashRequest") String carWashRequest,
             @V("maintenanceRequest") String maintenanceRequest);
+    // --8<-- [end:carConditionFeedbackSnippet]
 }
 
 
