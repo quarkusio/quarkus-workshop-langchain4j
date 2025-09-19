@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Management System</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Car Management System</h1>
+    
+    <!-- Notification and Error Messages -->
+    <div id="notification" style="display: none; background-color: #4CAF50; color: white; padding: 10px; margin-bottom: 10px; border-radius: 5px;"></div>
+    <div id="error-message" style="display: none; background-color: #f44336; color: white; padding: 10px; margin-bottom: 10px; border-radius: 5px;"></div>
+    
+    <!-- Refresh Button -->
+    <button id="refresh-button" style="margin-bottom: 20px; padding: 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Refresh Data
+    </button>
+    
+    <!-- Section 1: Fleet Status -->
+    <div id="fleet-status-section" class="section">
+        <h2>Fleet Status</h2>
+        
+        <!-- Filter input -->
+        <div class="filter-container">
+            <input type="text" id="fleet-filter" placeholder="Filter cars..." class="filter-input">
+            <select id="filter-field" class="filter-select">
+                <option value="all">All Fields</option>
+                <option value="id">Car Number</option>
+                <option value="make">Make</option>
+                <option value="model">Model</option>
+                <option value="year">Year</option>
+                <option value="status">Status</option>
+            </select>
+            <button id="clear-filter" class="filter-button">Clear</button>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="sortable" data-sort="id">Car Number <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="make">Make <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="model">Model <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="year">Year <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="status">Status <span class="sort-icon">↕</span></th>
+                </tr>
+            </thead>
+            <tbody id="fleet-status-table-body">
+                <!-- Table rows will be populated by JavaScript -->
+                <tr>
+                    <td colspan="6">Loading data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Section 2-4: Returns with Tabs -->
+    <div id="returns-section" class="section">
+        <h2>Returns</h2>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="rental-return">Rental Return</button>
+            <button class="tab-button" data-tab="car-wash">Car Wash Return</button>
+        </div>
+        
+        <!-- Rental Return Tab Content -->
+        <div id="rental-return-section" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Car Number</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="rental-return-table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="5">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Car Wash Return Tab Content -->
+        <div id="car-wash-section" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Car Number</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="car-wash-table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="5">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="/js/app.js"></script>
+</body>
+</html>
