@@ -1,4 +1,4 @@
-# Step 1 - Introduction to Quarkus LangChain4j
+# Step 01 - Introduction to Quarkus LangChain4j
 
 To get started, make sure you use the `step-01` directory.
 

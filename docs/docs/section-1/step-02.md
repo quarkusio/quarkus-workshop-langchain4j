@@ -1,4 +1,4 @@
-# Step 2 - LLM configuration
+# Step 02 - LLM configuration
 
 In this step, we will play with various configurations of the language model (LLM) that we will use in the subsequent steps.
 

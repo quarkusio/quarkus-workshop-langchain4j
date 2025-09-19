@@ -1,4 +1,4 @@
-# Step 6 - Deconstructing the RAG pattern
+# Step 06 - Deconstructing the RAG pattern
 
 In the previous step, we implemented a RAG (Retrieval Augmented Generation) pattern in our AI service using [EasyRag](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){target="_blank"}.
 Most of the complexity was hidden by EasyRag.

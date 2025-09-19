@@ -1,4 +1,4 @@
-# Step 3 - Streaming responses
+# Step 03 - Streaming responses
 
 LLM responses can be long.
 Imagine asking the model to generate a story. It could potentially produce hundreds of lines of text.
