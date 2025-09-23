@@ -42,7 +42,6 @@ Car looks good
 
 In the logs you should see a response indicating a car wash is not required:
 
-TODO: replace with OpenAI log
 ```
 - status code: 200
 - headers: [content-length: 442], [content-type: application/json; charset=utf-8], [date: Mon, 08 Sep 2025 18:58:10 GMT]
@@ -51,7 +50,7 @@ TODO: replace with OpenAI log
 
 ## Building Agents with LangChain4j
 
-The [langchain4j-agentic](https://github.com/langchain4j/langchain4j/tree/main/langchain4j-agentic){target="_blank"} module introduces the ability to create Agents. In their simplest form, agents are very similar to AI Services (introduced earlier):
+The [langchain4j-agentic](https://github.com/langchain4j/langchain4j/tree/main/langchain4j-agentic){target="_blank"} module introduces the ability to create Agents. In their simplest form, agents are very similar to AI Services (introduced in section-1):
 
 - Agents are declared in interfaces (and are implemented for you automatically)
 - Agent interfaces let you specify a `SystemMessage` and `UserMessage`
@@ -65,20 +64,31 @@ In contrast to AI Services, only one method on an agent interface can be annotat
 ![App Blueprint](../images/agentic-app-1.png){: .center}
 
 
-```java title="CarManagementResource.java"
+The `CarManagementResource` provides REST APIs to handle returns of cars from the rental team and the car wash team. 
+
+```java hl_lines="26 50" title="CarManagementResource.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java:car-management"
 ```
 
-The `CarManagementResource` provides REST APIs to handle returns of cars from the rental team and the car wash team.
+The `CarManagementService`, when initialized, creates an instance of the `CarWashAgent` with a call to the `createCarWashAgent` method.
 
 ```java title="CarManagementService.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:createCarWashAgent"
 ```
 
-The `CarManagementResource` calls the `CarManagementService` to handle car returns. The `CarManagementService` uses the `CarWashAgent` to request car washes. The `CarManagementService` sets up the agent, which entails:
+The set up of the agent entails:
 
 - defining the chat model it should use
 - indicating the output name in the `AgenticScope` to use to hold the result from the call to the agent (more will be said about the `AgenticScope` in the next step)
+
+
+The `CarManagementResource` calls the `CarManagementService.processCarReturn` method to handle car returns. 
+
+```java hl_lines="16-22 24-26" title="CarManagementService.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
+```
+
+The `processCarReturn` method uses the `carWashAgent` to request car washes. Notice also that the response from the agent is checked to see if the agent's response contained `CARWASH_NOT_REQUIRED` -- if so, the car state is changed, and if not, it implies the car wash agent requested further car cleaning (so no state change would be required).
 
 ```java title="CarWashAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java:carWashAgent"
@@ -86,16 +96,18 @@ The `CarManagementResource` calls the `CarManagementService` to handle car retur
 
 The `CarWashAgent` looks at the comments from when the car was returned and decides which car wash options to select.
 
-- `@SystemMessage` is used to tell the agent its role and how to handle requests.
+- `@SystemMessage` is used to tell the agent its role and how to handle requests. Notice we ask the agent to return `CARWASH_NOT_REQUIRED`, if applicable, to make it easy for callers to identify that outcome.
 - `@UserMessage` is used to provide content specific to the request.
-- You don't provide the implementation (that is created for you by LangChain4j)
+- You don't provide the implementation of agents (that is created for you by LangChain4j)
 - `@Agent` annotation identifies the method in the interface to use as the agent. Only one method can have the `@Agent` annotation per interface.
 
-```java title="CarWashTool.java"
+When the carWashAgent was created it was assigned a tool (the `CarWashTool`). When requests are made to the agent, the agent can decide to call any of the tools it has been assigned to help satisfy the request.
+
+```java hl_lines="4 24" title="CarWashTool.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CarWashTool.java:CarWashTool"
 ```
 
-The `CarWashTool` is a mock tool for requesting the car wash. The `@Tool` annotation is used to identify each method that should be registered as a tool that agents can use.
+The `CarWashTool` is a mock tool for requesting the car wash. The `@Tool` annotation is used to identify the methods that should be registered as tool methods, which agents can use.
 
 ??? question "Why do we use @Dependent scope for the Tool?"
     When a tool is added to the definition of an agent, LangChain4j introspects the tool object to see which methods have `@Tool` annotations. CDI creates proxies around objects that are defined with certain CDI scopes (such as `@ApplicationScoped` or `@SessionScoped`). The proxy methods do not have the `@Tool` annotations and therefore the agents don't properly recognize the tool methods on those objects. If you need your tools to be defined with other CDI scopes, you can use a `ToolProvider` to add tools (not discussed in this tutorial).
