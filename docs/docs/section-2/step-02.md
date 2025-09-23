@@ -4,22 +4,22 @@
 
 The Miles of Smiles management team now wants to keep track of the condition of its cars.
 
-In the previous step, cars could be returned by the team processing returns or the car wash team — and in either case comments could be provided from the teams about the car. The recorded condition of the car should be automatically updated based on those comments.
+In the previous step, cars could be returned by the team processing returns or the car wash team — and in either case comments could be provided from the teams about the car. We would like to automatically update the recorded condition of the car based on those comments.
 
 In this step you will be introduced to using multiple agents together in a workflow.
 
 ## Workflows
 
-With LangChain4j you can set up a set of agents to work together to solve problems. Much like the building blocks of a programming language, langchain4j-agentic provides some basic constructs you can use to build agentic workflows:
+With LangChain4j you can set up a set of agents to work together to solve problems. Much like the building blocks of a programming language, `langchain4j-agentic` provides some basic constructs you can use to build agentic workflows:
 
 - **Sequence Workflows** - Agents execute one after another in a predetermined order.
 - **Parallel Workflows** - Agents execute at the same time on separate threads.
 - **Loop Workflows** - A sequence of agents runs repeatedly, until some condition is satisfied.
 - **Conditional Workflows** - A sequence of agents runs in a predetermined order, but each agent in the sequence only runs if a specified condition is satisfied.
 
-To satisfy management's new requirement, let's use a Sequence of agents to first call the Car Wash agent, and then call another agent to update the car condition.
+To satisfy management's new requirement, let's use a **sequence** of agents to first call the car wash agent, and then call another agent to update the car condition.
 
-To enable Agents to better work together, langchain4j-agentic includes a shared context class called `AgenticScope`. The agent framework uses the `AgenticScope` to maintain context between calls to each agent in a workflow. When calling an agent in a workflow, the agent framework attempts to use an internal map in the `AgenticScope` to read inputs corresponding to the list of inputs declared in the agent method's signature. When an agent returns a result, the agent framework writes the result into the `AgenticScope`'s map using the output name specified by the agent.
+To enable agents to better work together, `langchain4j-agentic` includes a shared context class called `AgenticScope`. The agent framework uses the `AgenticScope` to maintain context between calls to each agent in a workflow. When calling an agent in a workflow, the agent framework attempts to use an internal map in the `AgenticScope` to read inputs corresponding to the list of inputs declared in the agent method's signature. When an agent returns a result, the agent framework writes the result into the `AgenticScope`'s map using the output name specified by the agent.
 
 ## What Are We Going to Build?
 
@@ -30,8 +30,8 @@ We'll create a workflow that processes car returns, updates car conditions based
 Starting from our app in step-01, we need to:
 
 1. Create a `CarConditionFeedbackAgent`
-2. Create a `CarProcessingWorkflow` interface
-3. Create a sequence workflow in `CarManagementService` (we'll call it `CarProcessingWorkflow`)
+2. Create a `CarProcessingWorkflow` agent interface to use for the sequence workflow
+3. Define the sequence workflow in `CarManagementService`
 4. Modify the `CarManagementService` to use the sequence workflow
 
 ## Before You Begin
@@ -41,7 +41,7 @@ You can either use the code from `step-01` and continue from there, or check the
 ??? important "Do not forget to close the application"
     If you have the application running from the previous step and decide to use the `step-02` directory, make sure to stop it (CTRL+C) before continuing.
 
-If you are continuing to build the app in the step-01 directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from step-02:
+If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-02`:
 
 For Linux/macOS:
 ```bash
@@ -65,44 +65,69 @@ copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\ja
 
 ## Create a CarConditionFeedbackAgent
 
+In the `section-2/step-02/src/main/java/com/carmanagement/agentic/agents` directory, create the `CarConditionFeedbackAgent`:
+
 ```java title="CarConditionFeedbackAgent.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedbackAgent"
+--8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
-As we've seen before, the interface for an agent defines the system message, user message and indicates which method is the agent method.
+As we've seen before, the interface for an agent defines the system message, user message and indicates which method is the agent method. The car condition feedback agent will assess the car's condition based on its previous known condition and the feedback provided.
 
-## Create a CarProcessingWorkflow Interface
+## Create a CarProcessingWorkflow Agent Interface to Use for the Sequence Workflow
 
 First, create the directory:
 
+For Linux/macOS:
 ```bash
-mkdir ./src/main/java/com/carmanagement/agentic/workflow
+mkdir -p ./src/main/java/com/carmanagement/agentic/workflow
 ```
 
-Then create the workflow interface:
-
-```java title="CarProcessingWorkflow.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java:carProcessingWorkflow"
+For Windows:
+```batch
+mkdir .\src\main\java\com\carmanagement\agentic\workflow
 ```
 
-`CarProcessingWorkflow` is a type-safe interface that we can use to refer to our sequence workflow. Notice that the `CarProcessingWorkflow` interface looks a lot like a regular Agent. Workflows can be thought of as containers for sets of agents, not agents themselves. Since they are not agents (and cause no LLM calls to be made on their behalf) they do not have `@SystemMessage` or `@UserMessage` annotations.
+Then create the agent interface in that directory for the sequence workflow:
 
-## Create a Sequence Workflow in CarManagementService
-
-```java title="CarManagementService.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:carManagementService"
+```java hl_lines="16" title="CarProcessingWorkflow.java"
+--8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
-Let's break down the key parts of this implementation:
+`CarProcessingWorkflow` is a type-safe interface that we can use as our sequence workflow. Notice that the `CarProcessingWorkflow` interface looks a lot like a regular agent. Workflows can be thought of as containers for sets of agents, not agents themselves. Since workflows do not interact with LLMs, they do not have `@SystemMessage` or `@UserMessage` annotations. Notice that the `processCarReturn` method returns a result with type `ResultWithAgenticScope<String>` -- this is a special type that causes the generated code to return not just the text response from the agent, but also the `AgenticScope` that is created and used in the workflow.
 
-- **Lines 43-45**: Initialize the `CarProcessingWorkflow` when the service is instantiated.
-- **Lines 47-??**: Define the `CarWashAgent` and `CarConditionFeedbackAgent` — the 2 agents we want to include in our sequence workflow. Set an output name, "carCondition", for the `CarConditionFeedbackAgent` that we can use to see the result from that agent.
-- **Lines ?-71**: Define the sequence workflow, `CarProcessingWorkflow`, including the `CarWashAgent` and `CarConditionFeedbackAgent` as subagents (the term subagent is used to represent the list of agents that are in the workflow).
-- **Lines 99-103**: Retrieve the "carCondition" value from the `AgenticScope`, and use that value to update the condition for the car.
+## Define the Sequence Workflow in CarManagementService
 
-## Trying Out the New Workflow
+Next, let's define the sequence workflow in `CarManagementService`.
 
-Now that we have updated the workflow to update the car condition we can try it in the UI. Notice that the Fleet Status section of the UI now has a "Condition" column, indicating the last known condition of the car.
+- Let's modify the `initialize` method to initialize the `CarProcessingWorkflow` when the service is instantiated.
+- The `createCarProcessingWorkflow` method needs to define the `CarWashAgent` and `CarConditionFeedbackAgent` — the 2 agents we want to include in our sequence workflow. Use an output name, `carCondition`, for the `CarConditionFeedbackAgent`, that we can use to see the result from that agent in the `AgenticScope`.
+- The `createCarProcessingWorkflow` method then needs to define the sequence workflow, `CarProcessingWorkflow`, including the `CarWashAgent` and `CarConditionFeedbackAgent` as subagents (the subagent list represents the list of agents that are in the workflow).
+
+```java hl_lines="43-45 48-61 63-70 87-94 96-103" title="CarManagementService.java"
+--8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part1"
+```
+
+## Modify the CarManagementService to Use the Sequence Workflow
+
+In the `CarManagementService`, let's modify the `processCarReturn` method to call the `carProcessingWorkflow` and process its results. 
+
+First, we need to invoke `carProcessingWorkflow.processCarReturn`, the agent method, to cause each of the subagents to be executed in sequence. 
+
+Next, retrieve the `carCondition` value from the `AgenticScope`, and use that value as the new condition for the car.
+
+As before, check the results from the car wash agent to decide whether to change the car state.
+
+```java hl_lines="15-22 24-31 33-36"  title="CarManagementService.java"
+--8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part2"
+```
+
+## Try Out the New Workflow
+
+Now that we have updated the workflow to update the car condition we can try it in the UI. 
+
+In your browser, access [http://localhost:8080](http://localhost:8080){target="_blank"}.
+
+Notice that the Fleet Status section of the UI now has a "Condition" column, indicating the last known condition of the car.
 
 On the Rental Return tab choose a car and enter some feedback that would indicate something has changed about the condition of the car. For example:
 
@@ -114,7 +139,7 @@ After submitting the feedback (by hitting the Return button), and a brief pause,
 
 ![Agentic UI](../images/agentic-UI-2.png){: .center}
 
-You should also see in the log file that the two agents ran in sequence. Here you can see that the car wash agent requested an interior wash of car, and the car condition feedback agent came up with a new car condition.
+You should also see in the log file that the car wash agent and car condition agent ran in sequence. Here you can see that the car wash agent requested an interior wash of car, and the car condition feedback agent came up with a new car condition.
 
 ```
 <log snippet showing 2 agents running in sequence - remember to collect this while using OpenAI LLM>
