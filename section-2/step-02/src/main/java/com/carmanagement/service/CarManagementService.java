@@ -1,3 +1,4 @@
+// --8<-- [start:part1]
 package com.carmanagement.service;
 
 import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
@@ -14,7 +15,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.annotation.PostConstruct;
 
-// --8<-- [start:carManagementService]
 /**
  * Service for managing car returns from various operations.
  */
@@ -70,7 +70,9 @@ public class CarManagementService {
 
         return carProcessingWorkflow;
     }
+// --8<-- [end:part1]
 
+// --8<-- [start:part2]
     /**
      * Process a car return from any operation.
      *
@@ -116,7 +118,5 @@ public class CarManagementService {
         boolean required = s != null && !s.isEmpty() && !s.toUpperCase().contains("NOT_REQUIRED");
         return required;
     }
+// --8<-- [end:part2]
 }
-// --8<-- [end:carManagementService]
-
-
