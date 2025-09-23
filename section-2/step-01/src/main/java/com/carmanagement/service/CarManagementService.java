@@ -35,12 +35,12 @@ public class CarManagementService {
 
     private CarWashAgent carWashAgent;
 
+    // --8<-- [start:createCarWashAgent]
     @PostConstruct
     void initialize() {
         carWashAgent = createCarWashAgent();
     }
 
-// --8<-- [start:createCarWashAgent]
     private CarWashAgent createCarWashAgent() {
         // CarWashAgent
         CarWashAgent carWashAgent = AgenticServices
@@ -54,6 +54,7 @@ public class CarManagementService {
     }
 // --8<-- [end:createCarWashAgent]
 
+    // --8<-- [start:processCarReturn]
     /**
      * Process a car return from any operation.
      *
@@ -83,5 +84,6 @@ public class CarManagementService {
 
         return result;
     }
+    // --8<-- [end:processCarReturn]
 }
 
