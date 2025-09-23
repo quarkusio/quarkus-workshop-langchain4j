@@ -4,6 +4,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @Path("/")
 public class WeatherService {
@@ -12,8 +13,8 @@ public class WeatherService {
 
     @Path("weather")
     @GET
-    public String getWeather(@QueryParam("latitude") double latitude,
-                             @QueryParam("longitude") double longitude){
+    public String getWeather(@RestQuery double latitude,
+                             @RestQuery double longitude){
         return wc.getForecast(
                 latitude,
                 longitude,
