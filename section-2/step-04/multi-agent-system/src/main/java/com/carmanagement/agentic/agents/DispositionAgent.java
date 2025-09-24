@@ -8,7 +8,7 @@ import dev.langchain4j.agentic.Agent;
  */
 public interface DispositionAgent {
 
-    @Agent("Car disposition specialist. Determines how to dispose of a car.")
+    @Agent(outputName="dispositionAgentResult", description="Car disposition specialist. Determines how to dispose of a car.")
     String processDisposition(
             @V("carMake") String carMake,
             @V("carModel") String carModel,

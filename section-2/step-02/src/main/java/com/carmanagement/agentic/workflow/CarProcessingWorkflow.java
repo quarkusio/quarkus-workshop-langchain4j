@@ -12,7 +12,7 @@ public interface CarProcessingWorkflow {
     /**
      * Processes a car return by running feedback analysis and then appropriate actions.
      */
-    @Agent
+    @Agent(outputName="carProcessingAgentResult")
     ResultWithAgenticScope<String> processCarReturn(
             @V("carMake") String carMake,
             @V("carModel") String carModel,

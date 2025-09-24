@@ -47,7 +47,6 @@ public class CarManagementService {
                 .agentBuilder(CarWashAgent.class)
                 .chatModel(models.baseModel())
                 .tools(carWashTool)
-                .outputName("carWashAgentResult")
                 .build();
 
         return carWashAgent;

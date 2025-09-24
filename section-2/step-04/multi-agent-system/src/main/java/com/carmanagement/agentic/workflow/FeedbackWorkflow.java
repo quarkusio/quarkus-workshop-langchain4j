@@ -11,7 +11,7 @@ public interface FeedbackWorkflow {
     /**
      * Runs multiple feedback agents in parallel to analyze different aspects of car feedback.
      */
-    @Agent
+    @Agent(outputName="feedbackResult")
     void analyzeFeedback(
             @V("carMake") String carMake,
             @V("carModel") String carModel,

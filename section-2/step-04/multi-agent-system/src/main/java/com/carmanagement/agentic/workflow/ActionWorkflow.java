@@ -12,7 +12,7 @@ public interface ActionWorkflow {
      * Runs the appropriate action agent based on the feedback analysis.
      */
     // --8<-- [start:actionWorkflow]
-    @Agent
+    @Agent(outputName="actionResult")
     String processAction(
             @V("carMake") String carMake,
             @V("carModel") String carModel,

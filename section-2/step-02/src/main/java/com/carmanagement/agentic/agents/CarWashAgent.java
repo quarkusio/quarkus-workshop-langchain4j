@@ -28,7 +28,7 @@ public interface CarWashAgent {
         Rental Feedback: {{rentalFeedback}}
         Car Wash Feedback: {{carWashFeedback}}
         """)
-    @Agent("Car wash specialist. Determines what car wash services are needed.")
+    @Agent(outputName="carWashAgentResult", description="Car wash specialist. Determines what car wash services are needed.")
     String processCarWash(
             @V("carMake") String carMake,
             @V("carModel") String carModel,
