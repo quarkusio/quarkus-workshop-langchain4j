@@ -21,13 +21,13 @@ public interface FeedbackWorkflow {
             @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
     })
     String analyzeFeedback(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carCondition") String carCondition,
-            @V("rentalFeedback") String rentalFeedback,
-            @V("carWashFeedback") String carWashFeedback,
-            @V("maintenanceFeedback") String maintenanceFeedback);
+            String carMake,
+            String carModel,
+            Integer carYear,
+            String carCondition,
+            String rentalFeedback,
+            String carWashFeedback,
+            String maintenanceFeedback);
 }
 
 
