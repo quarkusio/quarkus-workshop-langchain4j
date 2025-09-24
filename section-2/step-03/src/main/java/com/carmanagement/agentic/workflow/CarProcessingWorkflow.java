@@ -1,6 +1,8 @@
 package com.carmanagement.agentic.workflow;
 
-import dev.langchain4j.agentic.Agent;
+import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
+import dev.langchain4j.agentic.declarative.SequenceAgent;
+import dev.langchain4j.agentic.declarative.SubAgent;
 import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
 import dev.langchain4j.service.V;
 
@@ -12,7 +14,11 @@ public interface CarProcessingWorkflow {
     /**
      * Processes a car return by running feedback analysis and then appropriate actions.
      */
-    @Agent
+    @SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
+            @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
+            @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
+            @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+    })
     ResultWithAgenticScope<String> processCarReturn(
             @V("carMake") String carMake,
             @V("carModel") String carModel,

@@ -38,98 +38,96 @@ public class CarManagementService {
     @Inject
     CarService carService;
 
-    @Inject
-    Models models = null;
+//    @Inject
+//    CarWashTool carWashTool;
+//
+//    @Inject
+//    MaintenanceTool maintenanceTool;
 
     @Inject
-    CarWashTool carWashTool;
+    CarProcessingWorkflow carProcessingWorkflow;
 
-    @Inject
-    MaintenanceTool maintenanceTool;
+//    @PostConstruct
+//    void initialize() {
+//        carProcessingWorkflow = createCarProcessingWorkflow();
+//    }
 
-    private CarProcessingWorkflow carProcessingWorkflow;
-
-    @PostConstruct
-    void initialize() {
-        carProcessingWorkflow = createCarProcessingWorkflow();
-    }
-
-    private CarProcessingWorkflow createCarProcessingWorkflow() {
-        // CarWashAgent
-        CarWashAgent carWashAgent = AgenticServices
-                .agentBuilder(CarWashAgent.class)
-                .chatModel(models.baseModel())
-                .tools(carWashTool)
-                .outputName("carWashAgentResult")
-                .build();
-
-        // MaintenanceAgent
-        MaintenanceAgent maintenanceAgent = AgenticServices
-                .agentBuilder(MaintenanceAgent.class)
-                .chatModel(models.baseModel())
-                .tools(maintenanceTool)
-                .outputName("maintenanceAgentResult")
-                .build();
-
-
-        // CarWashFeedbackAgent
-        CarWashFeedbackAgent carWashFeedbackAgent = AgenticServices
-                .agentBuilder(CarWashFeedbackAgent.class)
-                .chatModel(models.baseModel())
-                .outputName("carWashRequest")
-                .build();
-
-
-        // MaintenanceFeedbackAgent
-        MaintenanceFeedbackAgent maintenanceFeedbackAgent = AgenticServices
-                .agentBuilder(MaintenanceFeedbackAgent.class)
-                .chatModel(models.baseModel())
-                .outputName("maintenanceRequest")
-                .build();
-
-        // CarConditionFeedbackAgent
-        CarConditionFeedbackAgent carConditionFeedbackAgent = AgenticServices
-                .agentBuilder(CarConditionFeedbackAgent.class)
-                .chatModel(models.baseModel())
-                .outputName("carCondition")
-                .build();
-
-
-        // FeedbackWorkflow
-        FeedbackWorkflow feedbackWorkflow = AgenticServices
-                .parallelBuilder(FeedbackWorkflow.class)
-                .subAgents(carWashFeedbackAgent, maintenanceFeedbackAgent)
-                .outputName("feedbackResult")
-                .build();
-
-        // ActionWorkflow
-        ActionWorkflow actionWorkflow = AgenticServices
-                .conditionalBuilder(ActionWorkflow.class)
-                .subAgents(
-                    // Check if maintenance is required
-                    agenticScope -> selectAgent(agenticScope) == AgentType.MAINTENANCE,
-                    maintenanceAgent
-                )
-                .subAgents(
-                    // Check if car wash is required
-                    agenticScope -> selectAgent(agenticScope) == AgentType.CAR_WASH,
-                    carWashAgent
-                )
-                .outputName("actionResult")
-                .build();
-
-
-        // --8<-- [start:sequenceWorkflow]
-        // CarProcessingWorkflow
-        CarProcessingWorkflow carProcessingWorkflow = AgenticServices
-                .sequenceBuilder(CarProcessingWorkflow.class)
-                .subAgents(feedbackWorkflow, actionWorkflow, carConditionFeedbackAgent)
-                .outputName("carProcessingAgentResult")
-                .build();
-        // --8<-- [end:sequenceWorkflow]
-
-        return carProcessingWorkflow;
-    }
+//    private CarProcessingWorkflow createCarProcessingWorkflow() {
+//        // CarWashAgent
+//        CarWashAgent carWashAgent = AgenticServices
+//                .agentBuilder(CarWashAgent.class)
+//                .chatModel(models.baseModel())
+//                .tools(carWashTool)
+//                .outputName("carWashAgentResult")
+//                .build();
+//
+//        // MaintenanceAgent
+//        MaintenanceAgent maintenanceAgent = AgenticServices
+//                .agentBuilder(MaintenanceAgent.class)
+//                .chatModel(models.baseModel())
+//                .tools(maintenanceTool)
+//                .outputName("maintenanceAgentResult")
+//                .build();
+//
+//
+//        // CarWashFeedbackAgent
+//        CarWashFeedbackAgent carWashFeedbackAgent = AgenticServices
+//                .agentBuilder(CarWashFeedbackAgent.class)
+//                .chatModel(models.baseModel())
+//                .outputName("carWashRequest")
+//                .build();
+//
+//
+//        // MaintenanceFeedbackAgent
+//        MaintenanceFeedbackAgent maintenanceFeedbackAgent = AgenticServices
+//                .agentBuilder(MaintenanceFeedbackAgent.class)
+//                .chatModel(models.baseModel())
+//                .outputName("maintenanceRequest")
+//                .build();
+//
+//        // CarConditionFeedbackAgent
+//        CarConditionFeedbackAgent carConditionFeedbackAgent = AgenticServices
+//                .agentBuilder(CarConditionFeedbackAgent.class)
+//                .chatModel(models.baseModel())
+//                .outputName("carCondition")
+//                .build();
+//
+//
+//        // FeedbackWorkflow
+//        FeedbackWorkflow feedbackWorkflow = AgenticServices
+//                .parallelBuilder(FeedbackWorkflow.class)
+//                .subAgents(carWashFeedbackAgent, maintenanceFeedbackAgent)
+//                .outputName("feedbackResult")
+//                .build();
+//
+//        // ActionWorkflow
+//        ActionWorkflow actionWorkflow = AgenticServices
+//                .conditionalBuilder(ActionWorkflow.class)
+//                .subAgents(
+//                    // Check if maintenance is required
+//                    agenticScope -> selectAgent(agenticScope) == AgentType.MAINTENANCE,
+//                    maintenanceAgent
+//                )
+//                .subAgents(
+//                    // Check if car wash is required
+//                    agenticScope -> selectAgent(agenticScope) == AgentType.CAR_WASH,
+//                    carWashAgent
+//                )
+//                .outputName("actionResult")
+//                .build();
+//
+//
+//        // --8<-- [start:sequenceWorkflow]
+//        // CarProcessingWorkflow
+//        CarProcessingWorkflow carProcessingWorkflow = AgenticServices
+//                .sequenceBuilder(CarProcessingWorkflow.class)
+//                .subAgents(feedbackWorkflow, actionWorkflow, carConditionFeedbackAgent)
+//                .outputName("carProcessingAgentResult")
+//                .build();
+//        // --8<-- [end:sequenceWorkflow]
+//
+//        return carProcessingWorkflow;
+//    }
 
     /**
      * Process a car return from any operation.
