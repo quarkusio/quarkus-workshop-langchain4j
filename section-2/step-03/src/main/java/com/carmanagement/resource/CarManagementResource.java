@@ -5,13 +5,12 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jboss.resteasy.reactive.RestQuery;
 
 /**
  * REST resource for car management operations.
  */
 @Path("/car-management")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 public class CarManagementResource {
     
     @Inject
@@ -26,9 +25,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/rental-return/{carNumber}")
-    public Response processRentalReturn(
-            @PathParam("carNumber") Integer carNumber,
-            @QueryParam("rentalFeedback") String rentalFeedback) {
+    public Response processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "", "");
@@ -50,9 +47,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/car-wash-return/{carNumber}")
-    public Response processCarWashReturn(
-            @PathParam("carNumber") Integer carNumber,
-            @QueryParam("carWashFeedback") String carWashFeedback) {
+    public Response processCarWashReturn(Integer carNumber, @RestQuery String carWashFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", carWashFeedback, "");
@@ -74,9 +69,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/maintenance-return/{carNumber}")
-    public Response processMaintenanceReturn(
-            @PathParam("carNumber") Integer carNumber,
-            @QueryParam("maintenanceFeedback") String maintenanceFeedback) {
+    public Response processMaintenanceReturn(Integer carNumber, @RestQuery String maintenanceFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", "", maintenanceFeedback);

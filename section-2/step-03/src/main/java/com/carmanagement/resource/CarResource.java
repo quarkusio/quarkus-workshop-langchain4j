@@ -17,7 +17,6 @@ import java.util.List;
  * REST resource for car operations.
  */
 @Path("/cars")
-@Produces(MediaType.APPLICATION_JSON)
 public class CarResource {
     
     @Inject
