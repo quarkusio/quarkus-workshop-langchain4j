@@ -1,7 +1,10 @@
 package com.carmanagement.agentic.workflow;
 
-import dev.langchain4j.agentic.Agent;
-import dev.langchain4j.service.V;
+import com.carmanagement.agentic.agents.CarWashAgent;
+import com.carmanagement.agentic.agents.MaintenanceAgent;
+import dev.langchain4j.agentic.declarative.ActivationCondition;
+import dev.langchain4j.agentic.declarative.ConditionalAgent;
+import dev.langchain4j.agentic.declarative.SubAgent;
 
 /**
  * Workflow for processing car actions conditionally.
@@ -11,16 +14,32 @@ public interface ActionWorkflow {
     /**
      * Runs the appropriate action agent based on the feedback analysis.
      */
-    @Agent(outputName="actionResult")
+    @ConditionalAgent(outputName = "actionResult", subAgents = {
+            @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
+            @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+    })
     String processAction(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carNumber") Integer carNumber,
-            @V("carCondition") String carCondition,
-            @V("carWashRequest") String carWashRequest,
-            @V("maintenanceRequest") String maintenanceRequest);
+            String carMake,
+            String carModel,
+            Integer carYear,
+            Integer carNumber,
+            String carCondition,
+            String carWashRequest,
+            String maintenanceRequest);
 
+    @ActivationCondition(MaintenanceAgent.class)
+    static boolean activateMaintenance(String maintenanceRequest) {
+        return isRequired(maintenanceRequest);
+    }
+
+    @ActivationCondition(CarWashAgent.class)
+    static boolean activateCarWash(String carWashRequest) {
+        return isRequired(carWashRequest);
+    }
+
+    private static boolean isRequired(String value) {
+        return value != null && !value.isEmpty() && !value.toUpperCase().contains("NOT_REQUIRED");
+    }
 }
 
 
