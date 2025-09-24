@@ -51,21 +51,18 @@ public class CarManagementService {
                 .agentBuilder(CarWashAgent.class)
                 .chatModel(models.baseModel())
                 .tools(carWashTool)
-                .outputName("carWashAgentResult")
                 .build();
 
         // CarConditionFeedbackAgent
         CarConditionFeedbackAgent carConditionFeedbackAgent = AgenticServices
                 .agentBuilder(CarConditionFeedbackAgent.class)
                 .chatModel(models.baseModel())
-                .outputName("carCondition")
                 .build();
 
         // CarProcessingWorkflow - simple sequence of CarWashAgent and CarConditionFeedbackAgent
         CarProcessingWorkflow carProcessingWorkflow = AgenticServices
                 .sequenceBuilder(CarProcessingWorkflow.class)
                 .subAgents(carWashAgent, carConditionFeedbackAgent)
-                .outputName("carProcessingAgentResult")
                 .build();
 
         return carProcessingWorkflow;

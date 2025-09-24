@@ -63,7 +63,6 @@ public class CarManagementService {
                 .agentBuilder(CarWashAgent.class)
                 .chatModel(models.baseModel())
                 .tools(carWashTool)
-                .outputName("carWashAgentResult")
                 .build();
 
         // MaintenanceAgent
@@ -71,41 +70,35 @@ public class CarManagementService {
                 .agentBuilder(MaintenanceAgent.class)
                 .chatModel(models.baseModel())
                 .tools(maintenanceTool)
-                .outputName("maintenanceAgentResult")
                 .build();
 
         // DispositionAgent
         DispositionAgent dispositionAgent = AgenticServices
                 .a2aBuilder("http://localhost:8888", DispositionAgent.class)
-                .outputName("dispositionAgentResult")
                 .build();
 
         // CarWashFeedbackAgent
         CarWashFeedbackAgent carWashFeedbackAgent = AgenticServices
                 .agentBuilder(CarWashFeedbackAgent.class)
                 .chatModel(models.baseModel())
-                .outputName("carWashRequest")
                 .build();
 
         // DispositionFeedbackAgent
         DispositionFeedbackAgent dispositionFeedbackAgent = AgenticServices
                 .agentBuilder(DispositionFeedbackAgent.class)
                 .chatModel(models.baseModel())
-                .outputName("dispositionRequest")
                 .build();
 
         // MaintenanceFeedbackAgent
         MaintenanceFeedbackAgent maintenanceFeedbackAgent = AgenticServices
                 .agentBuilder(MaintenanceFeedbackAgent.class)
                 .chatModel(models.baseModel())
-                .outputName("maintenanceRequest")
                 .build();
 
         // CarConditionFeedbackAgent
         CarConditionFeedbackAgent carConditionFeedbackAgent = AgenticServices
                 .agentBuilder(CarConditionFeedbackAgent.class)
                 .chatModel(models.baseModel())
-                .outputName("carCondition")
                 .build();
 
 
@@ -113,7 +106,6 @@ public class CarManagementService {
         FeedbackWorkflow feedbackWorkflow = AgenticServices
                 .parallelBuilder(FeedbackWorkflow.class)
                 .subAgents(carWashFeedbackAgent, maintenanceFeedbackAgent, dispositionFeedbackAgent)
-                .outputName("feedbackResult")
                 .build();
 
         // ActionWorkflow
@@ -134,7 +126,6 @@ public class CarManagementService {
                     agenticScope -> selectAgent(agenticScope) == AgentType.CAR_WASH,
                     carWashAgent
                 )
-                .outputName("actionResult")
                 .build();
 
 
@@ -142,7 +133,6 @@ public class CarManagementService {
         CarProcessingWorkflow carProcessingWorkflow = AgenticServices
                 .sequenceBuilder(CarProcessingWorkflow.class)
                 .subAgents(feedbackWorkflow, actionWorkflow, carConditionFeedbackAgent)
-                .outputName("carProcessingAgentResult")
                 .build();
 
         return carProcessingWorkflow;
