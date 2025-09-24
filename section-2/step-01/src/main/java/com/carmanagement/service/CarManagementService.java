@@ -1,7 +1,6 @@
 package com.carmanagement.service;
 
 import com.carmanagement.agentic.agents.CarWashAgent;
-import com.carmanagement.agentic.tools.CarWashTool;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,40 +12,12 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class CarManagementService {
 
-    /**
-     * Enum representing the type of agent to be selected for car processing
-     */
-    public enum AgentType {
-        CAR_WASH,
-        NONE
-    }
-
     @Inject
     CarService carService;
 
     @Inject
     CarWashAgent carWashAgent;
 
-    // --8<-- [start:createCarWashAgent]
-//    @PostConstruct
-//    void initialize() {
-//        carWashAgent = createCarWashAgent();
-//    }
-//
-//    private CarWashAgent createCarWashAgent() {
-//        // CarWashAgent
-//        CarWashAgent carWashAgent = AgenticServices
-//                .agentBuilder(CarWashAgent.class)
-//                .chatModel(models.baseModel())
-//                .tools(carWashTool)
-//                .outputName("carWashAgentResult")
-//                .build();
-//
-//        return carWashAgent;
-//    }
-// --8<-- [end:createCarWashAgent]
-
-    // --8<-- [start:processCarReturn]
     /**
      * Process a car return from any operation.
      *
@@ -76,6 +47,5 @@ public class CarManagementService {
 
         return result;
     }
-    // --8<-- [end:processCarReturn]
 }
 

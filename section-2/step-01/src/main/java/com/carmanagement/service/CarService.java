@@ -3,9 +3,10 @@ package com.carmanagement.service;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
 
-import jakarta.annotation.PostConstruct;
+import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import jakarta.enterprise.event.Observes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,7 @@ public class CarService {
     /**
      * Initialize the service with mock car data.
      */
-    @PostConstruct
-    void init() {
+    void init(@Observes StartupEvent ev) {
         generateMockData();
     }
     
