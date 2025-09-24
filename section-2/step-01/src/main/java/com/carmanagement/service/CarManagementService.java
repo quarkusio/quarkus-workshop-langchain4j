@@ -1,12 +1,9 @@
 package com.carmanagement.service;
 
 import com.carmanagement.agentic.agents.CarWashAgent;
-import com.carmanagement.agentic.config.Models;
 import com.carmanagement.agentic.tools.CarWashTool;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import dev.langchain4j.agentic.AgenticServices;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -28,30 +25,25 @@ public class CarManagementService {
     CarService carService;
 
     @Inject
-    Models models;
-
-    @Inject
-    CarWashTool carWashTool;
-
-    private CarWashAgent carWashAgent;
+    CarWashAgent carWashAgent;
 
     // --8<-- [start:createCarWashAgent]
-    @PostConstruct
-    void initialize() {
-        carWashAgent = createCarWashAgent();
-    }
-
-    private CarWashAgent createCarWashAgent() {
-        // CarWashAgent
-        CarWashAgent carWashAgent = AgenticServices
-                .agentBuilder(CarWashAgent.class)
-                .chatModel(models.baseModel())
-                .tools(carWashTool)
-                .outputName("carWashAgentResult")
-                .build();
-
-        return carWashAgent;
-    }
+//    @PostConstruct
+//    void initialize() {
+//        carWashAgent = createCarWashAgent();
+//    }
+//
+//    private CarWashAgent createCarWashAgent() {
+//        // CarWashAgent
+//        CarWashAgent carWashAgent = AgenticServices
+//                .agentBuilder(CarWashAgent.class)
+//                .chatModel(models.baseModel())
+//                .tools(carWashTool)
+//                .outputName("carWashAgentResult")
+//                .build();
+//
+//        return carWashAgent;
+//    }
 // --8<-- [end:createCarWashAgent]
 
     // --8<-- [start:processCarReturn]
