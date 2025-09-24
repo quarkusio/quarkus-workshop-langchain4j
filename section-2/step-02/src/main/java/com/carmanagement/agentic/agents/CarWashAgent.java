@@ -1,9 +1,11 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.agentic.tools.CarWashTool;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import dev.langchain4j.agentic.Agent;
+import io.quarkiverse.langchain4j.ToolBox;
 
 /**
  * Agent that determines what car wash services to request.
@@ -29,6 +31,7 @@ public interface CarWashAgent {
         Car Wash Feedback: {{carWashFeedback}}
         """)
     @Agent("Car wash specialist. Determines what car wash services are needed.")
+    @ToolBox(CarWashTool.class)
     String processCarWash(
             @V("carMake") String carMake,
             @V("carModel") String carModel,
