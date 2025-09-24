@@ -100,10 +100,10 @@ Then create the agent interface in that directory for the sequence workflow:
 Next, let's define the sequence workflow in `CarManagementService`.
 
 - Let's modify the `initialize` method to initialize the `CarProcessingWorkflow` when the service is instantiated.
-- The `createCarProcessingWorkflow` method needs to define the `CarWashAgent` and `CarConditionFeedbackAgent` — the 2 agents we want to include in our sequence workflow. Use an output name, `carCondition`, for the `CarConditionFeedbackAgent`, that we can use to see the result from that agent in the `AgenticScope`.
+- The `createCarProcessingWorkflow` method needs to define the `CarWashAgent` and `CarConditionFeedbackAgent` — the 2 agents we want to include in our sequence workflow.
 - The `createCarProcessingWorkflow` method then needs to define the sequence workflow, `CarProcessingWorkflow`, including the `CarWashAgent` and `CarConditionFeedbackAgent` as subagents (the subagent list represents the list of agents that are in the workflow).
 
-```java hl_lines="43-45 48-61 63-70 87-94 96-103" title="CarManagementService.java"
+```java hl_lines="43-45 48-59 61-67" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part1"
 ```
 
