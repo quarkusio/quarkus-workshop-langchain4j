@@ -13,7 +13,6 @@ import io.quarkiverse.langchain4j.ToolBox;
 public interface CarWashAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You handle intake for the car wash department of a car rental company.
         It is your job to submit a request to the provided requestCarWash function to take action based on the provided feedback.
         Be specific about what services are needed.
@@ -30,15 +29,16 @@ public interface CarWashAgent {
         Rental Feedback: {{rentalFeedback}}
         Car Wash Feedback: {{carWashFeedback}}
         """)
-    @Agent("Car wash specialist. Determines what car wash services are needed.")
+    @Agent(outputName = "carWashAgentResult",
+            description = "Car wash specialist. Determines what car wash services are needed.")
     @ToolBox(CarWashTool.class)
     String processCarWash(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carNumber") Integer carNumber,
-            @V("rentalFeedback") String rentalFeedback,
-            @V("carWashFeedback") String carWashFeedback);
+            String carMake,
+            String carModel,
+            Integer carYear,
+            Integer carNumber,
+            String rentalFeedback,
+            String carWashFeedback);
 }
 
 
