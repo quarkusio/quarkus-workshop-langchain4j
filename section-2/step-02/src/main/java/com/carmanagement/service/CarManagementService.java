@@ -1,19 +1,15 @@
 // --8<-- [start:part1]
 package com.carmanagement.service;
 
-import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
-import com.carmanagement.agentic.agents.CarWashAgent;
-import com.carmanagement.agentic.config.Models;
 import com.carmanagement.agentic.tools.CarWashTool;
 import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
+import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import dev.langchain4j.agentic.AgenticServices;
 import dev.langchain4j.agentic.scope.AgenticScope;
 import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.annotation.PostConstruct;
 
 /**
  * Service for managing car returns from various operations.
@@ -33,46 +29,8 @@ public class CarManagementService {
     CarService carService;
 
     @Inject
-    Models models = null;
+    CarProcessingWorkflow carProcessingWorkflow;
 
-    @Inject
-    CarWashTool carWashTool;
-
-    private CarProcessingWorkflow carProcessingWorkflow;
-
-    @PostConstruct
-    void initialize() {
-        carProcessingWorkflow = createCarProcessingWorkflow();
-    }
-
-    private CarProcessingWorkflow createCarProcessingWorkflow() {
-        // CarWashAgent
-        CarWashAgent carWashAgent = AgenticServices
-                .agentBuilder(CarWashAgent.class)
-                .chatModel(models.baseModel())
-                .tools(carWashTool)
-                .outputName("carWashAgentResult")
-                .build();
-
-        // CarConditionFeedbackAgent
-        CarConditionFeedbackAgent carConditionFeedbackAgent = AgenticServices
-                .agentBuilder(CarConditionFeedbackAgent.class)
-                .chatModel(models.baseModel())
-                .outputName("carCondition")
-                .build();
-
-        // CarProcessingWorkflow - simple sequence of CarWashAgent and CarConditionFeedbackAgent
-        CarProcessingWorkflow carProcessingWorkflow = AgenticServices
-                .sequenceBuilder(CarProcessingWorkflow.class)
-                .subAgents(carWashAgent, carConditionFeedbackAgent)
-                .outputName("carProcessingAgentResult")
-                .build();
-
-        return carProcessingWorkflow;
-    }
-// --8<-- [end:part1]
-
-// --8<-- [start:part2]
     /**
      * Process a car return from any operation.
      *
@@ -87,7 +45,7 @@ public class CarManagementService {
         }
 
         // Process the car return using the workflow and get the AgenticScope
-        ResultWithAgenticScope<String> resultWithScope = carProcessingWorkflow.processCarReturn(
+        CarConditions carConditions = carProcessingWorkflow.processCarReturn(
                 carInfo.getMake(),
                 carInfo.getModel(),
                 carInfo.getYear(),
@@ -96,27 +54,14 @@ public class CarManagementService {
                 rentalFeedback != null ? rentalFeedback : "",
                 carWashFeedback != null ? carWashFeedback : "");
 
-        String result = resultWithScope.result();
-        AgenticScope scope = resultWithScope.agenticScope();
-
         // Update the car's condition with the result from CarConditionFeedbackAgent
-        String newCondition = (String) scope.readState("carCondition");
-        if (newCondition != null && !newCondition.isEmpty()) {
-            carInfo.setCondition(newCondition);
-        }
+        carInfo.setCondition(carConditions.generalCondition());
 
         // If carwash was not required, make the car available to rent
-        if (!isRequired(scope, "carWashAgentResult")) {
+        if (!carConditions.carWashRequired()) {
             carInfo.setStatus(CarStatus.AVAILABLE);
         }
 
-        return result;
+        return carConditions.generalCondition();
     }
-
-    private static boolean isRequired(AgenticScope agenticScope, String key) {
-        String s = (String)agenticScope.readState(key);
-        boolean required = s != null && !s.isEmpty() && !s.toUpperCase().contains("NOT_REQUIRED");
-        return required;
-    }
-// --8<-- [end:part2]
 }
