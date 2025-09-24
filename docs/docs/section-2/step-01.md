@@ -79,8 +79,7 @@ The `CarManagementService`, when initialized, creates an instance of the `CarWas
 The set up of the agent entails:
 
 - defining the chat model it should use
-- indicating the output name in the `AgenticScope` to use to hold the result from the call to the agent (more will be said about the `AgenticScope` in the next step)
-
+- associating tools with the agent
 
 The `CarManagementResource` calls the `CarManagementService.processCarReturn` method to handle car returns. 
 
