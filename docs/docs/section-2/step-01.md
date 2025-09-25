@@ -70,17 +70,6 @@ The `CarManagementResource` provides REST APIs to handle returns of cars from th
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java:car-management"
 ```
 
-The `CarManagementService`, when initialized, creates an instance of the `CarWashAgent` with a call to the `createCarWashAgent` method.
-
-```java title="CarManagementService.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:createCarWashAgent"
-```
-
-The set up of the agent entails:
-
-- defining the chat model it should use
-- associating tools with the agent
-
 The `CarManagementResource` calls the `CarManagementService.processCarReturn` method to handle car returns. 
 
 ```java hl_lines="16-22 24-26" title="CarManagementService.java"

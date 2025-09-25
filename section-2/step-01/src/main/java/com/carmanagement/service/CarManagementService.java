@@ -18,6 +18,7 @@ public class CarManagementService {
     @Inject
     CarWashAgent carWashAgent;
 
+    // --8<-- [start:processCarReturn]
     /**
      * Process a car return from any operation.
      *
@@ -47,5 +48,6 @@ public class CarManagementService {
 
         return result;
     }
+    // --8<-- [end:processCarReturn]
 }
 

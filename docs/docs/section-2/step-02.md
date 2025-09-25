@@ -109,17 +109,7 @@ Next, let's define the sequence workflow in `CarManagementService`.
 
 ## Modify the CarManagementService to Use the Sequence Workflow
 
-In the `CarManagementService`, let's modify the `processCarReturn` method to call the `carProcessingWorkflow` and process its results. 
-
-First, we need to invoke `carProcessingWorkflow.processCarReturn`, the agent method, to cause each of the subagents to be executed in sequence. 
-
-Next, retrieve the `carCondition` value from the `AgenticScope`, and use that value as the new condition for the car.
-
-As before, check the results from the car wash agent to decide whether to change the car state.
-
-```java hl_lines="15-22 24-31 33-36"  title="CarManagementService.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part2"
-```
+TODO: fix to update the agents
 
 ## Try Out the New Workflow
 
