@@ -40,8 +40,10 @@ Create the maintenance tool and maintenance returns API:
    - Create a `MaintenanceTool` 
    - Modify `CarManagementResource` to add a maintenance returns API
 
-Define the workflows:
+Define the agents and workflows:
 
+   - Define the `MaintenanceAgent`
+   - Define the `MaintenanceFeedbackAgent`
    - Define a parallel workflow, `FeebackWorkflow`, including the `CarWashFeedbackAgent` and `MaintenanceFeedbackAgent`
    - Define a conditional workflow, `ActionWorkflow`, including the `CarWashAgent` and `MaintenanceAgent`
    - Modify the sequence workflow, to include the feedback workflow, the action workflow and the car condition feedback agent
@@ -181,15 +183,23 @@ Update the file in your `src/main/java/com/carmanagement/resource` directory.
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java:maintenanceReturn"
 ```
 
-## Define the workflows
+## Define the agents and workflows
 
 We'll need to make a few changes to our `CarManagementService` to define new workflows and update existing workflows:
 
 Update the file in your `src/main/java/com/carmanagement/service` directory.
 
-```java hl_lines="93-97 99-112 114-118 174-192" title="CarManagementService.java"
+```java hl_lines="65-70 80-84 93-97 99-112 114-118 174-192" title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
+
+### Define the `MaintenanceAgent`
+
+Notice the definition of the `MaintenanceAgent` (above), associating it with the injected `MaintenanceTool`.
+
+### Define the `MaintenanceFeedbackAgent`
+
+Notice the definition of the `MaintenanceFeedbackAgent` (above).
 
 ### Define a parallel workflow, `FeedbackWorkflow`, including the `CarWashFeedbackAgent` and `MaintenanceFeedbackAgent`
 
