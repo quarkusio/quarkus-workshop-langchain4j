@@ -30,7 +30,7 @@ public class Models {
     }
 
     // Set the model provider here
-    private static final MODEL_PROVIDER modelProvider = MODEL_PROVIDER.OLLAMA;
+    private static final MODEL_PROVIDER modelProvider = MODEL_PROVIDER.OPENAI;
 
     /**
      * Provides the base chat language model for the application.
