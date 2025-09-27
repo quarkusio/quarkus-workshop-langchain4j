@@ -1,4 +1,3 @@
-// --8<-- [start:part1]
 package com.carmanagement.service;
 
 import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
@@ -33,7 +32,7 @@ public class CarManagementService {
     CarService carService;
 
     @Inject
-    Models models = null;
+    Models models;
 
     @Inject
     CarWashTool carWashTool;
@@ -67,9 +66,7 @@ public class CarManagementService {
 
         return carProcessingWorkflow;
     }
-// --8<-- [end:part1]
 
-// --8<-- [start:part2]
     /**
      * Process a car return from any operation.
      *
@@ -115,5 +112,5 @@ public class CarManagementService {
         boolean required = s != null && !s.isEmpty() && !s.toUpperCase().contains("NOT_REQUIRED");
         return required;
     }
-// --8<-- [end:part2]
+
 }

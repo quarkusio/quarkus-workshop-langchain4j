@@ -39,7 +39,7 @@ public class CarManagementService {
     CarService carService;
 
     @Inject
-    Models models = null;
+    Models models;
 
     @Inject
     CarWashTool carWashTool;

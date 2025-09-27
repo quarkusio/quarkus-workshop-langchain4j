@@ -29,10 +29,15 @@ We'll create a workflow that processes car returns, updates car conditions based
 
 Starting from our app in step-01, we need to:
 
-1. Create a `CarConditionFeedbackAgent`
-2. Create a `CarProcessingWorkflow` agent interface to use for the sequence workflow
-3. Define the sequence workflow in `CarManagementService`
-4. Modify the `CarManagementService` to use the sequence workflow
+Create/Update agents and workflows:
+
+- Create a `CarConditionFeedbackAgent`
+- Create a `CarProcessingWorkflow` agent interface to use for the sequence workflow
+
+Define the agents and workflows:
+
+- Define the sequence workflow in `CarManagementService`
+- Modify the `CarManagementService` to use the sequence workflow
 
 ## Before You Begin
 
@@ -63,9 +68,11 @@ copy ..\step-02\src\main\java\com\carmanagement\service\CarService.java .\src\ma
 copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
 ```
 
-## Create a CarConditionFeedbackAgent
+## Create/Update agents and workflows
 
-In the `section-2/step-02/src/main/java/com/carmanagement/agentic/agents` directory, create the `CarConditionFeedbackAgent`:
+### Create a `CarConditionFeedbackAgent`
+
+In the `src/main/java/com/carmanagement/agentic/agents` directory, create the `CarConditionFeedbackAgent`:
 
 ```java title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
@@ -73,7 +80,7 @@ In the `section-2/step-02/src/main/java/com/carmanagement/agentic/agents` direct
 
 As we've seen before, the interface for an agent defines the system message, user message and indicates which method is the agent method. The car condition feedback agent will assess the car's condition based on its previous known condition and the feedback provided.
 
-## Create a CarProcessingWorkflow Agent Interface to Use for the Sequence Workflow
+### Create a `CarProcessingWorkflow` Agent Interface to Use for the Sequence Workflow
 
 First, create the directory:
 
@@ -95,19 +102,25 @@ Then create the agent interface in that directory for the sequence workflow:
 
 `CarProcessingWorkflow` is a type-safe interface that we can use as our sequence workflow. Notice that the `CarProcessingWorkflow` interface looks a lot like a regular agent. Workflows can be thought of as containers for sets of agents, not agents themselves. Since workflows do not interact with LLMs, they do not have `@SystemMessage` or `@UserMessage` annotations. Notice that the `processCarReturn` method returns a result with type `ResultWithAgenticScope<String>` -- this is a special type that causes the generated code to return not just the text response from the agent, but also the `AgenticScope` that is created and used in the workflow.
 
-## Define the Sequence Workflow in CarManagementService
+## Define the agents and workflows
 
-Next, let's define the sequence workflow in `CarManagementService`.
+We'll need to make a few changes to our `CarManagementService` to define our new agent and workflow.
+
+Complete the steps below in your `CarManagementService` file, or simply copy the following code to the file in your `src/main/java/com/carmanagement/service` directory.
+
+```java hl_lines="43-45 48-59 61-67 83-91 93-100 102-105" title="CarManagementService.java"
+--8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
+```
+
+### Define the Sequence Workflow in `CarManagementService`
+
+First, we'll define the sequence workflow in `CarManagementService`.
 
 - Let's modify the `initialize` method to initialize the `CarProcessingWorkflow` when the service is instantiated.
 - The `createCarProcessingWorkflow` method needs to define the `CarWashAgent` and `CarConditionFeedbackAgent` — the 2 agents we want to include in our sequence workflow.
 - The `createCarProcessingWorkflow` method then needs to define the sequence workflow, `CarProcessingWorkflow`, including the `CarWashAgent` and `CarConditionFeedbackAgent` as subagents (the subagent list represents the list of agents that are in the workflow).
 
-```java hl_lines="43-45 48-59 61-67" title="CarManagementService.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part1"
-```
-
-## Modify the CarManagementService to Use the Sequence Workflow
+### Modify the `CarManagementService` to Use the Sequence Workflow
 
 In the `CarManagementService`, let's modify the `processCarReturn` method to call the `carProcessingWorkflow` and process its results. 
 
@@ -117,33 +130,35 @@ Next, retrieve the `carCondition` value from the `AgenticScope`, and use that va
 
 As before, check the results from the car wash agent to decide whether to change the car state.
 
-```java hl_lines="15-22 24-31 33-36"  title="CarManagementService.java"
---8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java:part2"
-```
-
 ## Try Out the New Workflow
 
 Now that we have updated the workflow to update the car condition we can try it in the UI. 
 
 In your browser, access [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
-Notice that the Fleet Status section of the UI now has a "Condition" column, indicating the last known condition of the car.
+Notice that the **Fleet Status** section of the UI now has a "Condition" column, indicating the last known condition of the car.
 
-On the Rental Return tab choose a car and enter some feedback that would indicate something has changed about the condition of the car. For example:
+On the **Rental Return** tab choose a car and enter some feedback that would indicate something has changed about the condition of the car. For example:
 
 ```
 there has clearly been a fire in the trunk of this car
 ```
 
-After submitting the feedback (by hitting the Return button), and a brief pause, you should see the condition of the car gets updated in the Fleet Status section.
+After submitting the feedback (by hitting the **Return** button), and a brief pause, you should see the condition of the car gets updated in the **Fleet Status** section.
 
 ![Agentic UI](../images/agentic-UI-2.png){: .center}
 
 You should also see in the log file that the car wash agent and car condition agent ran in sequence. Here you can see that the car wash agent requested an interior wash of car, and the car condition feedback agent came up with a new car condition.
 
-```
-<log snippet showing 2 agents running in sequence - remember to collect this while using OpenAI LLM>
-```
+Take a moment to look at the logs from your Quarkus runtime. You should be able to identify the following sequence of events:
+
+1. an HTTP request to the car wash agent
+2. an HTTP response from the car wash agent, requesting to run the requestCarWash function
+3. the CarWashTool output, requesting interior cleaning of the car (and possibly other options)
+4. an HTTP request to the car wash agent, including the response from the car wash tool
+5. an HTTP response from the car wash agent, stating that the car wash has been requested
+6. an HTTP request to the car condition feedback agent
+7. an HTTP response from the car condition feedback agent, providing a new car condition summary
 
 ## When to Use Parallel Workflows
 
