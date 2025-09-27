@@ -100,13 +100,13 @@ Then create the agent interface in that directory for the sequence workflow:
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
-`CarProcessingWorkflow` is a type-safe interface that we can use as our sequence workflow. Notice that the `CarProcessingWorkflow` interface looks a lot like a regular agent. Workflows can be thought of as containers for sets of agents, not agents themselves. Since workflows do not interact with LLMs, they do not have `@SystemMessage` or `@UserMessage` annotations. Notice that the `processCarReturn` method returns a result with type `ResultWithAgenticScope<String>` -- this is a special type that causes the generated code to return not just the text response from the agent, but also the `AgenticScope` that is created and used in the workflow.
+`CarProcessingWorkflow` is a type-safe interface that we can use as our sequence workflow. Notice that the `CarProcessingWorkflow` interface looks a lot like a regular agent. Workflows can be thought of as containers for sets of agents, not agents themselves. Since workflows do not interact with LLMs, they do not have `@SystemMessage` or `@UserMessage` annotations. Notice that the `processCarReturn` method returns a result with type `ResultWithAgenticScope<String>` -- which contains the text response from the agent as well as the `AgenticScope` that is created and used in the workflow.
 
 ## Define the agents and workflows
 
 We'll need to make a few changes to our `CarManagementService` to define our new agent and workflow.
 
-Complete the steps below in your `CarManagementService` file, or simply copy the following code to the file in your `src/main/java/com/carmanagement/service` directory.
+Complete the steps described below, or simply copy the following code to the file in your `src/main/java/com/carmanagement/service` directory.
 
 ```java hl_lines="43-45 48-59 61-67 83-91 93-100 102-105" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
@@ -147,8 +147,6 @@ there has clearly been a fire in the trunk of this car
 After submitting the feedback (by hitting the **Return** button), and a brief pause, you should see the condition of the car gets updated in the **Fleet Status** section.
 
 ![Agentic UI](../images/agentic-UI-2.png){: .center}
-
-You should also see in the log file that the car wash agent and car condition agent ran in sequence. Here you can see that the car wash agent requested an interior wash of car, and the car condition feedback agent came up with a new car condition.
 
 Take a moment to look at the logs from your Quarkus runtime. You should be able to identify the following sequence of events:
 
