@@ -115,6 +115,8 @@ Create the file in your `src/main/java/com/carmanagement/agentic/workflow` direc
 
 The `CarProcessingWorkflow` represents our overall agent system. Modify the `CarProcessingWorkflow` to add the parameter for the feedback related to maintenance:
 
+Update the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
+
 ```java hl_lines="24" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
@@ -157,7 +159,7 @@ Similarly to the `CarWashAgent` and `MaintenanceAgent`, we will have the `CarCon
 
 Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
 
-```java hl_lines="19-20" title="CarConditionFeedbackAgent.java"
+```java hl_lines="15-17 26-27" title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedbackSnippet"
 ```
 
@@ -179,8 +181,8 @@ We'll modify the `CarManagementResource` to add a maintenance returns API. This 
 
 Update the file in your `src/main/java/com/carmanagement/resource` directory.
 
-```java title="CarManagementResource.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java:maintenanceReturn"
+```java hl_lines="67-88" title="CarManagementResource.java"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
 ## Define the agents and workflows
@@ -220,11 +222,11 @@ Notice that the `CarProcessingWorkflow` is a nested workflow (workflows within w
 
 ## Try out the new workflow
 
-In the Returns section of the UI you should now be able to see a Maintenance Return tab in the Returns section. This is where the Miles of Smiles maintenance team will enter their feedback when they are finished working on the car. 
+In the **Returns** section of the UI you should now be able to see a **Maintenance Return** tab in the **Returns** section. This is where the Miles of Smiles maintenance team will enter their feedback when they are finished working on the car. 
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-tab.png){: .center}
 
-On the Maintenance Return tab, for car 3, enter feedback to indicate the scratch (mentioned in the car condition) has been fixed, but the car needs to be cleaned:
+On the **Maintenance Return** tab, for **car 3**, enter feedback to indicate the scratch (mentioned in the car condition) has been fixed, but the car needs to be cleaned:
 
 ```
 buffed out the scratch. car could use a wash now.

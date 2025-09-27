@@ -10,6 +10,7 @@ import dev.langchain4j.agentic.Agent;
  */
 public interface CarConditionFeedbackAgent {
 
+    // --8<-- [start:carConditionFeedbackSnippet]
     @SystemMessage("""
         /nothink, Reasoning: low.
         You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on feedback.
@@ -17,7 +18,6 @@ public interface CarConditionFeedbackAgent {
         Always provide a concise condition description, even if there's minimal feedback.
         Do not add any headers or prefixes to your response.
         """)
-    // --8<-- [start:carConditionFeedbackSnippet]
     @UserMessage("""
             Car Information:
             Make: {{carMake}}
