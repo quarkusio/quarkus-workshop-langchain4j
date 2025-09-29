@@ -37,6 +37,16 @@ We will create a `DispositionAgent` to handle getting rid of cars, where each di
 
 Our architecture includes 2 Quarkus runtimes -- one running our agentic workflow (Quarkus runtime 1) and the other running the remote A2A agent (Quarkus runtime 2). 
 
+## Before you begin
+
+If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-04`. Run the following command from your `section-2` directory:
+
+For Linux/macOS:
+```bash
+# Run the setup script to set up both the multi-agent-system and remote-a2a-agent
+./setup-step-04.sh
+```
+
 ## Quarkus Runtime 1
 Starting from our app in `step-03`, we need to do the following for the original Quarkus Runtime 1:
 
@@ -53,17 +63,6 @@ Define the agents and workflows:
   - Define the `DispositionAgent`
   - Include the `DispositionFeedbackAgent` in the parallel workflow
   - Include the `DispositionAgent` in the conditional workflow
-
-
-## Before you begin
-
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-04`. Run the following commands from your `section-2` directory:
-
-For Linux/macOS:
-```bash
-# Run the setup script to set up both the multi-agent-system and remote-a2a-agent
-./setup-step-04.sh
-```
 
 ## Create/Update agent and workflow declarations:
 

@@ -51,7 +51,7 @@ Define the agents and workflows:
 
 ## Before You Begin
     
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-03`. Run the following commands from your `section-2` directory:
+If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-03`. Run the following command from your `section-2` directory:
 
 For Linux/macOS:
 ```bash

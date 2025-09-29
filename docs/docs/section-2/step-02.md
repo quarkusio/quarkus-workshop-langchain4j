@@ -46,7 +46,7 @@ You can either use the code from `step-01` and continue from there, or check the
 ??? important "Do not forget to close the application"
     If you have the application running from the previous step and decide to use the `step-02` directory, make sure to stop it (CTRL+C) before continuing.
 
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-02`. Run the following commands from your `section-2` directory:
+If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-02`. Run the following command from your `section-2` directory:
 
 For Linux/macOS:
 ```bash
