@@ -71,7 +71,7 @@ Create a `DispositionFeedbackAgent` to analyze the feedback from rental returns,
 
 In the system prompt, instruct the agent to include `DISPOSITION_NOT_REQUIRED` in its response if the car is in decent shape so that we can easily check for that string when we build our conditional agents.
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+Create the file in your `multi-agent-system/src/main/java/com/carmanagement/agentic/agents` directory.
 
 ```java hl_lines="17" title="DispositionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
@@ -81,7 +81,7 @@ Create the file in your `src/main/java/com/carmanagement/agentic/agents` directo
 
 For the disposition agent, in Quarkus runtime 1 we need to create an agent to be used as a type-safe interface for us to invoke the remote A2A agent. This agent will not need to interact with LLMS, so it shouldn't have system message or user message annotations. The parameters we define on the agent method define what will be sent to the remote agent.
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+Create the file in your `multi-agent-system/src/main/java/com/carmanagement/agentic/agents` directory.
 
 ```java title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
@@ -91,7 +91,7 @@ Create the file in your `src/main/java/com/carmanagement/agentic/agents` directo
 
 We need to extend our ActionWorkflow to accept the disposition feedback agent's output. The `DispositionFeedbackAgent` uses an `outputName` of `dispositionRequest`.
 
-Update the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
+Update the file in your `multi-agent-system/src/main/java/com/carmanagement/agentic/workflow` directory.
 
 ```java hl_lines="10" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java:actionWorkflow"
@@ -101,7 +101,7 @@ Update the file in your `src/main/java/com/carmanagement/agentic/workflow` direc
 
 Similarly, we need to modify the `CarConditionFeedbackAgent` to use the output from the `DispositionFeedbackAgent`.
 
-Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+Update the file in your `multi-agent-system/src/main/java/com/carmanagement/agentic/agents` directory.
 
 ```java hl_lines="11 20" title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedback"
@@ -111,7 +111,7 @@ Update the file in your `src/main/java/com/carmanagement/agentic/agents` directo
 
 We need to make a few changes to our `CarManagementService` to define agents and workflows:
 
-Update the file in your `src/main/java/com/carmanagement/service` directory.
+Update the file in your `multi-agent-system/src/main/java/com/carmanagement/service` directory.
 
 ```java hl_lines="75-78 86-90 108 114-118 197-200" title="CarManagementService.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
@@ -153,7 +153,7 @@ The setup script you ran earlier created the second Quarkus project `remote-a2a-
 
 Let's create a `DispositionTool` that can be used by the `DispositionAgent` to request disposition of cars. The tool should be able to handle scrapping the car, selling it, or donating it. 
 
-Create the file in your `src/main/java/com/demo` directory.
+Create the file in your `remote-a2a-agent/src/main/java/com/demo` directory.
 
 ```java title="DispositionTool.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionTool.java"
@@ -165,7 +165,7 @@ Here, let's use an AI service (introduced in `section-1`) rather than an agent, 
 
 Create the disposition AI service, providing it a `ToolBox` that contains the `DispositionTool`. This will enable the AI Service to call the `DispositionTool` to request disposition. For ease of parameter passing, let's use the same method signature for this `DispositionAgent` as we did for the client `DispositionAgent`.
 
-Create the file in your `src/main/java/com/demo` directory.
+Create the file in your `remote-a2a-agent/src/main/java/com/demo` directory.
 
 ```java title="DispositionAgent.java (remote)"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgent.java"
@@ -185,7 +185,7 @@ The agent card provides:
 
 This information is provided to clients that connect to the A2A server so that they know when and how to use the agent.
 
-Create the file in your `src/main/java/com/demo` directory.
+Create the file in your `remote-a2a-agent/src/main/java/com/demo` directory.
 
 ```java title="DispositionAgentCard.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentCard.java"
@@ -205,7 +205,7 @@ In the execute method we need to take action on the task:
 
 - We put the agent's response into an artifact in the `Task` and mark the task complete. This will result in the response being made available to the A2A client agent.
 
-Create the file in your `src/main/java/com/demo` directory.
+Create the file in your `remote-a2a-agent/src/main/java/com/demo` directory.
 
 ```java hl_lines="39-43 48-56 59-65 68-71" title="DispositionAgentExecutor.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentExecutor.java"
@@ -225,7 +225,7 @@ After reloading the UI, you should see the **Returns** section is now called **R
 On the **Maintenance Return** tab, select a car and try entering feedback that would suggest there is something wrong (so that it should be disposed of). For example:
 
 ```
-looks like this car hit a tree
+this vehicle has major damage, possibly from a rollover
 ```
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
@@ -233,5 +233,5 @@ looks like this car hit a tree
 In the logs of Quarkus runtime 2, you should be able to see that the disposition agent called its disposition tool and the tool initiated the disposition of the vehicle.
 
 ```
-DispositionTool result: Car disposition requested for Ford Mustang (2022), Car #11: Scrap the car
+DispositionTool result: Car disposition requested for Ford F-150 (2021), Car #3: Scrap the car
 ```
