@@ -61,32 +61,8 @@ If you are continuing to build the app in the `step-01` directory, start by copy
 
 For Linux/macOS:
 ```bash
-mv step-01 multi-agent-system
-mkdir step-01
-mv multi-agent-system step-01
-cd step-01/multi-agent-system
-cp ../../step-04/multi-agent-system/pom.xml ./pom.xml
-cp ../../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-cp ../../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-cp ../../step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
-cp ../../step-04/multi-agent-system/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
-cp ../../step-04/multi-agent-system/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
-cp ../../step-04/multi-agent-system/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
-```
-
-For Windows:
-```batch
-move step-01 multi-agent-system
-mkdir step-01
-move multi-agent-system step-01
-cd step-01\multi-agent-system
-copy ..\..\step-04\multi-agent-system\pom.xml pom.xml
-copy ..\..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java src\main\java\com\carmanagement\model\CarInfo.java
-copy ..\..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java src\main\java\com\carmanagement\model\CarStatus.java
-copy ..\..\step-04\multi-agent-system\src\main\java\com\carmanagement\service\CarService.java src\main\java\com\carmanagement\service\CarService.java
-copy ..\..\step-04\multi-agent-system\src\main\resources\static\css\styles.css src\main\resources\static\css\styles.css
-copy ..\..\step-04\multi-agent-system\src\main\resources\static\js\app.js src\main\resources\static\js\app.js
-copy ..\..\step-04\multi-agent-system\src\main\resources\templates\index.html src\main\resources\templates\index.html
+# Run the setup script to set up both the multi-agent-system and remote-a2a-agent
+./section-2/setup-step-04.sh
 ```
 
 ## Create/Update agent and workflow declarations:
@@ -171,39 +147,9 @@ Starting from our app in step-03, we need to do the following for Quarkus Runtim
 - Create a new `DispositionAgentCard`
 - Create a new `DispositionAgentExecutor`
 
-## Before you begin
-
-Run the following commands, from your `section-2` directory, to get your second Quarkus project set up with some initial files.
-
-For Linux/macOS:
-```bash
-cd ./step-01
-mkdir remote-a2a-agent
-cd remote-a2a-agent
-cp ../../step-04/remote-a2a-agent/mvnw.cmd ./mvnw.cmd
-cp ../../step-04/remote-a2a-agent/pom.xml ./pom.xml
-cp ../../step-04/remote-a2a-agent/mvnw ./mvnw
-mkdir -p ./src/main/resources
-mkdir -p ./src/main/java/com/demo
-cp ../../step-04/remote-a2a-agent/src/main/resources/application.properties ./src/main/resources/application.properties
-```
-
-For Windows:
-```batch
-cd step-01
-mkdir remote-a2a-agent
-cd remote-a2a-agent
-copy ..\..\step-04\remote-a2a-agent\mvnw.cmd mvnw.cmd
-copy ..\..\step-04\remote-a2a-agent\pom.xml pom.xml
-copy ..\..\step-04\remote-a2a-agent\mvnw mvnw
-mkdir src\main\resources
-mkdir src\main\java\com\demo
-copy ..\..\step-04\remote-a2a-agent\src\main\resources\application.properties src\main\resources\application.properties
-```
-
 ### Create a new Quarkus project for the remote A2A agent
 
-The files you have already copied from `step-04` include the Quarkus project setup. Take a moment to look at the `pom.xml` file, in the `section-2/step-04/remote-a2a-agent` directory, to see the new dependency added for `langchain4j-agentic-a2a`.
+The setup script you ran earlier created the second Quarkus project `remote-a2a-agent`. Take a moment to look at the `pom.xml` file, in the `remote-a2a-agent` directory, to see the new dependency added for `langchain4j-agentic-a2a`.
 
 ### Create a new `DispositionTool`
 
