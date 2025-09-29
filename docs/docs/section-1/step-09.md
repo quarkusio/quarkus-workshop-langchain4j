@@ -67,7 +67,8 @@ While not demonstrated here, it can map LLM response to complex objects using JS
 ## Guardrails to prevent prompt injection
 
 Let's now implement the guardrails to prevent prompt injection.
-==Create the `dev.langchain4j.quarkus.workshop.PromptInjectionGuard` class with the following content:==
+
+Create the `dev.langchain4j.quarkus.workshop.PromptInjectionGuard` class with the following content:
 
 ```java title="PromptInjectionGuard.java"
 --8<-- "../../section-1/step-09/src/main/java/dev/langchain4j/quarkus/workshop/PromptInjectionGuard.java"
@@ -85,21 +86,10 @@ We use an arbitrary threshold of 0.7 to determine whether the user message is li
 
 ## Using the guardrail
 
-==Let's now edit the `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service to use the guardrail:==
-
-```xml title="pom.xml"
-        <!-- Export metrics for OpenTelemetry compatible collectors -->
-        <dependency>
-            <groupId>io.quarkiverse.micrometer.registry</groupId>
-            <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.3.1</version>
-        </dependency>
-```
-
 Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the
 following annotations:
 
-```java hl_lines="6 8-9 29-31" title="CustomerSupportAgent.java"
+```java hl_lines="8 21" title="CustomerSupportAgent.java"
 --8<-- "../../section-1/step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
