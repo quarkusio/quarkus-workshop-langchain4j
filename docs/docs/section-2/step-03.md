@@ -24,7 +24,7 @@ At each step in the workflow, the agentic framework checks the inputs needed by 
 
 Starting from our app in `step-02`, we need to:
 
-Create/Update agents and workflows:
+Create/Update agent and workflow declarations:
 
    - Create a `MaintenanceFeedbackAgent`
    - Create a `CarWashFeedbackAgent`
@@ -51,7 +51,7 @@ Define the agents and workflows:
 
 ## Before You Begin
     
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-03`:
+If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-03`. Run the following commands from your `section-2` directory:
 
 For Linux/macOS:
 ```bash
@@ -73,7 +73,7 @@ copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\ma
 copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
 ```
 
-## Create/Update agents and workflows
+## Create/Update agent and workflow declarations
 
 ### Create a `MaintenanceFeedbackAgent`
 
