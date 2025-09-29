@@ -62,7 +62,7 @@ If you are continuing to build the app in the `step-01` directory, start by copy
 For Linux/macOS:
 ```bash
 # Run the setup script to set up both the multi-agent-system and remote-a2a-agent
-./section-2/setup-step-04.sh
+./setup-step-04.sh
 ```
 
 ## Create/Update agent and workflow declarations:

@@ -51,7 +51,7 @@ If you are continuing to build the app in the `step-01` directory, start by copy
 For Linux/macOS:
 ```bash
 # Run the setup script to copy necessary files
-./section-2/setup-step-02.sh
+./setup-step-02.sh
 ```
 
 ## Create/Update agent and workflow declarations
