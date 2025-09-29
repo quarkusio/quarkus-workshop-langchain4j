@@ -55,7 +55,6 @@ If you are continuing to build the app in the `step-01` directory, start by copy
 
 For Linux/macOS:
 ```bash
-# Run the setup script to copy necessary files
 ./setup-step-03.sh
 ```
 
