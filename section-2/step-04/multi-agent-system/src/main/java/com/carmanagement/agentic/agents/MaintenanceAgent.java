@@ -1,9 +1,10 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.agentic.tools.MaintenanceTool;
+import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.V;
-import dev.langchain4j.agentic.Agent;
+import io.quarkiverse.langchain4j.ToolBox;
 
 /**
  * Agent that determines what maintenance services to request.
@@ -26,13 +27,14 @@ public interface MaintenanceAgent {
         Maintenance Request:
         {maintenanceRequest}
         """)
-    @Agent(outputName="maintenanceAgentResult", description="Car maintenance specialist. Using car information and request, determines what maintenance services are needed.")
+    @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.", outputName = "maintenanceAgentResult")
+    @ToolBox(MaintenanceTool.class)
     String processMaintenance(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carNumber") Integer carNumber,
-            @V("maintenanceRequest") String maintenanceRequest);
+            String carMake,
+            String carModel,
+            Integer carYear,
+            Integer carNumber,
+            String maintenanceRequest);
 }
 
 

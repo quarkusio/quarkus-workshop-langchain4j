@@ -3,6 +3,8 @@ package com.demo;
 import java.util.Collections;
 import java.util.List;
 
+import io.a2a.spec.AgentInterface;
+import io.a2a.spec.TransportProtocol;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
@@ -22,11 +24,11 @@ public class DispositionAgentCard {
                 .description("Determines how a car should be disposed of based on the car condition and disposition request.")
                 .url("http://localhost:8888/")
                 .version("1.0.0")
-                .documentationUrl("http://example.com/docs")
+                .protocolVersion("1.0.0")
                 .capabilities(new AgentCapabilities.Builder()
                         .streaming(true)
-                        .pushNotifications(true)
-                        .stateTransitionHistory(true)
+                        .pushNotifications(false)
+                        .stateTransitionHistory(false)
                         .build())
                 .defaultInputModes(Collections.singletonList("text"))
                 .defaultOutputModes(Collections.singletonList("text"))
@@ -36,7 +38,9 @@ public class DispositionAgentCard {
                                 .description("Makes a request to dispose of a car (SCRAP, SELL, or DONATE)")
                                 .tags(List.of("disposition"))
                                 .build()))
-                .protocolVersion("0.2.5")
+                .preferredTransport(TransportProtocol.JSONRPC.asString())
+                .additionalInterfaces(List.of(
+                        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
                 .build();
     }
 }

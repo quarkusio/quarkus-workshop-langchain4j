@@ -1,9 +1,8 @@
 package com.carmanagement.agentic.agents;
 
+import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.V;
-import dev.langchain4j.agentic.Agent;
 
 /**
  * Agent that analyzes feedback to update the car condition.
@@ -17,7 +16,7 @@ public interface CarConditionFeedbackAgent {
         Always provide a concise condition description, even if there's minimal feedback.
         Do not add any headers or prefixes to your response.
         """)
-    // --8<-- [start:carConditionFeedback]
+    // --8<-- [start:carConditionFeedbackSnippet]
     @UserMessage("""
             Car Information:
             Make: {carMake}
@@ -28,19 +27,17 @@ public interface CarConditionFeedbackAgent {
             Feedback from other agents:
             Car Wash Recommendation: {carWashRequest}
             Maintenance Recommendation: {maintenanceRequest}
-            Disposition Recommendation: {dispositionRequest}
             """)
-    @Agent(outputName="carCondition", description="Car condition analyzer. Determines the current condition of a car based on feedback.")
+    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.", outputName = "carCondition")
     String analyzeForCondition(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carNumber") Integer carNumber,
-            @V("carCondition") String carCondition,
-            @V("dispositionRequest") String dispositionRequest,
-            @V("carWashRequest") String carWashRequest,
-            @V("maintenanceRequest") String maintenanceRequest);
-    // --8<-- [end:carConditionFeedback]
+            String carMake,
+            String carModel,
+            Integer carYear,
+            Integer carNumber,
+            String carCondition,
+            String carWashRequest,
+            String maintenanceRequest);
+    // --8<-- [end:carConditionFeedbackSnippet]
 }
 
 
