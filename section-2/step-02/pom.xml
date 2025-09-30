@@ -50,10 +50,6 @@
         <artifactId>quarkus-langchain4j-ollama</artifactId>
         <version>${quarkus-langchain4j.version}</version>
       </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-undertow</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
