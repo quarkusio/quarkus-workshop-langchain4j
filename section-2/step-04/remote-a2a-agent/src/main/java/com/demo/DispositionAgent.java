@@ -35,12 +35,12 @@ public interface DispositionAgent {
         """)
     @ToolBox(DispositionTool.class)
     String processDisposition(
-            @V("carMake") String carMake,
-            @V("carModel") String carModel,
-            @V("carYear") Integer carYear,
-            @V("carNumber") Integer carNumber,
-            @V("carCondition") String carCondition,
-            @V("dispositionRequest") String dispositionRequest);
+            String carMake,
+            String carModel,
+            Integer carYear,
+            Integer carNumber,
+            String carCondition,
+            String dispositionRequest);
 }
 
 
