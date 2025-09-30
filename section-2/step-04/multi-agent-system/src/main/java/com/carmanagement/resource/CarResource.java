@@ -17,7 +17,6 @@ import java.util.List;
  * REST resource for car operations.
  */
 @Path("/cars")
-@Produces(MediaType.APPLICATION_JSON)
 public class CarResource {
     
     @Inject
@@ -41,7 +40,7 @@ public class CarResource {
      */
     @GET
     @Path("/{id}")
-    public Response getCarById(@PathParam("id") Integer id) {
+    public Response getCarById(Integer id) {
         CarInfo car = carService.getCarById(id);
         if (car == null) {
             return Response.status(Response.Status.NOT_FOUND)
