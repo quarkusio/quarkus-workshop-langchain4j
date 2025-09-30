@@ -22,15 +22,15 @@ public interface MaintenanceFeedbackAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Previous Condition: {{carCondition}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Previous Condition: {carCondition}
         
         Feedback:
-        Rental Feedback: {{rentalFeedback}}
-        Car Wash Feedback: {{carWashFeedback}}
-        Maintenance Feedback: {{maintenanceFeedback}}
+        Rental Feedback: {rentalFeedback}
+        Car Wash Feedback: {carWashFeedback}
+        Maintenance Feedback: {maintenanceFeedback}
         """)
     @Agent(outputName="maintenanceRequest", description="Car maintenance analyzer. Using feedback, determines if a car needs maintenance.")
     String analyzeForMaintenance(

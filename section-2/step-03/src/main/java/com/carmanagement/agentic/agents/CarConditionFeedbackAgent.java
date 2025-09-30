@@ -19,14 +19,14 @@ public interface CarConditionFeedbackAgent {
     // --8<-- [start:carConditionFeedbackSnippet]
     @UserMessage("""
             Car Information:
-            Make: {{carMake}}
-            Model: {{carModel}}
-            Year: {{carYear}}
-            Previous Condition: {{carCondition}}
+            Make: {carMake}
+            Model: {carModel}
+            Year: {carYear}
+            Previous Condition: {carCondition}
             
             Feedback from other agents:
-            Car Wash Recommendation: {{carWashRequest}}
-            Maintenance Recommendation: {{maintenanceRequest}}
+            Car Wash Recommendation: {carWashRequest}
+            Maintenance Recommendation: {maintenanceRequest}
             """)
     @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.", outputName = "carCondition")
     String analyzeForCondition(

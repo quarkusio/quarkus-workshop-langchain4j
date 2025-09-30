@@ -22,16 +22,16 @@ public interface DispositionAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Car Number: {{carNumber}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Car Number: {carNumber}
         
         Previous Car Condition:
-        {{carCondition}}
+        {carCondition}
         
         Disposition Request:
-        {{dispositionRequest}}
+        {dispositionRequest}
         """)
     @ToolBox(DispositionTool.class)
     String processDisposition(
