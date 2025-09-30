@@ -55,7 +55,7 @@ public class CarWashTool {
         String result = generateCarWashSummary(carNumber, carMake, carModel, carYear,
                                               exteriorWash, interiorCleaning, detailing,
                                               waxing, requestText);
-        System.out.println("CarWashTool result: " + result);
+        System.out.println("\uD83D\uDE97 CarWashTool result: " + result);
         return result;
     }
 // --8<-- [end:CarWashTool]
