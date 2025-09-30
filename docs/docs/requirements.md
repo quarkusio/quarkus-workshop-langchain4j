@@ -1,138 +1,124 @@
 # Requirements
 
-## Software requirements
+## Software Requirements
 
-- JDK 21.0 or later - Download it from [Adoptium](https://adoptium.net/){target="_blank"}
-- A key for OpenAI API (provided by the workshop organizer)
-- Podman or Docker - See [Podman installation](https://podman.io/getting-started/installation){target="_blank"} or [Docker installation](https://docs.docker.com/get-docker/){target="_blank"}
-  - If you use Podman, Podman Desktop provides a great user experience to manage your containers: [Podman Desktop](https://podman-desktop.io/docs/installation){target="_blank"}
-- Git (not mandatory) - See [Git installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git){target="_blank"}
-- An IDE with Java support (IntelliJ, Eclipse, VSCode with the Java extension, etc.)
-- A terminal
+- **JDK 21.0 or later** – [Download from Adoptium](https://adoptium.net/){target="_blank"}
+- **OpenAI API key** – provided by the workshop organizer
+- **Podman or Docker** – see [Podman installation](https://podman.io/getting-started/installation){target="_blank"} or [Docker installation](https://docs.docker.com/get-docker/){target="_blank"}
+    - If you use Podman, we recommend [Podman Desktop](https://podman-desktop.io/docs/installation){target="_blank"} for easier container management.
+- **IDE with Java support** – IntelliJ, Eclipse, VSCode (with Java extension), etc.
+- **Terminal** – to run commands
+- _(Optional)_ **Git** – [Installation guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git){target="_blank"}
 
-???+ note "Want to use our environment rather than yours?"
-    If you are running this as part of an instructor-led workshop and have been provided a virtual machine, [click here](rhel-setup.md) to learn about how to use it if you'd prefer it over using your own laptop.
+---
 
 ## AI Model Requirements
 
-You will need an OpenAI API key to complete this workshop. If your instructor has provided one for you to use, use it! [Click here](https://platform.openai.com/docs/quickstart/create-and-export-an-api-key){target="_blank"} to create one if you do not have one. 
+You will need an OpenAI API key to complete this workshop.  
+If your instructor provided a key, use that one. Otherwise, [create an API key](https://platform.openai.com/docs/quickstart/create-and-export-an-api-key){target="_blank"}.
 
-??? info "Did your instructor not provide a key?"
-    You should receive $5 in free OpenAI trial credits if this is the first time you are creating an OpenAI developer account. If you already have an account and have used your free trial credits, then you will need to fund your account.
+??? info "No instructor-provided key?"
+New OpenAI developer accounts receive $5 in free trial credits.  
+If you already used your credits, you’ll need to fund your account.
 
-    Don't worry, this workshop will not cost much. You can [check out the OpenAI pricing calculator](https://openai.com/api/pricing/){target="_blank"}.
+    Don’t worry — this workshop is inexpensive. The total cost should not exceed **$0.50 (~€0.43)**.  
+    See the [OpenAI pricing calculator](https://openai.com/api/pricing/){target="_blank"}.
 
-    The cost for going through this workshop should not exceed $0.25 (~&euro;0.22).
+Once you have a key, set it as an environment variable:
 
-Once you have an OpenAI API key, make sure you have set it as an environment variable, eg:
-
+=== "Linux / macOS"
 ```bash
 export OPENAI_API_KEY=<your-key>
 ```
 
+=== "Windows PowerShell"
 ```powershell
 $Env:OPENAI_API_KEY = <your-key>
 ```
 
-## Good to know
+---
 
-You can run a Quarkus application in [_dev mode_](https://quarkus.io/guides/maven-tooling#dev-mode){target="_blank"} by running the following command in the project directory:
+## Good to Know
 
-### Quarkus dev mode
+### Quarkus Dev Mode
+
+Run your Quarkus app in **dev mode** from the project directory:
 
 ```bash
 ./mvnw quarkus:dev
 ```
 
-This will start the application in dev mode, which means that the application will be recompiled automatically on every change in the source code.
-Just refresh the browser to see the changes.
-The application serves the application at [http://localhost:8080/](http://localhost:8080/).
+Dev mode automatically recompiles your code on every change.
+Your app will be available at http://localhost:8080/.
 
-!!! warning "Stopping the application"
-    When switching steps, make sure to stop the running application before starting the next step. 
-    You can exit the application by pressing `Ctrl+C` in the terminal where the application is running.
+!!! warning “Switching steps”
+    Stop the running application (Ctrl+C) before starting the next step.
 
 ### Dev UI
 
-Quarkus ships with a [Dev UI](https://quarkus.io/guides/dev-ui){target="_blank"}, which is available only in dev mode only at [http://localhost:8080/q/dev/](http://localhost:8080/q/dev/).
-The Dev UI can be seen as your toolbox when building Quarkus applications.
+Quarkus ships with a [Dev UI](https://quarkus.io/guides/dev-ui){target="\_blank"}, available only in dev mode at [http://localhost:8080/q/dev/](http://localhost:8080/q/dev/).
+Think of it as your **toolbox** when building Quarkus applications.
 
 ### Debugging
 
-For debugging a Quarkus application running in dev mode, put your breakpoints and select `Run > Attach to Process`, then select the Quarkus process (in IntelliJ).
+To debug an app in dev mode, put breakpoints in your code and attach your IDE debugger.
+In IntelliJ, use `Run > Attach to Process` and select the Quarkus process.
+Other IDEs (Eclipse, VSCode) support similar remote debugging.
 
-## Let's get started
+---
 
-It's time to get started with the workshop.
+## Getting the Workshop Material
 
-### Getting the workshop material
+Either clone the repository with Git or download a ZIP archive.
 
-Either use `git` or download the repository as a zip file.
-
-#### With Git
-
-If you haven't already, clone the repository and checkout the `main` branch.
+### With Git
 
 ```shell
 git clone https://github.com/quarkusio/quarkus-langchain4j-workshop.git
-```
-
-Then navigate to the directory:
-
-```shell
 cd quarkus-langchain4j-workshop
 ```
 
-#### Direct Download
-
-If you didn't use the `git` approach, you can download the repository as a zip file from the [GitHub repository](https://github.com/quarkusio/quarkus-langchain4j-workshop/archive/refs/heads/main.zip):
+### Direct Download
 
 ```shell
 curl -L -o workshop.zip https://github.com/quarkusio/quarkus-langchain4j-workshop/archive/refs/heads/main.zip
-```
-
-Then unzip the file and navigate to the directory:
-
-```shell
 unzip workshop.zip
 cd quarkus-langchain4j-workshop-main
 ```
 
-### Warming the caches
+---
 
-This workshop needs to download all sorts of Maven artifacts and Docker images.
-Some of these artifacts are large, and because we have to share the internet connection at the workshop location, it is better to download them before the workshop.
+## Pre-Warming Caches
 
-If you’re getting ready for a workshop, you might find it helpful to pre-download some of these artifacts.
-This can save strain on shared bandwidth.
-If, however, you’re already attending a workshop, don’t worry about warming anything up.
+This workshop requires downloading Maven dependencies and Docker images.
+To avoid bandwidth issues during the session, we recommend pre-downloading them.
 
-### Warming up Maven
-
-To warm up Maven, you can run the following command in the root directory of the project:
+### Warm up Maven
 
 ```shell
 ./mvnw verify
 ```
 
-### Warming up Docker images
+!!! tip 
+    This command not only downloads dependencies but also verifies your setup before the workshop.
 
-To download the Docker images, you can run one of the following commands:
+### Warm up Docker Images
 
-=== "Podman"
+* Podman: `podman pull pgvector/pgvector:pg16`
+* Docker: `docker pull pgvector/pgvector:pg16`
 
-    ``` shell
-    podman pull pgvector/pgvector:pg16
-    ```
+---
 
-=== "Docker"
+## Importing the Project in Your IDE
 
-    ```shell
-    docker pull pgvector/pgvector:pg16
-    ```
+!!! tip 
+    Open the project from `section-1/step-01` in your IDE and use that directory throughout the workshop.\
 
-### Import the project in your IDE
+If you get stuck, simply switch to the `step-xx` directory of the last completed step.
 
-Then, open the project from the `section-1/step-01` directory in your IDE and use that directory throughout the workshop. If you get stuck anywhere and would like to move on, simply switch to the `step-xx` directory of the last step you completed.
+---
 
-Once done, you can move on to the next step: [Step 1](section-1/step-01.md).
+## Next Step
+
+You’re ready to go! Move on to [Step 1](section-1/step-01.md).
+
