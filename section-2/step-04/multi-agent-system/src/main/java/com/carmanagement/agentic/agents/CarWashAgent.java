@@ -19,13 +19,13 @@ public interface CarWashAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Car Number: {{carNumber}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Car Number: {carNumber}
         
         Car Wash Request:
-        {{carWashRequest}}
+        {carWashRequest}
         """)
     @Agent(outputName="carWashAgentResult", description="Car wash specialist. Determines what car wash services are needed.")
     String processCarWash(

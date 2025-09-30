@@ -20,13 +20,13 @@ public interface CarWashAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Car Number: {{carNumber}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Car Number: {carNumber}
         
         Car Wash Request:
-        {{carWashRequest}}
+        {carWashRequest}
         """)
     @Agent(description = "Car wash specialist. Determines what car wash services are needed.", outputName = "carWashAgentResult")
     @ToolBox(CarWashTool.class)

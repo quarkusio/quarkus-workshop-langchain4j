@@ -19,13 +19,13 @@ public interface MaintenanceAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Car Number: {{carNumber}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Car Number: {carNumber}
         
         Maintenance Request:
-        {{maintenanceRequest}}
+        {maintenanceRequest}
         """)
     @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.", outputName = "maintenanceAgentResult")
     @ToolBox(MaintenanceTool.class)

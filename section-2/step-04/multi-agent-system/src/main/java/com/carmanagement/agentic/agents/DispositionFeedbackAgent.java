@@ -19,15 +19,15 @@ public interface DispositionFeedbackAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {{carMake}}
-        Model: {{carModel}}
-        Year: {{carYear}}
-        Previous Condition: {{carCondition}}
+        Make: {carMake}
+        Model: {carModel}
+        Year: {carYear}
+        Previous Condition: {carCondition}
         
         Feedback:
-        Rental Feedback: {{rentalFeedback}}
-        Car Wash Feedback: {{carWashFeedback}}
-        Maintenance Feedback: {{maintenanceFeedback}}
+        Rental Feedback: {rentalFeedback}
+        Car Wash Feedback: {carWashFeedback}
+        Maintenance Feedback: {maintenanceFeedback}
         """)
     @Agent(outputName="dispositionRequest", description="Car disposition analyzer. Using feedback, determines if a car should be disposed of.")
     String analyzeForDisposition(
