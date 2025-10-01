@@ -491,11 +491,11 @@ The declarative API uses annotations to define workflows, making them:
 
 ## Key Takeaways
 
-**Workflows enable collaboration**: Multiple agents work together to solve complex problems
-**AgenticScope enables data sharing**: Agents pass data through a shared context without tight coupling
-**Sequence workflows run in order**: Perfect when Agent B needs Agent A's output
-**The declarative API is powerful**: Annotate interfaces, get automatic implementations
-**Type safety matters**: The compiler helps catch errors before runtime
+- **Workflows enable collaboration**: Multiple agents work together to solve complex problems
+- **AgenticScope enables data sharing**: Agents pass data through a shared context without tight coupling
+- **Sequence workflows run in order**: Perfect when Agent B needs Agent A's output
+- **The declarative API is powerful**: Annotate interfaces, get automatic implementations
+- **Type safety matters**: The compiler helps catch errors before runtime
 
 ---
 

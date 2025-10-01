@@ -1,6 +1,7 @@
 package com.carmanagement.resource;
 
 import com.carmanagement.service.CarManagementService;
+import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -31,7 +32,6 @@ public class CarManagementResource {
             String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "", "");
             return Response.ok(result).build();
         } catch (Exception e) {
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error processing rental return: " + e.getMessage())
                     .build();

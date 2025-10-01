@@ -1,237 +1,716 @@
-# Step 03 - Building nested agent workflows
+# Step 03 - Building Nested Agent Workflows
 
-## Expanding Requirements
+## New Requirement: Comprehensive Car Management
 
-The Miles of Smiles management team has decided to get more serious about car maintenance. When cars are returned, the provided feedback should be analyzed — to see if car cleaning is needed and also to see if car maintenance is needed. If maintenance is needed then the car should be given to the maintenance team. If the car doesn't need maintenance but does need cleaning then it should be given to the car wash team. 
+The Miles of Smiles management team wants (again!) a more sophisticated car management system.
+When cars are returned, the system should automatically:
 
-There are a number of things that we now need our car management app to handle:
+1. **Analyze feedback** for both cleaning needs AND maintenance requirements
+2. **Route cars appropriately** — send to maintenance if needed, otherwise to car wash if needed
+3. **Track all feedback sources** — from rentals, car wash, and maintenance teams
+4. **Update car conditions** based on all collected feedback
 
-- Car returns from rentals, the car wash, or the maintenance department
-- Analyzing the return feedback to see if a car wash and/or maintenance are required
-- Based on the feedback, getting the maintenance department to work on the car
-- Based on the feedback, getting the car wash team to clean the car
-- Automatically updating the car condition based on the analysis of the feedback
+This requires a more complex workflow that can handle **parallel analysis** and **conditional routing**.
 
-## Nested Workflows
+---
 
-In the previous step, we used a sequence workflow, which ran the car wash agent followed by the car condition feedback agent. In this step, we will build a sequence workflow that contains a parallel workflow, a conditional workflow, and a single agent (see diagram below). 
+## What You'll Learn
 
-At each step in the workflow, the agentic framework checks the inputs needed by the next workflow or agent that needs to run. For the root of the workflow (in this case our sequence workflow), parameters are provided by the caller of the workflow interface. In subsequent steps within the workflow, the framework gathers values for input parameters from the `AgenticScope`. The output from each agent or workflow is added to the `AgenticScope` (using the agent's `outputName` setting). The output from a workflow is typically the output of the last agent in the workflow. When building the agent/workflow, you can also specify an output method, which will be run after the response from the agent/workflow is created — this is particularly useful for parallel workflows, to customize what to fill into the corresponding `outputName` for that agent/workflow.
+In this step, you will:
 
-## What are we going to build?
+- Build **nested workflows**, workflows that contain other workflows
+- Use **parallel workflows** to run multiple agents concurrently
+- Implement **conditional workflows** that route execution based on conditions
+- Understand **activation conditions** that control when agents execute
+- See how complex agent systems compose from simple building blocks
+
+---
+
+## Understanding Nested Workflows
+
+In Step 02, you built a simple sequence workflow with two agents running one after another. In this step, you'll build a three-level nested workflow:
+
+```mermaid
+graph TD
+    A[CarProcessingWorkflow<br/>Sequence] --> B[1. FeedbackWorkflow<br/>Parallel]
+    A --> C[2. ActionWorkflow<br/>Conditional]
+    A --> D[3. CarConditionFeedbackAgent<br/>Single Agent]
+
+    B --> B1[CarWashFeedbackAgent]
+    B --> B2[MaintenanceFeedbackAgent]
+
+    C --> C1{Condition:<br/>Maintenance needed?}
+    C1 -->|Yes| C2[MaintenanceAgent]
+    C1 -->|No| C3{Condition:<br/>Car wash needed?}
+    C3 -->|Yes| C4[CarWashAgent]
+    C3 -->|No| C5[Skip]
+
+    style A fill:#e1f5ff
+    style B fill:#fff3cd
+    style C fill:#f8d7da
+```
+
+**The Flow:**
+
+1. **FeedbackWorkflow** (Parallel): Analyzes feedback simultaneously from two perspectives:
+   - Does the car need maintenance?
+   - Does the car need washing?
+
+2. **ActionWorkflow** (Conditional): Routes the car based on the analysis:
+   - If maintenance needed → send to maintenance team
+   - Else if washing needed → send to car wash
+   - Else → do nothing
+
+3. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
+
+---
+
+## What Are We Going to Build?
 
 ![App Blueprint](../images/agentic-app-3.png){: .center}
 
-Starting from our app in `step-02`, we need to:
+We'll transform the car management system to handle:
 
-Create/Update agents and workflows:
+- **Three feedback sources**: rental returns, car wash returns, maintenance returns
+- **Parallel analysis**: concurrent evaluation for cleaning and maintenance needs
+- **Conditional routing**: intelligent decision-making about where to send each car
+- **Comprehensive tracking**: updated car conditions based on all feedback
 
-   - Create a `MaintenanceFeedbackAgent`
-   - Create a `CarWashFeedbackAgent`
-   - Create a `FeebackWorkflow`
-   - Modify the `CarProcessingWorkflow` to add the maintenance feedback
-   - Create a `MaintenanceAgent`
-   - Modify the `CarWashAgent` to use the output from the car wash feedback agent
-   - Create an `ActionWorkflow`
-   - Modify the `CarConditionFeedbackAgent` to use the output from the feedback agents
+---
 
-Create the maintenance tool and maintenance returns API:
+## Architecture Overview
 
-   - Create a `MaintenanceTool` 
-   - Modify `CarManagementResource` to add a maintenance returns API
+### The Nested Workflow Structure
 
-Define the agents and workflows:
+```mermaid
+sequenceDiagram
+    participant User
+    participant Main as CarProcessingWorkflow<br/>(Sequence)
+    participant Feedback as FeedbackWorkflow<br/>(Parallel)
+    participant Action as ActionWorkflow<br/>(Conditional)
+    participant Condition as CarConditionFeedbackAgent
+    participant Scope as AgenticScope
 
-   - Define the `MaintenanceAgent`
-   - Define the `MaintenanceFeedbackAgent`
-   - Define a parallel workflow, `FeebackWorkflow`, including the `CarWashFeedbackAgent` and `MaintenanceFeedbackAgent`
-   - Define a conditional workflow, `ActionWorkflow`, including the `CarWashAgent` and `MaintenanceAgent`
-   - Modify the sequence workflow, to include the feedback workflow, the action workflow and the car condition feedback agent
+    User->>Main: processCarReturn(feedback)
+    Main->>Scope: Initialize state
 
+    Note over Main,Feedback: Step 1: Parallel Analysis
+    Main->>Feedback: analyzeFeedback()
+    par Parallel Execution
+        Feedback->>Scope: CarWashFeedbackAgent<br/>Write: carWashRequest
+    and
+        Feedback->>Scope: MaintenanceFeedbackAgent<br/>Write: maintenanceRequest
+    end
 
-## Before You Begin
-    
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-03`:
+    Note over Main,Action: Step 2: Conditional Routing
+    Main->>Action: processAction()
+    Action->>Action: Check conditions
+    alt Maintenance Required
+        Action->>Scope: MaintenanceAgent executes
+    else Car Wash Required
+        Action->>Scope: CarWashAgent executes
+    else Neither Required
+        Action->>Action: Skip both agents
+    end
 
-For Linux/macOS:
+    Note over Main,Condition: Step 3: Update Condition
+    Main->>Condition: analyzeForCondition()
+    Condition->>Scope: Write: carCondition
+
+    Main->>User: Return CarConditions
+```
+
+---
+
+## Prerequisites
+
+Before starting:
+
+- Completed Step 02 (or have the `section-2/step-02` code available)
+- Application from Step 02 is stopped (Ctrl+C)
+
+---
+
+## Option 1: Continue from Step 02
+
+If you want to continue building on your Step 02 code, copy the updated UI files:
+
+=== "Linux / macOS"
+    ```bash
+    cd section-2/step-02
+    cp ../step-03/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
+    cp ../step-03/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
+    cp ../step-03/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
+    cp ../step-03/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
+    cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
+    ```
+
+=== "Windows"
+    ```cmd
+    cd section-2\step-02
+    copy ..\step-03\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
+    copy ..\step-03\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
+    copy ..\step-03\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
+    copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+    ```
+
+---
+
+## Option 2: Start Fresh from Step 03
+
+Navigate to the complete `section-2/step-03` directory:
+
 ```bash
-cd ./step-01
-cp ../step-03/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
-cp ../step-03/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
-cp ../step-03/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
-cp ../step-03/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
-cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
+cd section-2/step-03
 ```
 
-For Windows:
-```batch
-cd .\step-01
-copy ..\step-03\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-copy ..\step-03\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-copy ..\step-03\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
-copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
-copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-```
+---
 
-## Create/Update agents and workflows
+## Part 1: Create Feedback Analysis Agents
 
-### Create a `MaintenanceFeedbackAgent`
+We need two specialized agents to analyze feedback from different perspectives.
 
-Create a `MaintenanceFeedbackAgent` to analyze the feedback from rental returns, car wash returns and maintenance returns. The agent will decide if maintenance is required on the car.
+### Step 1: Create the MaintenanceFeedbackAgent
 
-In the system prompt, instruct the agent to include `MAINTENANCE_NOT_REQUIRED` in its response if no maintenance is needed so that we can easily check for that string when we build our conditional agents.
+This agent determines if a car needs maintenance based on feedback.
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedbackAgent.java`:
 
-```java hl_lines="20" title="MaintenanceFeedbackAgent.java"
+```java title="MaintenanceFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
-### Create a `CarWashFeedbackAgent`
+**Key Points:**
 
-Create a `CarWashFeedbackAgent` to analyze the feedback from rental returns, car wash returns and maintenance returns. The agent will decide if any cleaning is required of the car.
+- **System message**: Focuses on mechanical issues, performance problems, and maintenance needs
+- **Specific output format**: Returns "MAINTENANCE_NOT_REQUIRED" when no maintenance is needed (for easy conditional checking)
+- **outputName**: `"maintenanceRequest"` — stores the result in AgenticScope's state
+- **Three feedback sources**: Analyzes rental, car wash, AND maintenance feedback
 
-In the system prompt instruct the agent to include `CARWASH_NOT_REQUIRED` in its response if no cleaning is needed so that we can easily check for that string when we build our conditional agents.
+### Step 2: Create the CarWashFeedbackAgent
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+This agent determines if a car needs washing based on feedback.
 
-```java hl_lines="19" title="CarWashFeedbackAgent.java"
+In `src/main/java/com/carmanagement/agentic/agents`, create `CarWashFeedbackAgent.java`:
+
+```java title="CarWashFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashFeedbackAgent.java"
 ```
 
-### Create a `FeedbackWorkflow`
+**Key Points:**
 
-We need to analyze feedback from car returns both from the perspective of car cleanliness and needed repairs/maintenance. Since those are independent considerations we can do those analyses in parallel (to improve responsiveness of the overall workflow).
+- **System message**: Focuses on cleanliness issues — dirt, stains, smells
+- **Specific output format**: Returns "CARWASH_NOT_REQUIRED" when no washing is needed
+- **outputName**: `"carWashRequest"` — stores the result in AgenticScope's state
+- **Same inputs**: Also analyzes all three feedback sources
 
-Create a `FeedbackWorkflow` which we will use for our parallel workflow.
+---
 
-Create the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
+## Part 2: Create the Parallel Feedback Workflow
+
+Now we'll create a workflow that runs both feedback agents **concurrently**.
+
+### Step 3: Create the FeedbackWorkflow
+
+In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.java`:
 
 ```java title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
-### Modify the `CarProcessingWorkflow` to add the maintenance feedback
+**Let's break it down:**
 
-The `CarProcessingWorkflow` represents our overall agent system. Modify the `CarProcessingWorkflow` to add the parameter for the feedback related to maintenance:
+#### `@ParallelAgent` Annotation
 
-```java hl_lines="24" title="CarProcessingWorkflow.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
+```java
+@ParallelAgent(
+    outputName = "feedbackResult",
+    subAgents = {
+        @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
+        @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+    }
+)
 ```
 
-### Create a `MaintenanceAgent`
+This defines a **parallel workflow**:
 
-Create a maintenance agent that can use a maintenance tool to request maintenance. The maintenance requests will be created by the `MaintenanceFeedbackAgent`. The `MaintenanceFeedbackAgent` uses an `outputName` of `maintenanceRequest`.
+- Both agents execute **concurrently**
+- Improves performance, no waiting for one to finish before the other starts
+- Each agent has its own `outputName` to store results independently
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+!!! note "Why Parallel Here?"
+    The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other. 
+    Running them in parallel cuts the total execution time roughly in half!
 
-```java hl_lines="26-27 35" title="MaintenanceAgent.java"
+---
+
+## Part 3: Create Action Agents
+
+We need agents that can actually request maintenance and car washes.
+
+### Step 4: Create the MaintenanceAgent
+
+This agent uses a tool to request maintenance services.
+
+In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceAgent.java`:
+
+```java title="MaintenanceAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
-### Modify the `CarWashAgent` to use the output from the car wash feedback agent
+**Key Points:**
 
-We need to modify the `CarWashAgent` to rely on requests created by the `CarWashFeedbackAgent`. The `CarWashFeedbackAgent`, uses an `outputName` of `carWashRequest`. Modify the `CarWashAgent` to use the `carWashRequest` as its input.
+- **Input**: `maintenanceRequest` — reads the output from `MaintenanceFeedbackAgent`
+- **Tool**: `MaintenanceTool` — can request oil changes, brake service, etc.
+- **System message**: Interprets the maintenance request and calls the appropriate tool
 
-Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+### Step 5: Update the CarWashAgent
 
-```java hl_lines="27-28 36" title="CarWashAgent.java"
+The `CarWashAgent` needs to read from the `CarWashFeedbackAgent`'s output.
+
+Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
+
+```java title="CarWashAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
-### Create an `ActionWorkflow`
+**Key change:**
 
-In cases where the feedback agents indicate car maintenance is required, we want to invoke the maintenance agent (to request maintenance). In cases where no maintenance is required, but a car wash is required, we want to invoke the car wash agent (to request a car wash). If the feedback indicates neither is required then we should act accordingly. For this, we will need a conditional workflow.
+Now takes `carWashRequest` as input (instead of analyzing raw feedback itself). 
+This follows the separation of concerns principle:
 
-Create an `ActionWorkflow` which we will use for our conditional workflow, using the `carWashRequest` and `maintenanceRequest` as inputs.
+- Feedback agents: Analyze and decide
+- Action agents: Execute based on decisions
 
-Create the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
+---
 
-```java hl_lines="21-22" title="ActionWorkflow.java"
+## Part 4: Create the Conditional Action Workflow
+
+Now we'll create a workflow that **conditionally** executes agents based on the feedback analysis.
+
+### Step 6: Create the ActionWorkflow
+
+In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.java`:
+
+```java title="ActionWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
-### Modify the `CarConditionFeedbackAgent` to use the output from the feedback agents
+**Let's break it down:**
 
-Similarly to the `CarWashAgent` and `MaintenanceAgent`, we will have the `CarConditionFeedbackAgent` rely on the output from the feedback agents rather than interpreting the returns feedback directly itself.
+#### `@ConditionalAgent` Annotation
 
-Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+```java
+@ConditionalAgent(
+    outputName = "actionResult",
+    subAgents = {
+        @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
+        @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+    }
+)
+```
 
-```java hl_lines="19-20" title="CarConditionFeedbackAgent.java"
+A **conditional workflow** is a sequence where each agent only runs if its condition is met.
+
+#### `@ActivationCondition` Methods
+
+```java
+@ActivationCondition(MaintenanceAgent.class)
+static boolean activateMaintenance(String maintenanceRequest) {
+    return isRequired(maintenanceRequest);
+}
+
+@ActivationCondition(CarWashAgent.class)
+static boolean activateCarWash(String carWashRequest) {
+    return isRequired(carWashRequest);
+}
+```
+
+These methods control when each agent executes:
+
+- **`activateMaintenance`**: Returns `true` if maintenance is needed
+- **`activateCarWash`**: Returns `true` if car wash is needed
+
+The parameters are automatically extracted from AgenticScope's state by name.
+
+#### Execution Logic
+
+```
+if (activateMaintenance(maintenanceRequest) == true)
+    → Execute MaintenanceAgent
+    → Skip CarWashAgent (regardless of its condition)
+else if (activateCarWash(carWashRequest) == true)
+    → Execute CarWashAgent
+else
+    → Skip both agents
+```
+
+This implements _priority routing_: maintenance takes precedence over car wash.
+
+---
+
+## Part 5: Update the Car Condition Agent
+
+### Step 7: Update CarConditionFeedbackAgent
+
+The condition agent should now use the analyzed requests instead of raw feedback.
+
+Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
+
+```java title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedbackSnippet"
 ```
 
-## Create the maintenance tool and maintenance returns API
+**Key changes:**
 
-### Create a `MaintenanceTool`
+- Now takes `carWashRequest` and `maintenanceRequest` as inputs
+- Uses the analyzed requests (which include reasoning) to determine condition
+- More accurate condition updates based on professional analysis
 
-We need to create a `MaintenanceTool` that can be used by the `MaintenanceAgent` to select maintenance options to open a request for maintenance. The tool should let an agent request a variety of maintenance tasks for the car, such as oil changes, tire rotations, brake service, engine service or transmission service.
+---
 
-Create the file in your `src/main/java/com/carmanagement/agentic/tools` directory.
+## Part 6: Create Supporting Infrastructure
+
+### Step 8: Create the MaintenanceTool
+
+In `src/main/java/com/carmanagement/agentic/tools`, create `MaintenanceTool.java`:
 
 ```java title="MaintenanceTool.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java"
 ```
 
-### Modify `CarManagementResource` to add a maintenance returns API
+Similar to `CarWashTool`, this tool:
 
-We'll modify the `CarManagementResource` to add a maintenance returns API. This will be called by the UI and will be very similar to the car wash returns API.
+- Uses `@Dependent` scope (required for tool detection)
+- Provides maintenance options: oil change, tire rotation, brake service, etc.
+- Updates car status to `UNDER_MAINTENANCE`
+- Returns a summary of requested services
 
-Update the file in your `src/main/java/com/carmanagement/resource` directory.
+### Step 9: Create the RequiredAction Model
+
+We need a model to represent what action is required for a car.
+
+In `src/main/java/com/carmanagement/model`, create `RequiredAction.java`:
+
+```java title="RequiredAction.java"
+package com.carmanagement.model;
+
+public enum RequiredAction {
+    NONE,
+    CAR_WASH,
+    MAINTENANCE
+}
+```
+
+### Step 10: Update the CarConditions Model
+
+Update `src/main/java/com/carmanagement/model/CarConditions.java`:
+
+```java title="CarConditions.java"
+package com.carmanagement.model;
+
+public record CarConditions(String generalCondition, RequiredAction requiredAction) {
+}
+```
+
+Changed from `boolean carWashRequired` to `RequiredAction requiredAction` to support three states.
+
+### Step 11: Add Maintenance Returns API
+
+Update `src/main/java/com/carmanagement/resource/CarManagementResource.java`:
 
 ```java title="CarManagementResource.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java:maintenanceReturn"
 ```
 
-## Define the agents and workflows
+Adds a new endpoint for the maintenance team to return cars with feedback.
 
-We'll need to make a few changes to our `CarManagementService` to define new workflows and update existing workflows:
+---
 
-Update the file in your `src/main/java/com/carmanagement/service` directory.
+## Part 7: Update the Main Workflow
 
-```java hl_lines="65-70 80-84 93-97 99-112 114-118 174-192" title="CarManagementService.java"
+### Step 12: Update CarProcessingWorkflow
+
+This is where everything comes together! Update the workflow to use nested workflows.
+
+Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
+
+```java title="CarProcessingWorkflow.java"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
+```
+
+**Let's break it down:**
+
+#### The Sequence
+
+```java
+@SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
+    @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
+    @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
+    @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+})
+```
+
+Notice the subagents include **workflows** (`FeedbackWorkflow`, `ActionWorkflow`), not just agents!
+
+This is **workflow composition**: workflows can contain other workflows.
+
+#### The Execution Order
+
+1. **FeedbackWorkflow** (parallel): Analyzes feedback for both maintenance and car wash needs
+2. **ActionWorkflow** (conditional): Routes the car to maintenance or car wash based on analysis
+3. **CarConditionFeedbackAgent** (single): Updates the car's overall condition
+
+#### The @Output Method
+
+```java
+@Output
+static CarConditions output(String carCondition, String maintenanceRequest, String carWashRequest) {
+    RequiredAction requiredAction;
+    if (isRequired(maintenanceRequest)) {
+        requiredAction = RequiredAction.MAINTENANCE;
+    } else if (isRequired(carWashRequest)) {
+        requiredAction = RequiredAction.CAR_WASH;
+    } else {
+        requiredAction = RequiredAction.NONE;
+    }
+    return new CarConditions(carCondition, requiredAction);
+}
+```
+
+Extracts three values from AgenticScope's state and combines them into the final result.
+
+---
+
+## Part 8: Update the Service Layer
+
+### Step 13: Update CarManagementService
+
+Finally, update the service to handle the new workflow structure.
+
+Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
+
+```java title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
-### Define the `MaintenanceAgent`
+**Key changes:**
 
-Notice the definition of the `MaintenanceAgent` (above), associating it with the injected `MaintenanceTool`.
+- Now passes `maintenanceFeedback` parameter to the workflow
+- Uses `RequiredAction` enum to determine car status
+- Sets status to `UNDER_MAINTENANCE` or `AT_CAR_WASH` based on the required action
 
-### Define the `MaintenanceFeedbackAgent`
+---
 
-Notice the definition of the `MaintenanceFeedbackAgent` (above).
+## Try It Out
 
-### Define a parallel workflow, `FeedbackWorkflow`, including the `CarWashFeedbackAgent` and `MaintenanceFeedbackAgent`
+Start the application:
 
-Notice, in the `CarManagementService` (above), that we've defined the `FeedbackWorkflow` using the agent interface we created earlier. This is a parallel workflow that runs both feedback agents simultaneously to analyze the car's condition from different perspectives.
+```bash
+./mvnw quarkus:dev
+```
 
-### Define a conditional workflow, `ActionWorkflow`, including the `CarWashAgent` and `MaintenanceAgent`
+Open [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
-Also in the `CarManagementService` (above), notice the definition of the `ActionWorkflow`, which is a conditional workflow including the maintenance agent and the car wash agent as subagents. Conditional workflows are sequence workflows where each agent in the workflow is paired with a condition that must evaluate to true in order for the agent to be called (otherwise the agent is skipped).
+### Notice the New UI
 
-The maintenance agent will only execute if the `selectAgent` method indicates maintenance is required. The car wash agent will only execute if the `selectAgent` method indicates a car wash is required. The `selectAgent` method looks at the values of `maintenanceRequest` and `carWashRequest`, in the agentic scope, to make the determination. In this way, we have used conditions to build a kind of router, choosing which of the agents to run for each request.
-
-### Modify the sequence workflow, to include the feedback workflow, the action workflow and the car condition feedback agent
-
-Finally, in the code above, we redefined the `CarProcessingWorkflow` to sequentially run the feedback workflow, the action workflow, and the car condition feedback agent:
-
-Notice that the `CarProcessingWorkflow` is a nested workflow (workflows within workflows).
-
-
-## Try out the new workflow
-
-In the Returns section of the UI you should now be able to see a Maintenance Return tab in the Returns section. This is where the Miles of Smiles maintenance team will enter their feedback when they are finished working on the car. 
+The **Returns** section now has a **Maintenance Return** tab:
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-tab.png){: .center}
 
-On the Maintenance Return tab, for car 3, enter feedback to indicate the scratch (mentioned in the car condition) has been fixed, but the car needs to be cleaned:
+### Test the Complete Workflow
+
+Enter feedback on the Maintenance Return tab for car 3:
 
 ```
 buffed out the scratch. car could use a wash now.
 ```
 
-Once the request completes, you should see that the car's status has been updated in the Fleet Status section.
+Click **Return**.
 
-![Updated Fleet Status](../images/agentic-UI-fleet-status.png){: .center}
+**What happens?**
 
-Take a look at the logs. You should see that the car wash feedback agent and maintenance feedback agent both ran (in parallel, which may be evident from when the responses from those agents were logged). You should then see the car wash agent and car wash tool responses in the log (since there was no need for maintenance, but a car wash was needed). Finally, you should see the response from the car condition feedback agent.
+1. **Parallel Analysis** (FeedbackWorkflow):
+   - `MaintenanceFeedbackAgent`: "MAINTENANCE_NOT_REQUIRED" (scratch fixed)
+   - `CarWashFeedbackAgent`: "Car wash needed for general cleaning"
+
+2. **Conditional Routing** (ActionWorkflow):
+   - Maintenance condition: `false` (not required)
+   - Car wash condition: `true` (required)
+   - → Executes `CarWashAgent`, sends car to car wash
+
+3. **Condition Update** (CarConditionFeedbackAgent):
+   - Updates car condition: "Scratch removed, clean overall"
+
+4. **UI Update**:
+   - Car status → `AT_CAR_WASH`
+   - Condition column updates
+
+### Check the Logs
+
+Look for evidence of parallel execution:
+
+```
+[MaintenanceFeedbackAgent] MAINTENANCE_NOT_REQUIRED - Scratch has been repaired
+[CarWashFeedbackAgent] Recommend exterior wash and interior cleaning
+🚗 CarWashTool result: Car wash requested for Honda Civic (2020), Car #3:
+- Exterior wash
+- Interior cleaning
+[CarConditionFeedbackAgent] Good condition, scratch repaired, recently cleaned
+```
+
+Notice how both feedback agents' responses appear close together in time (parallel execution)!
+
+---
+
+## How It All Works Together
+
+Let's trace a complete example with maintenance needed:
+
+### Example: "Strange engine noise"
+
+```
+Rental feedback: "Engine making strange knocking sound"
+```
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Main as CarProcessingWorkflow
+    participant Feedback as FeedbackWorkflow
+    participant Action as ActionWorkflow
+    participant Scope as AgenticScope State
+
+    User->>Main: Return car with feedback
+    Main->>Scope: Store: rentalFeedback="Engine knocking"
+
+    rect rgb(255, 243, 205)
+    Note over Main,Feedback: Parallel Workflow
+    Main->>Feedback: Execute
+    par
+        Feedback->>Scope: MaintenanceFeedbackAgent<br/>Write: "Engine service needed - knocking sound"
+    and
+        Feedback->>Scope: CarWashFeedbackAgent<br/>Write: "CARWASH_NOT_REQUIRED"
+    end
+    end
+
+    rect rgb(248, 215, 218)
+    Note over Main,Action: Conditional Workflow
+    Main->>Action: Execute
+    Action->>Scope: Read: maintenanceRequest, carWashRequest
+    Action->>Action: activateMaintenance() = true
+    Action->>Scope: MaintenanceAgent executes<br/>Write: "Maintenance requested: engine service"
+    Note over Action: CarWashAgent skipped (condition false)
+    end
+
+    Main->>Scope: CarConditionFeedbackAgent<br/>Write: "Requires engine inspection"
+
+    Main->>Main: @Output combines results
+    Main->>User: CarConditions(condition="Requires engine inspection", action=MAINTENANCE)
+```
+
+---
+
+## Understanding Workflow Composition
+
+The power of this system comes from **composability** — complex workflows built from simple pieces.
+We keep control on the flow, while letting agents focus on their specific tasks.
+
+### Building Blocks
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `CarWashFeedbackAgent` | Agent | Analyzes cleaning needs |
+| `MaintenanceFeedbackAgent` | Agent | Analyzes maintenance needs |
+| `FeedbackWorkflow` | Parallel Workflow | Runs both analyses concurrently |
+| `CarWashAgent` | Agent | Requests car washing |
+| `MaintenanceAgent` | Agent | Requests maintenance |
+| `ActionWorkflow` | Conditional Workflow | Routes to appropriate action |
+| `CarConditionFeedbackAgent` | Agent | Updates car condition |
+| `CarProcessingWorkflow` | Sequence Workflow | Orchestrates everything |
+
+### Composition Hierarchy
+
+```
+CarProcessingWorkflow (Sequence)
+├── FeedbackWorkflow (Parallel)
+│   ├── CarWashFeedbackAgent
+│   └── MaintenanceFeedbackAgent
+├── ActionWorkflow (Conditional)
+│   ├── MaintenanceAgent (with MaintenanceTool)
+│   └── CarWashAgent (with CarWashTool)
+└── CarConditionFeedbackAgent
+```
+
+This is a **three-level** nested workflow!
+
+---
+
+## Key Takeaways
+
+- **Workflows compose**: Build complex systems by nesting simple workflows
+- **Parallel workflows improve response time**: Independent tasks run concurrently
+- **Conditional workflows enable routing**: Execute different paths based on runtime conditions
+- **Activation conditions are powerful**: Control agent execution with simple boolean logic
+- **Separation of concerns**: Analysis agents separate from action agents for clarity
+- **Type safety throughout**: Compile-time checks on the entire workflow structure
+
+---
+
+## Experiment Further
+
+### 1. Add Priority Levels
+
+What if you wanted to add a third level of priority (e.g., emergency repairs)?
+
+- Add an `EmergencyRepairFeedbackAgent`
+- Update `ActionWorkflow` with a third condition
+- Ensure emergency repairs take highest priority
+
+### 2. Make Feedback Analysis Sequential
+
+Try changing `FeedbackWorkflow` from `@ParallelAgent` to `@SequenceAgent`. How does this affect performance? When might you want sequential analysis?
+
+### 3. Add More Sophisticated Conditions
+
+The `ActionWorkflow` currently uses simple `isRequired()` checks. Try adding:
+
+- Cost-based conditions (only send to maintenance if estimated cost < $500)
+- Time-based conditions (skip car wash if it was washed in last 24 hours)
+- Severity-based conditions (emergency repairs vs. routine maintenance)
+
+### 4. Visualize the Workflow
+
+Add logging to each agent and workflow to print when they start and finish. Observe the parallel execution in the logs!
+
+---
+
+## Troubleshooting
+
+??? warning "Parallel agents not executing in parallel"
+    Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
+
+??? warning "Conditional workflow always/never executing certain agents"
+    - Verify your `@ActivationCondition` methods are correctly named
+    - Check that parameter names match the `outputName` values exactly
+    - Add logging to the condition methods to see what values they're receiving
+
+??? warning "Error: Cannot find symbol 'RequiredAction'"
+    Make sure you created both:
+
+    - The `RequiredAction` enum
+    - Updated `CarConditions` to use it
+
+??? warning "Agents getting wrong input values"
+    Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
+
+---
+
+## What's Next?
+
+You've built a sophisticated multi-level nested workflow combining sequence, parallel, and conditional execution!
+
+In **Step 04**, you'll learn about **Agent-to-Agent (A2A) communication** — connecting your workflows to remote agents running in separate systems!
+
+[Continue to Step 04 - Using Remote Agents (A2A)](step-04.md)
