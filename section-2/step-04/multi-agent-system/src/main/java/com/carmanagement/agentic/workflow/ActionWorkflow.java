@@ -24,7 +24,7 @@ public interface ActionWorkflow {
             String carMake,
             String carModel,
             Integer carYear,
-            Integer carNumber,
+            Long carNumber,
             String carCondition,
             String carWashRequest,
             String maintenanceRequest,

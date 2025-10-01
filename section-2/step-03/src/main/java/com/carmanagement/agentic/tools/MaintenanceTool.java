@@ -2,19 +2,15 @@ package com.carmanagement.agentic.tools;
 
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.service.CarService;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 /**
  * Tool for requesting car maintenance operations.
  */
 @Dependent
 public class MaintenanceTool {
-
-    @Inject
-    CarService carService;
 
     /**
      * Requests maintenance for a car based on the provided parameters.
@@ -32,8 +28,9 @@ public class MaintenanceTool {
      * @return A summary of the maintenance request
      */
     @Tool("Requests maintenance with the specified options")
+    @Transactional
     public String requestMaintenance(
-            Integer carNumber,
+            Long carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -48,9 +45,10 @@ public class MaintenanceTool {
         // or update a database with the maintenance request
         
         // Update car status to IN_MAINTENANCE
-        CarInfo carInfo = carService.getCarById(carNumber);
+        CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo != null) {
-            carInfo.setStatus(CarStatus.IN_MAINTENANCE);
+            carInfo.status = CarStatus.IN_MAINTENANCE;
+            carInfo.persist();
         }
         
         StringBuilder summary = new StringBuilder();

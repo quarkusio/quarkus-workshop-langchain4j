@@ -2,19 +2,14 @@ package com.carmanagement.agentic.tools;
 
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.service.CarService;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
 
 /**
  * Tool for requesting car wash operations.
  */
 @Dependent
 public class CarWashTool {
-
-    @Inject
-    CarService carService;
 
     /**
      * Requests a car wash based on the provided parameters.
@@ -32,7 +27,7 @@ public class CarWashTool {
      */
     @Tool("Requests a car wash with the specified options")
     public String requestCarWash(
-            Integer carNumber,
+            Long carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -46,9 +41,10 @@ public class CarWashTool {
         // or update a database with the car wash request
         
         // Update car status to AT_CAR_WASH
-        CarInfo carInfo = carService.getCarById(carNumber);
+        CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo != null) {
-            carInfo.setStatus(CarStatus.AT_CAR_WASH);
+            carInfo.status = CarStatus.AT_CAR_WASH;
+            carInfo.persist();
         }
         
         String result = generateCarWashSummary(carNumber, carMake, carModel, carYear,
@@ -59,7 +55,7 @@ public class CarWashTool {
     }
 
     private String generateCarWashSummary(
-            Integer carNumber,
+            Long carNumber,
             String carMake,
             String carModel,
             Integer carYear,

@@ -57,6 +57,14 @@
             <artifactId>langchain4j-agentic-a2a</artifactId>
             <version>${langchain4j-beta.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-orm-panache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>

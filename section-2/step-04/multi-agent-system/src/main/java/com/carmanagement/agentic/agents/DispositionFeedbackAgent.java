@@ -32,7 +32,7 @@ public interface DispositionFeedbackAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Integer carNumber,
+            Long carNumber,
             String carCondition,
             String rentalFeedback,
             String carWashFeedback,

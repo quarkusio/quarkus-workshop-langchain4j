@@ -43,7 +43,7 @@ public class DispositionTool {
      */
     @Tool(name = "DispositionTool")
     public String requestDisposition(
-            Integer carNumber,
+            Long carNumber,
             String carMake,
             String carModel,
             Integer carYear,
