@@ -22,12 +22,12 @@ In this step, you will:
 The **Miles of Smiles** car rental company needs help managing their fleet. 
 Here's the business process:
 
-1. **Rental Returns**: When customers return cars, the rental team records feedback about the car's condition
-2. **Car Wash Requests**: Based on the feedback, the system should automatically decide if the car needs cleaning
-3. **Car Wash Returns**: After cleaning, the car wash team provides their own feedback and returns the car
-4. **Fleet Availability**: Clean cars with no issues return to the available pool for rental
+1. **Rental Returns**: When customers return cars, the rental team records feedback about the car's condition.
+2. **Car Wash Requests**: Based on the feedback, the system should automatically decide if the car needs cleaning.
+3. **Car Wash Returns**: After cleaning, the car wash team provides their own feedback and returns the car.
+4. **Fleet Availability**: Clean cars with no issues return to the available pool for rental.
 
-Your job is to build an **AI agent** that can analyze feedback and intelligently decide whether to request a car wash.
+Your job is to build an **AI agent** that can analyze feedback and _intelligently_ decide whether to request a car wash.
 
 ---
 
@@ -54,7 +54,7 @@ Before starting, ensure you have:
 
 - Completed Section 1 (or are familiar with Quarkus LangChain4j basics)
 - JDK 21+ installed
-- OpenAI API key set as `OPENAI_API_KEY` environment variable
+  - OpenAI API key set as `OPENAI_API_KEY` environment variable (or [configured Ollama](https://docs.quarkiverse.io/quarkus-langchain4j/dev/guide-ollama.html) as needed with a model capable of function calling).
 - Docker or Podman running (if needed for later steps)
 
 ---

@@ -178,4 +178,4 @@ For instance, you could extend your chatbot with tools for weather forecasting (
 Additionally, you can leverage more specialized LLMs, routing specific queries—such as legal or insurance-related questions—to models trained in those domains.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
-In the [next step](./step-08), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.
+In the [next step](./step-08.md), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.
