@@ -55,6 +55,7 @@ Before starting, ensure you have:
 - Completed Section 1 (or are familiar with Quarkus LangChain4j basics)
 - JDK 21+ installed
 - OpenAI API key set as `OPENAI_API_KEY` environment variable
+- A container runtime (Docker/Podman) for running a PostgreSQL [dev service](https://quarkus.io/guides/databases-dev-services)
 
 ---
 
@@ -192,7 +193,7 @@ Let's explore each component.
 
 The `CarManagementResource` provides REST APIs to handle car returns:
 
-```java hl_lines="29 51" title="CarManagementResource.java"
+```java hl_lines="19 22 41 44" title="CarManagementResource.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java:car-management"
 ```
 
@@ -290,7 +291,7 @@ Defines the inputs and output:
 
 Tools enable agents to take **actions** in the real world:
 
-```java hl_lines="14 34" title="CarWashTool.java"
+```java hl_lines="4 21 40 47-48" title="CarWashTool.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CarWashTool.java:CarWashTool"
 ```
 

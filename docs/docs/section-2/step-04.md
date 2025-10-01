@@ -227,10 +227,10 @@ If you want to continue building on your Step 03 code, copy the updated files:
     cp ../step-04/multi-agent-system/pom.xml ./pom.xml
     cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
     cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
     cp ../step-04/multi-agent-system/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
     cp ../step-04/multi-agent-system/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
     cp ../step-04/multi-agent-system/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
+    cp ../step-04/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
     ```
 
 === "Windows"
@@ -239,10 +239,10 @@ If you want to continue building on your Step 03 code, copy the updated files:
     copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
     copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
     copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
     copy ..\step-04\multi-agent-system\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
     copy ..\step-04\multi-agent-system\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
     copy ..\step-04\multi-agent-system\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
     ```
 
 ---
@@ -320,7 +320,7 @@ String processDisposition(
     String carMake,
     String carModel,
     Integer carYear,
-    Integer carNumber,
+    Long carNumber,
     String carCondition,
     String dispositionRequest
 )
