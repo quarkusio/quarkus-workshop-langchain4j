@@ -44,10 +44,6 @@ graph TD
     C1 -->|No| C3{Condition:<br/>Car wash needed?}
     C3 -->|Yes| C4[CarWashAgent]
     C3 -->|No| C5[Skip]
-
-    style A fill:#e1f5ff
-    style B fill:#fff3cd
-    style C fill:#f8d7da
 ```
 
 **The Flow:**
