@@ -113,8 +113,8 @@ We need to extend our ActionWorkflow to accept the disposition feedback agent's 
 
 Update the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
 
-```java hl_lines="10" title="ActionWorkflow.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java:actionWorkflow"
+```java hl_lines="4 21 31 43-47 " title="ActionWorkflow.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
 ### Modify the `CarConditionFeedbackAgent` to use output from the `DispositionFeedbackAgent`
@@ -123,8 +123,8 @@ Similarly, we need to modify the `CarConditionFeedbackAgent` to use the output f
 
 Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
 
-```java hl_lines="11 20" title="CarConditionFeedbackAgent.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedback"
+```java hl_lines="3 13 31" title="CarConditionFeedbackAgent.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
 ## Define the agents and workflows:

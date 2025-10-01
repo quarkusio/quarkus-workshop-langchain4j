@@ -141,4 +141,4 @@ An MCP server in this context is very similar to the concept of local function c
 As you could see, the actual implementation of the MCP server is also entirely customizable.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
-In the [next step](./step-09), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
+In the [next step](./step-09.md), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
