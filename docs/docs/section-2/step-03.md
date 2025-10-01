@@ -133,7 +133,7 @@ Before starting:
 
 ## Option 1: Continue from Step 02
 
-If you want to continue building on your Step 02 code, copy the updated UI files:
+If you want to continue building on your Step 02 code, copy the updated files:
 
 === "Linux / macOS"
     ```bash
@@ -141,7 +141,7 @@ If you want to continue building on your Step 02 code, copy the updated UI files
     cp ../step-03/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
     cp ../step-03/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
     cp ../step-03/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
-    cp ../step-03/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
+    cp ../step-03/src/main/resources/import.sql ./src/main/resources/import.sql
     cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
     ```
 
@@ -151,6 +151,7 @@ If you want to continue building on your Step 02 code, copy the updated UI files
     copy ..\step-03\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
     copy ..\step-03\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
     copy ..\step-03\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
     copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
     copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
     ```
@@ -177,7 +178,7 @@ This agent determines if a car needs maintenance based on feedback.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedbackAgent.java`:
 
-```java title="MaintenanceFeedbackAgent.java"
+```java hl_lines="10 12-21 30-32 35" title="MaintenanceFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
@@ -255,7 +256,7 @@ This agent uses a tool to request maintenance services.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceAgent.java`:
 
-```java title="MaintenanceAgent.java"
+```java hl_lines="14-18 31 37" title="MaintenanceAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
@@ -332,7 +333,14 @@ These methods control when each agent executes:
 - **`activateMaintenance`**: Returns `true` if maintenance is needed
 - **`activateCarWash`**: Returns `true` if car wash is needed
 
-The parameters are automatically extracted from AgenticScope's state by name.
+This logic is defined in the `isRequired` method:
+```java
+private static boolean isRequired(String value) {
+    return value != null && !value.isEmpty() && !value.toUpperCase().contains("NOT_REQUIRED");
+}
+```
+
+The parameters are automatically extracted from ***AgenticScope***'s state by name.
 
 #### Execution Logic
 
@@ -384,7 +392,7 @@ Similar to `CarWashTool`, this tool:
 
 - Uses `@Dependent` scope (required for tool detection)
 - Provides maintenance options: oil change, tire rotation, brake service, etc.
-- Updates car status to `UNDER_MAINTENANCE`
+- Updates car status to `IN_MAINTENANCE`
 - Returns a summary of requested services
 
 ### Step 9: Create the RequiredAction Model
@@ -394,13 +402,7 @@ We need a model to represent what action is required for a car.
 In `src/main/java/com/carmanagement/model`, create `RequiredAction.java`:
 
 ```java title="RequiredAction.java"
-package com.carmanagement.model;
-
-public enum RequiredAction {
-    NONE,
-    CAR_WASH,
-    MAINTENANCE
-}
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/model/RequiredAction.java"
 ```
 
 ### Step 10: Update the CarConditions Model
@@ -408,13 +410,9 @@ public enum RequiredAction {
 Update `src/main/java/com/carmanagement/model/CarConditions.java`:
 
 ```java title="CarConditions.java"
-package com.carmanagement.model;
-
-public record CarConditions(String generalCondition, RequiredAction requiredAction) {
-}
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/model/CarConditions.java"
 ```
-
-Changed from `boolean carWashRequired` to `RequiredAction requiredAction` to support three states.
+Notice how it has changed from `boolean carWashRequired` to `RequiredAction requiredAction` to support three states.
 
 ### Step 11: Add Maintenance Returns API
 
@@ -424,7 +422,7 @@ Update `src/main/java/com/carmanagement/resource/CarManagementResource.java`:
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java:maintenanceReturn"
 ```
 
-Adds a new endpoint for the maintenance team to return cars with feedback.
+This adds a new endpoint for the maintenance team to return cars with feedback.
 
 ---
 
@@ -479,7 +477,7 @@ static CarConditions output(String carCondition, String maintenanceRequest, Stri
 }
 ```
 
-Extracts three values from AgenticScope's state and combines them into the final result.
+This static method extracts three values from AgenticScope's state and combines them into the final result.
 
 ---
 
@@ -487,7 +485,7 @@ Extracts three values from AgenticScope's state and combines them into the final
 
 ### Step 13: Update CarManagementService
 
-Finally, update the service to handle the new workflow structure.
+And to get things over the finish line, we need to update the car management service to handle the new workflow structure.
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
@@ -499,7 +497,7 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 - Now passes `maintenanceFeedback` parameter to the workflow
 - Uses `RequiredAction` enum to determine car status
-- Sets status to `UNDER_MAINTENANCE` or `AT_CAR_WASH` based on the required action
+- Sets status to `IN_MAINTENANCE` or `AT_CAR_WASH` based on the required action
 
 ---
 

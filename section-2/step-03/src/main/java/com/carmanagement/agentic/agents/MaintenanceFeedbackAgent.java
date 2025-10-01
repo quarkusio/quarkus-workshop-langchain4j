@@ -15,7 +15,8 @@ public interface MaintenanceFeedbackAgent {
         If the feedback mentions mechanical issues, strange noises, performance problems, or anything that suggests
         the car needs maintenance, recommend appropriate maintenance.
         Be specific about what type of maintenance is needed (oil change, tire rotation, brake service, engine service, transmission service).
-        If no service of any kind, repairs or maintenance are needed, respond with "MAINTENANCE_NOT_REQUIRED".
+        If no service of any kind, repairs or maintenance are needed, respond with 
+        "MAINTENANCE_NOT_REQUIRED".
         Include the reason for your choice but keep your response short.
         """)
     @UserMessage("""
@@ -30,7 +31,8 @@ public interface MaintenanceFeedbackAgent {
         Car Wash Feedback: {carWashFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
-    @Agent(description = "Car maintenance analyzer. Using feedback, determines if a car needs maintenance.", outputName = "maintenanceRequest")
+    @Agent(description = "Car maintenance analyzer. Using feedback, determines if a car needs maintenance.",
+            outputName = "maintenanceRequest")
     String analyzeForMaintenance(
             String carMake,
             String carModel,

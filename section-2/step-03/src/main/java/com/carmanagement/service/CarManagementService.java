@@ -48,6 +48,7 @@ public class CarManagementService {
         // Update the car's condition with the result from CarConditionFeedbackAgent
         carInfo.condition = carConditions.generalCondition();
 
+        // If no action is required, then the car should be available for the next rental
         if (carConditions.requiredAction() == RequiredAction.NONE) {
             carInfo.status = CarStatus.AVAILABLE;
         }

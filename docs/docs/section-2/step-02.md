@@ -130,8 +130,8 @@ If you want to continue building on your Step 01 code, you'll need to copy some 
     cd section-2/step-01
     cp ../step-02/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
     cp ../step-02/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
+    cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
     cp ../step-02/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
-    cp ../step-02/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
     cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
     ```
 
@@ -141,7 +141,7 @@ If you want to continue building on your Step 01 code, you'll need to copy some 
     copy ..\step-02\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
     copy ..\step-02\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
     copy ..\step-02\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
-    copy ..\step-02\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
+    copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
     copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
     ```
 
@@ -259,7 +259,7 @@ Now, create the workflow that orchestrates both agents.
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java"
+```java hl_lines="18-21" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -351,11 +351,11 @@ Quarkus LangChain4j generates the implementation automatically.
 
 ```java
 CarConditions carConditions = carProcessingWorkflow.processCarReturn(
-    carInfo.getMake(),
-    carInfo.getModel(),
-    carInfo.getYear(),
+    carInfo.make,
+    carInfo.model,
+    carInfo.year,
     carNumber,
-    carInfo.getCondition(),
+    carInfo.condition,
     rentalFeedback != null ? rentalFeedback : "",
     carWashFeedback != null ? carWashFeedback : ""
 );
@@ -367,11 +367,11 @@ It returns a `CarConditions` object containing results from both agents.
 ### Using the Results
 ```java
 // Update the car's condition with the result from CarConditionFeedbackAgent
-carInfo.setCondition(carConditions.generalCondition());
+carInfo.condition = carConditions.generalCondition();
 
 // If carwash was not required, make the car available to rent
 if (!carConditions.carWashRequired()) {
-    carInfo.setStatus(CarStatus.AVAILABLE);
+    carInfo.status = CarStatus.AVAILABLE;            
 }
 ```
 

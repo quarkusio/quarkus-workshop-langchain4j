@@ -41,8 +41,7 @@ public class MaintenanceTool {
             boolean transmissionService,
             String requestText) {
         
-        // In a real implementation, this would make an API call to a maintenance service
-        // or update a database with the maintenance request
+        // In a more elaborate implementation, we might make an API call to a maintenance service here
         
         // Update car status to IN_MAINTENANCE
         CarInfo carInfo = CarInfo.findById(carNumber);
