@@ -28,8 +28,9 @@ In this step, you will:
 - Integrate remote agents into existing workflows
 
 !!!note
-   At the moment the A2A integration is quite low-level and requires some boilerplate code.
-   The Quarkus LangChain4j team is working on higher-level abstractions to simplify A2A usage in future releases.
+   
+    At the moment the A2A integration is quite low-level and requires some boilerplate code.
+    The Quarkus LangChain4j team is working on higher-level abstractions to simplify A2A usage in future releases.
 
 ---
 
