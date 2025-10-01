@@ -9,8 +9,7 @@ import dev.langchain4j.service.UserMessage;
  */
 public interface CarConditionFeedbackAgent {
 
-    @SystemMessage("""
-        /nothink, Reasoning: low.
+    @SystemMessage("""       
         You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on feedback.
         Analyze all feedback and the previous car condition to provide an updated condition description.
         Always provide a concise condition description, even if there's minimal feedback.
@@ -28,7 +27,8 @@ public interface CarConditionFeedbackAgent {
             Car Wash Recommendation: {carWashRequest}
             Maintenance Recommendation: {maintenanceRequest}
             """)
-    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.", outputName = "carCondition")
+    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.",
+            outputName = "carCondition")
     String analyzeForCondition(
             String carMake,
             String carModel,

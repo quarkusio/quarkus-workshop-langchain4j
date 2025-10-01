@@ -10,7 +10,6 @@ import dev.langchain4j.service.UserMessage;
 public interface MaintenanceFeedbackAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You are a car maintenance analyzer for a car rental company. Your job is to determine if a car needs maintenance based on feedback.
         Analyze the feedback and car information to decide if maintenance is needed.
         If the feedback mentions mechanical issues, strange noises, performance problems, or anything that suggests

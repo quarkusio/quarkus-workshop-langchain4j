@@ -10,7 +10,6 @@ import dev.langchain4j.service.UserMessage;
 public interface CarWashFeedbackAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You are a car wash analyzer for a car rental company. Your job is to determine if a car needs washing based on feedback.
         Analyze the feedback and car information to decide if a car wash is needed.
         If the feedback mentions dirt, mud, stains, or anything that suggests the car is dirty, recommend a car wash.

@@ -1,289 +1,1004 @@
-# Step 04 - Using remote agents (A2A)
+# Step 04 - Using Remote Agents (A2A)
 
-## Time to get rid of some cars!
+## New Requirement: Car Disposal Decisions
 
-The Miles of Smiles team has decided they need to get rid of cars that are no longer in good enough shape to rent out. When car return feedback warrants disposing of a car, they want to send the car to a car broker who will then sell, donate, or scrap it. The Miles of Smiles team will still make the determination of which cars to get rid of, and the car broker will take action on their request. The car broker has their own agent that handles car dispositions.
+The Miles of Smiles management team has yet another new challenge: they need to decide what to do with cars that are beyond economical repair.
 
-## Agent2Agent (A2A)
+When cars are returned with severe damage or major mechanical issues, the company needs to:
 
-The Agent2Agent protocol can be used to enable agents to communicate to each other remotely. 
+1. **Analyze if disposal is needed**: determine if repair costs exceed the car's value
+2. **Consult a specialized disposition expert**: a remote AI agent that makes disposal recommendations
+3. **Execute the disposal decision**: scrap, sell, or donate the car
 
-LangChain4j provides the `langchain4j-agentic-a2a` module, which can be used with `langchain4j-agentic` to add remote agents to a workflow in the same way as you have been adding local agents. We will declare an A2A agent in our existing app that we will then add to our workflow. Communicating with this local agent will make a2a send the agent request to the remotely connected agent.
+The disposition expert is maintained by a separate (remote) team and runs in its own system. 
+You'll learn how to integrate it using the **Agent-to-Agent (A2A) protocol**.
 
-You will see how the A2A sdk handles the protocol in our remote A2A server built on Quarkus. As part of the protocol, agents defined in the server must provide an `AgentCard` which describes:
+---
 
-- The name and description of the agent
-- The agent's capabilities (the parts of the A2A protocol it supports)
-- The agent's skills (what the agent's purpose is)
-- etc.
+## What You'll Learn
 
-A2A Agents must also implement an `AgentExecutor`. The A2A sdk calls the `AgentExecutor.execute` method when it wants to invoke your agent. Your implementation of the `AgentExecutor` interface is responsible for calling your agent (for example your LangChain4j AI service or Agent). The `AgentExecutor.execute` method has the following signature:
+In this step, you will:
 
-```java
-public void execute(RequestContext context, EventQueue eventQueue)
+- Understand the **Agent-to-Agent (A2A) protocol** for distributed agent communication
+- Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
+- Create an **A2A server** that exposes an AI agent as a remote service
+- Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
+- Understand the difference between **Tasks** and **Messages** in A2A protocol
+- Run **multiple Quarkus applications** that communicate via A2A
+- Integrate remote agents into existing workflows
+
+!!!note
+   At the moment the A2A integration is quite low-level and requires some boilerplate code.
+   The Quarkus LangChain4j team is working on higher-level abstractions to simplify A2A usage in future releases.
+
+---
+
+## Understanding the A2A Protocol
+
+The **Agent-to-Agent (A2A) protocol** is an open standard for AI agents to communicate across different systems and platforms.
+
+### Why A2A?
+
+- **Separation of concerns**: Different teams can develop specialized agents independently
+- **Scalability**: Distribute agent workload across multiple systems
+- **Reusability**: One agent can serve multiple client applications
+- **Technology independence**: Agents can be implemented in different languages/frameworks
+
+### A2A Architecture
+
+```mermaid
+graph LR
+    subgraph "Quarkus Runtime 1: Car Management System"
+        W[CarProcessingWorkflow]
+        DA[DispositionAgent<br/>@A2AClientAgent]
+        W --> DA
+    end
+
+    subgraph "A2A Protocol Layer"
+        AP[JSON-RPC over HTTP]
+    end
+
+    subgraph "Quarkus Runtime 2: Disposition Service"
+        AC[AgentCard<br/>Agent Metadata]
+        AE[AgentExecutor<br/>Request Handler]
+        AI[DispositionAgent<br/>AI Service]
+        T[DispositionTool]
+
+        AC -.describes.-> AI
+        AE --> AI
+        AI --> T
+    end
+
+    DA -->|A2A Request| AP
+    AP -->|A2A Response| DA
+    AP <-->|JSON-RPC| AE
+
+    style W fill:#e1f5ff
+    style DA fill:#fff3cd
+    style AP fill:#d4edda
+    style AC fill:#f8d7da
+    style AE fill:#f8d7da
+    style AI fill:#f8d7da
 ```
 
-The execute method is invoked when a task or message need to be handled. 
+**The Flow:**
 
-**Tasks** have unique IDs, have a state (submitted, working, input-required, auth-required, completed, canceled, failed, rejected or unknown), and can be referenced across requests to the A2A agent. As such, tasks are created for tracking ongoing work on a specific topic (eg. a hotel booking) that may not complete within a few seconds.
+1. **Client agent** (`DispositionAgent` with `@A2AClientAgent`) sends a request to the remote agent
+2. **A2A Protocol Layer** (JSON-RPC) transports the request over HTTP
+3. **AgentCard** describes the remote agent's capabilities (skills, inputs, outputs)
+4. **AgentExecutor** receives the request and orchestrates the execution
+5. **Remote AI agent** (DispositionAgent AI service) processes the request using tools
+6. Response flows back through the same path
 
-**Messages** have unique IDs but no tracked state. They are good for short requests that do not require more context information than can be found in the recent message history.
+---
 
-We will create a `DispositionAgent` to handle getting rid of cars, where each disposition of a car is a task.
+## Understanding Tasks vs. Messages
 
-## What are we going to build?
+The A2A protocol distinguishes between two types of interactions:
+
+| Concept | Description | Use Case |
+|---------|-------------|----------|
+| **Task** | A long-running job with a defined goal and tracked state | "Determine if this car should be scrapped" |
+| **Message** | A single conversational exchange with no tracked state | Chat messages, quick questions |
+
+In this step, we'll use **Tasks** because car disposition analysis is a discrete job with a clear objective.
+
+**Task Lifecycle:**
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Agent
+    participant Server as A2A Server
+    participant Executor as AgentExecutor
+    participant AI as AI Agent
+
+    Client->>Server: Create Task (POST /tasks)
+    Server->>Executor: Initialize TaskUpdater
+    Executor->>AI: Execute with input
+    AI->>AI: Process and use tools
+    AI->>Executor: Return result
+    Executor->>Server: Update task status
+    Server->>Client: Task result
+```
+
+---
+
+## What Are We Going to Build?
 
 ![App Blueprint](../images/agentic-app-4.png){: .center}
 
-Our architecture includes 2 Quarkus runtimes -- one running our agentic workflow (Quarkus runtime 1) and the other running the remote A2A agent (Quarkus runtime 2). 
+We'll extend the car management system with:
 
-## Quarkus Runtime 1
-Starting from our app in `step-03`, we need to do the following for the original Quarkus Runtime 1:
+1. **DispositionFeedbackAgent**: Analyzes if a car should be disposed (scrap/sell/donate)
+2. **DispositionAgent (Client)**: Connects to the remote disposition expert via A2A
+3. **Remote A2A Server**: A separate Quarkus application exposing the disposition expert
+4. **Disposition Workflow**: Integrates disposition analysis into the car processing flow
 
-Create/Update agents and workflows:
+**The Complete Architecture:**
 
-  - Create a new `DispositionFeedbackAgent`
-  - Create a new `DispositionAgent` (for the client side)
-  - Modify the `ActionWorkflow` to use output from the `DispositionFeedbackAgent`
-  - Modify the `CarConditionFeedbackAgent` to use output from the `DispositionFeedbackAgent`
+```mermaid
+graph TD
+    subgraph "Main Application (localhost:8080)"
+        R[Rental/CarWash/Maintenance Returns]
+        FW[FeedbackWorkflow<br/>Parallel]
+        DFA[DispositionFeedbackAgent]
+        AW[ActionWorkflow<br/>Conditional]
+        DAC[DispositionAgent<br/>@A2AClientAgent]
 
-Define the agents and workflows:
+        R --> FW
+        FW --> DFA
+        DFA --> AW
+        AW --> DAC
+    end
 
-  - Define the `DispositionFeedbackAgent`
-  - Define the `DispositionAgent`
-  - Include the `DispositionFeedbackAgent` in the parallel workflow
-  - Include the `DispositionAgent` in the conditional workflow
+    subgraph "Remote Disposition Service (localhost:8888)"
+        AC[AgentCard]
+        AE[AgentExecutor]
+        DAI[DispositionAgent<br/>AI Service]
+        DT[DispositionTool]
 
+        AE --> DAI
+        DAI --> DT
+    end
 
-## Before you begin
+    DAC -->|A2A Protocol| AE
 
-If you are continuing to build the app in the `step-01` directory, start by copying some files (which don't relate to the experience of building agentic AI apps) from `step-04`:
+    style R fill:#e1f5ff
+    style FW fill:#fff3cd
+    style AW fill:#f8d7da
+    style DAC fill:#d4edda
+    style AE fill:#f8d7da
+```
 
-For Linux/macOS:
+---
+
+## Prerequisites
+
+Before starting:
+
+- Completed Step 03 (or have the `section-2/step-03` code available)
+- Application from Step 03 is stopped (Ctrl+C)
+- Ports 8080 and 8888 are available (you'll run two applications simultaneously)
+
+---
+
+## Understanding the Project Structure
+
+The Step 04 code includes **two separate Quarkus applications**:
+
+```
+section-2/step-04/
+├── multi-agent-system/          # Main car management application (port 8080)
+│   ├── src/main/java/com/carmanagement/
+│   │   ├── agentic/
+│   │   │   ├── agents/
+│   │   │   │   ├── DispositionAgent.java          # A2A client agent
+│   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
+│   │   │   └── workflow/
+│   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
+│   │   │       ├── ActionWorkflow.java            # Conditional routing
+│   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
+│   └── pom.xml
+│
+└── remote-a2a-agent/            # Remote disposition service (port 8888)
+    ├── src/main/java/com/demo/
+    │   ├── DispositionAgentCard.java       # Describes agent capabilities
+    │   ├── DispositionAgentExecutor.java   # Handles A2A requests
+    │   ├── DispositionAgent.java           # AI service
+    │   └── DispositionTool.java            # Tool for scrap/sell/donate
+    └── pom.xml
+```
+
+**Why Two Applications?**
+
+- Simulates a real-world scenario where different teams maintain different agents
+- The disposition service could be reused by multiple client applications
+- Demonstrates cross-application agent communication via A2A
+
+---
+
+## Option 1: Continue from Step 03
+
+If you want to continue building on your Step 03 code, copy the updated files:
+
+=== "Linux / macOS"
+    ```bash
+    cd section-2/step-03
+    cp ../step-04/multi-agent-system/pom.xml ./pom.xml
+    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
+    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
+    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarService.java ./src/main/java/com/carmanagement/service/CarService.java
+    cp ../step-04/multi-agent-system/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
+    cp ../step-04/multi-agent-system/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
+    cp ../step-04/multi-agent-system/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
+    ```
+
+=== "Windows"
+    ```cmd
+    cd section-2\step-03
+    copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
+    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
+    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
+    copy ..\step-04\multi-agent-system\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
+    copy ..\step-04\multi-agent-system\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
+    copy ..\step-04\multi-agent-system\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    ```
+
+---
+
+## Option 2: Start Fresh from Step 04
+
+Navigate to the complete `section-2/step-04/multi-agent-system` directory:
+
 ```bash
-cd ./step-01
-cp ../step-04/multi-agent-system/pom.xml ./multi-agent-system/pom.xml
-cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java
-cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java
-cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarService.java ./multi-agent-system/src/main/java/com/carmanagement/service/CarService.java
-cp ../step-04/multi-agent-system/src/main/resources/static/css/styles.css ./multi-agent-system/src/main/resources/static/css/styles.css
-cp ../step-04/multi-agent-system/src/main/resources/static/js/app.js ./multi-agent-system/src/main/resources/static/js/app.js
-cp ../step-04/multi-agent-system/src/main/resources/templates/index.html ./multi-agent-system/src/main/resources/templates/index.html
+cd section-2/step-04/multi-agent-system
 ```
 
-For Windows:
-```batch
-cd .\step-01
-copy ..\step-04\multi-agent-system\pom.xml .\multi-agent-system\pom.xml
-copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java
-copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java
-copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\service\CarService.java .\multi-agent-system\src\main\java\com\carmanagement\service\CarService.java
-copy ..\step-04\multi-agent-system\src\main\resources\static\css\styles.css .\multi-agent-system\src\main\resources\static\css\styles.css
-copy ..\step-04\multi-agent-system\src\main\resources\static\js\app.js .\multi-agent-system\src\main\resources\static\js\app.js
-copy ..\step-04\multi-agent-system\src\main\resources\templates\index.html .\multi-agent-system\src\main\resources\templates\index.html
-```
+---
 
-## Create/Update agents and workflows:
+## Part 1: Build the Client-Side Components
 
-### Create a new `DispositionFeedbackAgent`
+### Step 1: Create the DispositionFeedbackAgent
 
-Create a `DispositionFeedbackAgent` to analyze the feedback from rental returns, car wash returns and maintenance returns. The agent will decide if we need to get rid of the car.
+This agent analyzes feedback to determine if a car should be disposed.
 
-In the system prompt, instruct the agent to include `DISPOSITION_NOT_REQUIRED` in its response if the car is in decent shape so that we can easily check for that string when we build our conditional agents.
+In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
-
-```java hl_lines="17" title="DispositionFeedbackAgent.java"
+```java title="DispositionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
 ```
 
-### Create a new `DispositionAgent` (for the client side)
+**Key Points:**
 
-For the disposition agent, in Quarkus runtime 1 we need to create an agent to be used as a type-safe interface for us to invoke the remote A2A agent. This agent will not need to interact with LLMS, so it shouldn't have system message or user message annotations. The parameters we define on the agent method define what will be sent to the remote agent.
+- **System message**: Focuses on economic viability (is the car worth repairing?)
+- **Specific output format**: Returns `"DISPOSITION_NOT_REQUIRED"` when the car is repairable
+- **outputName**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
+- **Three feedback sources**: Analyzes rental, car wash, and maintenance feedback
 
-Create the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+**Decision Criteria:**
+
+The agent considers:
+- Severity of damage (structural, engine, transmission)
+- Repair costs vs. car value
+- Age and condition of the vehicle
+- Safety concerns
+
+### Step 2: Create the DispositionAgent (Client)
+
+This is where the A2A magic happens! 
+This agent connects to the remote disposition agent.
+
+In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
 ```java title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
-### Modify the `ActionWorkflow` to use output from the `DispositionFeedbackAgent`
+**Let's break it down:**
 
-We need to extend our ActionWorkflow to accept the disposition feedback agent's output. The `DispositionFeedbackAgent` uses an `outputName` of `dispositionRequest`.
+#### `@A2AClientAgent` Annotation
 
-Update the file in your `src/main/java/com/carmanagement/agentic/workflow` directory.
+```java
+@A2AClientAgent(
+    a2aServerUrl = "http://localhost:8888",
+    outputName = "dispositionAgentResult",
+    description = "Car disposition specialist. Recommends how to dispose of a car (scrap, sell, donate)."
+)
+```
 
-```java hl_lines="4 21 31 43-47 " title="ActionWorkflow.java"
+This annotation transforms the method into an **A2A client**:
+
+- **`a2aServerUrl`**: The URL of the remote A2A server
+- **`outputName`**: Where to store the result in AgenticScope's state
+- **`description`**: Describes the agent's purpose (helps with agent discovery)
+
+#### The Method Signature
+
+```java
+String processDisposition(
+    String carMake,
+    String carModel,
+    Integer carYear,
+    Integer carNumber,
+    String carCondition,
+    String dispositionRequest
+)
+```
+
+These parameters are sent to the remote agent as task inputs. 
+The remote agent can access them by name.
+
+#### How It Works
+
+1. When this method is called, Quarkus LangChain4j:
+   - Creates an A2A Task with the method parameters as inputs
+   - Sends the task to the remote server via JSON-RPC
+   - Waits for the remote agent to complete the task
+   - Returns the result as a String
+
+2. No manual HTTP requests needed
+3. Type-safe: compile-time checking of parameters
+4. Automatic error handling and retries
+
+---
+
+## Part 2: Update the Workflows
+
+### Step 3: Update FeedbackWorkflow
+
+The `FeedbackWorkflow` needs to include the new disposition analysis.
+
+Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
+
+```java title="FeedbackWorkflow.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
+```
+
+**Key changes:**
+
+Added `DispositionFeedbackAgent` to the parallel workflow:
+
+```java
+@SubAgent(type = DispositionFeedbackAgent.class, outputName = "dispositionRequest")
+```
+
+Now **three agents run concurrently**:
+- `CarWashFeedbackAgent` — analyzes cleaning needs
+- `MaintenanceFeedbackAgent` — analyzes maintenance needs
+- `DispositionFeedbackAgent` — analyzes disposal needs
+
+This parallel execution is efficient: all three analyses happen at the same time!
+
+### Step 4: Update ActionWorkflow
+
+The `ActionWorkflow` needs to handle disposition requests.
+
+Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
+
+```java title="ActionWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
-### Modify the `CarConditionFeedbackAgent` to use output from the `DispositionFeedbackAgent`
+**Key changes:**
 
-Similarly, we need to modify the `CarConditionFeedbackAgent` to use the output from the `DispositionFeedbackAgent`.
+#### Added DispositionAgent to SubAgents
 
-Update the file in your `src/main/java/com/carmanagement/agentic/agents` directory.
+```java
+@SubAgent(type = DispositionAgent.class, outputName = "actionResult")
+```
 
-```java hl_lines="3 13 31" title="CarConditionFeedbackAgent.java"
+#### Added Activation Condition
+
+```java
+@ActivationCondition(DispositionAgent.class)
+static boolean activateDisposition(String dispositionRequest) {
+    return isRequired(dispositionRequest);
+}
+```
+
+#### Updated Execution Priority
+
+The conditional workflow now has **priority ordering**:
+
+1. **Disposition** (highest priority) — if disposal is needed
+2. **Maintenance** — if maintenance is needed and disposal isn't
+3. **Car Wash** — if washing is needed and neither disposal nor maintenance is
+4. **Skip** — if nothing is needed
+
+This ensures critical issues (disposal) are handled before routine tasks (washing).
+
+### Step 5: Update CarConditionFeedbackAgent
+
+The `CarConditionFeedbackAgent` should consider disposition feedback.
+
+Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
+
+```java title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
-## Define the agents and workflows:
+**Key changes:**
 
-We need to make a few changes to our `CarManagementService` to define agents and workflows:
+Now takes `dispositionRequest` as input to provide more comprehensive condition assessments.
 
-Update the file in your `src/main/java/com/carmanagement/service` directory.
+### Step 6: Update CarProcessingWorkflow
 
-```java hl_lines="75-78 86-90 108 114-118" title="CarManagementService.java"
+Update the output method to handle disposition:
+
+Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
+
+```java title="CarProcessingWorkflow.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
+```
+
+**Key changes:**
+
+The `@Output` method now checks for disposition requests first:
+
+```java
+ @Output
+static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String carWashRequest) {
+    RequiredAction requiredAction;
+    // Check maintenance first (higher priority)
+    if (isRequired(dispositionRequest)) {              // Highest priority
+        requiredAction = RequiredAction.DISPOSITION;
+    } else if (isRequired(maintenanceRequest)) {
+        requiredAction = RequiredAction.MAINTENANCE;
+    } else if (isRequired(carWashRequest)) {
+        requiredAction = RequiredAction.CAR_WASH;
+    } else {
+        requiredAction = RequiredAction.NONE;
+    }
+    return new CarConditions(carCondition, requiredAction);
+}
+```
+
+Disposition has the highest priority in the result.
+
+### Step 7: Update RequiredAction Enum
+
+Update the `RequiredAction` enum to include disposition:
+
+Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
+
+```java title="RequiredAction.java"
+package com.carmanagement.model;
+
+public enum RequiredAction {
+    NONE,
+    CAR_WASH,
+    MAINTENANCE,
+    DISPOSITION
+}
+```
+
+### Step 8: Update CarManagementService
+
+Update the service to handle disposition status:
+
+Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
+
+```java title="CarManagementService.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
-### Define the `DispositionFeedbackAgent`
+**Key changes:**
 
-Notice the definition of the `DispositionFeedbackAgent` in the `CarManagementService` code above.
+Added handling for `RequiredAction.DISPOSITION`:
 
-### Define the `DispositionAgent`
+```java
+case DISPOSITION -> carInfo.setStatus(CarStatus.DISPOSED);
+```
 
-We use the `a2aBuilder` method, in the `CarManagementService` code above, to create an A2A agent client out of the `DispositionAgent` interface. Notice that we specify the URL of the remote A2A agent as part of the `a2aBuilder` method.
+When disposition is required, the car is marked as disposed and removed from the active fleet.
 
-### Include the `DispositionFeedbackAgent` in the parallel workflow
+---
 
-We added the disposition feedback agent to the `FeedbackWorkflow` in the `CarManagementService` code above. This will make the disposition agent run in parallel along with the other 2 feedback agents.
+## Part 3: Build the Remote A2A Server
 
-### Include the `DispositionAgent` in the conditional workflow
+Now let's build the remote disposition service that will handle A2A requests.
 
-We added the disposition agent to the `ActionWorkflow` in the `CarManagementService` code above. 
+Navigate to the remote-a2a-agent directory:
 
-The disposition agent will only be run if the `selectAgent` method indicates disposition is required.
-
-## Quarkus Runtime 2
-
-Starting from our app in step-03, we need to do the following for Quarkus Runtime 2 (the Remote A2A Agent)
-
-- Create a new Quarkus project for the remote A2A agent
-- Create a new `DispositionAgent`
-- Create a new `DispositionTool`
-- Create a new `DispositionAgentCard`
-- Create a new `DispositionAgentExecutor`
-
-## Before you begin
-
-Run the following commands to get your second Quarkus project set up with some initial files.
-
-For Linux/macOS:
 ```bash
-cd ./step-01
-mkdir remote-a2a-agent
-cp ../step-04/remote-a2a-agent/mvnw.cmd ./remote-a2a-agent/mvnw.cmd
-cp ../step-04/remote-a2a-agent/pom.xml ./remote-a2a-agent/pom.xml
-cp ../step-04/remote-a2a-agent/README.md ./remote-a2a-agent/README.md
-cp ../step-04/remote-a2a-agent/.gitignore ./remote-a2a-agent/.gitignore
-cp ../step-04/remote-a2a-agent/.mvn/wrapper/.gitignore ./remote-a2a-agent/.mvn/wrapper/.gitignore
-cp ../step-04/remote-a2a-agent/mvnw ./remote-a2a-agent/mvnw
-cp ../step-04/remote-a2a-agent/src/main/resources/application.properties ./remote-a2a-agent/src/main/resources/application.properties
+cd section-2/step-04/remote-a2a-agent
 ```
 
-For Windows:
-```batch
-cd .\step-01
-mkdir remote-a2a-agent
-copy ..\step-04\remote-a2a-agent\mvnw.cmd .\remote-a2a-agent\mvnw.cmd
-copy ..\step-04\remote-a2a-agent\pom.xml .\remote-a2a-agent\pom.xml
-copy ..\step-04\remote-a2a-agent\README.md .\remote-a2a-agent\README.md
-copy ..\step-04\remote-a2a-agent\.gitignore .\remote-a2a-agent\.gitignore
-mkdir .\remote-a2a-agent\.mvn\wrapper
-copy ..\step-04\remote-a2a-agent\.mvn\wrapper\.gitignore .\remote-a2a-agent\.mvn\wrapper\.gitignore
-copy ..\step-04\remote-a2a-agent\mvnw .\remote-a2a-agent\mvnw
-mkdir .\remote-a2a-agent\src\main\resources
-copy ..\step-04\remote-a2a-agent\src\main\resources\application.properties .\remote-a2a-agent\src\main\resources\application.properties
-```
+### Step 9: Create the DispositionTool
 
-### Create a new Quarkus project for the remote A2A agent
+The tool that executes disposition actions (scrap, sell, donate).
 
-The files you have already copied from `step-04` include the Quarkus project setup. Take a moment to look at the `pom.xml` file, in the `section-2/step-04/remote-a2a-agent` directory, to see the new dependency added for `langchain4j-agentic-a2a`.
-
-### Create a new `DispositionTool`
-
-Let's create a `DispositionTool` that can be used by the `DispositionAgent` to request disposition of cars. The tool should be able to handle scrapping the car, selling it, or donating it. 
-
-Create the file in your `src/main/java/com/demo` directory.
+In `src/main/java/com/demo`, create `DispositionTool.java`:
 
 ```java title="DispositionTool.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionTool.java"
 ```
 
-### Create a new `DispositionAgent`
+**Key Points:**
 
-Here, let's use an AI service (introduced in `section-1`) rather than an agent, since we aren't going to be using the `DispositionAgent` in a workflow.
+- **@Dependent scope**: Required for tool detection
+- **Three methods**: `scrapCar()`, `sellCar()`, `donateCar()`
+- **@Tool annotation**: Makes each method available to the AI agent
+- **Detailed descriptions**: Help the AI agent choose the appropriate action
 
-Create the disposition AI service, providing it a `ToolBox` that contains the `DispositionTool`. This will enable the AI Service to call the `DispositionTool` to request disposition. For ease of parameter passing, let's use the same method signature for this `DispositionAgent` as we did for the client `DispositionAgent`.
+### Step 10: Create the DispositionAgent (AI Service)
 
-Create the file in your `src/main/java/com/demo` directory.
+The AI agent that actually makes disposition decisions.
 
-```java title="DispositionAgent.java (remote)"
+In `src/main/java/com/demo`, create `DispositionAgent.java`:
+
+```java title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgent.java"
 ```
 
-### Create a new `DispositionAgentCard`
+**Key Points:**
 
-The agent card provides:
+- **`@RegisterAiService`**: Registers this as an AI service (not an agentic agent)
+- **`@ToolBox(DispositionTool.class)`**: Has access to the DispositionTool
+- **System message**: Defines the agent as a car disposition specialist
+- **Decision criteria**: Considers condition, age, safety, and recommendation from the feedback agent
 
-- A description of the agent
-- A URL to invoke the agent with
-- A URL for the agent's documentation 
-- An indication of the agent's supported A2A capabilities
-- Input and output modes
-- A description of the skills the agent provides
-- An A2A protocol version
+!!!note "AI Service vs. Agentic Agent"
+    Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
+    The A2A server can expose both types.
 
-This information is provided to clients that connect to the A2A server so that they know when and how to use the agent.
+### Step 11: Create the AgentCard
 
-Create the file in your `src/main/java/com/demo` directory.
+The **AgentCard** describes the agent's capabilities, skills, and interface.
+
+In `src/main/java/com/demo`, create `DispositionAgentCard.java`:
 
 ```java title="DispositionAgentCard.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentCard.java"
 ```
 
-### Create a new `DispositionAgentExecutor`
+**Let's break it down:**
 
-In the execute method we need to take action on the task:
+#### `@PublicAgentCard` Annotation
 
-- We initialize a `TaskUpdater`, which is responsible for making updates to the Task status and recording events (such as Task status updates or additions of artifacts to the task) in the EventQueue.
+```java
+@Produces
+@PublicAgentCard
+public AgentCard agentCard()
+```
 
-- If there is no task currently in the `RequestContext` we put the task into the initial submitted state. If the task already exists, we put it into working state.
+This makes the AgentCard available at the `/card` endpoint. 
+Clients can query this endpoint to discover the agent's capabilities.
 
-- We extract the message parts from the request context. When an A2A agent has multiple parameters, each parameter gets stored as a separate message part.
+#### AgentCard Components
 
-- We invoke our LangChain4j `DispositionAgent` with the same parameters as were provided to the A2A agent.
+**Basic Information:**
+```java
+.name("Disposition Agent")
+.description("Determines how a car should be disposed...")
+.url("http://localhost:8888/")
+.version("1.0.0")
+```
 
-- We put the agent's response into an artifact in the `Task` and mark the task complete. This will result in the response being made available to the A2A client agent.
+**Capabilities:**
+```java
+.capabilities(new AgentCapabilities.Builder()
+    .streaming(true)           // Supports streaming responses
+    .pushNotifications(false)  // No push notifications
+    .stateTransitionHistory(false)  // No state history tracking
+    .build())
+```
 
-Create the file in your `src/main/java/com/demo` directory.
+**Skills:**
+```java
+.skills(Collections.singletonList(new AgentSkill.Builder()
+    .id("disposition")
+    .name("Car disposition")
+    .description("Makes a request to dispose of a car (SCRAP, SELL, or DONATE)")
+    .tags(List.of("disposition"))
+    .build()))
+```
 
-```java hl_lines="39-43 48-56 59-65 68-71" title="DispositionAgentExecutor.java"
+Skills describe what the agent can do. This helps clients discover appropriate agents for their needs.
+
+**Transport Protocol:**
+```java
+.preferredTransport(TransportProtocol.JSONRPC.asString())
+.additionalInterfaces(List.of(
+    new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
+```
+
+Specifies that this agent communicates via JSON-RPC over HTTP.
+
+### Step 12: Create the AgentExecutor
+
+The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
+
+In `src/main/java/com/demo`, create `DispositionAgentExecutor.java`:
+
+```java title="DispositionAgentExecutor.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentExecutor.java"
 ```
 
+**Let's break it down:**
 
-## Try out the new workflow
+#### CDI Bean with AgentExecutor Factory
 
-Ensure both Quarkus runtimes are running. From each of the multi-agent-system and remote-a2a-agent directories, run the following command (if it is not already running):
-
-```bash
-mvn quarkus:dev
+```java
+@ApplicationScoped
+public class DispositionAgentExecutor {
+    @Produces
+    public AgentExecutor agentExecutor(DispositionAgent dispositionAgent)
 ```
 
-After reloading the UI, you should see the Returns section is now called ==Returns and Dispositions==. You'll also notice that there is a new tab to list the cars that are pending disposition.
+Produces an `AgentExecutor` bean that Quarkus LangChain4j will use to handle A2A task requests.
 
-On the Maintenance Return tab, try entering feedback that would suggest there is something wrong with the car (so that it should be disposed of). For example:
+#### Task Processing
+
+```java
+public void execute(RequestContext context, EventQueue eventQueue) {
+    TaskUpdater updater = new TaskUpdater(context, eventQueue);
+
+    // Extract input parts from the task
+    Map<String, MessagePart> inputParts = context.task().input();
+```
+
+The `RequestContext` contains the incoming task with all input parameters sent by the client.
+
+#### Extract Parameters
+
+```java
+String carMake = getTextPart(inputParts, "carMake");
+String carModel = getTextPart(inputParts, "carModel");
+Integer carYear = getIntegerPart(inputParts, "carYear");
+// ... etc
+```
+
+Extracts each parameter by name from the task input. These names must match the client agent's method parameters.
+
+#### Call the AI Agent
+
+```java
+String result = dispositionAgent.processDisposition(
+    carMake, carModel, carYear, carNumber, carCondition, dispositionRequest
+);
+```
+
+Invokes the AI agent to process the disposition request.
+
+#### Update Task Status
+
+```java
+updater.finishTask(List.of(MessagePart.text(result)));
+```
+
+Sends the result back to the client via the `TaskUpdater`. This completes the A2A task.
+
+#### Helper Methods
+
+```java
+private String getTextPart(Map<String, MessagePart> parts, String key) {
+    MessagePart part = parts.get(key);
+    return part != null ? part.content() : "";
+}
+```
+
+Safely extracts text values from MessagePart objects.
+
+---
+
+## Try It Out
+
+You'll need to run **two applications simultaneously**.
+
+### Terminal 1: Start the Remote A2A Server
+
+```bash
+cd section-2/step-04/remote-a2a-agent
+./mvnw quarkus:dev
+```
+
+Wait for:
+```
+Listening on: http://localhost:8888
+```
+
+The disposition service is now running and ready to accept A2A requests!
+
+### Terminal 2: Start the Main Application
+
+Open a **new terminal** and run:
+
+```bash
+cd section-2/step-04/multi-agent-system
+./mvnw quarkus:dev
+```
+
+Wait for:
+```
+Listening on: http://localhost:8080
+```
+
+### Test the Complete Flow
+
+Open your browser to [http://localhost:8080](http://localhost:8080){target=_blank}.
+
+After reloading the UI, you should see the Returns section is now called **Returns and Dispositions**. You'll also notice that there is a new tab to list the cars that are pending disposition.
+
+![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
+
+On the Maintenance Return tab, enter feedback indicating severe damage for car 11:
 
 ```
 looks like this car hit a tree
 ```
 
-![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
+Click **Return**.
 
-In the logs of Quarkus runtime 2, you should be able to see that the disposition agent called its disposition tool and the tool initiated the disposition of the vehicle.
+**What happens?**
 
+1. **Parallel Analysis** (FeedbackWorkflow):
+   - `DispositionFeedbackAgent`: "Disposition required — severe damage"
+   - `MaintenanceFeedbackAgent`: "Major repairs needed"
+   - `CarWashFeedbackAgent`: "Not applicable"
+
+2. **Conditional Routing** (ActionWorkflow):
+   - Disposition condition: `true` (required)
+   - → Executes `DispositionAgent` (A2A client)
+
+3. **A2A Communication**:
+   - Client sends task to `http://localhost:8888`
+   - `AgentExecutor` receives and processes task
+   - `DispositionAgent` (AI service) analyzes using `DispositionTool`
+   - Result flows back to client
+
+4. **UI Update**:
+   - Car status → `DISPOSED`
+   - Car appears in the Dispositions tab
+
+### Check the Logs
+
+**Terminal 1 (Remote A2A Server):**
 ```
-DispositionTool result: Car disposition requested for Ford Mustang (2022), Car #11: Scrap the car
+[DispositionAgentExecutor] Received task: process disposition
+[DispositionAgent] Analyzing car: Ford Mustang (2022)
+⛍ DispositionTool result: Car disposition requested for Ford Mustang (2022), Car #11: Scrap the car
 ```
+
+**Terminal 2 (Main Application):**
+```
+[DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
+[ActionWorkflow] Activating DispositionAgent
+[DispositionAgent @A2AClientAgent] Sending task to http://localhost:8888
+[DispositionAgent @A2AClientAgent] Received result: Car should be scrapped...
+```
+
+Notice the **cross-application communication** via A2A!
+
+---
+
+## How It All Works Together
+
+Let's trace the complete flow:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Service as CarManagementService
+    participant Workflow as CarProcessingWorkflow
+    participant FeedbackWF as FeedbackWorkflow
+    participant ActionWF as ActionWorkflow
+    participant Client as DispositionAgent<br/>@A2AClientAgent
+    participant A2A as A2A Protocol<br/>(JSON-RPC)
+    participant Executor as AgentExecutor
+    participant Remote as DispositionAgent<br/>AI Service
+    participant Tool as DispositionTool
+
+    User->>Service: Return car with severe damage
+    Service->>Workflow: processCarReturn(...)
+
+    rect rgb(255, 243, 205)
+    Note over Workflow,FeedbackWF: Parallel Analysis
+    Workflow->>FeedbackWF: Execute
+    par Concurrent Execution
+        FeedbackWF->>FeedbackWF: CarWashFeedbackAgent
+    and
+        FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
+    and
+        FeedbackWF->>FeedbackWF: DispositionFeedbackAgent<br/>Result: "DISPOSITION_REQUIRED"
+    end
+    end
+
+    rect rgb(248, 215, 218)
+    Note over Workflow,ActionWF: Conditional Routing
+    Workflow->>ActionWF: Execute
+    ActionWF->>ActionWF: Check: dispositionRequest required? YES
+    ActionWF->>Client: Execute DispositionAgent
+    end
+
+    rect rgb(212, 237, 218)
+    Note over Client,Tool: A2A Communication
+    Client->>A2A: Create Task with inputs
+    A2A->>Executor: POST /tasks
+    Executor->>Remote: processDisposition(...)
+    Remote->>Tool: scrapCar() / sellCar() / donateCar()
+    Tool->>Tool: Execute disposal action
+    Tool->>Remote: Return result
+    Remote->>Executor: Return recommendation
+    Executor->>A2A: Update task status
+    A2A->>Client: Return result
+    end
+
+    Client->>Workflow: Return disposition result
+    Workflow->>Service: Return CarConditions
+    Service->>Service: Set status to DISPOSED
+    Service->>User: Update UI
+```
+
+---
+
+## Understanding the A2A Implementation
+
+### Client Side (`@A2AClientAgent`)
+
+The client agent is remarkably simple:
+
+```java
+@A2AClientAgent(a2aServerUrl = "http://localhost:8888", ...)
+String processDisposition(...)
+```
+
+Quarkus LangChain4j handles:
+- Creating the A2A task
+- Serializing method parameters as task inputs
+- Sending the HTTP request via JSON-RPC
+- Waiting for the response
+- Deserializing the result
+- Error handling and retries
+
+### Server Side (AgentCard + AgentExecutor)
+
+The server requires more components:
+
+| Component | Purpose |
+|-----------|---------|
+| **AgentCard** | Describes agent capabilities, published at `/card` endpoint |
+| **AgentExecutor** | Receives and processes A2A task requests |
+| **TaskUpdater** | Updates task status and sends results back to client |
+| **AI Agent** | The actual AI service that processes requests |
+| **Tools** | Actions the AI agent can perform |
+
+This separation allows:
+- Agents to focus on business logic
+- A2A infrastructure to handle protocol details
+- Multiple agents to be exposed from one server
+
+---
+
+## Key Takeaways
+
+- **A2A enables distributed agents**: Different teams can maintain specialized agents in separate systems
+- **`@A2AClientAgent` is powerful**: Simple annotation transforms a method into an A2A client
+- **AgentCard describes capabilities**: Clients can discover what remote agents can do
+- **AgentExecutor handles protocol**: Separates A2A infrastructure from agent logic
+- **Tasks vs. Messages**: A2A supports both task-based and conversational interactions
+- **Type-safe integration**: Method parameters automatically become task inputs
+- **Remote agents integrate seamlessly**: Works with existing workflows and agents
+- **Two runtimes communicate**: Real-world simulation of distributed agent systems
+
+---
+
+## Experiment Further
+
+### 1. Add Agent Discovery
+
+The AgentCard is published at `http://localhost:8888/card`. Try:
+
+```bash
+curl http://localhost:8888/card | jq
+```
+
+You'll see the full agent description including skills, capabilities, and transport protocols.
+
+### 2. Test Different Disposition Scenarios
+
+Try these feedback examples:
+
+**Scenario 1: Sell the car**
+```
+Minor engine issues, good body condition, low mileage. Repair cost: $800.
+```
+
+**Scenario 2: Donate the car**
+```
+Old car, high mileage, runs but needs work. Market value low.
+```
+
+**Scenario 3: Scrap the car**
+```
+Total loss from flood damage, electrical system destroyed.
+```
+
+Observe how the remote agent makes different decisions!
+
+### 3. Create Your Own A2A Agent
+
+What other specialized agents could be useful?
+
+- **Pricing Agent**: Determines optimal rental pricing based on demand
+- **Route Planner Agent**: Plans maintenance schedules for the fleet
+- **Insurance Agent**: Assesses insurance claims for damaged cars
+
+Try creating a simple A2A server for one of these!
+
+### 4. Monitor A2A Communication
+
+Add logging to see the JSON-RPC messages:
+
+```properties
+# In application.properties
+quarkus.log.category."io.a2a".level=DEBUG
+```
+
+This shows the raw A2A protocol messages.
+
+---
+
+## Troubleshooting
+
+??? warning "Connection refused to localhost:8888"
+    Make sure the remote A2A server is running in Terminal 1. Check for:
+    ```
+    Listening on: http://localhost:8888
+    ```
+
+    If you see "Port already in use", another application is using port 8888. You can change it in `remote-a2a-agent/src/main/resources/application.properties`:
+    ```properties
+    quarkus.http.port=8889
+    ```
+
+    Then update the client's `a2aServerUrl` accordingly.
+
+??? warning "Task execution timeout"
+    If the remote agent takes too long to respond, you might see a timeout error. The default timeout is sufficient for most cases, but you can increase it if needed by configuring the A2A client.
+
+??? warning "Parameter mismatch errors"
+    If you see errors about missing parameters, verify that:
+
+    - Client agent method parameter names match what AgentExecutor extracts
+    - The `getTextPart()` / `getIntegerPart()` calls use the correct keys
+    - All required parameters are being sent by the client
+
+??? warning "Agent not activating"
+    If the DispositionAgent never executes, check:
+
+    - The `@ActivationCondition` method is correctly implemented
+    - The `dispositionRequest` contains `"DISPOSITION_REQUIRED"`
+    - The condition is being checked in the correct order
+
+??? warning "Both applications on same port"
+    If you see "Port already in use" on 8080:
+
+    - Make sure you stopped the application from Step 03
+    - Only run the main application from `multi-agent-system`, not from a previous step directory
+    - Check for zombie Java processes: `ps aux | grep java`
+
+---
+
+## What's Next?
+
+You've successfully built a distributed agent system using the A2A protocol!
+
+You learned how to:
+- Connect to remote agents using `@A2AClientAgent`
+- Build A2A servers with AgentCard and AgentExecutor
+- Integrate remote agents into complex workflows
+- Run multiple Quarkus applications that communicate via A2A
+
+This completes **Section 2: Agentic Systems**! You've progressed from simple agents to complex distributed workflows with remote agent communication.
+
+**Congratulations!** You now have the skills to build sophisticated multi-agent systems with Quarkus LangChain4j!
+
+---
+
+## Additional Resources
+
+- [A2A Protocol Specification](https://a2a.dev)
+- [Quarkus LangChain4j Documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/)
+- [Quarkus LangChain4j Agentic Module](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agentic.html)

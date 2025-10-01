@@ -54,8 +54,7 @@ Before starting, ensure you have:
 
 - Completed Section 1 (or are familiar with Quarkus LangChain4j basics)
 - JDK 21+ installed
-  - OpenAI API key set as `OPENAI_API_KEY` environment variable (or [configured Ollama](https://docs.quarkiverse.io/quarkus-langchain4j/dev/guide-ollama.html) as needed with a model capable of function calling).
-- Docker or Podman running (if needed for later steps)
+- OpenAI API key set as `OPENAI_API_KEY` environment variable
 
 ---
 
