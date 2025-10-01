@@ -5,7 +5,6 @@ import com.carmanagement.agentic.agents.MaintenanceFeedbackAgent;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.declarative.ParallelAgent;
 import dev.langchain4j.agentic.declarative.SubAgent;
-import dev.langchain4j.service.V;
 
 /**
  * Workflow for processing car feedback in parallel.
@@ -24,6 +23,7 @@ public interface FeedbackWorkflow {
             String carMake,
             String carModel,
             Integer carYear,
+            Long carNumber,
             String carCondition,
             String rentalFeedback,
             String carWashFeedback,

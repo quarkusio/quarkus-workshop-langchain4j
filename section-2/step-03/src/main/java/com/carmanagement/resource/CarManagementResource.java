@@ -26,12 +26,13 @@ public class CarManagementResource {
      */
     @POST
     @Path("/rental-return/{carNumber}")
-    public Response processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
+    public Response processRentalReturn(Long carNumber, @RestQuery String rentalFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "", "");
             return Response.ok(result).build();
         } catch (Exception e) {
+            Log.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error processing rental return: " + e.getMessage())
                     .build();
@@ -47,7 +48,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/car-wash-return/{carNumber}")
-    public Response processCarWashReturn(Integer carNumber, @RestQuery String carWashFeedback) {
+    public Response processCarWashReturn(Long carNumber, @RestQuery String carWashFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", carWashFeedback, "");
@@ -69,7 +70,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/maintenance-return/{carNumber}")
-    public Response processMaintenanceReturn(Integer carNumber, @RestQuery String maintenanceFeedback) {
+    public Response processMaintenanceReturn(Long carNumber, @RestQuery String maintenanceFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", "", maintenanceFeedback);

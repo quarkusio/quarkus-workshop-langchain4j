@@ -1,9 +1,9 @@
 package com.carmanagement.resource;
 
 import com.carmanagement.service.CarManagementService;
+import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -26,7 +26,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/rental-return/{carNumber}")
-    public Response processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
+    public Response processRentalReturn(Long carNumber, @RestQuery String rentalFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "");
@@ -48,12 +48,13 @@ public class CarManagementResource {
      */
     @POST
     @Path("/car-wash-return/{carNumber}")
-    public Response processCarWashReturn(Integer carNumber, @RestQuery String carWashFeedback) {
+    public Response processCarWashReturn(Long carNumber, @RestQuery String carWashFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", carWashFeedback);
             return Response.ok(result).build();
         } catch (Exception e) {
+            Log.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error processing car wash return: " + e.getMessage())
                     .build();

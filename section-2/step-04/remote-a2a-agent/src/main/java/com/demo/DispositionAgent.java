@@ -2,7 +2,6 @@ package com.demo;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.V;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import io.quarkiverse.langchain4j.ToolBox;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,7 +37,7 @@ public interface DispositionAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Integer carNumber,
+            Long carNumber,
             String carCondition,
             String dispositionRequest);
 }

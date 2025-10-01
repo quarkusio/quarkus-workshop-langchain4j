@@ -60,7 +60,7 @@ public class DispositionAgentExecutor {
                         inputs.get(0),                      // carMake
                         inputs.get(1),                      // carModel
                         Integer.parseInt(inputs.get(2)),    // carYear
-                        Integer.parseInt(inputs.get(3)),    // carNumber
+                        Long.parseLong(inputs.get(3)),      // carNumber
                         inputs.get(4),                      // carCondition
                         inputs.get(5));                     // dispositionRequest
                 

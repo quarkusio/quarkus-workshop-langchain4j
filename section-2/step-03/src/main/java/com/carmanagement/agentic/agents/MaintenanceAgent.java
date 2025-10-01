@@ -33,7 +33,7 @@ public interface MaintenanceAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Integer carNumber,
+            Long carNumber,
             String maintenanceRequest);
 }
 
