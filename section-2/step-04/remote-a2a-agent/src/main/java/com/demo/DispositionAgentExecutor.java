@@ -49,7 +49,7 @@ public class DispositionAgentExecutor {
                 if (message.getParts() != null) {
                     for (Part<?> part : message.getParts()) {
                         if (part instanceof TextPart textPart) {
-                            System.out.println("Text part: " + textPart.getText());
+                            System.out.println("\uD83D\uDCAC Text part: " + textPart.getText());
                             inputs.add(textPart.getText());
                         }
                     }

@@ -53,15 +53,12 @@ public class DispositionTool {
         // In a real implementation, this would make an API call to a disposition service
         // or update a database with the disposition request
 
-        StringBuilder summary = new StringBuilder();
-        summary.append("Car disposition requested for ").append(carMake).append(" ")
-               .append(carModel).append(" (").append(carYear).append("), Car #")
-               .append(carNumber).append(": ")
-               .append(dispositionOption.getDescription())
-               .append("\n");
-
-        String result = summary.toString();
-        System.out.println("DispositionTool result: " + result);
+        String result = "Car disposition requested for " + carMake + " " +
+                carModel + " (" + carYear + "), Car #" +
+                carNumber + ": " +
+                dispositionOption.getDescription() +
+                "\n";
+        System.out.println("⛍ DispositionTool result: " + result);
         return result;
     }
 }

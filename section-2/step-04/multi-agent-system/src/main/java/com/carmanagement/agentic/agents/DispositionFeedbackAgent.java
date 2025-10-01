@@ -10,7 +10,6 @@ import dev.langchain4j.agentic.Agent;
 public interface DispositionFeedbackAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You are a car disposition analyzer for a car rental company. Your job is to determine if a car should be disposed of based on feedback.
         Analyze the maintenance feedback and car information to decide if the car should be scrapped, sold, or donated.
         If the car is in decent shape, respond with "DISPOSITION_NOT_REQUIRED".

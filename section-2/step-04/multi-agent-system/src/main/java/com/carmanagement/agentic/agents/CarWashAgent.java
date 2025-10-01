@@ -12,7 +12,6 @@ import io.quarkiverse.langchain4j.ToolBox;
 public interface CarWashAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You handle intake for the car wash department of a car rental company.
         It is your job to submit a request to the provided requestCarWash function to take action on the request.
         Be specific about what services are needed based on the car wash request.
