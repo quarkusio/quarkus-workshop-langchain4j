@@ -50,8 +50,8 @@ The **Agent-to-Agent (A2A) protocol** is an open standard for AI agents to commu
 ```mermaid
 graph LR
     subgraph "Quarkus Runtime 1: Car Management System"
-        W[CarProcessingWorkflow]
-        DA[DispositionAgent<br/>@A2AClientAgent]
+        W[CarProcessingWorkflow] 
+        DA["DispositionAgent<br/>@A2AClientAgent"]
         W --> DA
     end
 
@@ -74,12 +74,6 @@ graph LR
     AP -->|A2A Response| DA
     AP <-->|JSON-RPC| AE
 
-    style W fill:#e1f5ff
-    style DA fill:#fff3cd
-    style AP fill:#d4edda
-    style AC fill:#f8d7da
-    style AE fill:#f8d7da
-    style AI fill:#f8d7da
 ```
 
 **The Flow:**
@@ -144,7 +138,7 @@ graph TD
         FW[FeedbackWorkflow<br/>Parallel]
         DFA[DispositionFeedbackAgent]
         AW[ActionWorkflow<br/>Conditional]
-        DAC[DispositionAgent<br/>@A2AClientAgent]
+        DAC["DispositionAgent<br/>@A2AClientAgent"]
 
         R --> FW
         FW --> DFA
@@ -164,11 +158,6 @@ graph TD
 
     DAC -->|A2A Protocol| AE
 
-    style R fill:#e1f5ff
-    style FW fill:#fff3cd
-    style AW fill:#f8d7da
-    style DAC fill:#d4edda
-    style AE fill:#f8d7da
 ```
 
 ---
