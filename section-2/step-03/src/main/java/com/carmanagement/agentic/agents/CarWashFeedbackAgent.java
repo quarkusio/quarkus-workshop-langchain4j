@@ -10,7 +10,6 @@ import dev.langchain4j.agentic.Agent;
 public interface CarWashFeedbackAgent {
 
     @SystemMessage("""
-        /nothink, Reasoning: low.
         You are a car wash analyzer for a car rental company. Your job is to determine if a car needs washing based on feedback.
         Analyze the feedback and car information to decide if a car wash is needed.
         If the feedback mentions dirt, mud, stains, or anything that suggests the car is dirty, recommend a car wash.
@@ -30,7 +29,8 @@ public interface CarWashFeedbackAgent {
         Car Wash Feedback: {carWashFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
-    @Agent(description = "Car wash analyzer. Using feedback, determines if a car wash is needed.", outputName = "carWashRequest")
+    @Agent(description = "Car wash analyzer. Using feedback, determines if a car wash is needed.",
+            outputName = "carWashRequest")
     String analyzeForCarWash(
             String carMake,
             String carModel,
