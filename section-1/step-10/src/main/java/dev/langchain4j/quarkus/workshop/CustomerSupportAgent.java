@@ -1,6 +1,7 @@
 package dev.langchain4j.quarkus.workshop;
 
 import dev.langchain4j.service.guardrail.InputGuardrails;
+import io.quarkiverse.langchain4j.mcp.runtime.McpToolBox;
 import jakarta.enterprise.context.SessionScoped;
 
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
@@ -26,6 +27,7 @@ public interface CustomerSupportAgent {
             """)
     @InputGuardrails(PromptInjectionGuard.class)
     @ToolBox(BookingRepository.class)
+    @McpToolBox("weather")
     @Timeout(5000)
     @Retry(maxRetries = 3, delay = 100)
     @Fallback(CustomerSupportAgentFallback.class)
