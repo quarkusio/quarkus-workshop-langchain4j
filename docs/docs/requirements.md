@@ -52,7 +52,7 @@ Run your Quarkus app in **dev mode** from the project directory:
 Dev mode automatically recompiles your code on every change.
 Your app will be available at http://localhost:8080/.
 
-!!! warning “Switching steps”
+!!! warning "Switching steps"
     Stop the running application (Ctrl+C) before starting the next step.
 
 ### Dev UI
@@ -113,7 +113,7 @@ To avoid bandwidth issues during the session, we recommend pre-downloading them.
 ## Importing the Project in Your IDE
 
 !!! tip 
-    Open the project from `section-1/step-01` in your IDE and use that directory throughout the workshop.\
+    Open the project from `section-1/step-01` in your IDE and use that directory throughout the workshop.
 
 If you get stuck, simply switch to the `step-xx` directory of the last completed step.
 
