@@ -28,14 +28,14 @@ If you already used your credits, you’ll need to fund your account.
 Once you have a key, set it as an environment variable:
 
 === "Linux / macOS"
-```bash
-export OPENAI_API_KEY=<your-key>
-```
+    ```bash
+    export OPENAI_API_KEY=<your-key>
+    ```
 
 === "Windows PowerShell"
-```powershell
-$Env:OPENAI_API_KEY = <your-key>
-```
+    ```powershell
+    $Env:OPENAI_API_KEY = <your-key>
+    ```
 
 ---
 
