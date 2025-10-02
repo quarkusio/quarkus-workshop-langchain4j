@@ -177,5 +177,6 @@ The actual implementation of the function is entirely customizable.
 For instance, you could extend your chatbot with tools for weather forecasting (by integrating with a remote service), personalized recommendations, or other external data sources.
 Additionally, you can leverage more specialized LLMs, routing specific queries—such as legal or insurance-related questions—to models trained in those domains.
 
-However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
+Up to now, we have seen how you can expose business logic directly to an LLM, making methods callable as reasoning tools.
+This works great inside a single Quarkus application, but what if you want to go a step further and share those tools across services, runtimes, or even different languages?
 In the [next step](./step-08.md), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.
