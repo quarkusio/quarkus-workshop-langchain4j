@@ -1,6 +1,6 @@
 # Step 09 - Guardrails
 
-In the previous step we introduced function calling, enabling the LLM to interact with the application.
+In the previous steps we introduced function calling and MCP, enabling the LLM to interact with the application and the outside world.
 While this feature provides a powerful mechanism to extend the chatbot's capabilities, it also introduces new risks,
 such as [prompt injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/){target="_blank"}.
 
@@ -52,7 +52,7 @@ want a more complex user message extended with the user query.
 
 Notice the last line of the `@UserMessage` annotation: `User query: {userQuery}`.
 It will be replaced by the user query when the AI service is called.
-As we have seen in the previous step with `Today is {current_date}.`, the prompts are templates that can be filled with
+As we have seen in the step 7 with `Today is {current_date}.`, the prompts are templates that can be filled with
 values, here the `userQuery` parameter.
 
 The user message follows a [_few shot learning_](https://www.ibm.com/topics/few-shot-learning) format.
