@@ -185,12 +185,12 @@ we have included the `quarkus-micrometer-registry-otlp` extension for the genera
         <dependency>
             <groupId>io.quarkiverse.micrometer.registry</groupId>
             <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.2.4</version>
+            <version>3.4.1</version>
         </dependency>
 ```
 
 By default Quarkus will collect a variety of useful metrics for you by default,
-e.g., CPU & memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
+e.g., CPU and memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
 about the LLM interactions as well. Such as:
 
 ```bash title="Example of some of the LangChain4j metrics"
@@ -222,7 +222,7 @@ You can then tie these traces back to specific log entries or lines in your code
 
 Tracing can also help you detect anomalies in the behavior of your application over time, such as a sudden increase in traffic or a drop in response times.
 
-Quarkus implements the OpenTelemetry project for tracing capabilities, allowing you to collect and analyze
+Quarkus relies on OpenTelemetry for tracing capabilities, allowing you to collect and analyze
  trace data from your LangChain4j application. You can use the OpenTelemetry API to send traces to a tracing service
 such as Jaeger, Zipkin, or Tempo, which can then be used for monitoring and debugging purposes.
 
@@ -246,7 +246,8 @@ and configuring the OpenTelemetry API, including sending traces to a tracing ser
 integrates with the OpenTelemetry extension to collect traces regarding your interactions with LLMs as well.
 
 You can configure the opentelemetry tracing functionality by e.g. setting
-the endpoint and headers for your tracing service, as well as the format of the traces:
+the endpoint and headers for your tracing service, as well as the format of the traces
+by adding the following properties to the `src/main/resources/application.properties` file:
 
 ```properties
 # quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
@@ -266,11 +267,11 @@ In our case however, we're going to use a Quarkus Dev Service to capture and vis
 In production, your organization will likely already have tools set up to collect observability data,
 however Quarkus offers a few ways to visualize and search the collected data on your local machine.
 
-#### Quarkus Otel LGTM Dev Service
+#### Quarkus OTel LGTM Dev Service
 
 Quarkus provides an experimental new Dev Service to help visualize all your OpenTelemetry observability data in a central place.
 It is based on the open source LGTM stack, which stands for Loki (log aggregation), Grafana (graph tool), Tempo (traces aggregation)
-and Prometheus (metrics aggregation). By adding the `quarkus-observability-devservices-gtm` extension, this set of tools will
+and Prometheus (metrics aggregation). By adding the `quarkus-observability-devservices-lgtm` extension, this set of tools will
 automatically (or may we say 'automagically'?) start up in their respective containers and wire up to your application's observability endpoints.
 
 Add the following dependencies in your `pom.xml`:
@@ -283,7 +284,7 @@ Add the following dependencies in your `pom.xml`:
         </dependency>
 ```
 
-In the application.properties, let's enable the OpenTelemetry tracing and log collection features:
+In the `src/main/resources/application.properties` file, let's enable the OpenTelemetry tracing and log collection features:
 
 ```properties
 quarkus.otel.logs.enabled=true
@@ -297,28 +298,26 @@ Note that it could take a bit longer for the application to start up, since Quar
 in the background.
 
 After you've generated some data, let's go and explore this data in Grafana. The Dev Service exposes a random port.
-The easiest way to find it is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}) and click on the "Dev Services" menu item.
+The easiest way to access Grafana is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"}) and click on the "Grafana UI" link of the "Observability" tile.
 
-![Quarkus Dev Services](../images/dev-services-observability.png)
+![Quarkus Dev UI](../images/dev-ui-observability.png)
 
-Find the `grafana.endpoint` and open the url in another browser tab. Use admin/admin to log in if you need to.
-
-Let's first explore the provided custom metrics dashboards that the dev service creates. Go to "Dashboards" in the left menu.
-You will notice 2 dashboards, one for OTLP and one for Prometheus. Remember how we added both the Micrometer OpenTelemetry and Prometheus
+Let's first explore the provided custom metrics dashboards that the Dev Service creates. Go to "Dashboards" in the left menu.
+You will notice 4 dashboards, including one for OTLP and one for Prometheus. Remember how we added both the Micrometer OpenTelemetry and Prometheus
 registry extensions? They're both reflected here. Feel free to explore the dashboards.
-If you don't see much data data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
+If you don't see much data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
 create some more chat requests.
 
 ![Grafana Dashboard](../images/grafana-dashboard.png)
 
-You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore > Metrics:
+You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Drilldown > Metrics:
 
 ![Prometheus Metrics graphs](../images/prometheus-metrics.png)
 
 Now let's explore the Query functionality to find specific data. Click on the `Explore` menu item.
 An interactive query window will open up.
 Next to "Outline" you'll see that Prometheus is selected in the dropdown. Select `gen_ai_client_estimated_cost_total`.
-Then, in label filters, select `currency` and value `USD`. Finally, click the Run query button to see the results.
+Then, in label filters, select `currency` and value `USD`. Finally, click the `Run query` button to see the results.
 You should see an estimated cost aggregation of the latest calls to the model. This is an experimental feature
 based on what typical calls to ChatGPT cost.
 
@@ -354,7 +353,7 @@ should something go wrong, we are able to handle it gracefully.
 
 Ultimately, calling an LLM is not much different than making traditional REST calls.
 If you're familiar with [MicroProfile](https://microprofile.io){target="_blank"}, you may know that it has a specification for how to implement Fault Tolerance. Quarkus implements this feature with the `quarkus-smallrye-fault-tolerance`
-extension. Go ahead and add it to the your pom.xml:
+extension. Go ahead and add it to your `pom.xml`:
 
 ```xml title="pom.xml"
         <!-- Fault Tolerance -->
@@ -364,7 +363,7 @@ extension. Go ahead and add it to the your pom.xml:
         </dependency>
 ```
 
-The Microprofile Fault Tolerance spec defines 3 main fault tolerance capabilities:
+The MicroProfile Fault Tolerance spec defines 3 main fault tolerance capabilities:
 
 * Timeout - allows you to set a maximum time the call to the LLM should take before failing.
 * Fallback - allows you to call a fallback method in case there's an error
@@ -379,14 +378,16 @@ following annotations:
 ```
 
 That's all. To test the implemented fault tolerance, we'll need to 'break' our application.
-You can either turn off your wifi, set the @Timeout value to something very low (e.g. 10), or
-you could set the inference server url to something that won't resolve, eg:
+You can either turn off your wifi, set the `@Timeout` value to something very low (e.g. 10), or
+you could set the inference server url to something that won't resolve, e.g. add the following property to your `src/main/resources/application.properties` file:
 
 ```properties
 quarkus.langchain4j.openai.base-url=https://api.example.com/v1/
 ```
 
 It's up to you to decide what your preferred way to create chaos is :).  Once you've done that, run your application and test it with different inputs. You should see that the fallback method is called when the LLM fails to produce a response within the specified timeout. This demonstrates the fault tolerance of our application.
+
+Don't forget to revert the change you just did!
 
 ![Fallback is being called when an error occurs](../images/fallback.png)
 
