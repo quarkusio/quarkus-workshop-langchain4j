@@ -18,12 +18,12 @@ You will need an OpenAI API key to complete this workshop.
 If your instructor provided a key, use that one. Otherwise, [create an API key](https://platform.openai.com/docs/quickstart/create-and-export-an-api-key){target="_blank"}.
 
 ??? info "No instructor-provided key?"
-New OpenAI developer accounts receive $5 in free trial credits.  
-If you already used your credits, you’ll need to fund your account.
-
-!!! tip
-    Don’t worry — this workshop is inexpensive. The total cost should not exceed **$0.50 (~€0.43)**.  
-    See the [OpenAI pricing calculator](https://openai.com/api/pricing/){target="_blank"}.
+    New OpenAI developer accounts receive $5 in free trial credits.  
+    If you already used your credits, you’ll need to fund your account.
+    
+    !!! tip
+        Don’t worry — this workshop is inexpensive. The total cost should not exceed **$0.50 (~€0.43)**.  
+        See the [OpenAI pricing calculator](https://openai.com/api/pricing/){target="_blank"}.
 
 Once you have a key, set it as an environment variable:
 
