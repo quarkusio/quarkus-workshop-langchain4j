@@ -164,7 +164,7 @@ the url, headers, and in the body, the model you called, the messages, temperatu
 }
 ```
 
-By default the logs are output the console. In a production system the console output is typically forwarded
+By default, the logs are output the console. In a production system the console output is typically forwarded
 to a log aggregation service so logs can be centralized and searched in more advanced ways.
 We'll take a look at a log collection system in a little bit, but first let's take a look at how to collect
 metrics from our application.
@@ -373,12 +373,12 @@ and what delay there should be in between the calls
 Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the
 following annotations:
 
-```java hl_lines="6 8-9 29-31" title="CustomerSupportAgent.java"
+```java hl_lines="7-11 31-33 36-44" title="CustomerSupportAgent.java"
 --8<-- "../../section-1/step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 That's all. To test the implemented fault tolerance, we'll need to 'break' our application.
-You can either turn off your wifi, set the `@Timeout` value to something very low (e.g. 10), or
+You can either turn off your Wi-Fi, set the `@Timeout` value to something very low (e.g. 10), or
 you could set the inference server url to something that won't resolve, e.g. add the following property to your `src/main/resources/application.properties` file:
 
 ```properties
