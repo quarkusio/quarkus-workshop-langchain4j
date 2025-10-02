@@ -12,15 +12,15 @@ The RAG pattern is composed of two parts:
 - **Ingestion**: This is the part that stores data in the knowledge base.
 - **Augmentation**: This is the part that adds the retrieved information to the input of the LLM.
 
-We will see these two parts in the next steps, but first let's use [EasyRag](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){:target="_blank"} to get started and understand the RAG pattern.
-EasyRag abstracts most of the complexity of implementing the RAG pattern.
+We will see these two parts in the next steps, but first let's use [EasyRAG](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html){:target="\_blank"} to get started and understand the RAG pattern.
+EasyRAG abstracts most of the complexity of implementing the RAG pattern.
 Basically, you drop your data in a configured directory, and _voilà_!
 
 If you want to see the final result of this step, you can check out the `step-05` directory.
 
 ## Adding the Easy Rag dependency
 
-First, we need to add the EasyRag dependency to our project.
+First, we need to add the EasyRAG dependency to our project.
 Add the following dependency to your `pom.xml` file:
 
 ```xml title="pom.xml"
@@ -36,6 +36,7 @@ Add the following dependency to your `pom.xml` file:
 
 !!! note "Reloading"
     If your application is running in dev mode, it will automatically restart with the new dependency.
+    It won't be functional though, as it is missing a mandatory configuration property that we will set a bit later.
 
 ## Adding some data
 
@@ -52,11 +53,11 @@ Alternatively, you can copy the `miles-of-smiles-terms-of-use.txt` file from the
 
 Note that we are adding a single file, but you can add as many files as you want in the `rag` directory.
 Also, it's not limited to text files, you can use PDF, Word, or any other format.
-See the [EasyRag documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){target="_blank"} for more information.
+See the [EasyRAG documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html){target="_blank"} for more information.
 
-## Configuring EasyRag
+## Configuring EasyRAG
 
-Now that we have some data, we need to configure EasyRag to ingest it.
+Now that we have some data, we need to configure EasyRAG to ingest it.
 ==In the `src/main/resources/application.properties` file, add the following configuration:==
 
 ```properties title="application.properties"
@@ -100,7 +101,7 @@ We will see in the next steps how to use your own embedding model.
 Let's have a look at the content of our knowledge base.
 ==Open the browser to [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui/).
 This is the Quarkus Dev UI, the toolbox with everything you need to develop your Quarkus application.
-Locate the _LangChain4j_ tile, and click on the _Embedding store_ link:==
+Locate the _LangChain4j Core_ tile, and click on the _Embedding store_ link:==
 
 ![Embedding store link in the dev UI](../images/langchain4j-tile.png)
 

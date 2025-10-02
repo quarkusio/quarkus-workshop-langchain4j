@@ -1,7 +1,7 @@
 # Step 06 - Deconstructing the RAG pattern
 
-In the previous step, we implemented a RAG (Retrieval Augmented Generation) pattern in our AI service using [EasyRag](https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html){target="_blank"}.
-Most of the complexity was hidden by EasyRag.
+In the previous step, we implemented a RAG (Retrieval Augmented Generation) pattern in our AI service using [EasyRAG](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html){target="_blank"}.
+Most of the complexity was hidden by EasyRAG.
 
 In this step, we will deconstruct the RAG pattern to understand how it works under the hood.
 We will see how we can customize it and use our own knowledge base and embedding model.
@@ -208,9 +208,9 @@ The augmentor is responsible for extending the prompt with the retrieved segment
 The `create` method handles both the retrieval and the prompt augmentation.
 It uses the `PgVectorEmbeddingStore` bean to retrieve the embeddings and the `BgeSmallEnQuantizedEmbeddingModel` bean to generate the embeddings.
 
-!!! important Using the same embedding model
-        is crucial to use the same embedding model for the retriever and the ingestor.
-        Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.
+!!! important
+    Using the same embedding model is crucial to use the same embedding model for the retriever and the ingestor.
+    Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.
 
 The `EmbeddingStoreContentRetriever` class is used to retrieve the most relevant segments.
 We configure the maximum number of results to 3 (like in the previous step).
