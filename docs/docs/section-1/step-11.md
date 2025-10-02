@@ -10,7 +10,7 @@ The final code of this step is available in the `step-11` directory.
 
 ## Adding Jlama dependencies
 
-Jlama is well integrated with Quarkus through the dedicated langchain4j based extension. Note that for performance reasons Jlama uses the [Vector API](https://openjdk.org/jeps/469) which is still in preview in Java 23, and very likely will be released as a supported feature in Java 25.
+Jlama is well integrated with Quarkus through the dedicated LangChain4j based extension. Note that for performance reasons Jlama uses the [Vector API](https://openjdk.org/jeps/469) which is still in preview in Java 23, and very likely will be released as a supported feature in Java 25.
 
 For this reason the first step to do is enabling the `quarkus-maven-plugin` in our pom file to use this preview API, by adding the following configuration to it.
 
