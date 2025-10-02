@@ -311,8 +311,6 @@ You are not viewing the latest version.
       
         
       
-        
-      
     
     
       
@@ -503,7 +501,7 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#configuring-easyrag" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuring EasyRag
+      Configuring EasyRAG
     </span>
   </a>
   
@@ -656,27 +654,6 @@ You are not viewing the latest version.
   
   <span class="md-ellipsis">
     Step 10 - Observability and Fault Tolerance
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
   </span>
   
 
@@ -924,7 +901,7 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#configuring-easyrag" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuring EasyRag
+      Configuring EasyRAG
     </span>
   </a>
   
@@ -1001,12 +978,12 @@ The RAG pattern allows you to add a <em>knowledge base</em> to the LLM.</p>
 <li><strong>Ingestion</strong>: This is the part that stores data in the knowledge base.</li>
 <li><strong>Augmentation</strong>: This is the part that adds the retrieved information to the input of the LLM.</li>
 </ul>
-<p>We will see these two parts in the next steps, but first let’s use <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html">EasyRag</a>{:target=”<em>blank”} to get started and understand the RAG pattern.
-EasyRag abstracts most of the complexity of implementing the RAG pattern.
-Basically, you drop your data in a configured directory, and _voilà</em>!</p>
+<p>We will see these two parts in the next steps, but first let’s use <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html" target="_blank">EasyRAG</a> to get started and understand the RAG pattern.
+EasyRAG abstracts most of the complexity of implementing the RAG pattern.
+Basically, you drop your data in a configured directory, and <em>voilà</em>!</p>
 <p>If you want to see the final result of this step, you can check out the <code>step-05</code> directory.</p>
 <h2 id="adding-the-easy-rag-dependency">Adding the Easy Rag dependency<a class="headerlink" href="#adding-the-easy-rag-dependency" title="Permanent link"></a></h2>
-<p>First, we need to add the EasyRag dependency to our project.
+<p>First, we need to add the EasyRAG dependency to our project.
 Add the following dependency to your <code>pom.xml</code> file:</p>
 <div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;dependency&gt;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.langchain4j<span class="nt">&lt;/groupId&gt;</span>
@@ -1021,7 +998,8 @@ Add the following dependency to your <code>pom.xml</code> file:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Reloading</p>
-<p>If your application is running in dev mode, it will automatically restart with the new dependency.</p>
+<p>If your application is running in dev mode, it will automatically restart with the new dependency.
+It won’t be functional though, as it is missing a mandatory configuration property that we will set a bit later.</p>
 </div>
 <h2 id="adding-some-data">Adding some data<a class="headerlink" href="#adding-some-data" title="Permanent link"></a></h2>
 <p>The RAG pattern allows to extend the LLM knowledge with your own data.
@@ -1069,9 +1047,9 @@ Then, create a file named <code>miles-of-smiles-terms-of-use.txt</code> in the <
 Alternatively, you can copy the <code>miles-of-smiles-terms-of-use.txt</code> file from the <code>step-05/src/main/resources/rag</code> directory.
 <p>Note that we are adding a single file, but you can add as many files as you want in the <code>rag</code> directory.
 Also, it’s not limited to text files, you can use PDF, Word, or any other format.
-See the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html" target="_blank">EasyRag documentation</a> for more information.</p>
-<h2 id="configuring-easyrag">Configuring EasyRag<a class="headerlink" href="#configuring-easyrag" title="Permanent link"></a></h2>
-<p>Now that we have some data, we need to configure EasyRag to ingest it.
+See the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html" target="_blank">EasyRAG documentation</a> for more information.</p>
+<h2 id="configuring-easyrag">Configuring EasyRAG<a class="headerlink" href="#configuring-easyrag" title="Permanent link"></a></h2>
+<p>Now that we have some data, we need to configure EasyRAG to ingest it.
 <mark>In the <code>src/main/resources/application.properties</code> file, add the following configuration:</mark></p>
 <div class="highlight"><span class="filename">application.properties</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">quarkus.langchain4j.easy-rag.path</span><span class="o">=</span><span class="s">src/main/resources/rag</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">quarkus.langchain4j.easy-rag.max-segment-size</span><span class="o">=</span><span class="s">100</span>
@@ -1107,7 +1085,7 @@ We will see in the next steps how to use your own embedding model.</p>
 <p>Let’s have a look at the content of our knowledge base.
 <mark>Open the browser to <a href="http://localhost:8080/q/dev-ui/">http://localhost:8080/q/dev-ui</a>.
 This is the Quarkus Dev UI, the toolbox with everything you need to develop your Quarkus application.
-Locate the <em>LangChain4j</em> tile, and click on the <em>Embedding store</em> link:</mark></p>
+Locate the <em>LangChain4j Core</em> tile, and click on the <em>Embedding store</em> link:</mark></p>
 <p><img alt="Embedding store link in the dev UI" src="../../images/langchain4j-tile.png"></p>
 <p><mark>Then, look for the <code>Search for relevant embeddings</code> section.
 Enter a query in the <code>Search text</code> field, for example, <code>Cancellation</code>, and then click on the <code>Search</code> button:</mark></p>

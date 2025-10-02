@@ -491,8 +491,6 @@ You are not viewing the latest version.
       
         
       
-        
-      
     
     
       
@@ -727,27 +725,6 @@ You are not viewing the latest version.
   
   <span class="md-ellipsis">
     Step 10 - Observability and Fault Tolerance
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../section-1/step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
   </span>
   
 
@@ -1155,27 +1132,27 @@ You are not viewing the latest version.
 If your instructor provided a key, use that one. Otherwise, <a href="https://platform.openai.com/docs/quickstart/create-and-export-an-api-key" target="_blank">create an API key</a>.</p>
 <details class="info">
 <summary>No instructor-provided key?</summary>
-</details>
 <p>New OpenAI developer accounts receive $5 in free trial credits.<br>
 If you already used your credits, you’ll need to fund your account.</p>
-<div class="highlight"><pre><span></span><code>Don’t worry — this workshop is inexpensive. The total cost should not exceed **$0.50 (~€0.43)**.  
-See the [OpenAI pricing calculator](https://openai.com/api/pricing/){target="_blank"}.
-</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Don’t worry — this workshop is inexpensive. The total cost should not exceed <strong>$0.50 (~€0.43)</strong>.<br>
+See the <a href="https://openai.com/api/pricing/" target="_blank">OpenAI pricing calculator</a>.</p>
+</div>
+</details>
 <p>Once you have a key, set it as an environment variable:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label><label for="__tabbed_1_2">Windows PowerShell</label></div>
 <div class="tabbed-content">
-<div class="tabbed-block"></div>
-</div>
-</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>&lt;your-key&gt;
 </code></pre></div>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked id="__tabbed_2_1" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">Windows PowerShell</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block"></div>
 </div>
-</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">$Env:OPENAI_API_KEY</span> <span class="p">=</span> <span class="p">&lt;</span><span class="n">your-key</span><span class="p">&gt;</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <hr>
 <h2 id="good-to-know">Good to Know<a class="headerlink" href="#good-to-know" title="Permanent link"></a></h2>
 <h3 id="quarkus-dev-mode">Quarkus Dev Mode<a class="headerlink" href="#quarkus-dev-mode" title="Permanent link"></a></h3>
@@ -1184,8 +1161,10 @@ See the [OpenAI pricing calculator](https://openai.com/api/pricing/){target="_bl
 </code></pre></div>
 <p>Dev mode automatically recompiles your code on every change.
 Your app will be available at http://localhost:8080/.</p>
-<p>!!! warning “Switching steps”
-    Stop the running application (Ctrl+C) before starting the next step.</p>
+<div class="admonition warning">
+<p class="admonition-title">Switching steps</p>
+<p>Stop the running application (Ctrl+C) before starting the next step.</p>
+</div>
 <h3 id="dev-ui">Dev UI<a class="headerlink" href="#dev-ui" title="Permanent link"></a></h3>
 <p>Quarkus ships with a <a href="https://quarkus.io/guides/dev-ui" target="_blank">Dev UI</a>, available only in dev mode at <a href="http://localhost:8080/q/dev/">http://localhost:8080/q/dev/</a>.
 Think of it as your <strong>toolbox</strong> when building Quarkus applications.</p>
@@ -1225,7 +1204,7 @@ To avoid bandwidth issues during the session, we recommend pre-downloading them.
 <h2 id="importing-the-project-in-your-ide">Importing the Project in Your IDE<a class="headerlink" href="#importing-the-project-in-your-ide" title="Permanent link"></a></h2>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Open the project from <code>section-1/step-01</code> in your IDE and use that directory throughout the workshop.\</p>
+<p>Open the project from <code>section-1/step-01</code> in your IDE and use that directory throughout the workshop.</p>
 </div>
 <p>If you get stuck, simply switch to the <code>step-xx</code> directory of the last completed step.</p>
 <hr>

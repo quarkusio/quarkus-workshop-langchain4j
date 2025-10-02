@@ -311,8 +311,6 @@ You are not viewing the latest version.
       
         
       
-        
-      
     
     
       
@@ -650,27 +648,6 @@ You are not viewing the latest version.
   
   <span class="md-ellipsis">
     Step 10 - Observability and Fault Tolerance
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
   </span>
   
 
@@ -1275,7 +1252,8 @@ In the chatbot, let’s try the following interactions:</p>
 The actual implementation of the function is entirely customizable.
 For instance, you could extend your chatbot with tools for weather forecasting (by integrating with a remote service), personalized recommendations, or other external data sources.
 Additionally, you can leverage more specialized LLMs, routing specific queries—such as legal or insurance-related questions—to models trained in those domains.</p>
-<p>However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
+<p>Up to now, we have seen how you can expose business logic directly to an LLM, making methods callable as reasoning tools.
+This works great inside a single Quarkus application, but what if you want to go a step further and share those tools across services, runtimes, or even different languages?
 In the <a href="../step-08/">next step</a>, we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.</p></div>
 
 

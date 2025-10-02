@@ -12,7 +12,7 @@
         <link rel="prev" href="../step-09/">
       
       
-        <link rel="next" href="../step-11/">
+        <link rel="next" href="../../section-2/step-01/">
       
       
       <link rel="icon" href="../../images/logo.png">
@@ -290,8 +290,6 @@ You are not viewing the latest version.
   
     
     
-      
-        
       
         
       
@@ -637,7 +635,7 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#quarkus-otel-lgtm-dev-service" class="md-nav__link">
     <span class="md-ellipsis">
-      Quarkus Otel LGTM Dev Service
+      Quarkus OTel LGTM Dev Service
     </span>
   </a>
   
@@ -675,27 +673,6 @@ You are not viewing the latest version.
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -968,7 +945,7 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#quarkus-otel-lgtm-dev-service" class="md-nav__link">
     <span class="md-ellipsis">
-      Quarkus Otel LGTM Dev Service
+      Quarkus OTel LGTM Dev Service
     </span>
   </a>
   
@@ -1188,11 +1165,11 @@ we have included the <code>quarkus-micrometer-registry-otlp</code> extension for
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="nt">&lt;dependency&gt;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">            </span><span class="nt">&lt;groupId&gt;</span>io.quarkiverse.micrometer.registry<span class="nt">&lt;/groupId&gt;</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>quarkus-micrometer-registry-otlp<span class="nt">&lt;/artifactId&gt;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">&lt;version&gt;</span>3.2.4<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">&lt;version&gt;</span>3.4.1<span class="nt">&lt;/version&gt;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
 <p>By default Quarkus will collect a variety of useful metrics for you by default,
-e.g., CPU &amp; memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
+e.g., CPU and memory usage, garbage collection stats, etc. The LangChain4j extension will add useful metrics
 about the LLM interactions as well. Such as:</p>
 <div class="highlight"><span class="filename">Example of some of the LangChain4j metrics</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># HELP langchain4j_aiservices_seconds_max </span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># TYPE langchain4j_aiservices_seconds_max gauge</span>
@@ -1217,7 +1194,7 @@ For example, you could track the amount of time it took to call the model,
 and identify any requests that took longer than expected.
 You can then tie these traces back to specific log entries or lines in your code.</p>
 <p>Tracing can also help you detect anomalies in the behavior of your application over time, such as a sudden increase in traffic or a drop in response times.</p>
-<p>Quarkus implements the OpenTelemetry project for tracing capabilities, allowing you to collect and analyze
+<p>Quarkus relies on OpenTelemetry for tracing capabilities, allowing you to collect and analyze
  trace data from your LangChain4j application. You can use the OpenTelemetry API to send traces to a tracing service
 such as Jaeger, Zipkin, or Tempo, which can then be used for monitoring and debugging purposes.</p>
 <p>To add OpenTelemetry (and by extension tracing) to your application, you will need to add the opentelemetry
@@ -1236,7 +1213,8 @@ extensions to your pom.xml file. You can optionally also add the opentelemetry-j
 and configuring the OpenTelemetry API, including sending traces to a tracing service. Quarkus LangChain4j automatically
 integrates with the OpenTelemetry extension to collect traces regarding your interactions with LLMs as well.</p>
 <p>You can configure the opentelemetry tracing functionality by e.g. setting
-the endpoint and headers for your tracing service, as well as the format of the traces:</p>
+the endpoint and headers for your tracing service, as well as the format of the traces
+by adding the following properties to the <code>src/main/resources/application.properties</code> file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="na">quarkus.otel.exporter.otlp.traces.headers</span><span class="o">=</span><span class="s">authorization=Bearer my_secret </span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="na">quarkus.log.console.format</span><span class="o">=</span><span class="s">%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n  </span>
@@ -1250,10 +1228,10 @@ In our case however, we’re going to use a Quarkus Dev Service to capture and v
 <h3 id="tools-to-visualize-your-collected-observability-data-on-your-local-machine">Tools to visualize your collected observability data on your local machine<a class="headerlink" href="#tools-to-visualize-your-collected-observability-data-on-your-local-machine" title="Permanent link"></a></h3>
 <p>In production, your organization will likely already have tools set up to collect observability data,
 however Quarkus offers a few ways to visualize and search the collected data on your local machine.</p>
-<h4 id="quarkus-otel-lgtm-dev-service">Quarkus Otel LGTM Dev Service<a class="headerlink" href="#quarkus-otel-lgtm-dev-service" title="Permanent link"></a></h4>
+<h4 id="quarkus-otel-lgtm-dev-service">Quarkus OTel LGTM Dev Service<a class="headerlink" href="#quarkus-otel-lgtm-dev-service" title="Permanent link"></a></h4>
 <p>Quarkus provides an experimental new Dev Service to help visualize all your OpenTelemetry observability data in a central place.
 It is based on the open source LGTM stack, which stands for Loki (log aggregation), Grafana (graph tool), Tempo (traces aggregation)
-and Prometheus (metrics aggregation). By adding the <code>quarkus-observability-devservices-gtm</code> extension, this set of tools will
+and Prometheus (metrics aggregation). By adding the <code>quarkus-observability-devservices-lgtm</code> extension, this set of tools will
 automatically (or may we say ‘automagically’?) start up in their respective containers and wire up to your application’s observability endpoints.</p>
 <p>Add the following dependencies in your <code>pom.xml</code>:</p>
 <div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="w">        </span><span class="nt">&lt;dependency&gt;</span>
@@ -1262,7 +1240,7 @@ automatically (or may we say ‘automagically’?) start up in their respective 
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">            </span><span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
-<p>In the application.properties, let’s enable the OpenTelemetry tracing and log collection features:</p>
+<p>In the <code>src/main/resources/application.properties</code> file, let’s enable the OpenTelemetry tracing and log collection features:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="na">quarkus.otel.logs.enabled</span><span class="o">=</span><span class="s">true</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="na">quarkus.otel.traces.enabled</span><span class="o">=</span><span class="s">true</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># Disable LTGM in test mode</span>
@@ -1272,21 +1250,20 @@ automatically (or may we say ‘automagically’?) start up in their respective 
 Note that it could take a bit longer for the application to start up, since Quarkus is starting up the LGTM Dev Services containers
 in the background.</p>
 <p>After you’ve generated some data, let’s go and explore this data in Grafana. The Dev Service exposes a random port.
-The easiest way to find it is to go to the Quarkus Dev UI (<a href="http://localhost:8080/q/dev-ui" target="_blank">http://localhost:8080/q/dev-ui</a>) and click on the “Dev Services” menu item.</p>
-<p><img alt="Quarkus Dev Services" src="../../images/dev-services-observability.png"></p>
-<p>Find the <code>grafana.endpoint</code> and open the url in another browser tab. Use admin/admin to log in if you need to.</p>
-<p>Let’s first explore the provided custom metrics dashboards that the dev service creates. Go to “Dashboards” in the left menu.
-You will notice 2 dashboards, one for OTLP and one for Prometheus. Remember how we added both the Micrometer OpenTelemetry and Prometheus
+The easiest way to access Grafana is to go to the Quarkus Dev UI (<a href="http://localhost:8080/q/dev-ui" target="_blank">http://localhost:8080/q/dev-ui</a>) and click on the “Grafana UI” link of the “Observability” tile.</p>
+<p><img alt="Quarkus Dev UI" src="../../images/dev-ui-observability.png"></p>
+<p>Let’s first explore the provided custom metrics dashboards that the Dev Service creates. Go to “Dashboards” in the left menu.
+You will notice 4 dashboards, including one for OTLP and one for Prometheus. Remember how we added both the Micrometer OpenTelemetry and Prometheus
 registry extensions? They’re both reflected here. Feel free to explore the dashboards.
-If you don’t see much data data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
+If you don’t see much data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
 create some more chat requests.</p>
 <p><img alt="Grafana Dashboard" src="../../images/grafana-dashboard.png"></p>
-<p>You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Explore &gt; Metrics:</p>
+<p>You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Drilldown &gt; Metrics:</p>
 <p><img alt="Prometheus Metrics graphs" src="../../images/prometheus-metrics.png"></p>
 <p>Now let’s explore the Query functionality to find specific data. Click on the <code>Explore</code> menu item.
 An interactive query window will open up.
 Next to “Outline” you’ll see that Prometheus is selected in the dropdown. Select <code>gen_ai_client_estimated_cost_total</code>.
-Then, in label filters, select <code>currency</code> and value <code>USD</code>. Finally, click the Run query button to see the results.
+Then, in label filters, select <code>currency</code> and value <code>USD</code>. Finally, click the <code>Run query</code> button to see the results.
 You should see an estimated cost aggregation of the latest calls to the model. This is an experimental feature
 based on what typical calls to ChatGPT cost.</p>
 <p><img alt="Estimated Cost Graph" src="../../images/genai-estimated-cost.png"></p>
@@ -1311,14 +1288,14 @@ the user would still be affected and potentially get an ugly error message.</p>
 should something go wrong, we are able to handle it gracefully.</p>
 <p>Ultimately, calling an LLM is not much different than making traditional REST calls.
 If you’re familiar with <a href="https://microprofile.io" target="_blank">MicroProfile</a>, you may know that it has a specification for how to implement Fault Tolerance. Quarkus implements this feature with the <code>quarkus-smallrye-fault-tolerance</code>
-extension. Go ahead and add it to the your pom.xml:</p>
+extension. Go ahead and add it to your <code>pom.xml</code>:</p>
 <div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">        </span><span class="cm">&lt;!-- Fault Tolerance --&gt;</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">        </span><span class="nt">&lt;dependency&gt;</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">            </span><span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>quarkus-smallrye-fault-tolerance<span class="nt">&lt;/artifactId&gt;</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
-<p>The Microprofile Fault Tolerance spec defines 3 main fault tolerance capabilities:</p>
+<p>The MicroProfile Fault Tolerance spec defines 3 main fault tolerance capabilities:</p>
 <ul>
 <li>Timeout - allows you to set a maximum time the call to the LLM should take before failing.</li>
 <li>Fallback - allows you to call a fallback method in case there’s an error</li>
@@ -1372,11 +1349,12 @@ following annotations:</p>
 <a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a><span class="p">}</span>
 </code></pre></div>
 <p>That’s all. To test the implemented fault tolerance, we’ll need to ‘break’ our application.
-You can either turn off your wifi, set the @Timeout value to something very low (e.g. 10), or
-you could set the inference server url to something that won’t resolve, eg:</p>
+You can either turn off your wifi, set the <code>@Timeout</code> value to something very low (e.g. 10), or
+you could set the inference server url to something that won’t resolve, e.g. add the following property to your <code>src/main/resources/application.properties</code> file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="na">quarkus.langchain4j.openai.base-url</span><span class="o">=</span><span class="s">https://api.example.com/v1/</span>
 </code></pre></div>
 <p>It’s up to you to decide what your preferred way to create chaos is :).  Once you’ve done that, run your application and test it with different inputs. You should see that the fallback method is called when the LLM fails to produce a response within the specified timeout. This demonstrates the fault tolerance of our application.</p>
+<p>Don’t forget to revert the change you just did!</p>
 <p><img alt="Fallback is being called when an error occurs" src="../../images/fallback.png"></p>
 <h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link"></a></h2>
 <p>In this step, we introduced observability to retrieve useful information about the application’s state, performance
@@ -1433,13 +1411,13 @@ fallback mechanism responds. This is a crucial step for ensuring that our applic
         
         
           
-          <a href="../step-11/" class="md-footer__link md-footer__link--next" aria-label="Next: Step 11 - Serving the model in pure Java with Jlama">
+          <a href="../../section-2/step-01/" class="md-footer__link md-footer__link--next" aria-label="Next: Step 1 - Implementing AI Agents">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Step 11 - Serving the model in pure Java with Jlama
+                Step 1 - Implementing AI Agents
               </div>
             </div>
             <div class="md-footer__button md-icon">

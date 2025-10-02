@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="../step-10/">
-      
-      
-        <link rel="next" href="../../section-2/step-01/">
       
       
       <link rel="icon" href="../../images/logo.png">
@@ -284,14 +280,10 @@ You are not viewing the latest version.
       
   
   
-    
   
   
-  
     
     
-      
-        
       
         
       
@@ -321,11 +313,11 @@ You are not viewing the latest version.
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -339,7 +331,7 @@ You are not viewing the latest version.
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Section 1 - AI Apps
@@ -551,112 +543,6 @@ You are not viewing the latest version.
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introducing-jlama" class="md-nav__link">
-    <span class="md-ellipsis">
-      Introducing Jlama
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-jlama-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      Adding Jlama dependencies
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuring-jlama" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuring Jlama
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sanitizing-hallucinated-llm-responses" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sanitizing hallucinated LLM responses
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-llm-inference-locally" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running the LLM inference locally
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -948,7 +834,7 @@ You are not viewing the latest version.
 <p>Jlama is a library allowing to execute LLM inference in pure Java. It supports many LLM model families like Llama, Mistral, Qwen2 and Granite. It also implements out-of-the-box many useful LLM related features like functions calling, models quantization, mixture of experts and even distributed inference.</p>
 <p>The final code of this step is available in the <code>step-11</code> directory.</p>
 <h2 id="adding-jlama-dependencies">Adding Jlama dependencies<a class="headerlink" href="#adding-jlama-dependencies" title="Permanent link"></a></h2>
-<p>Jlama is well integrated with Quarkus through the dedicated langchain4j based extension. Note that for performance reasons Jlama uses the <a href="https://openjdk.org/jeps/469">Vector API</a> which is still in preview in Java 23, and very likely will be released as a supported feature in Java 25.</p>
+<p>Jlama is well integrated with Quarkus through the dedicated LangChain4j based extension. Note that for performance reasons Jlama uses the <a href="https://openjdk.org/jeps/469">Vector API</a> which is still in preview in Java 23, and very likely will be released as a supported feature in Java 25.</p>
 <p>For this reason the first step to do is enabling the <code>quarkus-maven-plugin</code> in our pom file to use this preview API, by adding the following configuration to it.</p>
 <div class="highlight"><span class="filename">pom.xml</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;configuration&gt;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&lt;jvmArgs&gt;</span>--enable-preview<span class="w"> </span>--enable-native-access=ALL-UNNAMED<span class="nt">&lt;/jvmArgs&gt;</span>
@@ -1187,44 +1073,6 @@ Feel free to uncomment the extensions from the <code>pom.xml</code> if you want 
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../step-10/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 10 - Observability and Fault Tolerance">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Step 10 - Observability and Fault Tolerance
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../../section-2/step-01/" class="md-footer__link md-footer__link--next" aria-label="Next: Step 1 - Implementing AI Agents">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Step 1 - Implementing AI Agents
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">

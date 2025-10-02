@@ -311,8 +311,6 @@ You are not viewing the latest version.
       
         
       
-        
-      
     
     
       
@@ -650,27 +648,6 @@ You are not viewing the latest version.
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -961,7 +938,7 @@ You are not viewing the latest version.
 
 
 <div><h1 id="step-09-guardrails">Step 09 - Guardrails<a class="headerlink" href="#step-09-guardrails" title="Permanent link"></a></h1>
-<p>In the previous step we introduced function calling, enabling the LLM to interact with the application.
+<p>In the previous steps we introduced function calling and MCP, enabling the LLM to interact with the application and the outside world.
 While this feature provides a powerful mechanism to extend the chatbot’s capabilities, it also introduces new risks,
 such as <a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" target="_blank">prompt injection</a>.</p>
 <p>In this step we will explore how to mitigate prompt injection using <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/guardrails.html#_input_guardrails">input guardrails</a>, that are a set of functions executed before and after the LLM’s response to ensure the safety and reliability of
@@ -1057,7 +1034,7 @@ Unlike in the <code>CustomerSupportAgent</code> AI service, where the user messa
 want a more complex user message extended with the user query.</p>
 <p>Notice the last line of the <code>@UserMessage</code> annotation: <code>User query: {userQuery}</code>.
 It will be replaced by the user query when the AI service is called.
-As we have seen in the previous step with <code>Today is {current_date}.</code>, the prompts are templates that can be filled with
+As we have seen in the step 7 with <code>Today is {current_date}.</code>, the prompts are templates that can be filled with
 values, here the <code>userQuery</code> parameter.</p>
 <p>The user message follows a <a href="https://www.ibm.com/topics/few-shot-learning"><em>few shot learning</em></a> format.
 It provides examples of user queries and the expected output.

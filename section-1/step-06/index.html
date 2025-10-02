@@ -311,8 +311,6 @@ You are not viewing the latest version.
       
         
       
-        
-      
     
     
       
@@ -683,27 +681,6 @@ You are not viewing the latest version.
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../step-11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Step 11 - Serving the model in pure Java with Jlama
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1027,8 +1004,8 @@ You are not viewing the latest version.
 
 
 <div><h1 id="step-06-deconstructing-the-rag-pattern">Step 06 - Deconstructing the RAG pattern<a class="headerlink" href="#step-06-deconstructing-the-rag-pattern" title="Permanent link"></a></h1>
-<p>In the previous step, we implemented a RAG (Retrieval Augmented Generation) pattern in our AI service using <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html" target="_blank">EasyRag</a>.
-Most of the complexity was hidden by EasyRag.</p>
+<p>In the previous step, we implemented a RAG (Retrieval Augmented Generation) pattern in our AI service using <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-easy-rag.html" target="_blank">EasyRAG</a>.
+Most of the complexity was hidden by EasyRAG.</p>
 <p>In this step, we will deconstruct the RAG pattern to understand how it works under the hood.
 We will see how we can customize it and use our own knowledge base and embedding model.</p>
 <p>If you want to see the final result of this step, you can check out the <code>step-06</code> directory.
@@ -1255,11 +1232,10 @@ The augmentor is responsible for extending the prompt with the retrieved segment
 </code></pre></div>
 <p>The <code>create</code> method handles both the retrieval and the prompt augmentation.
 It uses the <code>PgVectorEmbeddingStore</code> bean to retrieve the embeddings and the <code>BgeSmallEnQuantizedEmbeddingModel</code> bean to generate the embeddings.</p>
-<div class="admonition important using the same embedding model">
+<div class="admonition important">
 <p class="admonition-title">Important</p>
-<div class="highlight"><pre><span></span><code>is crucial to use the same embedding model for the retriever and the ingestor.
-Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.
-</code></pre></div>
+<p>Using the same embedding model is crucial to use the same embedding model for the retriever and the ingestor.
+Otherwise, the embeddings will not match, and the retriever will not find the relevant segments.</p>
 </div>
 <p>The <code>EmbeddingStoreContentRetriever</code> class is used to retrieve the most relevant segments.
 We configure the maximum number of results to 3 (like in the previous step).
