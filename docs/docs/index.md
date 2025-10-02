@@ -53,5 +53,10 @@ Each step builds on the previous one, with the results stored in separate direct
 
 ## Let's Get Started!
 
-First, check the [requirements](./requirements.md) page to prepare your environment.  
-Once ready, begin with [Step 1](./section-1/step-01.md).
+First, check the [requirements](./requirements.md) page to prepare your environment.
+
+Once ready, you can pick one of these entries points to start the workshop:
+
+- If you discover Quarkus and Quarkus LangChain4j, start with [Section 1 - AI Apps](./section-1/step-01.md).
+- If you want to learn more advanced AI-Infused features, such as MCP, Guardrails, Observability, and Fault Tolerance, start with [Section 1 - Step 08](./section-1/step-08.md).
+- If you want to jump directly into agentic systems, start with [Section 2 - Agentic Workflows](./section-2/step-01.md).
