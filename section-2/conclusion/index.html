@@ -1,0 +1,1880 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../step-04/">
+      
+      
+        <link rel="next" href="../../conclusion/">
+      
+      
+      <link rel="icon" href="../../images/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>Mastering Agentic Systems - Quarkus LangChain4j Workshop</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CUbuntu+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Ubuntu Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#conclusion-mastering-agentic-systems" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+You are not viewing the latest version.
+<a href="../../..">
+    <strong>Click here to go to latest.</strong>
+</a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Quarkus LangChain4j Workshop" class="md-header__button md-logo" aria-label="Quarkus LangChain4j Workshop" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Quarkus LangChain4j Workshop
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Mastering Agentic Systems
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H6zm7-4.68V17c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-2.26C3.19 13.47 2 11.38 2 9c0-3.87 3.13-7 7-7 1.65 0 3.16.57 4.35 1.5C10.8 4.57 9 7.07 9 10c0 2.79 1.64 5.19 4 6.32m7.92-6.38-1.42-.91-1.4.97.4-1.65-1.33-1.03 1.68-.11.56-1.61.63 1.58 1.68.04-1.3 1.08zM19.39 13c-1.89 2.27-5.36 2.19-7.17-.05C10 10.13 11.56 6 15 5.34c.34-.05.64.29.5.63-.45 1.28-.38 2.74.35 4a4.62 4.62 0 0 0 3.27 2.28c.35.05.5.49.27.75"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm6-10h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14-1.42 1.41L3.5 4.93zm12.03 2.13 2.12-2.13 1.43 1.43-2.13 2.12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/quarkusio/quarkus-langchain4j-workshop" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Quarkus LangChain4j Workshop" class="md-nav__button md-logo" aria-label="Quarkus LangChain4j Workshop" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Quarkus LangChain4j Workshop
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/quarkusio/quarkus-langchain4j-workshop" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Requirements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Section 1 - AI Apps
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Section 1 - AI Apps
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-01/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 1 - Introduction to Quarkus LangChain4j
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-02/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 2 - Playing with model parameters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-03/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 3 - Streaming responses
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-04/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 4 - Using system messages
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-05/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 5 - Introduction to the RAG pattern
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-06/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 6 - Deconstructing the RAG
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-07/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 7 - Function calling and tools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-08/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 8 - Model Context Protocol
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-09/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 9 - Guardrails
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 10 - Observability and Fault Tolerance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../section-1/step-11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 11 - Serving the model in pure Java with Jlama
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Section 2 - Agentic Workflows
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Section 2 - Agentic Workflows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-01/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 1 - Implementing AI Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-02/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 2 - Composing simple agent workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-03/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 3 - Building nested agent workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-04/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 4 - Using remote agents (A2A)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Mastering Agentic Systems
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Mastering Agentic Systems
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#your-journey-through-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your Journey Through Agentic Systems
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Your Journey Through Agentic Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-01-introduction-to-ai-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 01: Introduction to AI Agents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-02-composing-agent-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 02: Composing Agent Workflows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-03-building-nested-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 03: Building Nested Workflows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-04-distributed-agents-with-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 04: Distributed Agents with A2A
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rationale-why-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Rationale: Why Agentic Systems?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Rationale: Why Agentic Systems?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#control-over-autonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control Over Autonomy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composability-and-reusability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Composability and Reusability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-ready-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production-Ready Architecture
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-design-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Design Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Design Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-agent-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Agent + Tool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-sequence-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Sequence Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Parallel Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-conditional-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 4: Conditional Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-5-nested-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 5: Nested Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-6-distributed-agent-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 6: Distributed Agent (A2A)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-ai-services-to-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      From AI Services to Agentic Systems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Real-World Applications
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Applications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#customer-support-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer Support Automation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-processing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-commerce-order-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      E-commerce Order Processing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#devops-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      DevOps Automation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices-youve-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices You&rsquo;ve Learned
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices You’ve Learned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-design-for-clarity" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Design for Clarity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embrace-specialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Embrace Specialization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-control-autonomy-carefully" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Control Autonomy Carefully
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-think-in-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Think in Layers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-plan-for-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Plan for Distribution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-test-at-every-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Test at Every Level
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-thoughts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Final Thoughts
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../conclusion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Conclusion
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#your-journey-through-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your Journey Through Agentic Systems
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Your Journey Through Agentic Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-01-introduction-to-ai-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 01: Introduction to AI Agents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-02-composing-agent-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 02: Composing Agent Workflows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-03-building-nested-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 03: Building Nested Workflows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-04-distributed-agents-with-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 04: Distributed Agents with A2A
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rationale-why-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Rationale: Why Agentic Systems?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Rationale: Why Agentic Systems?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#control-over-autonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control Over Autonomy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composability-and-reusability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Composability and Reusability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-ready-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production-Ready Architecture
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-design-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Design Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Design Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-agent-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Agent + Tool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-sequence-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Sequence Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Parallel Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-conditional-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 4: Conditional Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-5-nested-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 5: Nested Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-6-distributed-agent-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 6: Distributed Agent (A2A)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-ai-services-to-agentic-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      From AI Services to Agentic Systems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Real-World Applications
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Applications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#customer-support-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer Support Automation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-processing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-commerce-order-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      E-commerce Order Processing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#devops-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      DevOps Automation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices-youve-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices You&rsquo;ve Learned
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices You’ve Learned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-design-for-clarity" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Design for Clarity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embrace-specialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Embrace Specialization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-control-autonomy-carefully" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Control Autonomy Carefully
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-think-in-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Think in Layers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-plan-for-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Plan for Distribution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-test-at-every-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Test at Every Level
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-thoughts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Final Thoughts
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<div><h1 id="conclusion-mastering-agentic-systems">Conclusion: Mastering Agentic Systems<a class="headerlink" href="#conclusion-mastering-agentic-systems" title="Permanent link"></a></h1>
+<p>Congratulations! You’ve completed <strong>Section 2: Agentic Systems</strong> of the Quarkus LangChain4j workshop.</p>
+<p>Over the past four steps, you’ve journeyed from simple AI agents to sophisticated distributed multi-agent systems. 
+Let’s reflect on what you’ve built and why these patterns matter.</p>
+<hr>
+<h2 id="your-journey-through-agentic-systems">Your Journey Through Agentic Systems<a class="headerlink" href="#your-journey-through-agentic-systems" title="Permanent link"></a></h2>
+<h3 id="step-01-introduction-to-ai-agents">Step 01: Introduction to AI Agents<a class="headerlink" href="#step-01-introduction-to-ai-agents" title="Permanent link"></a></h3>
+<p>You started by transforming a traditional AI service into an <strong>autonomous agent</strong> that could use tools.</p>
+<p><strong>What you built:</strong>
+- <code>CarWashAgent</code>: An agent that analyzes feedback and decides which car wash services to request
+- <code>CarWashTool</code>: A tool that the agent calls to execute car wash actions</p>
+<p><strong>Key concepts:</strong>
+- <strong>Agent autonomy</strong>: The LLM decides when and how to use tools based on context, but you decide whether you control the flow or let an AI manage it
+- <strong>Tool calling</strong>: Declarative <code>@Tool</code> annotations make methods available to agents
+- <strong>Separation of concerns</strong>: Agents focus on reasoning; tools handle actions</p>
+<p><strong>Why it matters:</strong> This pattern is fundamental to building AI systems that can take action in the real world. 
+Instead of just answering questions, agents can interact with systems, databases, and APIs to accomplish tasks.</p>
+<hr>
+<h3 id="step-02-composing-agent-workflows">Step 02: Composing Agent Workflows<a class="headerlink" href="#step-02-composing-agent-workflows" title="Permanent link"></a></h3>
+<p>You learned how to orchestrate multiple agents working together through <strong>workflows</strong>.</p>
+<p><strong>What you built:</strong>
+- <code>CarConditionFeedbackAgent</code>: Analyzes feedback to determine car condition
+- <code>CarProcessingWorkflow</code>: A sequence workflow coordinating car wash and condition analysis
+- Understanding of <strong>AgenticScope’s state</strong>: The shared context enabling agent collaboration</p>
+<p><strong>Key concepts:</strong>
+- <strong>Workflow composition</strong>: Building complex systems from simple agent building blocks
+- <strong>Sequence workflows</strong>: Agents execute in order, each building on previous results
+- <strong>AgenticScope’s state</strong>: A shared key-value store for passing data between agents
+- <strong>@Output methods</strong>: Extract and combine results from multiple agents</p>
+<p><strong>Why it matters:</strong> Real-world problems rarely fit into a single agent’s capabilities. 
+Workflows let you compose specialized agents, each excellent at one task, into systems that solve complex multi-step problems.</p>
+<hr>
+<h3 id="step-03-building-nested-workflows">Step 03: Building Nested Workflows<a class="headerlink" href="#step-03-building-nested-workflows" title="Permanent link"></a></h3>
+<p>You mastered the art of <strong>composing workflows within workflows</strong>, unlocking truly sophisticated agent architectures.</p>
+<p><strong>What you built:</strong>
+- <code>FeedbackWorkflow</code>: Parallel analysis by three agents running concurrently
+- <code>ActionWorkflow</code>: Conditional routing based on what actions are needed
+- <code>CarProcessingWorkflow</code>: Three-level nested workflow orchestrating everything
+- Agents for maintenance, disposition, and comprehensive feedback analysis</p>
+<p><strong>Key concepts:</strong>
+- <strong>Parallel workflows</strong>: Concurrent agent execution for improved response time
+- <strong>Conditional workflows</strong>: Dynamic routing based on runtime conditions
+- <strong>Activation conditions</strong>: Boolean logic controlling when agents execute
+- <strong>Nested composition</strong>: Workflows containing other workflows, up to any depth
+- <strong>Priority routing</strong>: Handling critical issues before routine tasks</p>
+<p><strong>Why it matters:</strong> Production AI systems need to handle complex, branching logic. Nested workflows with parallel and conditional execution give you the control to build efficient, sophisticated systems while maintaining clarity and type safety.</p>
+<hr>
+<h3 id="step-04-distributed-agents-with-a2a">Step 04: Distributed Agents with A2A<a class="headerlink" href="#step-04-distributed-agents-with-a2a" title="Permanent link"></a></h3>
+<p>You extended beyond single-application boundaries to build <strong>distributed multi-agent systems</strong> using the A2A protocol.</p>
+<p><strong>What you built:</strong>
+- <code>DispositionAgent</code> (client): Connects to remote agents via <code>@A2AClientAgent</code>
+- Remote A2A server: Complete disposition service running independently
+- <code>AgentCard</code>: Describes remote agent capabilities
+- <code>AgentExecutor</code>: Handles A2A protocol communication
+- Two Quarkus applications communicating across HTTP</p>
+<p><strong>Key concepts:</strong>
+- <strong>A2A protocol</strong>: Open standard for agent-to-agent communication
+- <strong>Distributed architecture</strong>: Agents running in separate systems
+- <strong>Tasks vs. Messages</strong>: Different interaction patterns for different needs
+- <strong>Agent discovery</strong>: AgentCard enables clients to find and understand remote agents
+- <strong>Protocol abstraction</strong>: Declarative annotations hide complex protocol details</p>
+<p><strong>Why it matters:</strong> Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.</p>
+<hr>
+<h2 id="the-rationale-why-agentic-systems">The Rationale: Why Agentic Systems?<a class="headerlink" href="#the-rationale-why-agentic-systems" title="Permanent link"></a></h2>
+<h3 id="control-over-autonomy">Control Over Autonomy<a class="headerlink" href="#control-over-autonomy" title="Permanent link"></a></h3>
+<p>The agentic approach gives you <strong>precise control over agent autonomy</strong>:</p>
+<ul>
+<li><strong>Agents</strong> have autonomy within their domain (choosing which tools to use, reasoning about inputs)</li>
+<li><strong>Workflows</strong> control the structure (when agents run, in what order, under what conditions)</li>
+<li><strong>You</strong> maintain the overall architecture and business logic</li>
+</ul>
+<p>This is fundamentally different from fully autonomous agent frameworks where you describe a goal and hope the agent figures it out. 
+With Quarkus LangChain4j’s agentic module, you get:</p>
+<ul>
+<li>Predictable execution paths</li>
+<li>Clear debugging and testing</li>
+<li>Type safety throughout</li>
+<li>Explicit control flow</li>
+</ul>
+<p>The workshop did not cover the supervisor pattern, but it’s another powerful way to control autonomy by having a higher-level agent oversee and correct lower-level agents.
+The supervisor plans tasks and monitors execution, intervening when necessary.
+The supervisor is controlling the flow of other agents, but the agents themselves remain autonomous within their tasks.</p>
+<h3 id="composability-and-reusability">Composability and Reusability<a class="headerlink" href="#composability-and-reusability" title="Permanent link"></a></h3>
+<p>The workflow patterns you learned enable:</p>
+<ul>
+<li><strong>Specialization</strong>: Each agent does one thing well</li>
+<li><strong>Composition</strong>: Complex behaviors emerge from simple building blocks</li>
+<li><strong>Reusability</strong>: Agents and workflows can be used in multiple contexts</li>
+<li><strong>Maintainability</strong>: Changes to one agent don’t cascade through the system</li>
+</ul>
+<h3 id="production-ready-architecture">Production-Ready Architecture<a class="headerlink" href="#production-ready-architecture" title="Permanent link"></a></h3>
+<p>The patterns you’ve learned are production-ready:</p>
+<ul>
+<li><strong>Type safety</strong>: Compile-time checking catches errors before runtime</li>
+<li><strong>Declarative APIs</strong>: Annotations make intent clear and reduce boilerplate</li>
+<li><strong>Observability</strong>: Clear workflow structure makes logging and monitoring straightforward</li>
+<li><strong>Testing</strong>: Individual agents and workflows can be tested in isolation</li>
+<li><strong>Scalability</strong>: Distributed architectures support growing workloads</li>
+</ul>
+<hr>
+<h2 id="key-design-patterns">Key Design Patterns<a class="headerlink" href="#key-design-patterns" title="Permanent link"></a></h2>
+<p>Throughout this section, you’ve learned several fundamental patterns:</p>
+<h3 id="pattern-1-agent-tool">Pattern 1: Agent + Tool<a class="headerlink" href="#pattern-1-agent-tool" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Agent (reasoning) → Tool (action)
+</code></pre></div>
+<p><strong>When to use:</strong> Single autonomous decision-making with side effects</p>
+<p><strong>Example:</strong> <code>CarWashAgent</code> + <code>CarWashTool</code></p>
+<hr>
+<h3 id="pattern-2-sequence-workflow">Pattern 2: Sequence Workflow<a class="headerlink" href="#pattern-2-sequence-workflow" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Agent A → Agent B → Agent C
+</code></pre></div>
+<p><strong>When to use:</strong> Multi-step processes where each step builds on previous results</p>
+<p><strong>Example:</strong> <code>CarWashAgent</code> → <code>CarConditionFeedbackAgent</code></p>
+<hr>
+<h3 id="pattern-3-parallel-workflow">Pattern 3: Parallel Workflow<a class="headerlink" href="#pattern-3-parallel-workflow" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>      ┌─ Agent A ─┐
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Input ├─ Agent B ─┤ → Combined Output
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>      └─ Agent C ─┘
+</code></pre></div>
+<p><strong>When to use:</strong> Independent analyses that can run concurrently</p>
+<p><strong>Example:</strong> <code>FeedbackWorkflow</code> running wash, maintenance, and disposition analysis</p>
+<hr>
+<h3 id="pattern-4-conditional-workflow">Pattern 4: Conditional Workflow<a class="headerlink" href="#pattern-4-conditional-workflow" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Input → Condition Check → Agent A (if condition met)
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                       └→ Agent B (if different condition)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                       └→ Skip (if no conditions met)
+</code></pre></div>
+<p><strong>When to use:</strong> Dynamic routing based on runtime state</p>
+<p><strong>Example:</strong> <code>ActionWorkflow</code> routing to maintenance, car wash, or disposition</p>
+<hr>
+<h3 id="pattern-5-nested-workflow">Pattern 5: Nested Workflow<a class="headerlink" href="#pattern-5-nested-workflow" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Main Workflow
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├─ Sub-Workflow 1 (Parallel)
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│  ├─ Agent A
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│  └─ Agent B
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>├─ Sub-Workflow 2 (Conditional)
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│  ├─ Agent C
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>│  └─ Agent D
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>└─ Agent E
+</code></pre></div>
+<p><strong>When to use:</strong> Complex systems requiring multiple coordination strategies</p>
+<p><strong>Example:</strong> <code>CarProcessingWorkflow</code> orchestrating everything</p>
+<hr>
+<h3 id="pattern-6-distributed-agent-a2a">Pattern 6: Distributed Agent (A2A)<a class="headerlink" href="#pattern-6-distributed-agent-a2a" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Local Agent (client) → A2A Protocol → Remote Agent (server)
+</code></pre></div>
+<p><strong>When to use:</strong> Cross-system integration, team independence, specialized services</p>
+<p><strong>Example:</strong> <code>DispositionAgent</code> calling remote disposition service</p>
+<hr>
+<h2 id="from-ai-services-to-agentic-systems">From AI Services to Agentic Systems<a class="headerlink" href="#from-ai-services-to-agentic-systems" title="Permanent link"></a></h2>
+<p>Remember Section 1, where you built traditional AI services? Here’s how agentic systems differ:</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>AI Services (Section 1)</th>
+<th>Agentic Systems (Section 2)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Autonomy</strong></td>
+<td>None (deterministic method calls)</td>
+<td>Agents choose when to use tools</td>
+</tr>
+<tr>
+<td><strong>Composition</strong></td>
+<td>Manual orchestration in code</td>
+<td>Declarative workflows</td>
+</tr>
+<tr>
+<td><strong>Structure</strong></td>
+<td>Flat service calls</td>
+<td>Nested, composable workflows</td>
+</tr>
+<tr>
+<td><strong>Distribution</strong></td>
+<td>Single application</td>
+<td>Multi-application with A2A</td>
+</tr>
+<tr>
+<td><strong>Control Flow</strong></td>
+<td>Imperative (procedural code)</td>
+<td>Declarative (annotations)</td>
+</tr>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Simple Q&amp;A, classification</td>
+<td>Complex multi-step automation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>When to use each:</strong></p>
+<ul>
+<li><strong>AI Services</strong>: Simple tasks, straightforward LLM interactions, single-step operations</li>
+<li><strong>Agentic Systems</strong>: Complex workflows, tool orchestration, multi-agent collaboration, distributed systems</li>
+</ul>
+<hr>
+<h2 id="real-world-applications">Real-World Applications<a class="headerlink" href="#real-world-applications" title="Permanent link"></a></h2>
+<p>The patterns you’ve learned apply to countless real-world scenarios:</p>
+<h3 id="customer-support-automation">Customer Support Automation<a class="headerlink" href="#customer-support-automation" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Ticket Analysis Agent →
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  ├─ FAQ Agent (if simple question)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  ├─ Documentation Search Agent (if technical)
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  └─ Escalation Agent (if complex)
+</code></pre></div>
+<h3 id="data-processing-pipeline">Data Processing Pipeline<a class="headerlink" href="#data-processing-pipeline" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Parallel Analysis:
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  ├─ Data Quality Agent
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  ├─ Schema Validation Agent
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  └─ Anomaly Detection Agent
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>→ Conditional Action:
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>  ├─ Auto-Fix Agent (if minor issues)
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>  ├─ Alert Agent (if major issues)
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>  └─ Approve Agent (if clean)
+</code></pre></div>
+<h3 id="e-commerce-order-processing">E-commerce Order Processing<a class="headerlink" href="#e-commerce-order-processing" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Order Receipt →
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  ├─ Inventory Check Agent
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  ├─ Payment Processing Agent (A2A to payment service)
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  ├─ Fraud Detection Agent
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  └─ Shipping Coordination Agent
+</code></pre></div>
+<h3 id="devops-automation">DevOps Automation<a class="headerlink" href="#devops-automation" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Incident Detection →
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  ├─ Log Analysis Agent
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  ├─ Metric Analysis Agent
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  └─ Root Cause Agent
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>→ Conditional Response:
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  ├─ Auto-Remediation Agent (if known issue)
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  ├─ Rollback Agent (if deployment related)
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>  └─ Alert Agent (if unknown)
+</code></pre></div>
+<hr>
+<h2 id="best-practices-youve-learned">Best Practices You’ve Learned<a class="headerlink" href="#best-practices-youve-learned" title="Permanent link"></a></h2>
+<h3 id="1-design-for-clarity">1. Design for Clarity<a class="headerlink" href="#1-design-for-clarity" title="Permanent link"></a></h3>
+<ul>
+<li>Make workflows explicit and visible</li>
+<li>Use descriptive agent and output names</li>
+<li>Document activation conditions</li>
+</ul>
+<h3 id="2-embrace-specialization">2. Embrace Specialization<a class="headerlink" href="#2-embrace-specialization" title="Permanent link"></a></h3>
+<ul>
+<li>Each agent should have a focused purpose</li>
+<li>Avoid “god agents” that try to do everything</li>
+<li>Compose specialized agents into powerful workflows</li>
+</ul>
+<h3 id="3-control-autonomy-carefully">3. Control Autonomy Carefully<a class="headerlink" href="#3-control-autonomy-carefully" title="Permanent link"></a></h3>
+<ul>
+<li>Use workflows to define structure</li>
+<li>Let agents be autonomous within their domain</li>
+<li>Don’t over-constrain with too many conditions</li>
+</ul>
+<h3 id="4-think-in-layers">4. Think in Layers<a class="headerlink" href="#4-think-in-layers" title="Permanent link"></a></h3>
+<ul>
+<li>Simple agents at the bottom</li>
+<li>Workflows for coordination</li>
+<li>Nested workflows for complex orchestration</li>
+</ul>
+<h3 id="5-plan-for-distribution">5. Plan for Distribution<a class="headerlink" href="#5-plan-for-distribution" title="Permanent link"></a></h3>
+<ul>
+<li>Design agents with clear interfaces</li>
+<li>Use descriptive outputs that other agents can understand</li>
+<li>Consider which agents might benefit from being remote</li>
+</ul>
+<h3 id="6-test-at-every-level">6. Test at Every Level<a class="headerlink" href="#6-test-at-every-level" title="Permanent link"></a></h3>
+<ul>
+<li>Test individual agents in isolation</li>
+<li>Test workflows with mock agents</li>
+<li>Test integration points carefully</li>
+</ul>
+<hr>
+<h2 id="final-thoughts">Final Thoughts<a class="headerlink" href="#final-thoughts" title="Permanent link"></a></h2>
+<p>Agentic systems represent a fundamental shift in how we build AI-powered applications:</p>
+<ul>
+<li><strong>From prompts to workflows</strong>: Moving beyond single LLM calls to orchestrated agent systems</li>
+<li><strong>From monoliths to composition</strong>: Building complex behaviors from simple, reusable agents</li>
+<li><strong>From single applications to ecosystems</strong>: Agents collaborating across system boundaries</li>
+</ul>
+<p>The <code>quarkus-langchain4j-agentic</code> module gives you the tools to build these systems with the reliability, type safety, and developer experience you expect from Quarkus.</p>
+<p>You’ve mastered:
+- Agent autonomy and tool calling
+- Workflow composition (sequence, parallel, conditional)
+- AgenticScope’s state for agent collaboration
+- Nested workflow architectures
+- Distributed systems with A2A protocol</p>
+<p>You’re now equipped to build production-ready agentic systems that solve real-world problems.</p>
+<p>In addition, Quarkus Langchain4J also provides seamless integration with the broader Quarkus ecosystem, allowing you to leverage a wide range of extensions and tools to enhance your AI applications further.
+It also adds security features, monitoring, and scalability options that are essential for enterprise-grade AI applications.</p>
+<p><strong>Welcome to the future of AI application development!</strong></p></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../step-04/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 4 - Using remote agents (A2A)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Step 4 - Using remote agents (A2A)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../conclusion/" class="md-footer__link md-footer__link--next" aria-label="Next: Conclusion">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Conclusion
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <!--
+  Copyright (c) 2016-2022 Martin Donath <martin.donath@squidfunk.com>
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to
+  deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+-->
+
+<!-- Copyright and theme information, adapter to have the Red Hat footer -->
+<div class="md-copyright">
+    <div class="md-copyright__highlight">
+        Sponsored by <a href="https://www.redhat.com"><img style="vertical-align: middle;" alt="Red Hat" src="../../images/redhat_reversed.svg"/></a> <br/>
+        <a href="https://creativecommons.org/licenses/by/3.0/">CC by 3.0</a> |
+        <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </div>
+    
+    Made with
+    <a
+            href="https://squidfunk.github.io/mkdocs-material/"
+            target="_blank" rel="noopener"
+    >
+        Material for MkDocs
+    </a>
+    
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "content.tabs.link", "content.code.annotate", "navigation.instant", "navigation.indexes", "navigation.tracking", "navigation.footer", "navigation.tabs.sticky", "content.code.select", "content.code.copy"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
