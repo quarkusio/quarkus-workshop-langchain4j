@@ -62,14 +62,14 @@ Easy right? With just a few lines of code, we were able to build a full-blown MC
 ==Go ahead and start the server from the `quarkus-langchain4j-workshop-08-mcp-server` folder in a separate terminal window/tab:==
 
 ```shell
- ./mvnw quarkus:dev"
+ ./mvnw quarkus:dev
 ```
 
 Now, let's configure our client app to use the newly built MCP server.
 
 ## A new MCP client dependency
 
-Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to install a new MCP client dependency.
+Quarkus LangChain4j supports MCP with equally minimal work. To use it, we need to add a new MCP client dependency.
 ==Open the `pom.xml` file in your **main project** (ie. NOT the one containing the MCP Server) and add the following dependency:==
 
 ```xml title="pom.xml"
@@ -87,7 +87,7 @@ The LangChain4j MCP dependency will allow us to call remote MCP servers. Remembe
 
 ## Configuring the MCP client
 
-Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the application.properties file:
+Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the `src/main/resources/application.properties` file:
 
 ```properties title="application.properties"
 quarkus.langchain4j.mcp.weather.transport-type=http
@@ -96,9 +96,9 @@ quarkus.langchain4j.mcp.weather.url=http://localhost:8081/mcp/sse/
 
 Notice that we have used the "weather" name. We will reference this in the AI service to use this particular MCP server. 
 
-We'll add a @McpToolBox("weather") annotation to our AI Service to reference the available MCP server. And we'll add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.
+We'll add a `@McpToolBox("weather")` annotation to our AI Service to reference the available MCP server. And we'll add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.
 
-==In the CustomerSupportAgent.java file, update the SystemMessage with the following:==
+==In the `CustomerSupportAgent.java` file, update the `SystemMessage` with the following:==
 
 ```java title="CustomerSupportAgent.java"
 --8<-- "../../section-1/step-08/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
