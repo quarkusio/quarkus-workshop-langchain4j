@@ -105,8 +105,8 @@ To avoid bandwidth issues during the session, we recommend pre-downloading them.
 
 ### Warm up Docker Images
 
-* Podman: `podman pull pgvector/pgvector:pg16`
-* Docker: `docker pull pgvector/pgvector:pg16`
+* Podman: `podman pull pgvector/pgvector:pg17`
+* Docker: `docker pull pgvector/pgvector:pg17`
 
 ---
 
