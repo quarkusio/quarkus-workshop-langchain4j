@@ -52,10 +52,10 @@ In this section, you'll see how agents extend the capabilities you learned in Se
 
 Before starting, ensure you have:
 
-- Completed Section 1 (or are familiar with Quarkus LangChain4j basics)
+- Completed Section 1 (or you are familiar with Quarkus LangChain4j basics)
 - JDK 21+ installed
 - OpenAI API key set as `OPENAI_API_KEY` environment variable
-- A container runtime (Docker/Podman) for running a PostgreSQL [dev service](https://quarkus.io/guides/databases-dev-services)
+- A container runtime (Docker/Podman) for running a PostgreSQL [Dev Service](https://quarkus.io/guides/databases-dev-services)
 
 ---
 
@@ -81,8 +81,8 @@ Once started, open your browser to [http://localhost:8080](http://localhost:8080
 
 The application has two main sections:
 
-1. **Fleet Status** (left): Shows all cars in the Miles of Smiles fleet with their current status
-2. **Returns** (right): Displays cars that are currently rented or at the car wash
+1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status
+2. **Returns** (bottom): Displays cars that are currently rented or at the car wash
 
 ![Agentic App UI](../images/agentic-UI-1.png){: .center}
 
@@ -94,7 +94,7 @@ Let's see the agent in action!
 
 ### Test 1: Car Needs Cleaning
 
-Act as a rental team member processing a car return. In the **Rental Return** section, select a car and enter this feedback:
+Act as a rental team member processing a car return. In the **Returns > Rental Return** section, select a car and enter this feedback:
 
 ```
 Car has dog hair all over the back seat
@@ -269,7 +269,7 @@ Marks this as an **agent method** — only one per interface.
 Assigns the `CarWashTool` to this agent:
 
 - The agent can call methods in this tool to perform actions
-- The LLM decides when and how to use the tool based on the task (function calling has been covered in the section-1 of the workshop)
+- The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)
 
 ### Method Signature
 Defines the inputs and output:
@@ -321,10 +321,10 @@ Here is the sequence of actions happening when the agent is invoked:
 ??? question "Why do we use @Dependent scope for the Tool?"
     When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
 
-    **The Problem with Other Scopes:**
+    **The problem with other scopes:**
     CDI creates proxies for beans with scopes like `@ApplicationScoped` or `@SessionScoped`. These proxy objects don't preserve the `@Tool` annotations, so LangChain4j can't detect them.
 
-    **The Solution:**
+    **The solution:**
     Use `@Dependent` scope, which doesn't create proxies, allowing LangChain4j to see the annotations directly.
 
     **Alternative:**

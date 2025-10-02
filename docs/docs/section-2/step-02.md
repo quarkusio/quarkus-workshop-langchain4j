@@ -123,24 +123,24 @@ Before starting:
 
 ## Option 1: Continue from Step 01
 
-If you want to continue building on your Step 01 code, you'll need to copy some updated UI files from `step-02`:
+If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
 === "Linux / macOS"
     ```bash
     cd section-2/step-01
-    cp ../step-02/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
-    cp ../step-02/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
+    cp ../step-02/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+    cp ../step-02/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+    cp ../step-02/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
     cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
-    cp ../step-02/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
     cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
     ```
 
 === "Windows"
     ```cmd
     cd section-2\step-01
-    copy ..\step-02\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-    copy ..\step-02\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-    copy ..\step-02\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-02\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+    copy ..\step-02\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+    copy ..\step-02\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
     copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
     copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
     ```
@@ -397,7 +397,7 @@ The **Fleet Status** section now has a **"Condition"** column showing each car's
 
 ### Test the Workflow
 
-Enter feedback that indicates a problem with a car:
+In the `Returns > Rental Return` section, enter feedback that indicates a problem with a car:
 
 ```
 there has clearly been a fire in the trunk of this car
