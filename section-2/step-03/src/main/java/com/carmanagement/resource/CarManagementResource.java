@@ -60,7 +60,6 @@ public class CarManagementResource {
         }
     }
     
-    // --8<-- [start:maintenanceReturn]
     /**
      * Process a car return from maintenance.
      *
@@ -81,7 +80,6 @@ public class CarManagementResource {
                     .build();
         }
     }
-    // --8<-- [end:maintenanceReturn]
 }
 
 

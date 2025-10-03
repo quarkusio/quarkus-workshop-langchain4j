@@ -49,13 +49,13 @@ graph TD
 **The Flow:**
 
 1. **FeedbackWorkflow** (Parallel): Analyzes feedback simultaneously from two perspectives:
-   - Does the car need maintenance?
-   - Does the car need washing?
+    1. Does the car need maintenance?
+    2. Does the car need washing?
 
 2. **ActionWorkflow** (Conditional): Routes the car based on the analysis:
-   - If maintenance needed → send to maintenance team
-   - Else if washing needed → send to car wash
-   - Else → do nothing
+    1. If maintenance needed → send to maintenance team
+    2. Else if washing needed → send to car wash
+    3. Else → do nothing
 
 3. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
 
@@ -129,24 +129,22 @@ Before starting:
 
 ## Option 1: Continue from Step 02
 
-If you want to continue building on your Step 02 code, copy the updated files:
+If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
 
 === "Linux / macOS"
     ```bash
-    cd section-2/step-02
-    cp ../step-03/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
-    cp ../step-03/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
-    cp ../step-03/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
+    cp ../step-03/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+    cp ../step-03/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+    cp ../step-03/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
     cp ../step-03/src/main/resources/import.sql ./src/main/resources/import.sql
     cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
     ```
 
 === "Windows"
     ```cmd
-    cd section-2\step-02
-    copy ..\step-03\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-    copy ..\step-03\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-    copy ..\step-03\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+    copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+    copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
     copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
     copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
     copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
@@ -362,8 +360,8 @@ The condition agent should now use the analyzed requests instead of raw feedback
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
 
-```java title="CarConditionFeedbackAgent.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java:carConditionFeedbackSnippet"
+```java hl_lines="18-38" title="CarConditionFeedbackAgent.java"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
 **Key changes:**
@@ -414,11 +412,11 @@ Notice how it has changed from `boolean carWashRequired` to `RequiredAction requ
 
 Update `src/main/java/com/carmanagement/resource/CarManagementResource.java`:
 
-```java title="CarManagementResource.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java:maintenanceReturn"
+```java hl_lines="32 54 63-82" title="CarManagementResource.java"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
-This adds a new endpoint for the maintenance team to return cars with feedback.
+This adds a new endpoint for the maintenance team to return cars with feedback, and adjusts the existing endpoints.
 
 ---
 
@@ -515,7 +513,7 @@ The **Returns** section now has a **Maintenance Return** tab:
 
 ### Test the Complete Workflow
 
-Enter feedback on the Maintenance Return tab for car 3:
+Enter feedback on the Maintenance Return tab for the Ford F-150:
 
 ```
 buffed out the scratch. car could use a wash now.
@@ -526,20 +524,20 @@ Click **Return**.
 **What happens?**
 
 1. **Parallel Analysis** (FeedbackWorkflow):
-   - `MaintenanceFeedbackAgent`: "MAINTENANCE_NOT_REQUIRED" (scratch fixed)
-   - `CarWashFeedbackAgent`: "Car wash needed for general cleaning"
+    1. `MaintenanceFeedbackAgent`: "MAINTENANCE_NOT_REQUIRED" (scratch fixed)
+    2. `CarWashFeedbackAgent`: "Car wash needed for general cleaning"
 
 2. **Conditional Routing** (ActionWorkflow):
-   - Maintenance condition: `false` (not required)
-   - Car wash condition: `true` (required)
-   - → Executes `CarWashAgent`, sends car to car wash
+    1. Maintenance condition: `false` (not required)
+    2. Car wash condition: `true` (required)
+    3. → Executes `CarWashAgent`, sends car to car wash
 
 3. **Condition Update** (CarConditionFeedbackAgent):
-   - Updates car condition: "Scratch removed, clean overall"
+    1. Updates car condition: "Scratch removed, clean overall"
 
 4. **UI Update**:
-   - Car status → `AT_CAR_WASH`
-   - Condition column updates
+    1. Car status → `AT_CAR_WASH`
+    2. Condition column updates
 
 ### Check the Logs
 
