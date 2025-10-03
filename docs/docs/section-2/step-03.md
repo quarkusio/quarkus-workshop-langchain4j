@@ -434,7 +434,7 @@ This is where everything comes together! Update the workflow to use nested workf
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java"
+```java hl_lines="18-22 30-31 33-45 47-49" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -489,7 +489,7 @@ And to get things over the finish line, we need to update the car management ser
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java title="CarManagementService.java"
+```java hl_lines="26-27 31 45-46 51-54" title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -503,7 +503,10 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 ## Try It Out
 
-Start the application:
+Whew!! That was a lot, right? But we've built a fully functional car management system with LangChain4j's Agentic AI functionality! High-fives to everyone around you are encouraged!
+Let's test it out to understand how everything works together.
+
+Start the application (if it wasn't already running):
 
 ```bash
 ./mvnw quarkus:dev
