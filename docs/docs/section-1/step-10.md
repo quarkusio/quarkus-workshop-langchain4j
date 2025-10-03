@@ -48,7 +48,7 @@ the url, headers, and in the body, the model you called, the messages, temperatu
 - url: https://api.openai.com/v1/chat/completions
 - headers: [Accept: application/json], [Authorization: Be...1B], [Content-Type: application/json], [User-Agent: langchain4j-openai], [content-length: 2335]
 - body: {
-  "model" : "gpt-4o-mini",
+  "model" : "gpt-4o",
   "messages" : [ {
     "role" : "system",
     "content" : "You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n\nToday is 2025-01-10.\n"
@@ -131,7 +131,7 @@ the url, headers, and in the body, the model you called, the messages, temperatu
   "id": "chatcmpl-Ao51CDrgIYFN25RIK4GJAdvQjp5tY",
   "object": "chat.completion",
   "created": 1736499054,
-  "model": "gpt-4o-mini-2024-08-06",
+  "model": "gpt-4o-2024-08-06",
   "choices": [
     {
       "index": 0,

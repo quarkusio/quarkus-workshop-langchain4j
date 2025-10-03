@@ -17,7 +17,7 @@ The application is configured from the `src/main/resources/application.propertie
 
 The `quarkus.langchain4j.openai.api-key` property is the OpenAI API key. In our case we are configuring it to read from the `OPENAI_API_KEY` environment variable.
 
-The rest of the configuration indicates which model is used (`gpt-4o-mini`) and whether to log the requests and responses to the model in the terminal.
+The rest of the configuration indicates which model is used (`gpt-4o`) and whether to log the requests and responses to the model in the terminal.
 
 !!! important "Reloading"
     After changing a configuration property, you need to force a restart of the application to apply the changes.

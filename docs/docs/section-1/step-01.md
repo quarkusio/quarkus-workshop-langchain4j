@@ -3,7 +3,7 @@
 To get started, make sure you use the `step-01` directory.
 
 This step is the starting point for the workshop.
-It's a simple Quarkus application that uses the [Quarkus LangChain4j](https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html){target="_blank"} extension to interact with OpenAI's gpt-4o-mini model.
+It's a simple Quarkus application that uses the [Quarkus LangChain4j](https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html){target="_blank"} extension to interact with OpenAI's gpt-4o model.
 It's a simple chatbot that we will extend in the subsequent steps.
 
 ## Running the application
@@ -27,7 +27,7 @@ Open it and click the red robot icon in the bottom right corner to start chattin
 
 ## Chatting with the chatbot
 
-The chatbot is calling gpt-4o-mini (from OpenAI) via the backend. 
+The chatbot is calling gpt-4o (from OpenAI) via the backend. 
 You can test it out and observe that it has memory.
 Example:
 
@@ -50,7 +50,7 @@ INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread
 - url: https://api.openai.com/v1/chat/completions
 - headers: [Accept: application/json], [Authorization: Be...ex], [Content-Type: application/json], [User-Agent: langchain4j-openai], [content-length: 378]
 - body: {
-  "model" : "gpt-4o-mini",
+  "model" : "gpt-4o",
   # The conversation so far, including the latest messages
   "messages" : [ {
     "role" : "user", # The role of the message (user or assistant)
@@ -76,7 +76,7 @@ INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread
   "id": "chatcmpl-A7zaWTn1uMzq7Stw50Ug2Pg9TkBpV",
   "object": "chat.completion",
   "created": 1726468404,
-  "model": "gpt-4o-mini-2024-05-13",
+  "model": "gpt-4o-2024-05-13",
   "choices": [
     {
       "index": 0,
@@ -120,7 +120,7 @@ If you open the `pom.xml` file, you will see that the project is a Quarkus appli
 </dependency>
 ```
 
-[Quarkus LangChain4j OpenAI](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html){target="_blank"} is a Quarkus extension that provides a simple way to interact with language models (LLMs), like [gpt-4o-mini from OpenAI](https://platform.openai.com/docs/models/gpt-4o-mini){target="_blank"}.
+[Quarkus LangChain4j OpenAI](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html){target="_blank"} is a Quarkus extension that provides a simple way to interact with language models (LLMs), like [gpt-4o from OpenAI](https://platform.openai.com/docs/models/gpt-4o){target="_blank"}.
 It actually can interact with any model serving the OpenAI API (like [vLLM](https://docs.vllm.ai/en/latest/){target="_blank"} or [Podman AI Lab](https://podman-desktop.io/docs/ai-lab){target="_blank"}).
 Quarkus LangChain4j abstracts the complexity of calling the model and provides a simple API to interact with it.
 

@@ -1,5 +1,6 @@
 package dev.langchain4j.quarkus.workshop;
 
+import dev.langchain4j.guardrail.InputGuardrailException;
 import io.quarkus.logging.Log;
 import io.quarkus.websockets.next.OnOpen;
 import io.quarkus.websockets.next.OnTextMessage;
@@ -25,9 +26,12 @@ public class CustomerSupportAgentWebSocket {
     public String onTextMessage(String message) {
         try {
             return customerSupportAgent.chat(message);
-        } catch (GuardrailException e) {
+        } catch (InputGuardrailException e) {
             Log.errorf(e, "Error calling the LLM: %s", e.getMessage());
             return "Sorry, I am unable to process your request at the moment. It's not something I'm allowed to do.";
+        } catch (Exception e) {
+            Log.errorf(e, "Error calling the LLM: %s", e.getMessage());
+            return "I ran into some problems. Please try again.";
         }
     }
 }
