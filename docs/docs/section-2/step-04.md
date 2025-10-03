@@ -706,7 +706,7 @@ After reloading the UI, you should see the Returns section is now called **Retur
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
 
-On the Maintenance Return tab, enter feedback indicating severe damage for car 11:
+On the Maintenance Return tab, enter feedback indicating severe damage for the Ford F-150:
 
 ```
 looks like this car hit a tree
