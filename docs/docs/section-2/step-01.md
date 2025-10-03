@@ -19,7 +19,7 @@ In this step, you will:
 
 ## A New Scenario: Car Management System
 
-The **Miles of Smiles** car rental company needs help managing their fleet.
+The **Miles of Smiles** car rental company needs help managing their fleet. 
 Here's the business process:
 
 1. **Rental Returns**: When customers return cars, the rental team records feedback about the car's condition.
@@ -216,7 +216,6 @@ The `CarManagementService` orchestrates the car return process:
 
 - The `CarWashAgent` field is injected as a CDI bean
 - In the `processCarReturn` method, the agent is invoked with car details and feedback. The response is checked for `CARWASH_NOT_REQUIRED`:
-
     * If found → Car marked as `AVAILABLE`
     * If not found → Car stays `AT_CAR_WASH` (tool was called)
 
@@ -250,7 +249,7 @@ Defines the agent's **role** and **decision-making logic**:
     - **WHEN** to act (based on feedback)
     - **HOW** to respond (specific services or `CARWASH_NOT_REQUIRED`)
 
-### `@UserMessage`
+### `@UserMessage` 
 Provides **context** for each request using template variables:
 
 - Car details: `{carMake}`, `{carModel}`, `{carYear}`, `{carNumber}`
@@ -311,9 +310,9 @@ Here is the sequence of actions happening when the agent is invoked:
 2. LLM analyzes the feedback
 3. LLM decides to call `requestCarWash` (or not, depending on the feedback)
 4. If called, LLM determines which parameters to use:
-    - Should `interiorCleaning` be true?
-    - Should `exteriorWash` be true?
-    - What `requestText` should be included?
+     - Should `interiorCleaning` be true?
+     - Should `exteriorWash` be true?
+     - What `requestText` should be included?
 5. Tool executes and returns a result
 6. Agent receives the result and can respond
 
@@ -434,7 +433,7 @@ How does this change the agent's behavior?
 
 ### 3. Add More Tool Parameters
 
-Edit `CarWashTool.java` to add a `tireCleaning` parameter.
+Edit `CarWashTool.java` to add a `tireCleaning` parameter. 
 Does the agent automatically learn to use it?
 
 ---
@@ -451,14 +450,14 @@ Does the agent automatically learn to use it?
     Then restart the application.
 
 ??? warning "Tool methods not being called"
-  - Verify the tool uses `@Dependent` scope
-  - Check that the `@Tool` annotation is present
-  - Ensure the tool is properly referenced in `@ToolBox`
+   - Verify the tool uses `@Dependent` scope
+   - Check that the `@Tool` annotation is present
+   - Ensure the tool is properly referenced in `@ToolBox`
 
 ??? warning "Agent always/never calls the tool"
-  - Review your `@SystemMessage` — is it clear about when to use the tool?
-  - Try adding more explicit instructions
-  - Consider providing examples in the system message
+   - Review your `@SystemMessage` — is it clear about when to use the tool?
+   - Try adding more explicit instructions
+   - Consider providing examples in the system message
 
 ---
 

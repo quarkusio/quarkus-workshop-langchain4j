@@ -4,7 +4,7 @@
 
 The Miles of Smiles management team now wants to keep track of the condition of each car in their fleet.
 
-Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded.
+Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded. 
 Management wants the system to:
 
 1. **Automatically analyze feedback** from both rental returns and car wash returns
@@ -52,7 +52,7 @@ In this step, we'll use a **sequence workflow** to:
 
 ## Understanding AgenticScope
 
-To enable agents to work together, they need a way to **share data**.
+To enable agents to work together, they need a way to **share data**. 
 This is where `AgenticScope` comes in.
 
 **What is AgenticScope?**
@@ -194,7 +194,7 @@ Notice the new **`outputName` parameter**:
 @Agent(outputName = "carCondition", ...)
 ```
 
-This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`.
+This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`. 
 Other agents or the workflow can then access this value.
 
 ---
@@ -282,8 +282,8 @@ This annotation defines a **sequence workflow**:
 
 - **`outputName`**: Where to store the final workflow result in `AgenticScope`'s state
 - **`subAgents`**: The list of agents to execute in order
-    - Agent 1: `CarWashAgent`: determines if washing is needed
-    - Agent 2: `CarConditionFeedbackAgent`: updates the car condition
+  - Agent 1: `CarWashAgent`: determines if washing is needed
+  - Agent 2: `CarConditionFeedbackAgent`: updates the car condition
 
 The agents execute sequentially: `CarWashAgent` → `CarConditionFeedbackAgent`
 
@@ -339,13 +339,13 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 **What changed?**
 
-### Injection
+### Injection 
 ```java
 @Inject
 CarProcessingWorkflow carProcessingWorkflow;
 ```
 
-The workflow interface is injected just like any other CDI bean.
+The workflow interface is injected just like any other CDI bean. 
 Quarkus LangChain4j generates the implementation automatically.
 
 ### Workflow Invocation
@@ -362,7 +362,7 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 );
 ```
 
-Instead of calling agents individually, we call the workflow.
+Instead of calling agents individually, we call the workflow. 
 It returns a `CarConditions` object containing results from both agents.
 
 ### Using the Results
@@ -530,7 +530,7 @@ How does the condition agent synthesize feedback from multiple sources?
 ## Understanding Parallel vs. Sequence
 
 !!! note "Why Sequence Instead of Parallel?"
-    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback.
+    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback. 
     This means these agents could run in **parallel** for better response time.
 
     We chose a **sequence** workflow in this step because:

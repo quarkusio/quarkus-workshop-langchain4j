@@ -241,7 +241,7 @@ This defines a **parallel workflow**:
 - Each agent has its own `outputName` to store results independently
 
 !!! note "Why Parallel Here?"
-    The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other.
+    The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other. 
     Running them in parallel cuts the total execution time roughly in half!
 
 ---
@@ -687,7 +687,7 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 ??? warning "Parallel agents not executing in parallel"
     Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
 
-??? warning "Conditional workflow always/never executing certain agents"    
+??? warning "Conditional workflow always/never executing certain agents"
     - Verify your `@ActivationCondition` methods are correctly named
     - Check that parameter names match the `outputName` values exactly
     - Add logging to the condition methods to see what values they're receiving
