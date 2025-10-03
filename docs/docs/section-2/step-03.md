@@ -127,32 +127,38 @@ Before starting:
 
 ---
 
+!!! warning "Warning: this chapter involves many steps"
+In order to build out the solution, you will need to go through quite a few steps.
+While it is entirely possible to make the code changes manually (or via copy/paste),
+we recommend starting fresh from Step 03 with the changes already applied.
+You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
+
 ## Option 1: Continue from Step 02
 
 If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
 
 === "Linux / macOS"
-    ```bash
-    cp ../step-03/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-    cp ../step-03/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-    cp ../step-03/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-    cp ../step-03/src/main/resources/import.sql ./src/main/resources/import.sql
-    cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-    ```
+```bash
+cp ../step-03/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+cp ../step-03/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+cp ../step-03/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
+cp ../step-03/src/main/resources/import.sql ./src/main/resources/import.sql
+cp ../step-03/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
+```
 
 === "Windows"
-    ```cmd
-    copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-    copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-    copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-    copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
-    copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
-    copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-    ```
+```cmd
+copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
+copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
+copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+```
 
 ---
 
-## Option 2: Start Fresh from Step 03
+## Option 2: Start Fresh from Step 03 [Recommended]
 
 Navigate to the complete `section-2/step-03` directory:
 
@@ -189,7 +195,7 @@ This agent determines if a car needs washing based on feedback.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `CarWashFeedbackAgent.java`:
 
-```java title="CarWashFeedbackAgent.java"
+```java hl_lines="17 33" title="CarWashFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashFeedbackAgent.java"
 ```
 
@@ -210,7 +216,7 @@ Now we'll create a workflow that runs both feedback agents **concurrently**.
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.java`:
 
-```java title="FeedbackWorkflow.java"
+```java hl_lines="18-21" title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -220,11 +226,11 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.
 
 ```java
 @ParallelAgent(
-    outputName = "feedbackResult",
-    subAgents = {
-        @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
-        @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
-    }
+        outputName = "feedbackResult",
+        subAgents = {
+                @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
+                @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+        }
 )
 ```
 
@@ -235,8 +241,8 @@ This defines a **parallel workflow**:
 - Each agent has its own `outputName` to store results independently
 
 !!! note "Why Parallel Here?"
-    The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other. 
-    Running them in parallel cuts the total execution time roughly in half!
+The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other.
+Running them in parallel cuts the total execution time roughly in half!
 
 ---
 
@@ -257,7 +263,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceAgent.ja
 **Key Points:**
 
 - **Input**: `maintenanceRequest` — reads the output from `MaintenanceFeedbackAgent`
-- **Tool**: `MaintenanceTool` — can request oil changes, brake service, etc.
+- **Tool**: `MaintenanceTool` — can request oil changes, brake service, etc. (We will create this tool later)
 - **System message**: Interprets the maintenance request and calls the appropriate tool
 
 ### Step 5: Update the CarWashAgent
@@ -266,13 +272,13 @@ The `CarWashAgent` needs to read from the `CarWashFeedbackAgent`'s output.
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
 
-```java title="CarWashAgent.java"
+```java hl_lines="18-22 30-31 41" title="CarWashAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
 **Key change:**
 
-Now takes `carWashRequest` as input (instead of analyzing raw feedback itself). 
+Now takes `carWashRequest` as input (instead of analyzing raw feedback itself).
 This follows the separation of concerns principle:
 
 - Feedback agents: Analyze and decide
@@ -280,7 +286,7 @@ This follows the separation of concerns principle:
 
 ---
 
-## Part 4: Create the Conditional Action Workflow
+## Part 4: Create the ***Conditional Action*** Workflow
 
 Now we'll create a workflow that **conditionally** executes agents based on the feedback analysis.
 
@@ -288,7 +294,7 @@ Now we'll create a workflow that **conditionally** executes agents based on the 
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.java`:
 
-```java title="ActionWorkflow.java"
+```java hl_lines="17-20 30-33 35-38 40-42" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
@@ -298,11 +304,11 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.ja
 
 ```java
 @ConditionalAgent(
-    outputName = "actionResult",
-    subAgents = {
-        @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
-        @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
-    }
+        outputName = "actionResult",
+        subAgents = {
+                @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
+                @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+        }
 )
 ```
 
@@ -438,9 +444,9 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 
 ```java
 @SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
-    @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
-    @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
-    @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+        @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
+        @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
+        @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
 })
 ```
 
@@ -676,21 +682,21 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 ## Troubleshooting
 
 ??? warning "Parallel agents not executing in parallel"
-    Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
+Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
 
 ??? warning "Conditional workflow always/never executing certain agents"
-    - Verify your `@ActivationCondition` methods are correctly named
-    - Check that parameter names match the `outputName` values exactly
-    - Add logging to the condition methods to see what values they're receiving
+- Verify your `@ActivationCondition` methods are correctly named
+- Check that parameter names match the `outputName` values exactly
+- Add logging to the condition methods to see what values they're receiving
 
 ??? warning "Error: Cannot find symbol 'RequiredAction'"
-    Make sure you created both:
+Make sure you created both:
 
     - The `RequiredAction` enum
     - Updated `CarConditions` to use it
 
 ??? warning "Agents getting wrong input values"
-    Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
+Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
 
 ---
 

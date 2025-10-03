@@ -19,7 +19,7 @@ In this step, you will:
 
 ## A New Scenario: Car Management System
 
-The **Miles of Smiles** car rental company needs help managing their fleet. 
+The **Miles of Smiles** car rental company needs help managing their fleet.
 Here's the business process:
 
 1. **Rental Returns**: When customers return cars, the rental team records feedback about the car's condition.
@@ -64,16 +64,16 @@ Before starting, ensure you have:
 Navigate to the `section-2/step-01` directory and start the application:
 
 === "Linux / macOS"
-    ```bash
-    cd section-2/step-01
-    ./mvnw quarkus:dev
-    ```
+```bash
+cd section-2/step-01
+./mvnw quarkus:dev
+```
 
 === "Windows"
-    ```cmd
-    cd section-2\step-01
-    mvnw quarkus:dev
-    ```
+```cmd
+cd section-2\step-01
+mvnw quarkus:dev
+```
 
 Once started, open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
@@ -152,7 +152,6 @@ If you open the `pom.xml` file from the project, you will see this dependency:
 <dependency>
     <groupId>io.quarkiverse.langchain4j</groupId>
     <artifactId>quarkus-langchain4j-agentic</artifactId>
-    <version>${quarkus-langchain4j.version}</version>
 </dependency>
 ```
 
@@ -210,27 +209,27 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 The `CarManagementService` orchestrates the car return process:
 
 ```java hl_lines="37-43 45-47" title="CarManagementService.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
 **Key Points:**
 
 - The `CarWashAgent` field is injected as a CDI bean
 - In the `processCarReturn` method, the agent is invoked with car details and feedback. The response is checked for `CARWASH_NOT_REQUIRED`:
-  
+
     * If found → Car marked as `AVAILABLE`
     * If not found → Car stays `AT_CAR_WASH` (tool was called)
 
-This simple pattern allows you to integrate autonomous decision-making into your business logic!
+This simple pattern allows you to ***integrate autonomous decision-making into your business logic***!
 
 ---
 
 ## Component 3: The CarWashAgent
 
-Here's where the magic happens — the AI agent definition:
+Here's where the *magic* happens — the AI agent definition:
 
-```java title="CarWashAgent.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java:carWashAgent"
+```java hl_lines="18 31-32" title="CarWashAgent.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
 **Let's break it down:**
@@ -239,19 +238,19 @@ Here's where the magic happens — the AI agent definition:
 Defines the agent's **role** and **decision-making logic**:
 
 - Acts as the intake specialist for the car wash department
-- Should call the `requestCarWash` function when cleaning is needed
+- Should call the `requestCarWash` function in the CarWashTool when cleaning is needed
 - Should be specific about which services to request
 - Should return `CARWASH_NOT_REQUIRED` if no cleaning is needed
 
 !!! tip "Pro Tip: Clear Instructions Matter"
-    The system message is critical! It tells the agent:
+The system message is critical! It tells the agent:
 
     - **WHO** it is (car wash intake specialist)
     - **WHAT** to do (submit car wash requests)
     - **WHEN** to act (based on feedback)
     - **HOW** to respond (specific services or `CARWASH_NOT_REQUIRED`)
 
-### `@UserMessage` 
+### `@UserMessage`
 Provides **context** for each request using template variables:
 
 - Car details: `{carMake}`, `{carModel}`, `{carYear}`, `{carNumber}`
@@ -278,7 +277,7 @@ Defines the inputs and output:
 - **Output**: `String` — the agent's response (either tool result or `CARWASH_NOT_REQUIRED`)
 
 !!! info "No Implementation Required"
-    Notice there's **no method body**! LangChain4j automatically generates the implementation:
+Notice there's **no method body**! LangChain4j automatically generates the implementation:
 
     1. Receives the inputs
     2. Sends the system + user messages to the LLM
@@ -312,14 +311,14 @@ Here is the sequence of actions happening when the agent is invoked:
 2. LLM analyzes the feedback
 3. LLM decides to call `requestCarWash` (or not, depending on the feedback)
 4. If called, LLM determines which parameters to use:
-      - Should `interiorCleaning` be true?
-      - Should `exteriorWash` be true?
-      - What `requestText` should be included?
+    - Should `interiorCleaning` be true?
+    - Should `exteriorWash` be true?
+    - What `requestText` should be included?
 5. Tool executes and returns a result
 6. Agent receives the result and can respond
 
 ??? question "Why do we use @Dependent scope for the Tool?"
-    When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
+When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
 
     **The problem with other scopes:**
     CDI creates proxies for beans with scopes like `@ApplicationScoped` or `@SessionScoped`. These proxy objects don't preserve the `@Tool` annotations, so LangChain4j can't detect them.
@@ -435,7 +434,7 @@ How does this change the agent's behavior?
 
 ### 3. Add More Tool Parameters
 
-Edit `CarWashTool.java` to add a `tireCleaning` parameter. 
+Edit `CarWashTool.java` to add a `tireCleaning` parameter.
 Does the agent automatically learn to use it?
 
 ---
@@ -443,7 +442,7 @@ Does the agent automatically learn to use it?
 ## Troubleshooting
 
 ??? warning "Error: OPENAI_API_KEY not set"
-    Make sure you've exported the environment variable:
+Make sure you've exported the environment variable:
 
     ```bash
     export OPENAI_API_KEY=sk-your-key-here
@@ -452,14 +451,14 @@ Does the agent automatically learn to use it?
     Then restart the application.
 
 ??? warning "Tool methods not being called"
-    - Verify the tool uses `@Dependent` scope
-    - Check that the `@Tool` annotation is present
-    - Ensure the tool is properly referenced in `@ToolBox`
+- Verify the tool uses `@Dependent` scope
+- Check that the `@Tool` annotation is present
+- Ensure the tool is properly referenced in `@ToolBox`
 
 ??? warning "Agent always/never calls the tool"
-    - Review your `@SystemMessage` — is it clear about when to use the tool?
-    - Try adding more explicit instructions
-    - Consider providing examples in the system message
+- Review your `@SystemMessage` — is it clear about when to use the tool?
+- Try adding more explicit instructions
+- Consider providing examples in the system message
 
 ---
 

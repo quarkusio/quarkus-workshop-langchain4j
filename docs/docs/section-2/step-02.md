@@ -4,7 +4,7 @@
 
 The Miles of Smiles management team now wants to keep track of the condition of each car in their fleet.
 
-Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded. 
+Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded.
 Management wants the system to:
 
 1. **Automatically analyze feedback** from both rental returns and car wash returns
@@ -14,7 +14,8 @@ Management wants the system to:
 In this step, you'll learn how to compose **multiple agents into workflows** that work together to solve more complex problems.
 
 !!!note
-    Workflows are pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called). This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
+"Workflow" is a pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called).
+This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
 
 ---
 
@@ -51,7 +52,7 @@ In this step, we'll use a **sequence workflow** to:
 
 ## Understanding AgenticScope
 
-To enable agents to work together, they need a way to **share data**. 
+To enable agents to work together, they need a way to **share data**.
 This is where `AgenticScope` comes in.
 
 **What is AgenticScope?**
@@ -126,24 +127,24 @@ Before starting:
 If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
 === "Linux / macOS"
-    ```bash
-    cd section-2/step-01
-    cp ../step-02/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-    cp ../step-02/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-    cp ../step-02/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-    cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
-    cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-    ```
+```bash
+cd section-2/step-01
+cp ../step-02/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+cp ../step-02/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+cp ../step-02/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
+cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
+cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
+```
 
 === "Windows"
-    ```cmd
-    cd section-2\step-01
-    copy ..\step-02\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-    copy ..\step-02\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-    copy ..\step-02\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-    copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
-    copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-    ```
+```cmd
+cd section-2\step-01
+copy ..\step-02\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+copy ..\step-02\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+copy ..\step-02\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
+copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
+```
 
 These files add the "Condition" column to the UI and update the data model to track car conditions.
 
@@ -193,7 +194,7 @@ Notice the new **`outputName` parameter**:
 @Agent(outputName = "carCondition", ...)
 ```
 
-This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`. 
+This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`.
 Other agents or the workflow can then access this value.
 
 ---
@@ -227,7 +228,7 @@ The `CarWashAgent` needs to specify an `outputName` so its result can be accesse
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
 
-```java hl_lines="32" title="CarWashAgent.java"
+```java hl_lines="35" title="CarWashAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
@@ -242,14 +243,14 @@ In the `@Agent` annotation, adds `outputName = "carWashAgentResult"` to the `@Ag
 If continuing from Step 01, create the workflow directory:
 
 === "Linux / macOS"
-    ```bash
-    mkdir -p ./src/main/java/com/carmanagement/agentic/workflow
-    ```
+```bash
+mkdir -p ./src/main/java/com/carmanagement/agentic/workflow
+```
 
 === "Windows"
-    ```cmd
-    mkdir .\src\main\java\com\carmanagement\agentic\workflow
-    ```
+```cmd
+mkdir .\src\main\java\com\carmanagement\agentic\workflow
+```
 
 ---
 
@@ -281,8 +282,8 @@ This annotation defines a **sequence workflow**:
 
 - **`outputName`**: Where to store the final workflow result in `AgenticScope`'s state
 - **`subAgents`**: The list of agents to execute in order
-  - Agent 1: `CarWashAgent`: determines if washing is needed
-  - Agent 2: `CarConditionFeedbackAgent`: updates the car condition
+    - Agent 1: `CarWashAgent`: determines if washing is needed
+    - Agent 2: `CarConditionFeedbackAgent`: updates the car condition
 
 The agents execute sequentially: `CarWashAgent` → `CarConditionFeedbackAgent`
 
@@ -332,19 +333,19 @@ Now update the service to use the workflow instead of calling agents directly.
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java title="CarManagementService.java"
+```java hl_lines="17-23 25-26 43 48 52-58 62" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
 **What changed?**
 
-### Injection 
+### Injection
 ```java
 @Inject
 CarProcessingWorkflow carProcessingWorkflow;
 ```
 
-The workflow interface is injected just like any other CDI bean. 
+The workflow interface is injected just like any other CDI bean.
 Quarkus LangChain4j generates the implementation automatically.
 
 ### Workflow Invocation
@@ -361,7 +362,7 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 );
 ```
 
-Instead of calling agents individually, we call the workflow. 
+Instead of calling agents individually, we call the workflow.
 It returns a `CarConditions` object containing results from both agents.
 
 ### Using the Results
@@ -529,8 +530,8 @@ How does the condition agent synthesize feedback from multiple sources?
 ## Understanding Parallel vs. Sequence
 
 !!! note "Why Sequence Instead of Parallel?"
-    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback. 
-    This means these agents could run in **parallel** for better response time.
+You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback.
+This means these agents could run in **parallel** for better response time.
 
     We chose a **sequence** workflow in this step because:
 
@@ -544,17 +545,17 @@ How does the condition agent synthesize feedback from multiple sources?
 ## Troubleshooting
 
 ??? warning "Error: Cannot find symbol 'CarConditions'"
-    Make sure you created the `CarConditions.java` record in the `com.carmanagement.model` package.
+Make sure you created the `CarConditions.java` record in the `com.carmanagement.model` package.
 
 ??? warning "Workflow not updating car condition"
-    Check that:
+Check that:
 
     - The `CarWashAgent` has `outputName = "carWashAgentResult"`
     - The `CarConditionFeedbackAgent` has `outputName = "carCondition"`
     - The `@Output` method parameter names match these output names exactly
 
 ??? warning "UI not showing Condition column"
-    Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)
+Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)
 
 ---
 
