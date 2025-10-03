@@ -82,7 +82,7 @@ graph LR
 2. **A2A Protocol Layer** (JSON-RPC) transports the request over HTTP
 3. **AgentCard** describes the remote agent's capabilities (skills, inputs, outputs)
 4. **AgentExecutor** receives the request and orchestrates the execution
-5. **Remote AI agent** (DispositionAgent AI service) processes the request using tools
+5. **Remote AI agent** (`DispositionAgent` AI service) processes the request using tools
 6. Response flows back through the same path
 
 ---
@@ -209,29 +209,27 @@ section-2/step-04/
 
 ## Option 1: Continue from Step 03
 
-If you want to continue building on your Step 03 code, copy the updated files:
+If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
 
 === "Linux / macOS"
     ```bash
-    cd section-2/step-03
     cp ../step-04/multi-agent-system/pom.xml ./pom.xml
     cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
     cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-    cp ../step-04/multi-agent-system/src/main/resources/static/css/styles.css ./src/main/resources/static/css/styles.css
-    cp ../step-04/multi-agent-system/src/main/resources/static/js/app.js ./src/main/resources/static/js/app.js
-    cp ../step-04/multi-agent-system/src/main/resources/templates/index.html ./src/main/resources/templates/index.html
+    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
     cp ../step-04/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
     ```
 
 === "Windows"
     ```cmd
-    cd section-2\step-03
     copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
     copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
     copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-    copy ..\step-04\multi-agent-system\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-    copy ..\step-04\multi-agent-system\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-    copy ..\step-04\multi-agent-system\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
+    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
     copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
     ```
 
@@ -269,6 +267,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedback
 **Decision Criteria:**
 
 The agent considers:
+
 - Severity of damage (structural, engine, transmission)
 - Repair costs vs. car value
 - Age and condition of the vehicle
@@ -322,10 +321,10 @@ The remote agent can access them by name.
 #### How It Works
 
 1. When this method is called, Quarkus LangChain4j:
-   - Creates an A2A Task with the method parameters as inputs
-   - Sends the task to the remote server via JSON-RPC
-   - Waits for the remote agent to complete the task
-   - Returns the result as a String
+    1. Creates an A2A Task with the method parameters as inputs
+    2. Sends the task to the remote server via JSON-RPC
+    3. Waits for the remote agent to complete the task
+    4. Returns the result as a String
 
 2. No manual HTTP requests needed
 3. Type-safe: compile-time checking of parameters
@@ -354,6 +353,7 @@ Added `DispositionFeedbackAgent` to the parallel workflow:
 ```
 
 Now **three agents run concurrently**:
+
 - `CarWashFeedbackAgent` — analyzes cleaning needs
 - `MaintenanceFeedbackAgent` — analyzes maintenance needs
 - `DispositionFeedbackAgent` — analyzes disposal needs
@@ -453,14 +453,7 @@ Update the `RequiredAction` enum to include disposition:
 Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
 
 ```java title="RequiredAction.java"
-package com.carmanagement.model;
-
-public enum RequiredAction {
-    NONE,
-    CAR_WASH,
-    MAINTENANCE,
-    DISPOSITION
-}
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/RequiredAction.java"
 ```
 
 ### Step 8: Update CarManagementService
@@ -724,23 +717,23 @@ Click **Return**.
 **What happens?**
 
 1. **Parallel Analysis** (FeedbackWorkflow):
-   - `DispositionFeedbackAgent`: "Disposition required — severe damage"
-   - `MaintenanceFeedbackAgent`: "Major repairs needed"
-   - `CarWashFeedbackAgent`: "Not applicable"
+    1. `DispositionFeedbackAgent`: "Disposition required — severe damage"
+    2. `MaintenanceFeedbackAgent`: "Major repairs needed"
+    3. `CarWashFeedbackAgent`: "Not applicable"
 
 2. **Conditional Routing** (ActionWorkflow):
-   - Disposition condition: `true` (required)
-   - → Executes `DispositionAgent` (A2A client)
+    1. Disposition condition: `true` (required)
+    2. → Executes `DispositionAgent` (A2A client)
 
 3. **A2A Communication**:
-   - Client sends task to `http://localhost:8888`
-   - `AgentExecutor` receives and processes task
-   - `DispositionAgent` (AI service) analyzes using `DispositionTool`
-   - Result flows back to client
+    1. Client sends task to `http://localhost:8888`
+    2. `AgentExecutor` receives and processes task
+    3. `DispositionAgent` (AI service) analyzes using `DispositionTool`
+    4. Result flows back to client
 
 4. **UI Update**:
-   - Car status → `DISPOSED`
-   - Car appears in the Dispositions tab
+    1. Car status → `DISPOSED`
+    2. Car appears in the Dispositions tab
 
 ### Check the Logs
 
@@ -835,6 +828,7 @@ String processDisposition(...)
 ```
 
 Quarkus LangChain4j handles:
+
 - Creating the A2A task
 - Serializing method parameters as task inputs
 - Sending the HTTP request via JSON-RPC
@@ -976,6 +970,7 @@ This shows the raw A2A protocol messages.
 You've successfully built a distributed agent system using the A2A protocol!
 
 You learned how to:
+
 - Connect to remote agents using `@A2AClientAgent`
 - Build A2A servers with AgentCard and AgentExecutor
 - Integrate remote agents into complex workflows
