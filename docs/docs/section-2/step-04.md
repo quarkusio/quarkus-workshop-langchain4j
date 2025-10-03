@@ -207,6 +207,12 @@ section-2/step-04/
 
 ---
 
+!!! warning "Warning: this chapter involves many steps"
+    In order to build out the solution, you will need to go through quite a few steps.
+    While it is entirely possible to make the code changes manually (or via copy/paste),
+    we recommend starting fresh from Step 04 with the changes already applied.
+    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
+
 ## Option 1: Continue from Step 03
 
 If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
@@ -235,7 +241,7 @@ If you want to continue building on your previous code, place yourself at the ro
 
 ---
 
-## Option 2: Start Fresh from Step 04
+## Option 2: Start Fresh from Step 04 [Recommended]
 
 Navigate to the complete `section-2/step-04/multi-agent-system` directory:
 
@@ -253,7 +259,7 @@ This agent analyzes feedback to determine if a car should be disposed.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
 
-```java title="DispositionFeedbackAgent.java"
+```java hl_lines="15 30 37-39" title="DispositionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
 ```
 
@@ -280,7 +286,7 @@ This agent connects to the remote disposition agent.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
-```java title="DispositionAgent.java"
+```java hl_lines="10-13" title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
@@ -340,7 +346,7 @@ The `FeedbackWorkflow` needs to include the new disposition analysis.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 
-```java title="FeedbackWorkflow.java"
+```java hl_lines="22" title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -366,7 +372,7 @@ The `ActionWorkflow` needs to handle disposition requests.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 
-```java title="ActionWorkflow.java"
+```java hl_lines="21 31 43-46" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
@@ -398,27 +404,13 @@ The conditional workflow now has **priority ordering**:
 
 This ensures critical issues (disposal) are handled before routine tasks (washing).
 
-### Step 5: Update CarConditionFeedbackAgent
-
-The `CarConditionFeedbackAgent` should consider disposition feedback.
-
-Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
-
-```java title="CarConditionFeedbackAgent.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
-```
-
-**Key changes:**
-
-Now takes `dispositionRequest` as input to provide more comprehensive condition assessments.
-
-### Step 6: Update CarProcessingWorkflow
+### Step 5: Update CarProcessingWorkflow
 
 Update the output method to handle disposition:
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java"
+```java hl_lines="21 34 37-39" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -446,23 +438,23 @@ static CarConditions output(String carCondition, String dispositionRequest, Stri
 
 Disposition has the highest priority in the result.
 
-### Step 7: Update RequiredAction Enum
+### Step 6: Update RequiredAction Enum
 
 Update the `RequiredAction` enum to include disposition:
 
 Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
 
-```java title="RequiredAction.java"
+```java hl_lines="7" title="RequiredAction.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/RequiredAction.java"
 ```
 
-### Step 8: Update CarManagementService
+### Step 7: Update CarManagementService
 
 Update the service to handle disposition status:
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java title="CarManagementService.java"
+```java hl_lines="53-54" title="CarManagementService.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -488,7 +480,7 @@ Navigate to the remote-a2a-agent directory:
 cd section-2/step-04/remote-a2a-agent
 ```
 
-### Step 9: Create the DispositionTool
+### Step 8: Create the DispositionTool
 
 The tool that executes disposition actions (scrap, sell, donate).
 
@@ -505,7 +497,7 @@ In `src/main/java/com/demo`, create `DispositionTool.java`:
 - **@Tool annotation**: Makes each method available to the AI agent
 - **Detailed descriptions**: Help the AI agent choose the appropriate action
 
-### Step 10: Create the DispositionAgent (AI Service)
+### Step 9: Create the DispositionAgent (AI Service)
 
 The AI agent that actually makes disposition decisions.
 
@@ -526,7 +518,7 @@ In `src/main/java/com/demo`, create `DispositionAgent.java`:
     Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
     The A2A server can expose both types.
 
-### Step 11: Create the AgentCard
+### Step 10: Create the AgentCard
 
 The **AgentCard** describes the agent's capabilities, skills, and interface.
 
@@ -589,7 +581,7 @@ Skills describe what the agent can do. This helps clients discover appropriate a
 
 Specifies that this agent communicates via JSON-RPC over HTTP.
 
-### Step 12: Create the AgentExecutor
+### Step 11: Create the AgentExecutor
 
 The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
 

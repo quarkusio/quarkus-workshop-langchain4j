@@ -127,6 +127,12 @@ Before starting:
 
 ---
 
+!!! warning "Warning: this chapter involves many steps"
+    In order to build out the solution, you will need to go through quite a few steps.
+    While it is entirely possible to make the code changes manually (or via copy/paste),
+    we recommend starting fresh from Step 03 with the changes already applied.
+    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
+
 ## Option 1: Continue from Step 02
 
 If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
@@ -152,7 +158,7 @@ If you want to continue building on your previous code, place yourself at the ro
 
 ---
 
-## Option 2: Start Fresh from Step 03
+## Option 2: Start Fresh from Step 03 [Recommended]
 
 Navigate to the complete `section-2/step-03` directory:
 
@@ -189,7 +195,7 @@ This agent determines if a car needs washing based on feedback.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `CarWashFeedbackAgent.java`:
 
-```java title="CarWashFeedbackAgent.java"
+```java hl_lines="17 33" title="CarWashFeedbackAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashFeedbackAgent.java"
 ```
 
@@ -210,7 +216,7 @@ Now we'll create a workflow that runs both feedback agents **concurrently**.
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.java`:
 
-```java title="FeedbackWorkflow.java"
+```java hl_lines="18-21" title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -257,7 +263,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceAgent.ja
 **Key Points:**
 
 - **Input**: `maintenanceRequest` — reads the output from `MaintenanceFeedbackAgent`
-- **Tool**: `MaintenanceTool` — can request oil changes, brake service, etc.
+- **Tool**: `MaintenanceTool` — can request oil changes, brake service, etc. (We will create this tool later)
 - **System message**: Interprets the maintenance request and calls the appropriate tool
 
 ### Step 5: Update the CarWashAgent
@@ -266,13 +272,13 @@ The `CarWashAgent` needs to read from the `CarWashFeedbackAgent`'s output.
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
 
-```java title="CarWashAgent.java"
+```java hl_lines="18-22 30-31 41" title="CarWashAgent.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
 **Key change:**
 
-Now takes `carWashRequest` as input (instead of analyzing raw feedback itself). 
+Now takes `carWashRequest` as input (instead of analyzing raw feedback itself).
 This follows the separation of concerns principle:
 
 - Feedback agents: Analyze and decide
@@ -280,7 +286,7 @@ This follows the separation of concerns principle:
 
 ---
 
-## Part 4: Create the Conditional Action Workflow
+## Part 4: Create the ***Conditional Action*** Workflow
 
 Now we'll create a workflow that **conditionally** executes agents based on the feedback analysis.
 
@@ -288,7 +294,7 @@ Now we'll create a workflow that **conditionally** executes agents based on the 
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.java`:
 
-```java title="ActionWorkflow.java"
+```java hl_lines="17-20 30-33 35-38 40-42" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
@@ -428,7 +434,7 @@ This is where everything comes together! Update the workflow to use nested workf
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java"
+```java hl_lines="18-22 30-31 33-45 47-49" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -483,7 +489,7 @@ And to get things over the finish line, we need to update the car management ser
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java title="CarManagementService.java"
+```java hl_lines="26-27 31 45-46 51-54" title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -497,7 +503,10 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 ## Try It Out
 
-Start the application:
+Whew!! That was a lot, right? But we've built a fully functional car management system with LangChain4j's Agentic AI functionality! High-fives to everyone around you are encouraged!
+Let's test it out to understand how everything works together.
+
+Start the application (if it wasn't already running):
 
 ```bash
 ./mvnw quarkus:dev

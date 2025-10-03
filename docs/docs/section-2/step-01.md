@@ -152,7 +152,6 @@ If you open the `pom.xml` file from the project, you will see this dependency:
 <dependency>
     <groupId>io.quarkiverse.langchain4j</groupId>
     <artifactId>quarkus-langchain4j-agentic</artifactId>
-    <version>${quarkus-langchain4j.version}</version>
 </dependency>
 ```
 
@@ -210,27 +209,26 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 The `CarManagementService` orchestrates the car return process:
 
 ```java hl_lines="37-43 45-47" title="CarManagementService.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
 **Key Points:**
 
 - The `CarWashAgent` field is injected as a CDI bean
 - In the `processCarReturn` method, the agent is invoked with car details and feedback. The response is checked for `CARWASH_NOT_REQUIRED`:
-  
     * If found → Car marked as `AVAILABLE`
     * If not found → Car stays `AT_CAR_WASH` (tool was called)
 
-This simple pattern allows you to integrate autonomous decision-making into your business logic!
+This simple pattern allows you to ***integrate autonomous decision-making into your business logic***!
 
 ---
 
 ## Component 3: The CarWashAgent
 
-Here's where the magic happens — the AI agent definition:
+Here's where the *magic* happens — the AI agent definition:
 
-```java title="CarWashAgent.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java:carWashAgent"
+```java hl_lines="19 32-33" title="CarWashAgent.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
 **Let's break it down:**
@@ -239,7 +237,7 @@ Here's where the magic happens — the AI agent definition:
 Defines the agent's **role** and **decision-making logic**:
 
 - Acts as the intake specialist for the car wash department
-- Should call the `requestCarWash` function when cleaning is needed
+- Should call the `requestCarWash` function in the `CarWashTool` when cleaning is needed
 - Should be specific about which services to request
 - Should return `CARWASH_NOT_REQUIRED` if no cleaning is needed
 
@@ -312,9 +310,9 @@ Here is the sequence of actions happening when the agent is invoked:
 2. LLM analyzes the feedback
 3. LLM decides to call `requestCarWash` (or not, depending on the feedback)
 4. If called, LLM determines which parameters to use:
-      - Should `interiorCleaning` be true?
-      - Should `exteriorWash` be true?
-      - What `requestText` should be included?
+     - Should `interiorCleaning` be true?
+     - Should `exteriorWash` be true?
+     - What `requestText` should be included?
 5. Tool executes and returns a result
 6. Agent receives the result and can respond
 
@@ -452,14 +450,14 @@ Does the agent automatically learn to use it?
     Then restart the application.
 
 ??? warning "Tool methods not being called"
-    - Verify the tool uses `@Dependent` scope
-    - Check that the `@Tool` annotation is present
-    - Ensure the tool is properly referenced in `@ToolBox`
+   - Verify the tool uses `@Dependent` scope
+   - Check that the `@Tool` annotation is present
+   - Ensure the tool is properly referenced in `@ToolBox`
 
 ??? warning "Agent always/never calls the tool"
-    - Review your `@SystemMessage` — is it clear about when to use the tool?
-    - Try adding more explicit instructions
-    - Consider providing examples in the system message
+   - Review your `@SystemMessage` — is it clear about when to use the tool?
+   - Try adding more explicit instructions
+   - Consider providing examples in the system message
 
 ---
 
