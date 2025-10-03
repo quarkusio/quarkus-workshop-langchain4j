@@ -1,4 +1,3 @@
-// --8<-- [start:part1]
 package com.carmanagement.service;
 
 import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
