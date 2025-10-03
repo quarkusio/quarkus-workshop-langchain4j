@@ -886,7 +886,7 @@ You are not viewing the latest version.
 <div><h1 id="step-01-introduction-to-quarkus-langchain4j">Step 01 - Introduction to Quarkus LangChain4j<a class="headerlink" href="#step-01-introduction-to-quarkus-langchain4j" title="Permanent link"></a></h1>
 <p>To get started, make sure you use the <code>step-01</code> directory.</p>
 <p>This step is the starting point for the workshop.
-It’s a simple Quarkus application that uses the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html" target="_blank">Quarkus LangChain4j</a> extension to interact with OpenAI’s gpt-4o-mini model.
+It’s a simple Quarkus application that uses the <a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html" target="_blank">Quarkus LangChain4j</a> extension to interact with OpenAI’s gpt-4o model.
 It’s a simple chatbot that we will extend in the subsequent steps.</p>
 <h2 id="running-the-application">Running the application<a class="headerlink" href="#running-the-application" title="Permanent link"></a></h2>
 <p>Run the application with the following command:</p>
@@ -904,7 +904,7 @@ It’s a simple chatbot that we will extend in the subsequent steps.</p>
 Open it and click the red robot icon in the bottom right corner to start chatting with the chatbot.</p>
 <p><img alt="Miles of Smiles UI" src="../../images/ui-no-chatbot.png"></p>
 <h2 id="chatting-with-the-chatbot">Chatting with the chatbot<a class="headerlink" href="#chatting-with-the-chatbot" title="Permanent link"></a></h2>
-<p>The chatbot is calling gpt-4o-mini (from OpenAI) via the backend. 
+<p>The chatbot is calling gpt-4o (from OpenAI) via the backend. 
 You can test it out and observe that it has memory.
 Example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User: My name is Clement.
@@ -921,7 +921,7 @@ Example:</p>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>-<span class="w"> </span>url:<span class="w"> </span>https://api.openai.com/v1/chat/completions
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>-<span class="w"> </span>headers:<span class="w"> </span><span class="o">[</span>Accept:<span class="w"> </span>application/json<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Authorization:<span class="w"> </span>Be...ex<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>Content-Type:<span class="w"> </span>application/json<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>User-Agent:<span class="w"> </span>langchain4j-openai<span class="o">]</span>,<span class="w"> </span><span class="o">[</span>content-length:<span class="w"> </span><span class="m">378</span><span class="o">]</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>-<span class="w"> </span>body:<span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="s2">"model"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"gpt-4o-mini"</span>,
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="s2">"model"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"gpt-4o"</span>,
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="c1"># The conversation so far, including the latest messages</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="s2">"messages"</span><span class="w"> </span>:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="o">{</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="s2">"role"</span><span class="w"> </span>:<span class="w"> </span><span class="s2">"user"</span>,<span class="w"> </span><span class="c1"># The role of the message (user or assistant)</span>
@@ -947,7 +947,7 @@ Example:</p>
 <a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">  </span><span class="s2">"id"</span>:<span class="w"> </span><span class="s2">"chatcmpl-A7zaWTn1uMzq7Stw50Ug2Pg9TkBpV"</span>,
 <a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">  </span><span class="s2">"object"</span>:<span class="w"> </span><span class="s2">"chat.completion"</span>,
 <a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">  </span><span class="s2">"created"</span>:<span class="w"> </span><span class="m">1726468404</span>,
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">  </span><span class="s2">"model"</span>:<span class="w"> </span><span class="s2">"gpt-4o-mini-2024-05-13"</span>,
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">  </span><span class="s2">"model"</span>:<span class="w"> </span><span class="s2">"gpt-4o-2024-05-13"</span>,
 <a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">  </span><span class="s2">"choices"</span>:<span class="w"> </span><span class="o">[</span>
 <a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">    </span><span class="o">{</span>
 <a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">      </span><span class="s2">"index"</span>:<span class="w"> </span><span class="m">0</span>,
@@ -984,7 +984,7 @@ We will see how to manage this in the subsequent steps.</p>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>quarkus-langchain4j-openai<span class="nt">&lt;/artifactId&gt;</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
-<p><a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html" target="_blank">Quarkus LangChain4j OpenAI</a> is a Quarkus extension that provides a simple way to interact with language models (LLMs), like <a href="https://platform.openai.com/docs/models/gpt-4o-mini" target="_blank">gpt-4o-mini from OpenAI</a>.
+<p><a href="https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html" target="_blank">Quarkus LangChain4j OpenAI</a> is a Quarkus extension that provides a simple way to interact with language models (LLMs), like <a href="https://platform.openai.com/docs/models/gpt-4o" target="_blank">gpt-4o from OpenAI</a>.
 It actually can interact with any model serving the OpenAI API (like <a href="https://docs.vllm.ai/en/latest/" target="_blank">vLLM</a> or <a href="https://podman-desktop.io/docs/ai-lab" target="_blank">Podman AI Lab</a>).
 Quarkus LangChain4j abstracts the complexity of calling the model and provides a simple API to interact with it.</p>
 <p>In our case, the application is a simple chatbot.
