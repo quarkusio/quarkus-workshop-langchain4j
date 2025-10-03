@@ -18,7 +18,7 @@ public interface CarProcessingWorkflow {
     @SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
             @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
             @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
-            @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+            @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carCondition")
     })
     CarConditions processCarReturn(
             String carMake,
