@@ -207,6 +207,12 @@ section-2/step-04/
 
 ---
 
+!!! warning "Warning: this chapter involves many steps"
+    In order to build out the solution, you will need to go through quite a few steps.
+    While it is entirely possible to make the code changes manually (or via copy/paste),
+    we recommend starting fresh from Step 04 with the changes already applied.
+    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
+
 ## Option 1: Continue from Step 03
 
 If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
@@ -235,7 +241,7 @@ If you want to continue building on your previous code, place yourself at the ro
 
 ---
 
-## Option 2: Start Fresh from Step 04
+## Option 2: Start Fresh from Step 04 [Recommended]
 
 Navigate to the complete `section-2/step-04/multi-agent-system` directory:
 
@@ -253,7 +259,7 @@ This agent analyzes feedback to determine if a car should be disposed.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
 
-```java title="DispositionFeedbackAgent.java"
+```java hl_lines="15 30 37-39" title="DispositionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
 ```
 
@@ -280,7 +286,7 @@ This agent connects to the remote disposition agent.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
-```java title="DispositionAgent.java"
+```java hl_lines="10-13" title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
@@ -340,7 +346,7 @@ The `FeedbackWorkflow` needs to include the new disposition analysis.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 
-```java title="FeedbackWorkflow.java"
+```java hl_lines="22" title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -366,7 +372,7 @@ The `ActionWorkflow` needs to handle disposition requests.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 
-```java title="ActionWorkflow.java"
+```java hl_lines="21 31 43-46" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
@@ -404,7 +410,7 @@ The `CarConditionFeedbackAgent` should consider disposition feedback.
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
 
-```java title="CarConditionFeedbackAgent.java"
+```java hl_lines="28 40" title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
