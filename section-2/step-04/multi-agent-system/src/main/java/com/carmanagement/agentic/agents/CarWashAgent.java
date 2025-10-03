@@ -13,11 +13,14 @@ public interface CarWashAgent {
 
     @SystemMessage("""
         You handle intake for the car wash department of a car rental company.
-        It is your job to submit a request to the provided requestCarWash function to take action on the request.
-        Be specific about what services are needed based on the car wash request.
-        If no specific car wash request is provided, request a standard exterior wash.
         """)
     @UserMessage("""
+        Taking into account all provided feedback, determine if the car needs a car wash.
+        If the feedback indicates the car is dirty, has stains, or any other cleanliness issues,
+        call the provided tool and recommend appropriate car wash services (exterior wash, interior cleaning, waxing, detailing).
+        Be specific about what services are needed.
+        If no specific car wash request is provided, request a standard exterior wash.
+        
         Car Information:
         Make: {carMake}
         Model: {carModel}
