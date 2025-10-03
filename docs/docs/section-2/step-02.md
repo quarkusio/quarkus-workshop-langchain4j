@@ -14,8 +14,8 @@ Management wants the system to:
 In this step, you'll learn how to compose **multiple agents into workflows** that work together to solve more complex problems.
 
 !!!note
-"Workflow" is a pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called).
-This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
+    "Workflow" is a pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called).
+    This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
 
 ---
 

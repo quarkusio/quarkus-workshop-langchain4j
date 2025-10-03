@@ -243,7 +243,7 @@ Defines the agent's **role** and **decision-making logic**:
 - Should return `CARWASH_NOT_REQUIRED` if no cleaning is needed
 
 !!! tip "Pro Tip: Clear Instructions Matter"
-The system message is critical! It tells the agent:
+    The system message is critical! It tells the agent:
 
     - **WHO** it is (car wash intake specialist)
     - **WHAT** to do (submit car wash requests)
@@ -318,7 +318,7 @@ Here is the sequence of actions happening when the agent is invoked:
 6. Agent receives the result and can respond
 
 ??? question "Why do we use @Dependent scope for the Tool?"
-When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
+    When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
 
     **The problem with other scopes:**
     CDI creates proxies for beans with scopes like `@ApplicationScoped` or `@SessionScoped`. These proxy objects don't preserve the `@Tool` annotations, so LangChain4j can't detect them.
@@ -442,7 +442,7 @@ Does the agent automatically learn to use it?
 ## Troubleshooting
 
 ??? warning "Error: OPENAI_API_KEY not set"
-Make sure you've exported the environment variable:
+    Make sure you've exported the environment variable:
 
     ```bash
     export OPENAI_API_KEY=sk-your-key-here
@@ -451,14 +451,14 @@ Make sure you've exported the environment variable:
     Then restart the application.
 
 ??? warning "Tool methods not being called"
-- Verify the tool uses `@Dependent` scope
-- Check that the `@Tool` annotation is present
-- Ensure the tool is properly referenced in `@ToolBox`
+  - Verify the tool uses `@Dependent` scope
+  - Check that the `@Tool` annotation is present
+  - Ensure the tool is properly referenced in `@ToolBox`
 
 ??? warning "Agent always/never calls the tool"
-- Review your `@SystemMessage` — is it clear about when to use the tool?
-- Try adding more explicit instructions
-- Consider providing examples in the system message
+  - Review your `@SystemMessage` — is it clear about when to use the tool?
+  - Try adding more explicit instructions
+  - Consider providing examples in the system message
 
 ---
 

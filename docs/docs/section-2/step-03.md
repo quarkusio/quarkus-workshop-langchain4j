@@ -128,10 +128,10 @@ Before starting:
 ---
 
 !!! warning "Warning: this chapter involves many steps"
-In order to build out the solution, you will need to go through quite a few steps.
-While it is entirely possible to make the code changes manually (or via copy/paste),
-we recommend starting fresh from Step 03 with the changes already applied.
-You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
+    In order to build out the solution, you will need to go through quite a few steps.
+    While it is entirely possible to make the code changes manually (or via copy/paste),
+    we recommend starting fresh from Step 03 with the changes already applied.
+    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
 
 ## Option 1: Continue from Step 02
 
@@ -226,11 +226,11 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.
 
 ```java
 @ParallelAgent(
-        outputName = "feedbackResult",
-        subAgents = {
-                @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
-                @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
-        }
+    outputName = "feedbackResult",
+    subAgents = {
+            @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
+            @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+    }
 )
 ```
 
@@ -241,8 +241,8 @@ This defines a **parallel workflow**:
 - Each agent has its own `outputName` to store results independently
 
 !!! note "Why Parallel Here?"
-The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other.
-Running them in parallel cuts the total execution time roughly in half!
+    The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other.
+    Running them in parallel cuts the total execution time roughly in half!
 
 ---
 
@@ -304,11 +304,11 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.ja
 
 ```java
 @ConditionalAgent(
-        outputName = "actionResult",
-        subAgents = {
-                @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
-                @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
-        }
+    outputName = "actionResult",
+    subAgents = {
+            @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
+            @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+    }
 )
 ```
 
@@ -444,9 +444,9 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 
 ```java
 @SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
-        @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
-        @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
-        @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+    @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
+    @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
+    @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
 })
 ```
 
@@ -682,21 +682,21 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 ## Troubleshooting
 
 ??? warning "Parallel agents not executing in parallel"
-Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
+    Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
 
 ??? warning "Conditional workflow always/never executing certain agents"
-- Verify your `@ActivationCondition` methods are correctly named
-- Check that parameter names match the `outputName` values exactly
-- Add logging to the condition methods to see what values they're receiving
+  - Verify your `@ActivationCondition` methods are correctly named
+  - Check that parameter names match the `outputName` values exactly
+  - Add logging to the condition methods to see what values they're receiving
 
 ??? warning "Error: Cannot find symbol 'RequiredAction'"
-Make sure you created both:
+    Make sure you created both:
 
     - The `RequiredAction` enum
     - Updated `CarConditions` to use it
 
 ??? warning "Agents getting wrong input values"
-Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
+    Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
 
 ---
 
