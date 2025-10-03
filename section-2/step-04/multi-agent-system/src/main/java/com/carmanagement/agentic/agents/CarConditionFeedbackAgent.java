@@ -25,7 +25,6 @@ public interface CarConditionFeedbackAgent {
             Feedback from other agents:
             Car Wash Recommendation: {carWashRequest}
             Maintenance Recommendation: {maintenanceRequest}
-            Disposition Recommendation: {dispositionRequest}
             """)
     @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.",
             outputName = "carCondition")
@@ -36,8 +35,7 @@ public interface CarConditionFeedbackAgent {
             Long carNumber,
             String carCondition,
             String carWashRequest,
-            String maintenanceRequest,
-            String dispositionRequest);
+            String maintenanceRequest);
 }
 
 
