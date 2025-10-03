@@ -545,17 +545,17 @@ This means these agents could run in **parallel** for better response time.
 ## Troubleshooting
 
 ??? warning "Error: Cannot find symbol 'CarConditions'"
-Make sure you created the `CarConditions.java` record in the `com.carmanagement.model` package.
+    Make sure you created the `CarConditions.java` record in the `com.carmanagement.model` package.
 
 ??? warning "Workflow not updating car condition"
-Check that:
+    Check that:
 
     - The `CarWashAgent` has `outputName = "carWashAgentResult"`
     - The `CarConditionFeedbackAgent` has `outputName = "carCondition"`
     - The `@Output` method parameter names match these output names exactly
 
 ??? warning "UI not showing Condition column"
-Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)
+    Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)
 
 ---
 

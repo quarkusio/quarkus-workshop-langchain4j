@@ -228,7 +228,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 
 Here's where the *magic* happens — the AI agent definition:
 
-```java hl_lines="18 31-32" title="CarWashAgent.java"
+```java hl_lines="19 32-33" title="CarWashAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
 ```
 
