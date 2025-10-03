@@ -2621,7 +2621,7 @@ This follows the separation of concerns principle:</p>
 <a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a>
 <a id="__codelineno-15-82" name="__codelineno-15-82" href="#__codelineno-15-82"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">summary</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
-<a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"MaintenanceTool result: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\uD83D\uDE97 MaintenanceTool result: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <a id="__codelineno-15-84" name="__codelineno-15-84" href="#__codelineno-15-84"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
 <a id="__codelineno-15-85" name="__codelineno-15-85" href="#__codelineno-15-85"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-15-86" name="__codelineno-15-86" href="#__codelineno-15-86"></a><span class="p">}</span>
@@ -2882,14 +2882,10 @@ Notice how it has changed from <code>boolean carWashRequired</code> to <code>Req
 </ol>
 <h3 id="check-the-logs">Check the Logs<a class="headerlink" href="#check-the-logs" title="Permanent link"></a></h3>
 <p>Look for evidence of parallel execution:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>[MaintenanceFeedbackAgent] MAINTENANCE_NOT_REQUIRED - Scratch has been repaired
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>[CarWashFeedbackAgent] Recommend exterior wash and interior cleaning
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>🚗 CarWashTool result: Car wash requested for Honda Civic (2020), Car #3:
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>- Exterior wash
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>- Interior cleaning
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>[CarConditionFeedbackAgent] Good condition, scratch repaired, recently cleaned
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>🚗 CarWashTool result: Car wash requested for Ford F-150 (2021), Car #12:
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>- Exterior wash
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>Additional notes: Recommend an exterior car wash. The feedback suggests the car could use a wash after the scratch was buffed out.
 </code></pre></div>
-<p>Notice how both feedback agents’ responses appear close together in time (parallel execution)!</p>
 <hr>
 <h2 id="how-it-all-works-together">How It All Works Together<a class="headerlink" href="#how-it-all-works-together" title="Permanent link"></a></h2>
 <p>Let’s trace a complete example with maintenance needed:</p>
