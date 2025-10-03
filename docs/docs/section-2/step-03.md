@@ -546,15 +546,10 @@ Click **Return**.
 Look for evidence of parallel execution:
 
 ```
-[MaintenanceFeedbackAgent] MAINTENANCE_NOT_REQUIRED - Scratch has been repaired
-[CarWashFeedbackAgent] Recommend exterior wash and interior cleaning
-🚗 CarWashTool result: Car wash requested for Honda Civic (2020), Car #3:
+🚗 CarWashTool result: Car wash requested for Ford F-150 (2021), Car #12:
 - Exterior wash
-- Interior cleaning
-[CarConditionFeedbackAgent] Good condition, scratch repaired, recently cleaned
+Additional notes: Recommend an exterior car wash. The feedback suggests the car could use a wash after the scratch was buffed out.
 ```
-
-Notice how both feedback agents' responses appear close together in time (parallel execution)!
 
 ---
 
