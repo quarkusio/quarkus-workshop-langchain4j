@@ -64,16 +64,16 @@ Before starting, ensure you have:
 Navigate to the `section-2/step-01` directory and start the application:
 
 === "Linux / macOS"
-```bash
-cd section-2/step-01
-./mvnw quarkus:dev
-```
+    ```bash
+    cd section-2/step-01
+    ./mvnw quarkus:dev
+    ```
 
 === "Windows"
-```cmd
-cd section-2\step-01
-mvnw quarkus:dev
-```
+    ```cmd
+    cd section-2\step-01
+    mvnw quarkus:dev
+    ```
 
 Once started, open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
@@ -277,7 +277,7 @@ Defines the inputs and output:
 - **Output**: `String` — the agent's response (either tool result or `CARWASH_NOT_REQUIRED`)
 
 !!! info "No Implementation Required"
-Notice there's **no method body**! LangChain4j automatically generates the implementation:
+    Notice there's **no method body**! LangChain4j automatically generates the implementation:
 
     1. Receives the inputs
     2. Sends the system + user messages to the LLM

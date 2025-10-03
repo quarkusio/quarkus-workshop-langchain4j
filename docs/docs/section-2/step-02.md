@@ -127,24 +127,24 @@ Before starting:
 If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
 === "Linux / macOS"
-```bash
-cd section-2/step-01
-cp ../step-02/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-cp ../step-02/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-cp ../step-02/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
-cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-```
+    ```bash
+    cd section-2/step-01
+    cp ../step-02/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+    cp ../step-02/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+    cp ../step-02/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
+    cp ../step-02/src/main/resources/import.sql ./src/main/resources/import.sql
+    cp ../step-02/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
+    ```
 
 === "Windows"
-```cmd
-cd section-2\step-01
-copy ..\step-02\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-copy ..\step-02\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-copy ..\step-02\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
-copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-```
+    ```cmd
+    cd section-2\step-01
+    copy ..\step-02\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+    copy ..\step-02\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+    copy ..\step-02\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+    copy ..\step-02\src\main\resources\import.sql .\src\main\resources\import.sql
+    copy ..\step-02\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
+    ```
 
 These files add the "Condition" column to the UI and update the data model to track car conditions.
 
@@ -530,8 +530,8 @@ How does the condition agent synthesize feedback from multiple sources?
 ## Understanding Parallel vs. Sequence
 
 !!! note "Why Sequence Instead of Parallel?"
-You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback.
-This means these agents could run in **parallel** for better response time.
+    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback.
+    This means these agents could run in **parallel** for better response time.
 
     We chose a **sequence** workflow in this step because:
 

@@ -424,7 +424,7 @@ Update the output method to handle disposition:
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java"
+```java hl_lines="21 34 37-39" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -458,7 +458,7 @@ Update the `RequiredAction` enum to include disposition:
 
 Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
 
-```java title="RequiredAction.java"
+```java hl_lines="7" title="RequiredAction.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/RequiredAction.java"
 ```
 
@@ -468,7 +468,7 @@ Update the service to handle disposition status:
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java title="CarManagementService.java"
+```java hl_lines="53-54" title="CarManagementService.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
