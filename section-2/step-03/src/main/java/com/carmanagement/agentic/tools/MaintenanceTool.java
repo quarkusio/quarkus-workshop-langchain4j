@@ -80,7 +80,7 @@ public class MaintenanceTool {
         }
         
         String result = summary.toString();
-        System.out.println("MaintenanceTool result: " + result);
+        System.out.println("\uD83D\uDE97 MaintenanceTool result: " + result);
         return result;
     }
 }
