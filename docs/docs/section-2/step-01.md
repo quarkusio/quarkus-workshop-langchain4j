@@ -238,7 +238,7 @@ Here's where the *magic* happens — the AI agent definition:
 Defines the agent's **role** and **decision-making logic**:
 
 - Acts as the intake specialist for the car wash department
-- Should call the `requestCarWash` function in the CarWashTool when cleaning is needed
+- Should call the `requestCarWash` function in the `CarWashTool` when cleaning is needed
 - Should be specific about which services to request
 - Should return `CARWASH_NOT_REQUIRED` if no cleaning is needed
 
