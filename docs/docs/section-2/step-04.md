@@ -404,21 +404,7 @@ The conditional workflow now has **priority ordering**:
 
 This ensures critical issues (disposal) are handled before routine tasks (washing).
 
-### Step 5: Update CarConditionFeedbackAgent
-
-The `CarConditionFeedbackAgent` should consider disposition feedback.
-
-Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`:
-
-```java hl_lines="28 40" title="CarConditionFeedbackAgent.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
-```
-
-**Key changes:**
-
-Now takes `dispositionRequest` as input to provide more comprehensive condition assessments.
-
-### Step 6: Update CarProcessingWorkflow
+### Step 5: Update CarProcessingWorkflow
 
 Update the output method to handle disposition:
 
@@ -452,7 +438,7 @@ static CarConditions output(String carCondition, String dispositionRequest, Stri
 
 Disposition has the highest priority in the result.
 
-### Step 7: Update RequiredAction Enum
+### Step 6: Update RequiredAction Enum
 
 Update the `RequiredAction` enum to include disposition:
 
@@ -462,7 +448,7 @@ Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/RequiredAction.java"
 ```
 
-### Step 8: Update CarManagementService
+### Step 7: Update CarManagementService
 
 Update the service to handle disposition status:
 
@@ -494,7 +480,7 @@ Navigate to the remote-a2a-agent directory:
 cd section-2/step-04/remote-a2a-agent
 ```
 
-### Step 9: Create the DispositionTool
+### Step 8: Create the DispositionTool
 
 The tool that executes disposition actions (scrap, sell, donate).
 
@@ -511,7 +497,7 @@ In `src/main/java/com/demo`, create `DispositionTool.java`:
 - **@Tool annotation**: Makes each method available to the AI agent
 - **Detailed descriptions**: Help the AI agent choose the appropriate action
 
-### Step 10: Create the DispositionAgent (AI Service)
+### Step 9: Create the DispositionAgent (AI Service)
 
 The AI agent that actually makes disposition decisions.
 
@@ -532,7 +518,7 @@ In `src/main/java/com/demo`, create `DispositionAgent.java`:
     Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
     The A2A server can expose both types.
 
-### Step 11: Create the AgentCard
+### Step 10: Create the AgentCard
 
 The **AgentCard** describes the agent's capabilities, skills, and interface.
 
@@ -595,7 +581,7 @@ Skills describe what the agent can do. This helps clients discover appropriate a
 
 Specifies that this agent communicates via JSON-RPC over HTTP.
 
-### Step 12: Create the AgentExecutor
+### Step 11: Create the AgentExecutor
 
 The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
 
