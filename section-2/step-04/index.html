@@ -2076,7 +2076,7 @@ The Quarkus LangChain4j team is working on higher-level abstractions to simplify
 <li><strong>A2A Protocol Layer</strong> (JSON-RPC) transports the request over HTTP</li>
 <li><strong>AgentCard</strong> describes the remote agent’s capabilities (skills, inputs, outputs)</li>
 <li><strong>AgentExecutor</strong> receives the request and orchestrates the execution</li>
-<li><strong>Remote AI agent</strong> (DispositionAgent AI service) processes the request using tools</li>
+<li><strong>Remote AI agent</strong> (<code>DispositionAgent</code> AI service) processes the request using tools</li>
 <li>Response flows back through the same path</li>
 </ol>
 <hr>
@@ -2195,29 +2195,27 @@ The Quarkus LangChain4j team is working on higher-level abstractions to simplify
 </ul>
 <hr>
 <h2 id="option-1-continue-from-step-03">Option 1: Continue from Step 03<a class="headerlink" href="#option-1-continue-from-step-03" title="Permanent link"></a></h2>
-<p>If you want to continue building on your Step 03 code, copy the updated files:</p>
+<p>If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label><label for="__tabbed_1_2">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>section-2/step-03
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cp<span class="w"> </span>../step-04/multi-agent-system/pom.xml<span class="w"> </span>./pom.xml
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarInfo.java
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarStatus.java
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/static/css/styles.css<span class="w"> </span>./src/main/resources/static/css/styles.css
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/static/js/app.js<span class="w"> </span>./src/main/resources/static/js/app.js
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/templates/index.html<span class="w"> </span>./src/main/resources/templates/index.html
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/import.sql<span class="w"> </span>./src/main/resources/import.sql
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cp<span class="w"> </span>../step-04/multi-agent-system/pom.xml<span class="w"> </span>./pom.xml
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarInfo.java
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarStatus.java
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css<span class="w"> </span>./src/main/resources/META-INF/resources/css/styles.css
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/META-INF/resources/js/app.js<span class="w"> </span>./src/main/resources/META-INF/resources/js/app.js
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/META-INF/resources/index.html<span class="w"> </span>./src/main/resources/META-INF/resources/index.html
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>cp<span class="w"> </span>../step-04/multi-agent-system/src/main/resources/import.sql<span class="w"> </span>./src/main/resources/import.sql
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>cd section-2\step-03
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>copy ..\step-04\multi-agent-system\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>copy ..\step-04\multi-agent-system\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>copy ..\step-04\multi-agent-system\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
 </code></pre></div>
 </div>
 </div>
@@ -2281,11 +2279,13 @@ The Quarkus LangChain4j team is working on higher-level abstractions to simplify
 <li><strong>Three feedback sources</strong>: Analyzes rental, car wash, and maintenance feedback</li>
 </ul>
 <p><strong>Decision Criteria:</strong></p>
-<p>The agent considers:
-- Severity of damage (structural, engine, transmission)
-- Repair costs vs. car value
-- Age and condition of the vehicle
-- Safety concerns</p>
+<p>The agent considers:</p>
+<ul>
+<li>Severity of damage (structural, engine, transmission)</li>
+<li>Repair costs vs. car value</li>
+<li>Age and condition of the vehicle</li>
+<li>Safety concerns</li>
+</ul>
 <h3 id="step-2-create-the-dispositionagent-client">Step 2: Create the DispositionAgent (Client)<a class="headerlink" href="#step-2-create-the-dispositionagent-client" title="Permanent link"></a></h3>
 <p>This is where the A2A magic happens! 
 This agent connects to the remote disposition agent.</p>
@@ -2340,12 +2340,14 @@ This agent connects to the remote disposition agent.</p>
 The remote agent can access them by name.</p>
 <h4 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link"></a></h4>
 <ol>
-<li>When this method is called, Quarkus LangChain4j:</li>
+<li>
+<p>When this method is called, Quarkus LangChain4j:</p>
+<ol>
 <li>Creates an A2A Task with the method parameters as inputs</li>
 <li>Sends the task to the remote server via JSON-RPC</li>
 <li>Waits for the remote agent to complete the task</li>
-<li>
-<p>Returns the result as a String</p>
+<li>Returns the result as a String</li>
+</ol>
 </li>
 <li>
 <p>No manual HTTP requests needed</p>
@@ -2396,10 +2398,12 @@ The remote agent can access them by name.</p>
 <p>Added <code>DispositionFeedbackAgent</code> to the parallel workflow:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@SubAgent</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DispositionFeedbackAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">outputName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"dispositionRequest"</span><span class="p">)</span>
 </code></pre></div>
-<p>Now <strong>three agents run concurrently</strong>:
-- <code>CarWashFeedbackAgent</code> — analyzes cleaning needs
-- <code>MaintenanceFeedbackAgent</code> — analyzes maintenance needs
-- <code>DispositionFeedbackAgent</code> — analyzes disposal needs</p>
+<p>Now <strong>three agents run concurrently</strong>:</p>
+<ul>
+<li><code>CarWashFeedbackAgent</code> — analyzes cleaning needs</li>
+<li><code>MaintenanceFeedbackAgent</code> — analyzes maintenance needs</li>
+<li><code>DispositionFeedbackAgent</code> — analyzes disposal needs</li>
+</ul>
 <p>This parallel execution is efficient: all three analyses happen at the same time!</p>
 <h3 id="step-4-update-actionworkflow">Step 4: Update ActionWorkflow<a class="headerlink" href="#step-4-update-actionworkflow" title="Permanent link"></a></h3>
 <p>The <code>ActionWorkflow</code> needs to handle disposition requests.</p>
@@ -2495,30 +2499,28 @@ The remote agent can access them by name.</p>
 <a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="s">        Always provide a concise condition description, even if there's minimal feedback.</span>
 <a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="s">        Do not add any headers or prefixes to your response.</span>
 <a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="w">    </span><span class="c1">// --8&lt;-- [start:carConditionFeedbackSnippet]</span>
-<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="s">            Car Information:</span>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="s">            Make: {carMake}</span>
-<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">            Model: {carModel}</span>
-<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">            Year: {carYear}</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">            Previous Condition: {carCondition}</span>
-<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">            Feedback from other agents:</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">            Car Wash Recommendation: {carWashRequest}</span>
-<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">            Maintenance Recommendation: {maintenanceRequest}</span>
-<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="s">            """</span><span class="p">)</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car condition analyzer. Determines the current condition of a car based on feedback."</span><span class="p">,</span>
-<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="w">            </span><span class="n">outputName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carCondition"</span><span class="p">)</span>
-<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForCondition</span><span class="p">(</span>
-<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
-<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carWashRequest</span><span class="p">,</span>
-<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceRequest</span><span class="p">);</span>
-<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a><span class="w">    </span><span class="c1">// --8&lt;-- [end:carConditionFeedbackSnippet]</span>
-<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="p">}</span>
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="s">            Car Information:</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="s">            Make: {carMake}</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="s">            Model: {carModel}</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">            Year: {carYear}</span>
+<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">            Previous Condition: {carCondition}</span>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="s">            Feedback from other agents:</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">            Car Wash Recommendation: {carWashRequest}</span>
+<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">            Maintenance Recommendation: {maintenanceRequest}</span>
+<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">            """</span><span class="p">)</span>
+<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car condition analyzer. Determines the current condition of a car based on feedback."</span><span class="p">,</span>
+<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="w">            </span><span class="n">outputName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carCondition"</span><span class="p">)</span>
+<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForCondition</span><span class="p">(</span>
+<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
+<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
+<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
+<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
+<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carWashRequest</span><span class="p">,</span>
+<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceRequest</span><span class="p">);</span>
+<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Key changes:</strong></p>
 <p>Now takes <code>dispositionRequest</code> as input to provide more comprehensive condition assessments.</p>
@@ -2602,12 +2604,15 @@ The remote agent can access them by name.</p>
 <p>Update <code>src/main/java/com/carmanagement/model/RequiredAction.java</code>:</p>
 <div class="highlight"><span class="filename">RequiredAction.java</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.model</span><span class="p">;</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">RequiredAction</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="n">NONE</span><span class="p">,</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="n">CAR_WASH</span><span class="p">,</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="n">MAINTENANCE</span><span class="p">,</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="n">DISPOSITION</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="p">}</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="cm">/**</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="cm"> * Enum representing the type of possible required actions for car processing</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="cm"> */</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">RequiredAction</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="n">DISPOSITION</span><span class="p">,</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="n">MAINTENANCE</span><span class="p">,</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">    </span><span class="n">CAR_WASH</span><span class="p">,</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="n">NONE</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="step-8-update-carmanagementservice">Step 8: Update CarManagementService<a class="headerlink" href="#step-8-update-carmanagementservice" title="Permanent link"></a></h3>
 <p>Update the service to handle disposition status:</p>
@@ -3060,33 +3065,37 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <p>Click <strong>Return</strong>.</p>
 <p><strong>What happens?</strong></p>
 <ol>
-<li><strong>Parallel Analysis</strong> (FeedbackWorkflow):</li>
+<li>
+<p><strong>Parallel Analysis</strong> (FeedbackWorkflow):</p>
+<ol>
 <li><code>DispositionFeedbackAgent</code>: “Disposition required — severe damage”</li>
 <li><code>MaintenanceFeedbackAgent</code>: “Major repairs needed”</li>
-<li>
-<p><code>CarWashFeedbackAgent</code>: “Not applicable”</p>
+<li><code>CarWashFeedbackAgent</code>: “Not applicable”</li>
+</ol>
 </li>
 <li>
 <p><strong>Conditional Routing</strong> (ActionWorkflow):</p>
-</li>
+<ol>
 <li>Disposition condition: <code>true</code> (required)</li>
-<li>
-<p>→ Executes <code>DispositionAgent</code> (A2A client)</p>
+<li>→ Executes <code>DispositionAgent</code> (A2A client)</li>
+</ol>
 </li>
 <li>
 <p><strong>A2A Communication</strong>:</p>
-</li>
+<ol>
 <li>Client sends task to <code>http://localhost:8888</code></li>
 <li><code>AgentExecutor</code> receives and processes task</li>
 <li><code>DispositionAgent</code> (AI service) analyzes using <code>DispositionTool</code></li>
-<li>
-<p>Result flows back to client</p>
+<li>Result flows back to client</li>
+</ol>
 </li>
 <li>
 <p><strong>UI Update</strong>:</p>
-</li>
+<ol>
 <li>Car status → <code>DISPOSED</code></li>
 <li>Car appears in the Dispositions tab</li>
+</ol>
+</li>
 </ol>
 <h3 id="check-the-logs">Check the Logs<a class="headerlink" href="#check-the-logs" title="Permanent link"></a></h3>
 <p><strong>Terminal 1 (Remote A2A Server):</strong>
@@ -3162,13 +3171,15 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="nd">@A2AClientAgent</span><span class="p">(</span><span class="n">a2aServerUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"http://localhost:8888"</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 <a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">String</span><span class="w"> </span><span class="nf">processDisposition</span><span class="p">(...)</span>
 </code></pre></div>
-<p>Quarkus LangChain4j handles:
-- Creating the A2A task
-- Serializing method parameters as task inputs
-- Sending the HTTP request via JSON-RPC
-- Waiting for the response
-- Deserializing the result
-- Error handling and retries</p>
+<p>Quarkus LangChain4j handles:</p>
+<ul>
+<li>Creating the A2A task</li>
+<li>Serializing method parameters as task inputs</li>
+<li>Sending the HTTP request via JSON-RPC</li>
+<li>Waiting for the response</li>
+<li>Deserializing the result</li>
+<li>Error handling and retries</li>
+</ul>
 <h3 id="server-side-agentcard-agentexecutor">Server Side (AgentCard + AgentExecutor)<a class="headerlink" href="#server-side-agentcard-agentexecutor" title="Permanent link"></a></h3>
 <p>The server requires more components:</p>
 <table>
@@ -3296,11 +3307,13 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <hr>
 <h2 id="whats-next">What’s Next?<a class="headerlink" href="#whats-next" title="Permanent link"></a></h2>
 <p>You’ve successfully built a distributed agent system using the A2A protocol!</p>
-<p>You learned how to:
-- Connect to remote agents using <code>@A2AClientAgent</code>
-- Build A2A servers with AgentCard and AgentExecutor
-- Integrate remote agents into complex workflows
-- Run multiple Quarkus applications that communicate via A2A</p>
+<p>You learned how to:</p>
+<ul>
+<li>Connect to remote agents using <code>@A2AClientAgent</code></li>
+<li>Build A2A servers with AgentCard and AgentExecutor</li>
+<li>Integrate remote agents into complex workflows</li>
+<li>Run multiple Quarkus applications that communicate via A2A</li>
+</ul>
 <p>This completes <strong>Section 2: Agentic Systems</strong>! You’ve progressed from simple agents to complex distributed workflows with remote agent communication.</p>
 <p><strong>Congratulations!</strong> You now have the skills to build sophisticated multi-agent systems with Quarkus LangChain4j!</p>
 <hr>
