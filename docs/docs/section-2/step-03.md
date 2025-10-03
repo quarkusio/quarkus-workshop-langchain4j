@@ -228,8 +228,8 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.
 @ParallelAgent(
     outputName = "feedbackResult",
     subAgents = {
-            @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
-            @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+        @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
+        @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
     }
 )
 ```
@@ -306,8 +306,8 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.ja
 @ConditionalAgent(
     outputName = "actionResult",
     subAgents = {
-            @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
-            @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+        @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
+        @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
     }
 )
 ```

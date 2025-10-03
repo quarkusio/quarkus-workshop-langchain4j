@@ -243,14 +243,14 @@ In the `@Agent` annotation, adds `outputName = "carWashAgentResult"` to the `@Ag
 If continuing from Step 01, create the workflow directory:
 
 === "Linux / macOS"
-```bash
-mkdir -p ./src/main/java/com/carmanagement/agentic/workflow
-```
+    ```bash
+    mkdir -p ./src/main/java/com/carmanagement/agentic/workflow
+    ```
 
 === "Windows"
-```cmd
-mkdir .\src\main\java\com\carmanagement\agentic\workflow
-```
+    ```cmd
+    mkdir .\src\main\java\com\carmanagement\agentic\workflow
+    ```
 
 ---
 
