@@ -1609,10 +1609,10 @@ Here’s the business process:</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link"></a></h2>
 <p>Before starting, ensure you have:</p>
 <ul>
-<li>Completed Section 1 (or are familiar with Quarkus LangChain4j basics)</li>
+<li>Completed Section 1 (or you are familiar with Quarkus LangChain4j basics)</li>
 <li>JDK 21+ installed</li>
 <li>OpenAI API key set as <code>OPENAI_API_KEY</code> environment variable</li>
-<li>A container runtime (Docker/Podman) for running a PostgreSQL <a href="https://quarkus.io/guides/databases-dev-services">dev service</a></li>
+<li>A container runtime (Docker/Podman) for running a PostgreSQL <a href="https://quarkus.io/guides/databases-dev-services">Dev Service</a></li>
 </ul>
 <hr>
 <h2 id="running-the-application">Running the Application<a class="headerlink" href="#running-the-application" title="Permanent link"></a></h2>
@@ -1635,15 +1635,15 @@ Here’s the business process:</p>
 <h3 id="understanding-the-ui">Understanding the UI<a class="headerlink" href="#understanding-the-ui" title="Permanent link"></a></h3>
 <p>The application has two main sections:</p>
 <ol>
-<li><strong>Fleet Status</strong> (left): Shows all cars in the Miles of Smiles fleet with their current status</li>
-<li><strong>Returns</strong> (right): Displays cars that are currently rented or at the car wash</li>
+<li><strong>Fleet Status</strong> (top): Shows all cars in the Miles of Smiles fleet with their current status</li>
+<li><strong>Returns</strong> (bottom): Displays cars that are currently rented or at the car wash</li>
 </ol>
 <p><img alt="Agentic App UI" class="center" src="../../images/agentic-UI-1.png"></p>
 <hr>
 <h2 id="try-it-out">Try It Out<a class="headerlink" href="#try-it-out" title="Permanent link"></a></h2>
 <p>Let’s see the agent in action!</p>
 <h3 id="test-1-car-needs-cleaning">Test 1: Car Needs Cleaning<a class="headerlink" href="#test-1-car-needs-cleaning" title="Permanent link"></a></h3>
-<p>Act as a rental team member processing a car return. In the <strong>Rental Return</strong> section, select a car and enter this feedback:</p>
+<p>Act as a rental team member processing a car return. In the <strong>Returns &gt; Rental Return</strong> section, select a car and enter this feedback:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Car has dog hair all over the back seat
 </code></pre></div>
 <p>Click the <strong>Return</strong> button.</p>
@@ -1893,7 +1893,7 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <p>Assigns the <code>CarWashTool</code> to this agent:</p>
 <ul>
 <li>The agent can call methods in this tool to perform actions</li>
-<li>The LLM decides when and how to use the tool based on the task (function calling has been covered in the section-1 of the workshop)</li>
+<li>The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)</li>
 </ul>
 <h3 id="method-signature">Method Signature<a class="headerlink" href="#method-signature" title="Permanent link"></a></h3>
 <p>Defines the inputs and output:</p>
@@ -1993,9 +1993,9 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <details class="question">
 <summary>Why do we use @Dependent scope for the Tool?</summary>
 <p>When a tool is added to an agent, LangChain4j introspects the tool object to find methods with <code>@Tool</code> annotations.</p>
-<p><strong>The Problem with Other Scopes:</strong>
+<p><strong>The problem with other scopes:</strong>
 CDI creates proxies for beans with scopes like <code>@ApplicationScoped</code> or <code>@SessionScoped</code>. These proxy objects don’t preserve the <code>@Tool</code> annotations, so LangChain4j can’t detect them.</p>
-<p><strong>The Solution:</strong>
+<p><strong>The solution:</strong>
 Use <code>@Dependent</code> scope, which doesn’t create proxies, allowing LangChain4j to see the annotations directly.</p>
 <p><strong>Alternative:</strong>
 If you need other CDI scopes, you can use a <code>ToolProvider</code> to manually register tools (not covered in this workshop).</p>

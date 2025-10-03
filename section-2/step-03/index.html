@@ -2032,18 +2032,20 @@ When cars are returned, the system should automatically:</p>
     C3 --&gt;|No| C5[Skip]</code></pre>
 <p><strong>The Flow:</strong></p>
 <ol>
-<li><strong>FeedbackWorkflow</strong> (Parallel): Analyzes feedback simultaneously from two perspectives:</li>
-<li>Does the car need maintenance?</li>
 <li>
-<p>Does the car need washing?</p>
+<p><strong>FeedbackWorkflow</strong> (Parallel): Analyzes feedback simultaneously from two perspectives:</p>
+<ol>
+<li>Does the car need maintenance?</li>
+<li>Does the car need washing?</li>
+</ol>
 </li>
 <li>
 <p><strong>ActionWorkflow</strong> (Conditional): Routes the car based on the analysis:</p>
-</li>
+<ol>
 <li>If maintenance needed → send to maintenance team</li>
 <li>Else if washing needed → send to car wash</li>
-<li>
-<p>Else → do nothing</p>
+<li>Else → do nothing</li>
+</ol>
 </li>
 <li>
 <p><strong>CarConditionFeedbackAgent</strong> (Single): Updates the car’s condition based on all feedback</p>
@@ -2106,26 +2108,24 @@ When cars are returned, the system should automatically:</p>
 </ul>
 <hr>
 <h2 id="option-1-continue-from-step-02">Option 1: Continue from Step 02<a class="headerlink" href="#option-1-continue-from-step-02" title="Permanent link"></a></h2>
-<p>If you want to continue building on your Step 02 code, copy the updated files:</p>
+<p>If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label><label for="__tabbed_1_2">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>section-2/step-02
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cp<span class="w"> </span>../step-03/src/main/resources/static/css/styles.css<span class="w"> </span>./src/main/resources/static/css/styles.css
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cp<span class="w"> </span>../step-03/src/main/resources/static/js/app.js<span class="w"> </span>./src/main/resources/static/js/app.js
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>cp<span class="w"> </span>../step-03/src/main/resources/templates/index.html<span class="w"> </span>./src/main/resources/templates/index.html
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>cp<span class="w"> </span>../step-03/src/main/resources/import.sql<span class="w"> </span>./src/main/resources/import.sql
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>cp<span class="w"> </span>../step-03/src/main/java/com/carmanagement/model/CarStatus.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarStatus.java
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cp<span class="w"> </span>../step-03/src/main/resources/META-INF/resources/css/styles.css<span class="w"> </span>./src/main/resources/META-INF/resources/css/styles.css
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cp<span class="w"> </span>../step-03/src/main/resources/META-INF/resources/js/app.js<span class="w"> </span>./src/main/resources/META-INF/resources/js/app.js
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cp<span class="w"> </span>../step-03/src/main/resources/META-INF/resources/index.html<span class="w"> </span>./src/main/resources/META-INF/resources/index.html
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>cp<span class="w"> </span>../step-03/src/main/resources/import.sql<span class="w"> </span>./src/main/resources/import.sql
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>cp<span class="w"> </span>../step-03/src/main/java/com/carmanagement/model/CarStatus.java<span class="w"> </span>./src/main/java/com/carmanagement/model/CarStatus.java
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cd section-2\step-02
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>copy ..\step-03\src\main\resources\static\css\styles.css .\src\main\resources\static\css\styles.css
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>copy ..\step-03\src\main\resources\static\js\app.js .\src\main\resources\static\js\app.js
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>copy ..\step-03\src\main\resources\templates\index.html .\src\main\resources\templates\index.html
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
 </code></pre></div>
 </div>
 </div>
@@ -2507,27 +2507,45 @@ This follows the separation of concerns principle:</p>
 <h3 id="step-7-update-carconditionfeedbackagent">Step 7: Update CarConditionFeedbackAgent<a class="headerlink" href="#step-7-update-carconditionfeedbackagent" title="Permanent link"></a></h3>
 <p>The condition agent should now use the analyzed requests instead of raw feedback.</p>
 <p>Update <code>src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java</code>:</p>
-<div class="highlight"><span class="filename">CarConditionFeedbackAgent.java</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="s">        Car Information:</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s">        Make: {carMake}</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s">        Model: {carModel}</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s">        Year: {carYear}</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="s">        Previous Condition: {carCondition}</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="s">        Feedback from other agents:</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="s">        Car Wash Recommendation: {carWashRequest}</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="s">        Maintenance Recommendation: {maintenanceRequest}</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car condition analyzer. Determines the current condition of a car based on feedback."</span><span class="p">,</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">        </span><span class="n">outputName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carCondition"</span><span class="p">)</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForCondition</span><span class="p">(</span>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
-<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">carWashRequest</span><span class="p">,</span>
-<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceRequest</span><span class="p">);</span>
+<div class="highlight"><span class="filename">CarConditionFeedbackAgent.java</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="cm">/**</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="cm"> * Agent that analyzes feedback to update the car condition.</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="cm"> */</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarConditionFeedbackAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="s">        You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on feedback.</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="s">        Analyze all feedback and the previous car condition to provide an updated condition description.</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="s">        Always provide a concise condition description, even if there's minimal feedback.</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="s">        Do not add any headers or prefixes to your response.</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="hll"><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+</span><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="hll"><span class="s">            Car Information:</span>
+</span><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="hll"><span class="s">            Make: {carMake}</span>
+</span><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="hll"><span class="s">            Model: {carModel}</span>
+</span><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="hll"><span class="s">            Year: {carYear}</span>
+</span><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="hll"><span class="s">            Previous Condition: {carCondition}</span>
+</span><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="hll">
+</span><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="hll"><span class="s">            Feedback from other agents:</span>
+</span><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="hll"><span class="s">            Car Wash Recommendation: {carWashRequest}</span>
+</span><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="hll"><span class="s">            Maintenance Recommendation: {maintenanceRequest}</span>
+</span><a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="hll"><span class="s">            """</span><span class="p">)</span>
+</span><a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="hll"><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car condition analyzer. Determines the current condition of a car based on feedback."</span><span class="p">,</span>
+</span><a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="hll"><span class="w">            </span><span class="n">outputName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carCondition"</span><span class="p">)</span>
+</span><a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForCondition</span><span class="p">(</span>
+</span><a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
+</span><a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
+</span><a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="hll"><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
+</span><a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a><span class="hll"><span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+</span><a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
+</span><a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carWashRequest</span><span class="p">,</span>
+</span><a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceRequest</span><span class="p">);</span>
+</span><a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Key changes:</strong></p>
 <ul>
@@ -2651,34 +2669,103 @@ This follows the separation of concerns principle:</p>
 <p>Update <code>src/main/java/com/carmanagement/model/CarConditions.java</code>:</p>
 <p></p><div class="highlight"><span class="filename">CarConditions.java</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.model</span><span class="p">;</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">CarConditions</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">generalCondition</span><span class="p">,</span><span class="w"> </span><span class="n">RequiredAction</span><span class="w"> </span><span class="n">requiredAction</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">}</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="cm">/**</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="cm"> * Record representing the conditions of a car.</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="cm"> *</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="cm"> * @param generalCondition   A description of the car's general condition</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="cm"> * @param requiredAction    Indicates the action required</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="cm"> */</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">CarConditions</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">generalCondition</span><span class="p">,</span><span class="w"> </span><span class="n">RequiredAction</span><span class="w"> </span><span class="n">requiredAction</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="p">}</span>
 </code></pre></div>
 Notice how it has changed from <code>boolean carWashRequired</code> to <code>RequiredAction requiredAction</code> to support three states.
 <h3 id="step-11-add-maintenance-returns-api">Step 11: Add Maintenance Returns API<a class="headerlink" href="#step-11-add-maintenance-returns-api" title="Permanent link"></a></h3>
 <p>Update <code>src/main/java/com/carmanagement/resource/CarManagementResource.java</code>:</p>
-<div class="highlight"><span class="filename">CarManagementResource.java</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="cm">/**</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="cm"> * Process a car return from maintenance.</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="cm"> *</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="cm"> * @param carNumber The car number</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="cm"> * @param maintenanceFeedback Optional maintenance feedback</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="cm"> * @return Result of the processing</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="cm"> */</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="nd">@POST</span>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="nd">@Path</span><span class="p">(</span><span class="s">"/maintenance-return/{carNumber}"</span><span class="p">)</span>
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">processMaintenanceReturn</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="nd">@RestQuery</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>
-<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carManagementService</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="p">);</span>
-<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="na">Status</span><span class="p">.</span><span class="na">INTERNAL_SERVER_ERROR</span><span class="p">)</span>
-<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">                </span><span class="p">.</span><span class="na">entity</span><span class="p">(</span><span class="s">"Error processing maintenance return: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">())</span>
-<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">CarManagementResource.java</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.resource</span><span class="p">;</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.service.CarManagementService</span><span class="p">;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.logging.Log</span><span class="p">;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.inject.Inject</span><span class="p">;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.*</span><span class="p">;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.core.MediaType</span><span class="p">;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.ws.rs.core.Response</span><span class="p">;</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.jboss.resteasy.reactive.RestQuery</span><span class="p">;</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="cm">/**</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="cm"> * REST resource for car management operations.</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="cm"> */</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="nd">@Path</span><span class="p">(</span><span class="s">"/car-management"</span><span class="p">)</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CarManagementResource</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">    </span><span class="nd">@Inject</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="n">CarManagementService</span><span class="w"> </span><span class="n">carManagementService</span><span class="p">;</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="cm">     * Process a car return from rental.</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="cm">     * </span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="cm">     * @param carNumber The car number</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="cm">     * @param rentalFeedback Optional rental feedback</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="cm">     * @return Result of the processing</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="cm">     */</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">    </span><span class="nd">@POST</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="w">    </span><span class="nd">@Path</span><span class="p">(</span><span class="s">"/rental-return/{carNumber}"</span><span class="p">)</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">processRentalReturn</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="nd">@RestQuery</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a>
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carManagementService</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
+</span><a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a><span class="w">            </span><span class="n">Log</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">(),</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="na">Status</span><span class="p">.</span><span class="na">INTERNAL_SERVER_ERROR</span><span class="p">)</span>
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a><span class="w">                    </span><span class="p">.</span><span class="na">entity</span><span class="p">(</span><span class="s">"Error processing rental return: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">())</span>
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-18-40" name="__codelineno-18-40" href="#__codelineno-18-40"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-41" name="__codelineno-18-41" href="#__codelineno-18-41"></a>
+<a id="__codelineno-18-42" name="__codelineno-18-42" href="#__codelineno-18-42"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-18-43" name="__codelineno-18-43" href="#__codelineno-18-43"></a><span class="cm">     * Process a car return from car wash.</span>
+<a id="__codelineno-18-44" name="__codelineno-18-44" href="#__codelineno-18-44"></a><span class="cm">     * </span>
+<a id="__codelineno-18-45" name="__codelineno-18-45" href="#__codelineno-18-45"></a><span class="cm">     * @param carNumber The car number</span>
+<a id="__codelineno-18-46" name="__codelineno-18-46" href="#__codelineno-18-46"></a><span class="cm">     * @param carWashFeedback Optional car wash feedback</span>
+<a id="__codelineno-18-47" name="__codelineno-18-47" href="#__codelineno-18-47"></a><span class="cm">     * @return Result of the processing</span>
+<a id="__codelineno-18-48" name="__codelineno-18-48" href="#__codelineno-18-48"></a><span class="cm">     */</span>
+<a id="__codelineno-18-49" name="__codelineno-18-49" href="#__codelineno-18-49"></a><span class="w">    </span><span class="nd">@POST</span>
+<a id="__codelineno-18-50" name="__codelineno-18-50" href="#__codelineno-18-50"></a><span class="w">    </span><span class="nd">@Path</span><span class="p">(</span><span class="s">"/car-wash-return/{carNumber}"</span><span class="p">)</span>
+<a id="__codelineno-18-51" name="__codelineno-18-51" href="#__codelineno-18-51"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">processCarWashReturn</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="nd">@RestQuery</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">carWashFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-52" name="__codelineno-18-52" href="#__codelineno-18-52"></a>
+<a id="__codelineno-18-53" name="__codelineno-18-53" href="#__codelineno-18-53"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-54" name="__codelineno-18-54" href="#__codelineno-18-54"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carManagementService</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="n">carWashFeedback</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
+</span><a id="__codelineno-18-55" name="__codelineno-18-55" href="#__codelineno-18-55"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-18-56" name="__codelineno-18-56" href="#__codelineno-18-56"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-57" name="__codelineno-18-57" href="#__codelineno-18-57"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="na">Status</span><span class="p">.</span><span class="na">INTERNAL_SERVER_ERROR</span><span class="p">)</span>
+<a id="__codelineno-18-58" name="__codelineno-18-58" href="#__codelineno-18-58"></a><span class="w">                    </span><span class="p">.</span><span class="na">entity</span><span class="p">(</span><span class="s">"Error processing car wash return: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">())</span>
+<a id="__codelineno-18-59" name="__codelineno-18-59" href="#__codelineno-18-59"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-18-60" name="__codelineno-18-60" href="#__codelineno-18-60"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-18-61" name="__codelineno-18-61" href="#__codelineno-18-61"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-62" name="__codelineno-18-62" href="#__codelineno-18-62"></a>
+<a id="__codelineno-18-63" name="__codelineno-18-63" href="#__codelineno-18-63"></a><span class="hll"><span class="w">    </span><span class="cm">/**</span>
+</span><a id="__codelineno-18-64" name="__codelineno-18-64" href="#__codelineno-18-64"></a><span class="hll"><span class="cm">     * Process a car return from maintenance.</span>
+</span><a id="__codelineno-18-65" name="__codelineno-18-65" href="#__codelineno-18-65"></a><span class="hll"><span class="cm">     *</span>
+</span><a id="__codelineno-18-66" name="__codelineno-18-66" href="#__codelineno-18-66"></a><span class="hll"><span class="cm">     * @param carNumber The car number</span>
+</span><a id="__codelineno-18-67" name="__codelineno-18-67" href="#__codelineno-18-67"></a><span class="hll"><span class="cm">     * @param maintenanceFeedback Optional maintenance feedback</span>
+</span><a id="__codelineno-18-68" name="__codelineno-18-68" href="#__codelineno-18-68"></a><span class="hll"><span class="cm">     * @return Result of the processing</span>
+</span><a id="__codelineno-18-69" name="__codelineno-18-69" href="#__codelineno-18-69"></a><span class="hll"><span class="cm">     */</span>
+</span><a id="__codelineno-18-70" name="__codelineno-18-70" href="#__codelineno-18-70"></a><span class="hll"><span class="w">    </span><span class="nd">@POST</span>
+</span><a id="__codelineno-18-71" name="__codelineno-18-71" href="#__codelineno-18-71"></a><span class="hll"><span class="w">    </span><span class="nd">@Path</span><span class="p">(</span><span class="s">"/maintenance-return/{carNumber}"</span><span class="p">)</span>
+</span><a id="__codelineno-18-72" name="__codelineno-18-72" href="#__codelineno-18-72"></a><span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">processMaintenanceReturn</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="nd">@RestQuery</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-18-73" name="__codelineno-18-73" href="#__codelineno-18-73"></a><span class="hll">
+</span><a id="__codelineno-18-74" name="__codelineno-18-74" href="#__codelineno-18-74"></a><span class="hll"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-18-75" name="__codelineno-18-75" href="#__codelineno-18-75"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carManagementService</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="p">);</span>
+</span><a id="__codelineno-18-76" name="__codelineno-18-76" href="#__codelineno-18-76"></a><span class="hll"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</span><a id="__codelineno-18-77" name="__codelineno-18-77" href="#__codelineno-18-77"></a><span class="hll"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-18-78" name="__codelineno-18-78" href="#__codelineno-18-78"></a><span class="hll"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="na">Status</span><span class="p">.</span><span class="na">INTERNAL_SERVER_ERROR</span><span class="p">)</span>
+</span><a id="__codelineno-18-79" name="__codelineno-18-79" href="#__codelineno-18-79"></a><span class="hll"><span class="w">                    </span><span class="p">.</span><span class="na">entity</span><span class="p">(</span><span class="s">"Error processing maintenance return: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">())</span>
+</span><a id="__codelineno-18-80" name="__codelineno-18-80" href="#__codelineno-18-80"></a><span class="hll"><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><a id="__codelineno-18-81" name="__codelineno-18-81" href="#__codelineno-18-81"></a><span class="hll"><span class="w">        </span><span class="p">}</span>
+</span><a id="__codelineno-18-82" name="__codelineno-18-82" href="#__codelineno-18-82"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-18-83" name="__codelineno-18-83" href="#__codelineno-18-83"></a><span class="p">}</span>
 </code></pre></div>
-<p>This adds a new endpoint for the maintenance team to return cars with feedback.</p>
+<p>This adds a new endpoint for the maintenance team to return cars with feedback, and adjusts the existing endpoints.</p>
 <hr>
 <h2 id="part-7-update-the-main-workflow">Part 7: Update the Main Workflow<a class="headerlink" href="#part-7-update-the-main-workflow" title="Permanent link"></a></h2>
 <h3 id="step-12-update-carprocessingworkflow">Step 12: Update CarProcessingWorkflow<a class="headerlink" href="#step-12-update-carprocessingworkflow" title="Permanent link"></a></h3>
@@ -2849,36 +2936,40 @@ Notice how it has changed from <code>boolean carWashRequired</code> to <code>Req
 <p>The <strong>Returns</strong> section now has a <strong>Maintenance Return</strong> tab:</p>
 <p><img alt="Maintenance Returns Tab" class="center" src="../../images/agentic-UI-maintenance-returns-tab.png"></p>
 <h3 id="test-the-complete-workflow">Test the Complete Workflow<a class="headerlink" href="#test-the-complete-workflow" title="Permanent link"></a></h3>
-<p>Enter feedback on the Maintenance Return tab for car 3:</p>
+<p>Enter feedback on the Maintenance Return tab for the Ford F-150:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>buffed out the scratch. car could use a wash now.
 </code></pre></div>
 <p>Click <strong>Return</strong>.</p>
 <p><strong>What happens?</strong></p>
 <ol>
-<li><strong>Parallel Analysis</strong> (FeedbackWorkflow):</li>
-<li><code>MaintenanceFeedbackAgent</code>: “MAINTENANCE_NOT_REQUIRED” (scratch fixed)</li>
 <li>
-<p><code>CarWashFeedbackAgent</code>: “Car wash needed for general cleaning”</p>
+<p><strong>Parallel Analysis</strong> (FeedbackWorkflow):</p>
+<ol>
+<li><code>MaintenanceFeedbackAgent</code>: “MAINTENANCE_NOT_REQUIRED” (scratch fixed)</li>
+<li><code>CarWashFeedbackAgent</code>: “Car wash needed for general cleaning”</li>
+</ol>
 </li>
 <li>
 <p><strong>Conditional Routing</strong> (ActionWorkflow):</p>
-</li>
+<ol>
 <li>Maintenance condition: <code>false</code> (not required)</li>
 <li>Car wash condition: <code>true</code> (required)</li>
-<li>
-<p>→ Executes <code>CarWashAgent</code>, sends car to car wash</p>
+<li>→ Executes <code>CarWashAgent</code>, sends car to car wash</li>
+</ol>
 </li>
 <li>
 <p><strong>Condition Update</strong> (CarConditionFeedbackAgent):</p>
-</li>
-<li>
-<p>Updates car condition: “Scratch removed, clean overall”</p>
+<ol>
+<li>Updates car condition: “Scratch removed, clean overall”</li>
+</ol>
 </li>
 <li>
 <p><strong>UI Update</strong>:</p>
-</li>
+<ol>
 <li>Car status → <code>AT_CAR_WASH</code></li>
 <li>Condition column updates</li>
+</ol>
+</li>
 </ol>
 <h3 id="check-the-logs">Check the Logs<a class="headerlink" href="#check-the-logs" title="Permanent link"></a></h3>
 <p>Look for evidence of parallel execution:</p>
