@@ -55,12 +55,12 @@ For now, set the temperature to `1.0`.
 
 ## Max tokens
 
-`quarkus.langchain4j.openai.chat-model.max-tokens` limits the length of the  response.
+`quarkus.langchain4j.openai.chat-model.max-completion-tokens` limits the length of the  response.
 
 Try adding
 
 ```properties
-quarkus.langchain4j.openai.chat-model.max-tokens=20
+quarkus.langchain4j.openai.chat-model.max-completion-tokens=20
 ```
 
 to `src/main/resources/application.properties` and see how the model cuts off the response after 20 tokens.

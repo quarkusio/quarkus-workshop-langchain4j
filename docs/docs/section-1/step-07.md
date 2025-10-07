@@ -122,14 +122,6 @@ Also note that we have added a new placeholder `{current_date}` in the system pr
     It uses the [Qute](https://quarkus.io/guides/qute) template engine underneath.
     This is a powerful feature to allow you to have advanced template logic.
 
-!!! bug "Tools and streaming responses"
-    There is a known limitation currently when using (blocking) tools with streaming responses.
-    Replace `Multi<String>` with `String` in the AI service method signature to avoid this issue and change the call in the `dev.langchain4j.quarkus.workshop.CustomerSupportAgentWebSocket` accordingly:
-
-    ```java hl_lines="2" title="CustomerSupportAgentWebSocket.java"
-    --8<-- "../../section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java:tools"
-    ```
-
 ## Testing the function calling
 
 Let's test the function calling.
