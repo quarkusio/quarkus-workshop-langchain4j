@@ -242,7 +242,36 @@ Let's see if everything works as expected.
     The application requires Podman or Docker to automatically start a PostgreSQL database.
     So make sure you have one of them installed and running.
 
-When the application starts, it will ingest the documents into the vector store.
+
+> 🛠 Troubleshooting – Docker Permission Issue on Linux
+
+If you see this error when running the project:
+```
+DOCKER_HOST unix:///var/run/docker.sock is not listening:
+java.net.BindException: Permission denied
+```
+It means your user doesn't have access to the Docker socket (`/var/run/docker.sock`).
+
+> ✅ Solutions
+
+**Quick fix (⚠️ not recommended for production):**
+
+```bash
+sudo chmod 777 /var/run/docker.sock
+```
+This grants full access to all users. Use only in local/dev environments.
+
+**Recommended fix:**
+Add your user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+After adding your user to the Docker group, don't forget to log out and back in for the changes to take effect.
+
+
+**When the application starts, it will ingest the documents into the vector store.**
+
 
 You can use the dev UI to verify the ingestion like we did in the previous step.
 This time, let's test with the chatbot instead:
