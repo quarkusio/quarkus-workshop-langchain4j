@@ -944,9 +944,9 @@ Note that it will note guarantee the same response for the same input, but it wi
 <p>Applications that require a bit more creativity (e.g. to generate text for a story) can set the temperature to 0.3 or higher.</p>
 <p>For now, set the temperature to <code>1.0</code>.</p>
 <h2 id="max-tokens">Max tokens<a class="headerlink" href="#max-tokens" title="Permanent link"></a></h2>
-<p><code>quarkus.langchain4j.openai.chat-model.max-tokens</code> limits the length of the  response.</p>
+<p><code>quarkus.langchain4j.openai.chat-model.max-completion-tokens</code> limits the length of the  response.</p>
 <p>Try adding</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">quarkus.langchain4j.openai.chat-model.max-tokens</span><span class="o">=</span><span class="s">20</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">quarkus.langchain4j.openai.chat-model.max-completion-tokens</span><span class="o">=</span><span class="s">20</span>
 </code></pre></div>
 <p>to <code>src/main/resources/application.properties</code> and see how the model cuts off the response after 20 tokens.</p>
 <p>Tokens are not words, but rather the smallest units of text that the model can generate.
@@ -976,7 +976,7 @@ Each model has a different tokenization scheme, so the number of tokens in a sen
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="na">quarkus.langchain4j.openai.chat-model.log-responses</span><span class="o">=</span><span class="s">true</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="na">quarkus.langchain4j.openai.chat-model.temperature</span><span class="o">=</span><span class="s">1.0</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="na">quarkus.langchain4j.openai.chat-model.max-tokens</span><span class="o">=</span><span class="s">1000</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="na">quarkus.langchain4j.openai.chat-model.max-completion-tokens</span><span class="o">=</span><span class="s">1000</span>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="na">quarkus.langchain4j.openai.chat-model.frequency-penalty</span><span class="o">=</span><span class="s">0</span>
 </code></pre></div>
 <p>Let’s now switch to the <a href="../step-03/">next step</a>!</p></div>

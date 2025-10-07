@@ -1193,33 +1193,23 @@ You can pass parameters to AI service methods and include them in the prompt.
 It uses the <a href="https://quarkus.io/guides/qute">Qute</a> template engine underneath.
 This is a powerful feature to allow you to have advanced template logic.</p>
 </div>
-<div class="admonition bug">
-<p class="admonition-title">Tools and streaming responses</p>
-<p>There is a known limitation currently when using (blocking) tools with streaming responses.
-Replace <code>Multi&lt;String&gt;</code> with <code>String</code> in the AI service method signature to avoid this issue and change the call in the <code>dev.langchain4j.quarkus.workshop.CustomerSupportAgentWebSocket</code> accordingly:</p>
-<div class="highlight"><span class="filename">CustomerSupportAgentWebSocket.java</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@OnTextMessage</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="hll"><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">onTextMessage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">customerSupportAgent</span><span class="p">.</span><span class="na">chat</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
-</code></pre></div>
-</div>
 <h2 id="testing-the-function-calling">Testing the function calling<a class="headerlink" href="#testing-the-function-calling" title="Permanent link"></a></h2>
 <p>Let’s test the function calling.
 <mark>Make sure the application is running (<code>./mvnw quarkus:dev</code>).</mark></p>
 <p>Open your browser and go to <a href="http://localhost:8080">http://localhost:8080</a>.
 In the chatbot, let’s try the following interactions:</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Hello, I would like to cancel a booking.
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Hello, I would like to cancel a booking.
 </code></pre></div>
 <p><strong>AI</strong>: Sure, I can help with that. I’ll need a bit more information to proceed: 1. Your first and last name to look up the booking. 2. The booking ID associated with your reservation. Please provide these details so I can assist you further.</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>My name is Speedy McWheels. But, I don't remember the booking ID. Can you list all my future bookings?
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>My name is Speedy McWheels. But, I don't remember the booking ID. Can you list all my future bookings?
 </code></pre></div>
 <p><strong>AI</strong>: Here are your upcoming bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 3. Booking ID: 3 - From: 2025-10-01 - To: 2025-10-07 Please let me know which booking you would like to cancel.</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>I would like to cancel the last one.
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>I would like to cancel the last one.
 </code></pre></div>
 <p><strong>AI</strong>: Your booking from 2025-10-01 to 2025-10-07 has been successfully cancelled. If you need any further assistance, feel free to let me know!</p>
 <p>Here are your current bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 If you need any further assistance, please let me know!</p>
 <p>Alright, let’s try now to cancel an invalid booking:</p>
-<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Can you cancel my booking starting on 2025-07-10?
+<div class="highlight"><span class="filename">You</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Can you cancel my booking starting on 2025-07-10?
 </code></pre></div>
 <p><strong>AI</strong>:  Unfortunately, I cannot cancel your booking starting on 2025-07-10 because the booking period is less than 4 days, and cancellations are not permitted for such bookings. If you have any other questions or need further assistance, please let me know!</p>
 <p><div class="video-container"><video style="width: 80%" controls alt="type:video"><source src="../../images/chat-booking.mp4" type="video/mp4"></source></video></div></p>
