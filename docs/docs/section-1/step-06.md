@@ -79,8 +79,8 @@ Now that we have our embedding model, we need to store the embeddings.
 In the previous step, we used an _in memory_ store.
 Now we will use a persistent store to keep the embeddings between restarts.
 
-There are many options to store the embeddings, like [Redis](https://docs.quarkiverse.io/quarkus-langchain4j/dev/redis-store.html){target="_blank"}, [Infinispan](https://docs.quarkiverse.io/quarkus-langchain4j/dev/infinispan-store.html){target="_blank"}, specialized databases (like [Chroma](https://docs.quarkiverse.io/quarkus-langchain4j/dev/chroma-store.html){target="_blank"}), etc.
-Here, we will use the [PostgreSQL pgVector store](https://docs.quarkiverse.io/quarkus-langchain4j/dev/pgvector-store.html){target="_blank"}, a popular relational database. If you are not able to run Dev Services with Docker or Podman, you can use 
+There are many options to store the embeddings, like [Redis](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-redis.html){target="_blank"}, [Infinispan](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-infinispan-store.html){target="_blank"}, specialized databases (like [Chroma](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-chroma-store.html){target="_blank"}), etc.
+Here, we will use the [PostgreSQL pgVector store](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-pgvector-store.html){target="_blank"}, a popular relational database. If you are not able to run Dev Services with Docker or Podman, you can use
 [an in-memory embedding store](#in-memory-embedding-store).
 
 ==Add the following dependency to your `pom.xml` file:==
