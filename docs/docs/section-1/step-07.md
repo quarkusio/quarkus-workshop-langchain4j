@@ -22,7 +22,7 @@ The result is sent back to the LLM, which can use it to continue the conversatio
 In this step, we are going to see how to implement function calling in our application.
 We will set up a database and create a function that allows the LLM to retrieve data (bookings, customers...) from the database.
 
-The final code is available in the `step-06` folder.
+The final code is available in the `step-07` folder.
 However, we recommend you follow the step-by-step guide to understand how it works, and the different steps to implement this pattern.
 
 ## A couple of new dependencies
