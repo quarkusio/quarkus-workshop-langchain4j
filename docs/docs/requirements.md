@@ -10,8 +10,9 @@
 - **Terminal** – to run commands
 - _(Optional)_ **Git** – [Installation guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git){target="_blank"}
 
-???+ note "Want to use our environment rather than yours?"
-    If you are running this as part of an instructor-led workshop and have been provided a virtual machine, [click here](rhel-setup.md) to learn about how to use it if you'd prefer it over using your own laptop.
+[//]: # (???+ note "Want to use our environment rather than yours?")
+
+[//]: # (    If you are running this as part of an instructor-led workshop and have been provided a virtual machine, [click here]&#40;rhel-setup.md&#41; to learn about how to use it if you'd prefer it over using your own laptop.)
 
 
 ---
