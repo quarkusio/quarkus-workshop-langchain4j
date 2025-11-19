@@ -18,10 +18,10 @@
         <quarkus.platform.version>3.29.3</quarkus.platform.version>
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
-        <quarkus-langchain4j.version>1.3.1</quarkus-langchain4j.version>
+        <quarkus-langchain4j.version>1.4.1</quarkus-langchain4j.version>
         <langchain4j.version>1.6.0</langchain4j.version>
         <langchain4j.beta.version>1.8.0-beta15</langchain4j.beta.version>
-        <a2a.version>0.3.2.Final</a2a.version>
+        <a2a.version>0.3.0.Beta1</a2a.version>
     </properties>
 
     <dependencyManagement>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>io.github.a2asdk</groupId>
             <artifactId>a2a-java-sdk-reference-jsonrpc</artifactId>
-            <version>${a2a.version}</version>
+            <version>0.3.0.Beta1</version>
         </dependency>
     </dependencies>
 

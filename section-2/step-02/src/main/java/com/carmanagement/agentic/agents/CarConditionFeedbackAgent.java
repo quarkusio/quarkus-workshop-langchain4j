@@ -26,7 +26,7 @@ public interface CarConditionFeedbackAgent {
             Rental Feedback: {rentalFeedback}
             Car Wash Feedback: {carWashFeedback}
             """)
-    @Agent(outputName = "carCondition",
+    @Agent(outputKey = "carCondition",
             description = "Car condition analyzer. Determines the current condition of a car based on feedback.")
     String analyzeForCondition(
             String carMake,

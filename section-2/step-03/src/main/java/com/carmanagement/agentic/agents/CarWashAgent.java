@@ -31,7 +31,7 @@ public interface CarWashAgent {
         {carWashRequest}
         """)
     @Agent(description = "Car wash specialist. Determines what car wash services are needed.",
-            outputName = "carWashAgentResult")
+            outputKey = "carWashAgentResult")
     @ToolBox(CarWashTool.class)
     String processCarWash(
             String carMake,

@@ -267,7 +267,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedback
 
 - **System message**: Focuses on economic viability (is the car worth repairing?)
 - **Specific output format**: Returns `"DISPOSITION_NOT_REQUIRED"` when the car is repairable
-- **outputName**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
+- **outputKey**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
 - **Three feedback sources**: Analyzes rental, car wash, and maintenance feedback
 
 **Decision Criteria:**
@@ -297,7 +297,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.ja
 ```java
 @A2AClientAgent(
     a2aServerUrl = "http://localhost:8888",
-    outputName = "dispositionAgentResult",
+    outputKey = "dispositionAgentResult",
     description = "Car disposition specialist. Recommends how to dispose of a car (scrap, sell, donate)."
 )
 ```
@@ -305,7 +305,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.ja
 This annotation transforms the method into an **A2A client**:
 
 - **`a2aServerUrl`**: The URL of the remote A2A server
-- **`outputName`**: Where to store the result in AgenticScope's state
+- **`outputKey`**: Where to store the result in AgenticScope's state
 - **`description`**: Describes the agent's purpose (helps with agent discovery)
 
 #### The Method Signature
@@ -355,7 +355,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 Added `DispositionFeedbackAgent` to the parallel workflow:
 
 ```java
-@SubAgent(type = DispositionFeedbackAgent.class, outputName = "dispositionRequest")
+@SubAgent(type = DispositionFeedbackAgent.class, outputKey = "dispositionRequest")
 ```
 
 Now **three agents run concurrently**:
@@ -381,7 +381,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 #### Added DispositionAgent to SubAgents
 
 ```java
-@SubAgent(type = DispositionAgent.class, outputName = "actionResult")
+@SubAgent(type = DispositionAgent.class, outputKey = "actionResult")
 ```
 
 #### Added Activation Condition

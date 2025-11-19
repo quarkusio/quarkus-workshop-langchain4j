@@ -14,10 +14,9 @@ public interface FeedbackWorkflow {
     /**
      * Runs multiple feedback agents in parallel to analyze different aspects of car feedback.
      */
-    @Agent(outputName = "feedbackResult")
-    @ParallelAgent(outputName = "feedbackResult", subAgents = {
-            @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
-            @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+    @ParallelAgent(outputKey = "feedbackResult", subAgents = {
+            @SubAgent(type = CarWashFeedbackAgent.class, outputKey = "carWashRequest"),
+            @SubAgent(type = MaintenanceFeedbackAgent.class, outputKey = "maintenanceRequest")
     })
     String analyzeFeedback(
             String carMake,
