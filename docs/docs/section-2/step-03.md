@@ -186,7 +186,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedback
 
 - **System message**: Focuses on mechanical issues, performance problems, and maintenance needs
 - **Specific output format**: Returns "MAINTENANCE_NOT_REQUIRED" when no maintenance is needed (for easy conditional checking)
-- **outputName**: `"maintenanceRequest"` — stores the result in AgenticScope's state
+- **outputKey**: `"maintenanceRequest"` — stores the result in AgenticScope's state
 - **Three feedback sources**: Analyzes rental, car wash, AND maintenance feedback
 
 ### Step 2: Create the CarWashFeedbackAgent
@@ -203,7 +203,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `CarWashFeedbackAgen
 
 - **System message**: Focuses on cleanliness issues — dirt, stains, smells
 - **Specific output format**: Returns "CARWASH_NOT_REQUIRED" when no washing is needed
-- **outputName**: `"carWashRequest"` — stores the result in AgenticScope's state
+- **outputKey**: `"carWashRequest"` — stores the result in AgenticScope's state
 - **Same inputs**: Also analyzes all three feedback sources
 
 ---
@@ -226,10 +226,10 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.
 
 ```java
 @ParallelAgent(
-    outputName = "feedbackResult",
+    outputKey = "feedbackResult",
     subAgents = {
-        @SubAgent(type = CarWashFeedbackAgent.class, outputName = "carWashRequest"),
-        @SubAgent(type = MaintenanceFeedbackAgent.class, outputName = "maintenanceRequest")
+        @SubAgent(type = CarWashFeedbackAgent.class, outputKey = "carWashRequest"),
+        @SubAgent(type = MaintenanceFeedbackAgent.class, outputKey = "maintenanceRequest")
     }
 )
 ```
@@ -238,7 +238,7 @@ This defines a **parallel workflow**:
 
 - Both agents execute **concurrently**
 - Improves performance, no waiting for one to finish before the other starts
-- Each agent has its own `outputName` to store results independently
+- Each agent has its own `outputKey` to store results independently
 
 !!! note "Why Parallel Here?"
     The two feedback agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other. 
@@ -304,10 +304,10 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `ActionWorkflow.ja
 
 ```java
 @ConditionalAgent(
-    outputName = "actionResult",
+    outputKey = "actionResult",
     subAgents = {
-        @SubAgent(type = MaintenanceAgent.class, outputName = "actionResult"),
-        @SubAgent(type = CarWashAgent.class, outputName = "actionResult")
+        @SubAgent(type = MaintenanceAgent.class, outputKey = "actionResult"),
+        @SubAgent(type = CarWashAgent.class, outputKey = "actionResult")
     }
 )
 ```
@@ -443,10 +443,10 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 #### The Sequence
 
 ```java
-@SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
-    @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
-    @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
-    @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carProcessingAgentResult")
+@SequenceAgent(outputKey = "carProcessingAgentResult", subAgents = {
+    @SubAgent(type = FeedbackWorkflow.class, outputKey = "carProcessingAgentResult"),
+    @SubAgent(type = ActionWorkflow.class, outputKey = "carProcessingAgentResult"),
+    @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carProcessingAgentResult")
 })
 ```
 
@@ -689,7 +689,7 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 
 ??? warning "Conditional workflow always/never executing certain agents"
     - Verify your `@ActivationCondition` methods are correctly named
-    - Check that parameter names match the `outputName` values exactly
+    - Check that parameter names match the `outputKey` values exactly
     - Add logging to the condition methods to see what values they're receiving
 
 ??? warning "Error: Cannot find symbol 'RequiredAction'"
@@ -699,7 +699,7 @@ Add logging to each agent and workflow to print when they start and finish. Obse
     - Updated `CarConditions` to use it
 
 ??? warning "Agents getting wrong input values"
-    Remember that parameter names must match the `outputName` from previous agents or workflow inputs. Check for typos!
+    Remember that parameter names must match the `outputKey` from previous agents or workflow inputs. Check for typos!
 
 ---
 

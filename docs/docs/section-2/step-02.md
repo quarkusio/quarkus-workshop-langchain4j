@@ -60,7 +60,7 @@ This is where `AgenticScope` comes in.
 - A **shared context** that keeps track throughout a workflow execution.
 - Contains a **map** of key-value pairs that agents can read from and write to: the _state_.
 - This state is automatically populated with **inputs** from the workflow method signature.
-- This state is automatically updated with **outputs** from each agent using their `outputName`.
+- This state is automatically updated with **outputs** from each agent using their `outputKey`.
 
 **How It Works:**
 
@@ -74,8 +74,8 @@ graph LR
     B -->|Extract| E[Workflow Result]
 ```
 
-When an agent completes, its result is stored in the `AgenticScope`'s state using the `outputName` specified in the `@Agent` annotation.
-The next agent in the workflow can access this value as an input parameter using the name specified in the `outputName` annotation.
+When an agent completes, its result is stored in the `AgenticScope`'s state using the `outputKey` specified in the `@Agent` annotation.
+The next agent in the workflow can access this value as an input parameter using the name specified in the `outputKey` annotation.
 
 ---
 
@@ -187,11 +187,11 @@ Provides all the context needed:
 - **Previous condition**: `{carCondition}` — allows the agent to understand changes
 - Feedback from multiple sources: `{rentalFeedback}`, `{carWashFeedback}`
 
-### `@Agent` with `outputName`
-Notice the new **`outputName` parameter**:
+### `@Agent` with `outputKey`
+Notice the new **`outputKey` parameter**:
 
 ```java
-@Agent(outputName = "carCondition", ...)
+@Agent(outputKey = "carCondition", ...)
 ```
 
 This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`. 
@@ -224,7 +224,7 @@ This simple record combines the results from both agents in our workflow.
 
 ## Step 3: Update the CarWashAgent
 
-The `CarWashAgent` needs to specify an `outputName` so its result can be accessed by the workflow.
+The `CarWashAgent` needs to specify an `outputKey` so its result can be accessed by the workflow.
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
 
@@ -234,7 +234,7 @@ Update `src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java`:
 
 **Key change:**
 
-In the `@Agent` annotation, adds `outputName = "carWashAgentResult"` to the `@Agent` annotation. This stores the agent's response in the `AgenticScope`'s state, making it available to subsequent agents and the workflow output method.
+In the `@Agent` annotation, adds `outputKey = "carWashAgentResult"` to the `@Agent` annotation. This stores the agent's response in the `AgenticScope`'s state, making it available to subsequent agents and the workflow output method.
 
 ---
 
@@ -272,15 +272,15 @@ This annotation defines a **sequence workflow**:
 
 ```java
 @SequenceAgent(
-    outputName = "carConditions",
+    outputKey = "carConditions",
     subAgents = {
-        @SubAgent(type = CarWashAgent.class, outputName = "carWashAgentResult"),
-        @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carCondition")
+        @SubAgent(type = CarWashAgent.class, outputKey = "carWashAgentResult"),
+        @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carCondition")
     }
 )
 ```
 
-- **`outputName`**: Where to store the final workflow result in `AgenticScope`'s state
+- **`outputKey`**: Where to store the final workflow result in `AgenticScope`'s state
 - **`subAgents`**: The list of agents to execute in order
   - Agent 1: `CarWashAgent`: determines if washing is needed
   - Agent 2: `CarConditionFeedbackAgent`: updates the car condition
@@ -319,7 +319,7 @@ static CarConditions output(String carCondition, String carWashAgentResult) {
 
 **How it works:**
 
-1. The method parameters (`carCondition`, `carWashAgentResult`) are automatically extracted from the `AgenticScope` by matching their names with the `outputName` values from the agents
+1. The method parameters (`carCondition`, `carWashAgentResult`) are automatically extracted from the `AgenticScope` by matching their names with the `outputKey` values from the agents
 2. The method processes these values (in this case, checking if a car wash is required)
 3. Returns a `CarConditions` object combining both results
 
@@ -473,7 +473,7 @@ sequenceDiagram
 
 1. All workflow inputs are stored in `AgenticScope`'s state
 2. Each agent reads what it needs from the scope's state
-3. Each agent writes its result back to the scope's state using its `outputName`
+3. Each agent writes its result back to the scope's state using its `outputKey`
 4. The `@Output` method extracts specific values from the scope to build the final result
 
 ---
@@ -550,8 +550,8 @@ How does the condition agent synthesize feedback from multiple sources?
 ??? warning "Workflow not updating car condition"
     Check that:
 
-    - The `CarWashAgent` has `outputName = "carWashAgentResult"`
-    - The `CarConditionFeedbackAgent` has `outputName = "carCondition"`
+    - The `CarWashAgent` has `outputKey = "carWashAgentResult"`
+    - The `CarConditionFeedbackAgent` has `outputKey = "carCondition"`
     - The `@Output` method parameter names match these output names exactly
 
 ??? warning "UI not showing Condition column"
