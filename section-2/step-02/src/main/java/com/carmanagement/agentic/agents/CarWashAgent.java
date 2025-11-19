@@ -32,7 +32,7 @@ public interface CarWashAgent {
         Rental Feedback: {rentalFeedback}
         Car Wash Feedback: {carWashFeedback}
         """)
-    @Agent(outputName = "carWashAgentResult",
+    @Agent(outputKey = "carWashAgentResult",
             description = "Car wash specialist. Determines what car wash services are needed.")
     @ToolBox(CarWashTool.class)
     String processCarWash(

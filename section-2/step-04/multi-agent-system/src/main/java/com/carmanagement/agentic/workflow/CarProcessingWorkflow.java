@@ -16,8 +16,8 @@ public interface CarProcessingWorkflow {
      * Processes a car return by running feedback analysis and then appropriate actions.
      */
     @SequenceAgent(outputName = "carProcessingAgentResult", subAgents = {
-            @SubAgent(type = FeedbackWorkflow.class, outputName = "carProcessingAgentResult"),
-            @SubAgent(type = ActionWorkflow.class, outputName = "carProcessingAgentResult"),
+            @SubAgent(type = FeedbackWorkflow.class, outputName = "feedbackResult"),
+            @SubAgent(type = ActionWorkflow.class, outputName = "actionResult"),
             @SubAgent(type = CarConditionFeedbackAgent.class, outputName = "carCondition")
     })
     CarConditions processCarReturn(
