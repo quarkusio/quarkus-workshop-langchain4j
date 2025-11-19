@@ -16,9 +16,9 @@ public interface ActionWorkflow {
      * Runs the appropriate action agent based on the feedback analysis.
      */
     @ConditionalAgent(outputKey = "actionResult", subAgents = {
-            @SubAgent(type = MaintenanceAgent.class, outputKey = "actionResult"),
-            @SubAgent(type = CarWashAgent.class, outputKey = "actionResult"),
-            @SubAgent(type = DispositionAgent.class, outputKey = "actionResult")
+            @SubAgent(type = MaintenanceAgent.class, outputKey = "maintenanceAction"),
+            @SubAgent(type = CarWashAgent.class, outputKey = "carWashAction"),
+            @SubAgent(type = DispositionAgent.class, outputKey = "dispositionAction")
     })
     String processAction(
             String carMake,

@@ -19,6 +19,7 @@
         <quarkus-langchain4j.version>1.4.1</quarkus-langchain4j.version>
         <langchain4j.version>1.6.0</langchain4j.version>
         <langchain4j-beta.version>1.8.0-beta15</langchain4j-beta.version>
+        <a2a.version>0.3.0.Beta1</a2a.version>
     </properties>
 
     <dependencyManagement>
@@ -60,6 +61,12 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-agentic-a2a</artifactId>
+            <version>${langchain4j-beta.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.a2asdk</groupId>
+            <artifactId>a2a-java-sdk-reference-jsonrpc</artifactId>
+            <version>${a2a.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
