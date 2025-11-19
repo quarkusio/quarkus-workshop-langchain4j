@@ -443,10 +443,10 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 #### The Sequence
 
 ```java
-@SequenceAgent(outputKey = "carProcessingAgentResult", subAgents = {
-    @SubAgent(type = FeedbackWorkflow.class, outputKey = "carProcessingAgentResult"),
-    @SubAgent(type = ActionWorkflow.class, outputKey = "carProcessingAgentResult"),
-    @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carProcessingAgentResult")
+    @SequenceAgent(outputKey = "carProcessingAgentResult", subAgents = {
+        @SubAgent(type = FeedbackWorkflow.class, outputKey = "feedbackResult"),
+        @SubAgent(type = ActionWorkflow.class, outputKey = "actionResult"),
+        @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carCondition")
 })
 ```
 
