@@ -27,7 +27,7 @@ public interface DispositionFeedbackAgent {
         Car Wash Feedback: {carWashFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
-    @Agent(outputName="dispositionRequest", description="Car disposition analyzer. Using feedback, determines if a car should be disposed of.")
+    @Agent(outputKey="dispositionRequest", description="Car disposition analyzer. Using feedback, determines if a car should be disposed of.")
     String analyzeForDisposition(
             String carMake,
             String carModel,
