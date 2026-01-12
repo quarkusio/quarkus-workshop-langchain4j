@@ -5,7 +5,6 @@ import com.carmanagement.agentic.agents.CarWashAgent;
 import com.carmanagement.model.CarConditions;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
-import dev.langchain4j.agentic.declarative.SubAgent;
 
 /**
  * Workflow for processing car returns using a sequence of agents.
@@ -15,10 +14,8 @@ public interface CarProcessingWorkflow {
     /**
      * Processes a car return by running feedback analysis and then appropriate actions.
      */
-    @SequenceAgent(outputKey = "carConditions", subAgents = {
-            @SubAgent(type = CarWashAgent.class, outputKey = "carWashAgentResult"),
-            @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carCondition")
-    })
+    @SequenceAgent(outputKey = "carConditions",
+            subAgents = { CarWashAgent.class, CarConditionFeedbackAgent.class })
     CarConditions processCarReturn(
             String carMake,
             String carModel,
