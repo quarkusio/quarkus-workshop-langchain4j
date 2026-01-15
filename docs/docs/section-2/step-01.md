@@ -208,7 +208,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 The `CarManagementService` orchestrates the car return process:
 
-```java hl_lines="37-43 45-47" title="CarManagementService.java"
+```java hl_lines="37-43 45-48" title="CarManagementService.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -287,7 +287,9 @@ Defines the inputs and output:
 
 ## Component 4: The CarWashTool
 
-Tools enable agents to take **actions** in the real world:
+If you went through Section 1, you'll remember that we already covered Tools and Function Calling for single AI services.
+They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
+These tools can be local, like in the following CarWashTool example, or remote, using the MCP protocol we visited in Section 1, Step 8.
 
 ```java hl_lines="4 21 40 47-48" title="CarWashTool.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CarWashTool.java:CarWashTool"

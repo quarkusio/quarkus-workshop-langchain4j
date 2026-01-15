@@ -45,3 +45,5 @@ nb-configuration.xml
 site/
 
 __pycache__/
+
+.continue
