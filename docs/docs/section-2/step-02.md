@@ -1,13 +1,21 @@
-# Step 02 - Composing Simple Agent Workflows
+# Step 02 - Composing Simple Agentic Workflows
+
+## Agentic Workflows
+
+In the previous step, you created a first agent that could autonomously determine whether a returned car needed a car wash or not.
+In the end, implementing this agent was not much different from creating a single AI service like we did in the previous section.
+It did however set us up for building a more advanced agentic system, which is what we're going to start building now.
+In this step, we're going to take a look at how we can orchestrate multiple agents using the concept of **Agentic Workflows**.
 
 ## New Requirement: Track Car Conditions
 
 The Miles of Smiles management team now wants to keep track of the condition of each car in their fleet.
 
-Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded. 
+Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded.
+This leads to inconsistent records and makes it difficult to track the overall condition of the fleet.
 Management wants the system to:
 
-1. **Automatically analyze feedback** from both rental returns and car wash returns
+1. **Automatically analyze feedback** from **both** rental returns and car wash returns
 2. **Update the car's condition** based on this feedback
 3. **Display the current condition** in the fleet management UI
 
@@ -34,7 +42,7 @@ In this step, you will:
 ## Understanding Workflows
 
 With Quarkus LangChain4j, you can compose multiple agents to work together as a _team_.
-Much like the building blocks of a programming language, `quarkus-langchain4j-agentic` provides constructs to build different types of workflows:
+Much like the building blocks of a programming language, `quarkus-langchain4j-agentic` provides a few basic patterns to build different types of workflows:
 
 | Workflow Type | Description | Use Case |
 |--------------|-------------|----------|
@@ -43,39 +51,15 @@ Much like the building blocks of a programming language, `quarkus-langchain4j-ag
 | **Loop** | Agents run repeatedly until a condition is met | When iterative refinement is needed |
 | **Conditional** | Agents only execute if a condition is satisfied | When different paths are needed based on context |
 
+!!!note
+    LangChain4j provides these basic 4 basic workflows out of the box, but it also provides additional
+    building blocks to create more advanced and custom goal-oriented agentic AI patterns such as the Supervisor patterns, GOAP, etc.
+    We will visit those further along in this workshop. For now, let's focus on the basics.
+
 In this step, we'll use a **sequence workflow** to:
 
 1. First, run the `CarWashAgent` to determine if washing is needed
 2. Then, run the `CarConditionFeedbackAgent` to update the car's condition
-
----
-
-## Understanding AgenticScope
-
-To enable agents to work together, they need a way to **share data**. 
-This is where `AgenticScope` comes in.
-
-**What is AgenticScope?**
-
-- A **shared context** that keeps track throughout a workflow execution.
-- Contains a **map** of key-value pairs that agents can read from and write to: the _state_.
-- This state is automatically populated with **inputs** from the workflow method signature.
-- This state is automatically updated with **outputs** from each agent using their `outputKey`.
-
-**How It Works:**
-
-```mermaid
-graph LR
-    A[Workflow Inputs] -->|Populate| B[AgenticScope]
-    B -->|Read state| C[Agent 1]
-    C -->|Write state| B
-    B -->|Read state| D[Agent 2]
-    D -->|Write state| B
-    B -->|Extract| E[Workflow Result]
-```
-
-When an agent completes, its result is stored in the `AgenticScope`'s state using the `outputKey` specified in the `@Agent` annotation.
-The next agent in the workflow can access this value as an input parameter using the name specified in the `outputKey` annotation.
 
 ---
 
@@ -122,7 +106,7 @@ Before starting:
 
 ---
 
-## Option 1: Continue from Step 01
+### Option 1: Continue from Step 01
 
 If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
@@ -150,7 +134,7 @@ These files add the "Condition" column to the UI and update the data model to tr
 
 ---
 
-## Option 2: Start Fresh from Step 02
+### Option 2: Start Fresh from Step 02
 
 Alternatively, navigate to the complete `section-2/step-02` directory:
 
@@ -173,6 +157,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `CarConditionFeedbac
 **Let's break it down:**
 
 ### `@SystemMessage`
+
 Defines the agent's role as a **car condition analyzer**:
 
 - Analyzes feedback to determine current condition
@@ -181,6 +166,7 @@ Defines the agent's role as a **car condition analyzer**:
 - Does not add headers or prefixes (for clean output)
 
 ### `@UserMessage`
+
 Provides all the context needed:
 
 - Car details: `{carMake}`, `{carModel}`, `{carYear}`
@@ -188,14 +174,41 @@ Provides all the context needed:
 - Feedback from multiple sources: `{rentalFeedback}`, `{carWashFeedback}`
 
 ### `@Agent` with `outputKey`
+
 Notice the new **`outputKey` parameter**:
 
 ```java
 @Agent(outputKey = "carCondition", ...)
 ```
 
-This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`. 
+This tells the framework to store the agent's result in the `AgenticScope`'s state under the key `"carCondition"`.
 Other agents or the workflow can then access this value.
+
+!!!note "**Understanding AgenticScope**"
+    To enable agents to work together, they need a way to **share data**.
+    This is where `AgenticScope` comes in.
+
+    **What is AgenticScope?**
+    
+    - A **shared context** that keeps track throughout a workflow execution.
+    - Contains a **map** of key-value pairs that agents can read from and write to: the _state_.
+    - This state is automatically populated with **inputs** from the workflow method signature.
+    - This state is automatically updated with **outputs** from each agent using their `outputKey`.
+    
+    **How It Works:**
+    
+    ```mermaid
+    graph LR
+        A[Workflow Inputs] -->|Populate| B[AgenticScope]
+        B -->|Read state| C[Agent 1]
+        C -->|Write state| B
+        B -->|Read state| D[Agent 2]
+        D -->|Write state| B
+        B -->|Extract| E[Workflow Result]
+    ```
+    
+    When an agent completes, its result is stored in the `AgenticScope`'s state using the `outputKey` specified in the `@Agent` annotation.
+    The next agent in the workflow can access this value as an input parameter using the name specified in the `outputKey` annotation.
 
 ---
 
@@ -335,13 +348,14 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 **What changed?**
 
-### Injection 
+### Injection
+
 ```java
 @Inject
 CarProcessingWorkflow carProcessingWorkflow;
 ```
 
-The workflow interface is injected just like any other CDI bean. 
+The workflow interface is injected just like any other CDI bean.
 Quarkus LangChain4j generates the implementation automatically.
 
 ### Workflow Invocation
@@ -358,10 +372,11 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 );
 ```
 
-Instead of calling agents individually, we call the workflow. 
+Instead of calling agents individually, we call the workflow.
 It returns a `CarConditions` object containing results from both agents.
 
 ### Using the Results
+
 ```java
 // Update the car's condition with the result from CarConditionFeedbackAgent
 carInfo.condition = carConditions.generalCondition();
@@ -396,7 +411,7 @@ The **Fleet Status** section now has a **"Condition"** column showing each car's
 
 In the `Returns > Rental Return` section, enter feedback that indicates a problem with a car:
 
-```
+```text
 there has clearly been a fire in the trunk of this car
 ```
 
@@ -514,7 +529,7 @@ What if you wanted to pass the car's mileage to the condition agent? How would y
 
 Test these scenarios:
 
-```
+```text
 Rental feedback: "Scratch on door"
 Car wash feedback: "Scratch remains after cleaning"
 ```
@@ -526,7 +541,7 @@ How does the condition agent synthesize feedback from multiple sources?
 ## Understanding Parallel vs. Sequence
 
 !!! note "Why Sequence Instead of Parallel?"
-    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback. 
+    You might notice that `CarConditionFeedbackAgent` doesn't actually use the output from `CarWashAgent`, it only looks at the original feedback.
     This means these agents could run in **parallel** for better response time.
 
     We chose a **sequence** workflow in this step because:
