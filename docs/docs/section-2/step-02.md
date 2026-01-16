@@ -260,7 +260,7 @@ Now, create the workflow that orchestrates both agents.
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWorkflow.java`:
 
-```java hl_lines="18-21" title="CarProcessingWorkflow.java"
+```java hl_lines="17-19" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -271,13 +271,9 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWork
 This annotation defines a **sequence workflow**:
 
 ```java
-@SequenceAgent(
-    outputKey = "carConditions",
-    subAgents = {
-        @SubAgent(type = CarWashAgent.class, outputKey = "carWashAgentResult"),
-        @SubAgent(type = CarConditionFeedbackAgent.class, outputKey = "carCondition")
-    }
-)
+    @SequenceAgent(
+            outputKey = "carConditions",
+            subAgents = { CarWashAgent.class, CarConditionFeedbackAgent.class })
 ```
 
 - **`outputKey`**: Where to store the final workflow result in `AgenticScope`'s state

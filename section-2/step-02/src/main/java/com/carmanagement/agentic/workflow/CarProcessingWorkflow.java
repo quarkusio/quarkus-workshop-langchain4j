@@ -14,7 +14,8 @@ public interface CarProcessingWorkflow {
     /**
      * Processes a car return by running feedback analysis and then appropriate actions.
      */
-    @SequenceAgent(outputKey = "carConditions",
+    @SequenceAgent(
+            outputKey = "carConditions",
             subAgents = { CarWashAgent.class, CarConditionFeedbackAgent.class })
     CarConditions processCarReturn(
             String carMake,
