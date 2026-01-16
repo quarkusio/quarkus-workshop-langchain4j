@@ -1,19 +1,20 @@
 package com.carmanagement.agentic.tools;
 
-import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.CarStatus;
-import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.Dependent;
 import jakarta.transaction.Transactional;
 
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.CarStatus;
+import dev.langchain4j.agent.tool.Tool;
+
 /**
- * Tool for requesting car wash operations.
+ * Tool for requesting cleaning operations.
  */
 @Dependent
-public class CarWashTool {
+public class CleaningTool {
 
     /**
-     * Requests a car wash based on the provided parameters.
+     * Requests a cleaning based on the provided parameters.
      *
      * @param carNumber The car number
      * @param carMake The car make
@@ -23,12 +24,12 @@ public class CarWashTool {
      * @param interiorCleaning Whether to request interior cleaning
      * @param detailing Whether to request detailing
      * @param waxing Whether to request waxing
-     * @param requestText The car wash request text
-     * @return A summary of the car wash request
+     * @param requestText The cleaning request text
+     * @return A summary of the cleaning request
      */
-    @Tool("Requests a car wash with the specified options")
+    @Tool("Requests a cleaning with the specified options")
     @Transactional    
-    public String requestCarWash(
+    public String requestCleaning(
             Long carNumber,
             String carMake,
             String carModel,
@@ -39,24 +40,24 @@ public class CarWashTool {
             boolean waxing,
             String requestText) {
         
-        // In a real implementation, this would make an API call to a car wash service
-        // or update a database with the car wash request
+        // In a real implementation, this would make an API call to a cleaning service
+        // or update a database with the cleaning request
         
-        // Update car status to AT_CAR_WASH
+        // Update car status to AT_CLEANING
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo != null) {
-            carInfo.status = CarStatus.AT_CAR_WASH;
+            carInfo.status = CarStatus.AT_CLEANING;
             carInfo.persist();
         }
         
-        String result = generateCarWashSummary(carNumber, carMake, carModel, carYear,
+        String result = generateCleaningSummary(carNumber, carMake, carModel, carYear,
                                               exteriorWash, interiorCleaning, detailing,
                                               waxing, requestText);
-        System.out.println("\uD83D\uDE97 CarWashTool result: " + result);
+        System.out.println("\uD83D\uDE97 CleaningTool result: " + result);
         return result;
     }
 
-    private String generateCarWashSummary(
+    private String generateCleaningSummary(
             Long carNumber,
             String carMake,
             String carModel,
@@ -68,7 +69,7 @@ public class CarWashTool {
             String requestText) {
 
         StringBuilder summary = new StringBuilder();
-        summary.append("Car wash requested for ").append(carMake).append(" ")
+        summary.append("Cleaning requested for ").append(carMake).append(" ")
                .append(carModel).append(" (").append(carYear).append("), Car #")
                .append(carNumber).append(":\n");
         

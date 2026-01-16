@@ -5,7 +5,7 @@ package com.carmanagement.model;
  */
 public enum CarStatus {
     RENTED("rented"),
-    AT_CAR_WASH("at car wash"),
+    AT_CLEANING("at cleaning"),
     AVAILABLE("available to rent");
     
     private final String value;

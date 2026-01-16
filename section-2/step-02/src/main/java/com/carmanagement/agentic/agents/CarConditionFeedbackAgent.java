@@ -1,9 +1,8 @@
 package com.carmanagement.agentic.agents;
 
+import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.V;
-import dev.langchain4j.agentic.Agent;
 
 /**
  * Agent that analyzes feedback to update the car condition.
@@ -24,7 +23,7 @@ public interface CarConditionFeedbackAgent {
             Previous Condition: {carCondition}
             
             Rental Feedback: {rentalFeedback}
-            Car Wash Feedback: {carWashFeedback}
+            Cleaning Feedback: {cleaningFeedback}
             """)
     @Agent(outputKey = "carCondition",
             description = "Car condition analyzer. Determines the current condition of a car based on feedback.")
@@ -35,5 +34,5 @@ public interface CarConditionFeedbackAgent {
             Long carNumber,
             String carCondition,
             String rentalFeedback,
-            String carWashFeedback);
+            String cleaningFeedback);
 }
