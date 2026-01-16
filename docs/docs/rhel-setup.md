@@ -29,7 +29,7 @@ Now comes the tricky part. We need to copy and paste the workshop URL from our h
 
 ![Control Bar](images/rhel-control-bar.png)
 
-When you click on it, you will see the control bar expand. Select the clipboard icon, and now you should see a clipboard field which will allow you to copy text between your host and your VM. Copy the workshop url: [https://quarkusio.github.io/quarkus-langchain4j-workshop/rhel-setup](https://quarkusio.github.io/quarkus-langchain4j-workshop/rhel-setup) and paste it in this field. Now paste the same value in the Firefox browser address bar to pull up the workshop instructions.
+When you click on it, you will see the control bar expand. Select the clipboard icon, and now you should see a clipboard field which will allow you to copy text between your host and your VM. Copy the workshop url: [https://quarkusio.github.io/quarkus-workshop-langchain4j/rhel-setup](https://quarkusio.github.io/quarkus-workshop-langchain4j/rhel-setup) and paste it in this field. Now paste the same value in the Firefox browser address bar to pull up the workshop instructions.
 
 ![Clipboard](images/rhel-clipboard-url.png)
 

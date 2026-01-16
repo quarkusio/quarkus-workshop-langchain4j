@@ -1,4 +1,4 @@
-# quarkus-langchain4j-workshop
+# quarkus-workshop-langchain4j
 
 A workshop to learn how to build AI-Infused applications with Quarkus and LangChain4j.
 

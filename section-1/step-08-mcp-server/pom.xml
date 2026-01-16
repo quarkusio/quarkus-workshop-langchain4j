@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.quarkiverse.langchain4j</groupId>
-    <artifactId>quarkus-langchain4j-workshop-08-mcp-server</artifactId>
+    <artifactId>quarkus-workshop-langchain4j-08-mcp-server</artifactId>
     <name>Quarkus LangChain4j - Sample - Model Context Protocol Server</name>
     <version>1.0-SNAPSHOT</version>
 
