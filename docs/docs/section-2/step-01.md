@@ -8,7 +8,7 @@ In **Section 2**, we're shifting gears to explore **agentic systems** — autono
 
 ### What You'll Learn
 
-In this step, you will:
+In this section, you will:
 
 - Understand the difference between **AI Services** (Section 1) and **AI Agents** (Section 2)
 - Build your first autonomous agent using the `quarkus-langchain4j-agentic` module
@@ -20,31 +20,31 @@ In this step, you will:
 ## A New Scenario: Car Management System
 
 The **Miles of Smiles** car rental company needs help managing their fleet. 
-Here's the business process:
+Here's the business process flow:
 
 1. **Rental Returns**: When customers return cars, the rental team records feedback about the car's condition.
-2. **Car Wash Requests**: Based on the feedback, the system should automatically decide if the car needs cleaning.
-3. **Car Wash Returns**: After cleaning, the car wash team provides their own feedback and returns the car.
+2. **Cleaning Requests**: Based on the feedback, the system should automatically decide if the car needs cleaning.
+3. **Cleaning Returns**: After cleaning, the team provides their own feedback and returns the car.
 4. **Fleet Availability**: Clean cars with no issues return to the available pool for rental.
 
-Your job is to build an **AI agent** that can analyze feedback and _intelligently_ decide whether to request a car wash.
+Your job is to build an **AI agent** that can analyze feedback and _intelligently_ decide whether to request a cleaning.
 
 ---
 
 ## AI Services vs. AI Agents
 
-Before diving into the code, let's clarify the key differences:
+Before diving in, let's clarify some key differences:
 
-| Feature | AI Services (Section 1) | AI Agents (Section 2)                                     |
-|---------|------------------------|-----------------------------------------------------------|
-| **Purpose** | Answer user questions | Perform autonomous tasks                                  |
-| **Interaction** | Reactive (responds to prompts) | Reactive and Proactive (takes actions)                    |
-| **Tool Usage** | Can call tools when needed | Can call tools to accomplish goals                        |
-| **Workflows** | Single-agent interactions | Multi-agent collaboration  (workflow or supervisor-based) |
-| **Annotation** | Methods use `@SystemMessage` + `@UserMessage` | One method per interface uses `@Agent`                    |
-| **Use Cases** | Chatbots, Q&A, content generation | Automation, decision-making, orchestration                |
+| Feature         | AI Services (Section 1)                         | AI Agents (Section 2)                                                                                                                                                                                                            |
+|-----------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Purpose**     | Answer user questions                           | Perform autonomous tasks                                                                                                                                                                                                         |
+| **Interaction** | Reactive (responds to prompts)                  | Reactive and Proactive (takes actions)                                                                                                                                                                                           |
+| **Tool Usage**  | Can call tools when needed                      | Can call tools to accomplish goals                                                                                                                                                                                               |
+| **Workflows**   | Single-agent interactions                       | Multi-agent collaboration  ([workflow](https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns){target="_blank"} or [supervisor-based](https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai){target="_blank"} |
+| **Annotation**  | Methods use `@SystemMessage` and `@UserMessage` | One method per interface (using `@Agent`)                                                                                                                                                                                        |
+| **Use Cases**   | Chatbots, Q&A, content generation               | Automation, decision-making, orchestration                                                                                                                                                                                       |
 
-In this section, you'll see how agents extend the capabilities you learned in Section 1 to build sophisticated, autonomous systems.
+In this section, you'll see how agents extend the capabilities you created in Section 1 to build sophisticated, intelligent, and autonomous systems.
 
 ---
 
@@ -81,8 +81,8 @@ Once started, open your browser to [http://localhost:8080](http://localhost:8080
 
 The application has two main sections:
 
-1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status
-2. **Returns** (bottom): Displays cars that are currently rented or at the car wash
+1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status.
+2. **Returns** (bottom): Displays cars that are currently rented or being cleaned.
 
 ![Agentic App UI](../images/agentic-UI-1.png){: .center}
 
@@ -106,13 +106,13 @@ Click the **Return** button.
 
 - The agent analyzes the feedback
 - Recognizes the car needs cleaning
-- Calls the `CarWashTool` to request interior cleaning
-- Updates the car's status to `AT_CAR_WASH`
+- Calls the `CleaningTool` to request interior cleaning
+- Updates the car's status to `AT_CLEANING`
 
 Check your terminal logs (you may need to scroll up). You should see output like:
 
 ```
-🚗 CarWashTool result: Car wash requested for Mercedes-Benz C-Class (2020), Car #6:
+🚗 CleaningTool result: Cleaning requested for Mercedes-Benz C-Class (2020), Car #6:
 - Interior cleaning
 Additional notes: Interior cleaning required due to dog hair in back seat.
 ```
@@ -129,22 +129,22 @@ Car looks good
 
 - The agent analyzes the feedback
 - Determines no cleaning is needed
-- Returns `CARWASH_NOT_REQUIRED` (no tool call made)
+- Returns `CLEANING_NOT_REQUIRED` (no tool call made)
 - Updates the car's status to `AVAILABLE`
 
 In your logs, you'll see the agent's response contains:
 
 ```
-"content":"CARWASH_NOT_REQUIRED"
+"content":"CLEANING_NOT_REQUIRED"
 ```
 
-Notice how the agent **made a decision** without calling the car wash tool. This demonstrates reasoning!
+Notice how the agent **made a decision** without calling the cleaning tool. This demonstrates reasoning!
 
 ---
 
 ## Building Agents with Quarkus LangChain4j
 
-The [langchain4j-agentic](https://github.com/langchain4j/langchain4j/tree/main/langchain4j-agentic){target="_blank"} module introduces the ability to create AI Agents.
+The [langchain4j-agentic](https://docs.langchain4j.dev/tutorials/agents){target="_blank"} module introduces the ability to create AI Agents.
 This module is available in Quarkus using the `quarkus-langchain4j-agentic` module.
 If you open the `pom.xml` file from the project, you will see this dependency:
 
@@ -157,7 +157,7 @@ If you open the `pom.xml` file from the project, you will see this dependency:
 
 ### Key Concepts
 
-Agents share similarities with AI Services from Section 1:
+Agents share similarities with AI Services from [Section 1](../section-1/step-01.md){target="_blank"}:
 
 - Declared as interfaces (implementation generated automatically)
 - Use `@SystemMessage` to define the agent's role and behavior
@@ -168,7 +168,7 @@ Agents share similarities with AI Services from Section 1:
 ### Key Differences
 
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
-- Designed to be composed with for **workflows** or be invoked by a supervisor — agents can be composed together (more on this in Step 02)
+- Designed to be composed with for **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
 - Focus on **autonomous actions** rather than conversational responses
 
 ---
@@ -181,8 +181,8 @@ The application consists of four main components:
 
 1. **CarManagementResource**: REST API endpoints
 2. **CarManagementService**: Business logic and agent orchestration
-3. **CarWashAgent**: AI agent that decides if cleaning is needed
-4. **CarWashTool**: Tool that requests car wash services
+3. **CleaningAgent**: AI agent that decides if cleaning is needed
+4. **CleaningTool**: Tool that requests cleaning services
 
 Let's explore each component.
 
@@ -199,7 +199,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 **Key Points:**
 
 - The `processRentalReturn` method (endpoint `/car-management/rental-return/{carNumber}`):  Accepts feedback from the rental team
-- The `processCarWashReturn` method (endpoint `/car-management/car-wash-return/{carNumber}`): Accepts feedback from the car wash team
+- The `processCleaningReturn` method (endpoint `/car-management/cleaningReturn/{carNumber}`): Accepts feedback from the cleaning team
 - Both endpoints delegate to `CarManagementService.processCarReturn`
 
 ---
@@ -208,27 +208,27 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 The `CarManagementService` orchestrates the car return process:
 
-```java hl_lines="37-43 45-48" title="CarManagementService.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java"
+```java hl_lines="10 16-28" title="CarManagementService.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
 ```
 
 **Key Points:**
 
-- The `CarWashAgent` field is injected as a CDI bean
-- In the `processCarReturn` method, the agent is invoked with car details and feedback. The response is checked for `CARWASH_NOT_REQUIRED`:
+- The `CleaningAgent` field is injected as a CDI bean
+- In the `processCarReturn` method, the agent is invoked with car details and feedback. The response is checked for `CLEANING_NOT_REQUIRED`:
     * If found → Car marked as `AVAILABLE`
-    * If not found → Car stays `AT_CAR_WASH` (tool was called)
+    * If not found → Car stays `AT_CLEANING` (tool was called)
 
 This simple pattern allows you to ***integrate autonomous decision-making into your business logic***!
 
 ---
 
-## Component 3: The CarWashAgent
+## Component 3: The CleaningAgent
 
 Here's where the *magic* happens — the AI agent definition:
 
-```java hl_lines="19 32-33" title="CarWashAgent.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CarWashAgent.java"
+```java hl_lines="6-11 23-24" title="CleaningAgent.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java:cleaningAgent"
 ```
 
 **Let's break it down:**
@@ -236,35 +236,35 @@ Here's where the *magic* happens — the AI agent definition:
 ### `@SystemMessage`
 Defines the agent's **role** and **decision-making logic**:
 
-- Acts as the intake specialist for the car wash department
-- Should call the `requestCarWash` function in the `CarWashTool` when cleaning is needed
+- Acts as the intake specialist for the cleaning department
+- Should call the `requestCleaning` function in the `CleaningTool` when cleaning is needed
 - Should be specific about which services to request
-- Should return `CARWASH_NOT_REQUIRED` if no cleaning is needed
+- Should return `CLEANING_NOT_REQUIRED` if no cleaning is needed
 
 !!! tip "Pro Tip: Clear Instructions Matter"
     The system message is critical! It tells the agent:
 
-    - **WHO** it is (car wash intake specialist)
-    - **WHAT** to do (submit car wash requests)
+    - **WHO** it is (cleaning intake specialist)
+    - **WHAT** to do (submit cleaning requests)
     - **WHEN** to act (based on feedback)
-    - **HOW** to respond (specific services or `CARWASH_NOT_REQUIRED`)
+    - **HOW** to respond (specific services or `CLEANING_NOT_REQUIRED`)
 
 ### `@UserMessage` 
 Provides **context** for each request using template variables:
 
 - Car details: `{carMake}`, `{carModel}`, `{carYear}`, `{carNumber}`
-- Feedback sources: `{rentalFeedback}`, `{carWashFeedback}`
+- Feedback sources: `{rentalFeedback}`, `{cleaningFeedback}`
 
 These variables are automatically populated from the method parameters.
 
 ### `@Agent`
 Marks this as an **agent method** — only one per interface.
 
-- Provides a description: "Car wash specialist. Determines what car wash services are needed."
+- Provides a description: "Cleaning specialist. Determines what cleaning services are needed."
 - This description can be used by other agents or systems to understand this agent's purpose
 
 ### `@ToolBox`
-Assigns the `CarWashTool` to this agent:
+Assigns the `CleaningTool` to this agent:
 
 - The agent can call methods in this tool to perform actions
 - The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)
@@ -273,7 +273,7 @@ Assigns the `CarWashTool` to this agent:
 Defines the inputs and output:
 
 - **Inputs**: All the context the agent needs to make decisions
-- **Output**: `String` — the agent's response (either tool result or `CARWASH_NOT_REQUIRED`)
+- **Output**: `String` — the agent's response (either tool result or `CLEANING_NOT_REQUIRED`)
 
 !!! info "No Implementation Required"
     Notice there's **no method body**! LangChain4j automatically generates the implementation:
@@ -285,14 +285,14 @@ Defines the inputs and output:
 
 ---
 
-## Component 4: The CarWashTool
+## Component 4: The CleaningTool
 
-If you went through Section 1, you'll remember that we already covered Tools and Function Calling for single AI services.
+If you went through Section 1, you'll remember that we already covered [tool and function calling](../section-1/step-07.md){target="_blank"} for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
-These tools can be local, like in the following CarWashTool example, or remote, using the MCP protocol we visited in Section 1, Step 8.
+These tools can be local, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md){target="_blank"}..
 
-```java hl_lines="4 21 40 47-48" title="CarWashTool.java"
---8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CarWashTool.java:CarWashTool"
+```java hl_lines="4 21 40 47-48" title="CleaningTool.java"
+--8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CleaningTool.java:CleaningTool"
 ```
 
 **Key Points:**
@@ -301,22 +301,8 @@ These tools can be local, like in the following CarWashTool example, or remote, 
 - `@Tool` annotation exposes this method to agents
     - The description helps the LLM understand when to use this tool
     - Parameters define what information the agent must provide
-- The method updates the car status to `AT_CAR_WASH`, if the `carInfo` is not `null`
+- The method updates the car status to `AT_CLEANING`, if the `carInfo` is not `null`
 - The method returns a summary of the request (and prints a log messages)
-
-### Understanding Tool Execution Flow
-
-Here is the sequence of actions happening when the agent is invoked:
-
-1. Agent receives car return feedback (entered by the user)
-2. LLM analyzes the feedback
-3. LLM decides to call `requestCarWash` (or not, depending on the feedback)
-4. If called, LLM determines which parameters to use:
-     - Should `interiorCleaning` be true?
-     - Should `exteriorWash` be true?
-     - What `requestText` should be included?
-5. Tool executes and returns a result
-6. Agent receives the result and can respond
 
 ??? question "Why do we use @Dependent scope for the Tool?"
     When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
@@ -332,6 +318,20 @@ Here is the sequence of actions happening when the agent is invoked:
 
 ---
 
+### Understanding Tool Execution Flow
+
+Here is the sequence of actions happening when the agent is invoked:
+
+1. Agent receives car return feedback (entered by the user)
+2. LLM analyzes the feedback
+3. LLM decides to call `requestCleaning` (or not, depending on the feedback)
+4. If called, LLM determines which parameters to use:
+     - Should `interiorCleaning` be true?
+     - Should `exteriorWash` be true?
+     - What `requestText` should be included?
+5. Tool executes and returns a result
+6. Agent receives the result and can respond
+
 ## How It All Works Together
 
 Let's trace through a complete example:
@@ -343,21 +343,21 @@ sequenceDiagram
     participant User
     participant REST as CarManagementResource
     participant Service as CarManagementService
-    participant Agent as CarWashAgent
+    participant Agent as CleaningAgent
     participant LLM as OpenAI LLM
-    participant Tool as CarWashTool
+    participant Tool as CleaningTool
 
     User->>REST: POST /rental-return/6<br/>feedback: "Dog hair in back seat"
     REST->>Service: processCarReturn(6, "Dog hair...", "")
-    Service->>Agent: processCarWash(...)
-    Agent->>LLM: System: You handle car wash intake...<br/>User: Car #6, feedback: "Dog hair..."
+    Service->>Agent: processCleaning(...)
+    Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #6, feedback: "Dog hair..."
     LLM->>LLM: Analyze feedback<br/>Decision: Needs interior cleaning
-    LLM->>Tool: requestCarWash(<br/>  carNumber: 6,<br/>  interiorCleaning: true,<br/>  requestText: "Dog hair removal"<br/>)
-    Tool->>Tool: Update car status to AT_CAR_WASH
-    Tool-->>LLM: "Car wash requested: Interior cleaning..."
-    LLM-->>Agent: "Car wash requested: Interior cleaning..."
-    Agent-->>Service: "Car wash requested: Interior cleaning..."
-    Service->>Service: Check if contains "CARWASH_NOT_REQUIRED"<br/>No → Keep status AT_CAR_WASH
+    LLM->>Tool: requestCleaning(<br/>  carNumber: 6,<br/>  interiorCleaning: true,<br/>  requestText: "Dog hair removal"<br/>)
+    Tool->>Tool: Update car status to AT_CLEANING
+    Tool-->>LLM: "Cleaning requested: Interior cleaning..."
+    LLM-->>Agent: "Cleaning requested: Interior cleaning..."
+    Agent-->>Service: "Cleaning requested: Interior cleaning..."
+    Service->>Service: Check if contains "CLEANING_NOT_REQUIRED"<br/>No → Keep status AT_CLEANING
     Service-->>REST: Result message
     REST-->>User: 200 OK
 ```
@@ -369,17 +369,17 @@ sequenceDiagram
     participant User
     participant REST as CarManagementResource
     participant Service as CarManagementService
-    participant Agent as CarWashAgent
+    participant Agent as CleaningAgent
     participant LLM as OpenAI LLM
 
     User->>REST: POST /rental-return/3<br/>feedback: "Car looks good"
     REST->>Service: processCarReturn(3, "Car looks good", "")
-    Service->>Agent: processCarWash(...)
-    Agent->>LLM: System: You handle car wash intake...<br/>User: Car #3, feedback: "Car looks good"
+    Service->>Agent: processCleaning(...)
+    Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #3, feedback: "Car looks good"
     LLM->>LLM: Analyze feedback<br/>Decision: No cleaning needed
-    LLM-->>Agent: "CARWASH_NOT_REQUIRED"
-    Agent-->>Service: "CARWASH_NOT_REQUIRED"
-    Service->>Service: Check if contains "CARWASH_NOT_REQUIRED"<br/>Yes → Set status to AVAILABLE
+    LLM-->>Agent: "CLEANING_NOT_REQUIRED"
+    Agent-->>Service: "CLEANING_NOT_REQUIRED"
+    Service->>Service: Check if contains "CLEANING_NOT_REQUIRED"<br/>Yes → Set status to AVAILABLE
     Service-->>REST: Result message
     REST-->>User: 200 OK
 ```
@@ -388,11 +388,11 @@ sequenceDiagram
 
 ## Key Takeaways
 
-**Agents are autonomous**: They make decisions and take actions based on context.
-**Tools enable actions**: Agents use tools to interact with systems (databases, APIs, etc.)
-**Clear prompts matter**: The `@SystemMessage` guides the agent's decision-making
-**Type-safe interfaces**: No manual API calls — just define interfaces and let Quarkus LangChain4j handle the rest
-**CDI integration**: Agents and tools are managed beans that integrate seamlessly with Quarkus
+- **Agents are autonomous**: They make decisions and take actions based on context.
+- **Tools enable actions**: Agents use tools to interact with systems (databases, APIs, etc.)
+- **Clear prompts matter**: The `@SystemMessage` guides the agent's decision-making
+- **Type-safe interfaces**: No manual API calls — just define interfaces and let Quarkus LangChain4j handle the rest
+- **CDI integration**: Agents and tools are managed beans that integrate seamlessly with Quarkus
 
 ---
 
@@ -416,18 +416,18 @@ Minor scratch on the bumper
 Spotless condition
 ```
 
-What does the agent decide for each? Does it call the car wash tool?
+What does the agent decide for each? Does it call the cleaning tool?
 
 ### 2. Modify the System Message
 
-Edit `CarWashAgent.java` and change the system message. For example:
+Edit `CleaningAgent.java` and change the system message. For example:
 
 ```java
 @SystemMessage("""
-    You are a very picky car wash intake specialist.
+    You are a very picky cleaning intake specialist.
     Request a full detail (exterior, interior, waxing, detailing)
     unless the car is absolutely perfect.
-    If perfect, respond with "CARWASH_NOT_REQUIRED".
+    If perfect, respond with "CLEANING_NOT_REQUIRED".
     """)
 ```
 
@@ -435,7 +435,7 @@ How does this change the agent's behavior?
 
 ### 3. Add More Tool Parameters
 
-Edit `CarWashTool.java` to add a `tireCleaning` parameter. 
+Edit `CleaningTool.java` to add a `tireCleaning` parameter. 
 Does the agent automatically learn to use it?
 
 ---
