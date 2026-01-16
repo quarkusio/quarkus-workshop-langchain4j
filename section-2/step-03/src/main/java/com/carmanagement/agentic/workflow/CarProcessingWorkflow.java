@@ -23,17 +23,17 @@ public interface CarProcessingWorkflow {
             Long carNumber,
             String carCondition,
             String rentalFeedback,
-            String carWashFeedback,
+            String cleaningFeedback,
             String maintenanceFeedback);
 
     @Output
-    static CarConditions output(String carCondition, String maintenanceRequest, String carWashRequest) {
+    static CarConditions output(String carCondition, String maintenanceRequest, String cleaningRequest) {
         RequiredAction requiredAction;
         // Check maintenance first (higher priority)
         if (isRequired(maintenanceRequest)) {
             requiredAction = RequiredAction.MAINTENANCE;
-        } else if (isRequired(carWashRequest)) {
-            requiredAction = RequiredAction.CAR_WASH;
+        } else if (isRequired(cleaningRequest)) {
+            requiredAction = RequiredAction.CLEANING;
         } else {
             requiredAction = RequiredAction.NONE;
         }

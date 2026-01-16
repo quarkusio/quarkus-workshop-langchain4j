@@ -1,13 +1,14 @@
 package com.carmanagement.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
 import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
 import com.carmanagement.model.RequiredAction;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 
 /**
  * Service for managing car returns from various operations.
@@ -23,12 +24,12 @@ public class CarManagementService {
      *
      * @param carNumber The car number
      * @param rentalFeedback Optional rental feedback
-     * @param carWashFeedback Optional car wash feedback
+     * @param cleaningFeedback Optional cleaning feedback
      * @param maintenanceFeedback Optional maintenance feedback
      * @return Result of the processing
      */
     @Transactional
-    public String processCarReturn(Long carNumber, String rentalFeedback, String carWashFeedback, String maintenanceFeedback) {
+    public String processCarReturn(Long carNumber, String rentalFeedback, String cleaningFeedback, String maintenanceFeedback) {
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
@@ -42,7 +43,7 @@ public class CarManagementService {
                 carNumber,
                 carInfo.condition,
                 rentalFeedback != null ? rentalFeedback : "",
-                carWashFeedback != null ? carWashFeedback : "",
+                cleaningFeedback != null ? cleaningFeedback : "",
                 maintenanceFeedback != null ? maintenanceFeedback : "");
 
         // Update the car's condition with the result from CarConditionFeedbackAgent
