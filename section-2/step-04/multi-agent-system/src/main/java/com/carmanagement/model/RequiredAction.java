@@ -6,6 +6,6 @@ package com.carmanagement.model;
 public enum RequiredAction {
     DISPOSITION,
     MAINTENANCE,
-    CAR_WASH,
+    CLEANING,
     NONE
 }
