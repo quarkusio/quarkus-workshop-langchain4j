@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#step-02-composing-simple-agent-workflows" class="md-skip">
+        <a href="#step-02-composing-simple-agentic-workflows" class="md-skip">
           Skip to content
         </a>
       
@@ -687,6 +687,15 @@ You are not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#agentic-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agentic Workflows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#new-requirement-track-car-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       New Requirement: Track Car Conditions
@@ -714,15 +723,6 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#understanding-agenticscope" class="md-nav__link">
-    <span class="md-ellipsis">
-      Understanding AgenticScope
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-are-we-going-to-build" class="md-nav__link">
     <span class="md-ellipsis">
       What Are We Going to Build?
@@ -738,9 +738,10 @@ You are not viewing the latest version.
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#option-1-continue-from-step-01" class="md-nav__link">
     <span class="md-ellipsis">
       Option 1: Continue from Step 01
@@ -748,13 +749,18 @@ You are not viewing the latest version.
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#option-2-start-fresh-from-step-02" class="md-nav__link">
     <span class="md-ellipsis">
       Option 2: Start Fresh from Step 02
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1190,6 +1196,15 @@ You are not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#agentic-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agentic Workflows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#new-requirement-track-car-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       New Requirement: Track Car Conditions
@@ -1217,15 +1232,6 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#understanding-agenticscope" class="md-nav__link">
-    <span class="md-ellipsis">
-      Understanding AgenticScope
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-are-we-going-to-build" class="md-nav__link">
     <span class="md-ellipsis">
       What Are We Going to Build?
@@ -1241,9 +1247,10 @@ You are not viewing the latest version.
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#option-1-continue-from-step-01" class="md-nav__link">
     <span class="md-ellipsis">
       Option 1: Continue from Step 01
@@ -1251,13 +1258,18 @@ You are not viewing the latest version.
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#option-2-start-fresh-from-step-02" class="md-nav__link">
     <span class="md-ellipsis">
       Option 2: Start Fresh from Step 02
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1585,13 +1597,19 @@ You are not viewing the latest version.
   
 
 
-<div><h1 id="step-02-composing-simple-agent-workflows">Step 02 - Composing Simple Agent Workflows<a class="headerlink" href="#step-02-composing-simple-agent-workflows" title="Permanent link"></a></h1>
+<div><h1 id="step-02-composing-simple-agentic-workflows">Step 02 - Composing Simple Agentic Workflows<a class="headerlink" href="#step-02-composing-simple-agentic-workflows" title="Permanent link"></a></h1>
+<h2 id="agentic-workflows">Agentic Workflows<a class="headerlink" href="#agentic-workflows" title="Permanent link"></a></h2>
+<p>In the previous step, you created a first agent that could autonomously determine whether a returned car needed a car wash or not.
+In the end, implementing this agent was not much different from creating a single AI service like we did in the previous section.
+It did however set us up for building a more advanced agentic system, which is what we’re going to start building now.
+In this step, we’re going to take a look at how we can orchestrate multiple agents using the concept of <strong>Agentic Workflows</strong>.</p>
 <h2 id="new-requirement-track-car-conditions">New Requirement: Track Car Conditions<a class="headerlink" href="#new-requirement-track-car-conditions" title="Permanent link"></a></h2>
 <p>The Miles of Smiles management team now wants to keep track of the condition of each car in their fleet.</p>
-<p>Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded. 
+<p>Currently, when cars are returned (either from rentals or from the car wash), feedback is provided but not systematically recorded.
+This leads to inconsistent records and makes it difficult to track the overall condition of the fleet.
 Management wants the system to:</p>
 <ol>
-<li><strong>Automatically analyze feedback</strong> from both rental returns and car wash returns</li>
+<li><strong>Automatically analyze feedback</strong> from <strong>both</strong> rental returns and car wash returns</li>
 <li><strong>Update the car’s condition</strong> based on this feedback</li>
 <li><strong>Display the current condition</strong> in the fleet management UI</li>
 </ol>
@@ -1614,7 +1632,7 @@ This is different from the supervisor pattern where a special agent determines w
 <hr>
 <h2 id="understanding-workflows">Understanding Workflows<a class="headerlink" href="#understanding-workflows" title="Permanent link"></a></h2>
 <p>With Quarkus LangChain4j, you can compose multiple agents to work together as a <em>team</em>.
-Much like the building blocks of a programming language, <code>quarkus-langchain4j-agentic</code> provides constructs to build different types of workflows:</p>
+Much like the building blocks of a programming language, <code>quarkus-langchain4j-agentic</code> provides a few basic patterns to build different types of workflows:</p>
 <table>
 <thead>
 <tr>
@@ -1646,32 +1664,17 @@ Much like the building blocks of a programming language, <code>quarkus-langchain
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LangChain4j provides these basic 4 basic workflows out of the box, but it also provides additional
+building blocks to create more advanced and custom goal-oriented agentic AI patterns such as the Supervisor patterns, GOAP, etc.
+We will visit those further along in this workshop. For now, let’s focus on the basics.</p>
+</div>
 <p>In this step, we’ll use a <strong>sequence workflow</strong> to:</p>
 <ol>
 <li>First, run the <code>CarWashAgent</code> to determine if washing is needed</li>
 <li>Then, run the <code>CarConditionFeedbackAgent</code> to update the car’s condition</li>
 </ol>
-<hr>
-<h2 id="understanding-agenticscope">Understanding AgenticScope<a class="headerlink" href="#understanding-agenticscope" title="Permanent link"></a></h2>
-<p>To enable agents to work together, they need a way to <strong>share data</strong>. 
-This is where <code>AgenticScope</code> comes in.</p>
-<p><strong>What is AgenticScope?</strong></p>
-<ul>
-<li>A <strong>shared context</strong> that keeps track throughout a workflow execution.</li>
-<li>Contains a <strong>map</strong> of key-value pairs that agents can read from and write to: the <em>state</em>.</li>
-<li>This state is automatically populated with <strong>inputs</strong> from the workflow method signature.</li>
-<li>This state is automatically updated with <strong>outputs</strong> from each agent using their <code>outputKey</code>.</li>
-</ul>
-<p><strong>How It Works:</strong></p>
-<pre class="mermaid"><code>graph LR
-    A[Workflow Inputs] --&gt;|Populate| B[AgenticScope]
-    B --&gt;|Read state| C[Agent 1]
-    C --&gt;|Write state| B
-    B --&gt;|Read state| D[Agent 2]
-    D --&gt;|Write state| B
-    B --&gt;|Extract| E[Workflow Result]</code></pre>
-<p>When an agent completes, its result is stored in the <code>AgenticScope</code>’s state using the <code>outputKey</code> specified in the <code>@Agent</code> annotation.
-The next agent in the workflow can access this value as an input parameter using the name specified in the <code>outputKey</code> annotation.</p>
 <hr>
 <h2 id="what-are-we-going-to-build">What Are We Going to Build?<a class="headerlink" href="#what-are-we-going-to-build" title="Permanent link"></a></h2>
 <p><img alt="App Blueprint" class="center" src="../../images/agentic-app-2.png"></p>
@@ -1707,7 +1710,7 @@ The next agent in the workflow can access this value as an input parameter using
 <li>Application from Step 01 is stopped (Ctrl+C)</li>
 </ul>
 <hr>
-<h2 id="option-1-continue-from-step-01">Option 1: Continue from Step 01<a class="headerlink" href="#option-1-continue-from-step-01" title="Permanent link"></a></h2>
+<h3 id="option-1-continue-from-step-01">Option 1: Continue from Step 01<a class="headerlink" href="#option-1-continue-from-step-01" title="Permanent link"></a></h3>
 <p>If you want to continue building on your Step 01 code, you’ll need to copy some updated UI files and the updated <code>CarInfo.java</code> from <code>step-02</code>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label><label for="__tabbed_1_2">Windows</label></div>
 <div class="tabbed-content">
@@ -1733,7 +1736,7 @@ The next agent in the workflow can access this value as an input parameter using
 </div>
 <p>These files add the “Condition” column to the UI and update the data model to track car conditions.</p>
 <hr>
-<h2 id="option-2-start-fresh-from-step-02">Option 2: Start Fresh from Step 02<a class="headerlink" href="#option-2-start-fresh-from-step-02" title="Permanent link"></a></h2>
+<h3 id="option-2-start-fresh-from-step-02">Option 2: Start Fresh from Step 02<a class="headerlink" href="#option-2-start-fresh-from-step-02" title="Permanent link"></a></h3>
 <p>Alternatively, navigate to the complete <code>section-2/step-02</code> directory:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>section-2/step-02
 </code></pre></div>
@@ -1801,8 +1804,30 @@ The next agent in the workflow can access this value as an input parameter using
 <p>Notice the new <strong><code>outputKey</code> parameter</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Agent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carCondition"</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 </code></pre></div>
-<p>This tells the framework to store the agent’s result in the <code>AgenticScope</code>’s state under the key <code>"carCondition"</code>. 
+<p>This tells the framework to store the agent’s result in the <code>AgenticScope</code>’s state under the key <code>"carCondition"</code>.
 Other agents or the workflow can then access this value.</p>
+<div class="admonition note">
+<p class="admonition-title"><strong>Understanding AgenticScope</strong></p>
+<p>To enable agents to work together, they need a way to <strong>share data</strong>.
+This is where <code>AgenticScope</code> comes in.</p>
+<p><strong>What is AgenticScope?</strong></p>
+<ul>
+<li>A <strong>shared context</strong> that keeps track throughout a workflow execution.</li>
+<li>Contains a <strong>map</strong> of key-value pairs that agents can read from and write to: the <em>state</em>.</li>
+<li>This state is automatically populated with <strong>inputs</strong> from the workflow method signature.</li>
+<li>This state is automatically updated with <strong>outputs</strong> from each agent using their <code>outputKey</code>.</li>
+</ul>
+<p><strong>How It Works:</strong></p>
+<pre class="mermaid"><code>graph LR
+    A[Workflow Inputs] --&gt;|Populate| B[AgenticScope]
+    B --&gt;|Read state| C[Agent 1]
+    C --&gt;|Write state| B
+    B --&gt;|Read state| D[Agent 2]
+    D --&gt;|Write state| B
+    B --&gt;|Extract| E[Workflow Result]</code></pre>
+<p>When an agent completes, its result is stored in the <code>AgenticScope</code>’s state using the <code>outputKey</code> specified in the <code>@Agent</code> annotation.
+The next agent in the workflow can access this value as an input parameter using the name specified in the <code>outputKey</code> annotation.</p>
+</div>
 <hr>
 <h2 id="step-2-create-the-carconditions-model">Step 2: Create the CarConditions Model<a class="headerlink" href="#step-2-create-the-carconditions-model" title="Permanent link"></a></h2>
 <p>Before creating the workflow, we need a data model to return both the car condition and whether a car wash is required.</p>
@@ -2041,7 +2066,7 @@ Other agents or the workflow can then access this value.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@Inject</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">CarProcessingWorkflow</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">;</span>
 </code></pre></div>
-<p>The workflow interface is injected just like any other CDI bean. 
+<p>The workflow interface is injected just like any other CDI bean.
 Quarkus LangChain4j generates the implementation automatically.</p>
 <h3 id="workflow-invocation">Workflow Invocation<a class="headerlink" href="#workflow-invocation" title="Permanent link"></a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">CarConditions</span><span class="w"> </span><span class="n">carConditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span>
@@ -2054,7 +2079,7 @@ Quarkus LangChain4j generates the implementation automatically.</p>
 <a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">    </span><span class="n">carWashFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">carWashFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
 <a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="p">);</span>
 </code></pre></div>
-<p>Instead of calling agents individually, we call the workflow. 
+<p>Instead of calling agents individually, we call the workflow.
 It returns a <code>CarConditions</code> object containing results from both agents.</p>
 <h3 id="using-the-results">Using the Results<a class="headerlink" href="#using-the-results" title="Permanent link"></a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Update the car's condition with the result from CarConditionFeedbackAgent</span>
@@ -2178,7 +2203,7 @@ It returns a <code>CarConditions</code> object containing results from both agen
 <h2 id="understanding-parallel-vs-sequence">Understanding Parallel vs. Sequence<a class="headerlink" href="#understanding-parallel-vs-sequence" title="Permanent link"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Why Sequence Instead of Parallel?</p>
-<p>You might notice that <code>CarConditionFeedbackAgent</code> doesn’t actually use the output from <code>CarWashAgent</code>, it only looks at the original feedback. 
+<p>You might notice that <code>CarConditionFeedbackAgent</code> doesn’t actually use the output from <code>CarWashAgent</code>, it only looks at the original feedback.
 This means these agents could run in <strong>parallel</strong> for better response time.</p>
 <p>We chose a <strong>sequence</strong> workflow in this step because:</p>
 <ol>
