@@ -11,7 +11,7 @@ When cars are returned with severe damage or major mechanical issues, the compan
 3. **Execute the disposal decision**: scrap, sell, or donate the car
 
 The disposition expert is maintained by a separate (remote) team and runs in its own system. 
-You'll learn how to integrate it using the **Agent-to-Agent (A2A) protocol**.
+You'll learn how to integrate it using the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"}.
 
 ---
 
@@ -19,7 +19,7 @@ You'll learn how to integrate it using the **Agent-to-Agent (A2A) protocol**.
 
 In this step, you will:
 
-- Understand the **Agent-to-Agent (A2A) protocol** for distributed agent communication
+- Understand the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} for distributed agent communication
 - Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
 - Create an **A2A server** that exposes an AI agent as a remote service
 - Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
@@ -36,7 +36,7 @@ In this step, you will:
 
 ## Understanding the A2A Protocol
 
-The **Agent-to-Agent (A2A) protocol** is an open standard for AI agents to communicate across different systems and platforms.
+The [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} is an open protocol for AI agents to communicate across different systems and platforms.
 
 ### Why A2A?
 
@@ -79,17 +79,20 @@ graph LR
 **The Flow:**
 
 1. **Client agent** (`DispositionAgent` with `@A2AClientAgent`) sends a request to the remote agent
-2. **A2A Protocol Layer** (JSON-RPC) transports the request over HTTP
+2. **A2A Protocol Layer** ([JSON-RPC](https://www.jsonrpc.org/){target="_blank"}) transports the request over HTTP
 3. **AgentCard** describes the remote agent's capabilities (skills, inputs, outputs)
 4. **AgentExecutor** receives the request and orchestrates the execution
 5. **Remote AI agent** (`DispositionAgent` AI service) processes the request using tools
 6. Response flows back through the same path
 
+!!!info "Additional A2A Info"
+    For more information about the A2A protocol and the actors involved, see the [A2A documentation](https://a2a-protocol.org/latest/topics/key-concepts/#core-actors-in-a2a-interactions){target="_blank"}. 
+
 ---
 
 ## Understanding Tasks vs. Messages
 
-The A2A protocol distinguishes between two types of interactions:
+The A2A protocol distinguishes between [two types of interactions](https://a2a-protocol.org/latest/topics/life-of-a-task/){target="_blank"}:
 
 | Concept | Description | Use Case |
 |---------|-------------|----------|
@@ -134,7 +137,7 @@ We'll extend the car management system with:
 ```mermaid
 graph TD
     subgraph "Main Application (localhost:8080)"
-        R[Rental/CarWash/Maintenance Returns]
+        R[Rental/Cleaning/Maintenance Returns]
         FW[FeedbackWorkflow<br/>Parallel]
         DFA[DispositionFeedbackAgent]
         AW[ActionWorkflow<br/>Conditional]
@@ -166,7 +169,7 @@ graph TD
 
 Before starting:
 
-- Completed Step 03 (or have the `section-2/step-03` code available)
+- Completed [Step 03](step-03.md){target="_blank"} (or have the `section-2/step-03` code available)
 - Application from Step 03 is stopped (Ctrl+C)
 - Ports 8080 and 8888 are available (you'll run two applications simultaneously)
 
@@ -213,41 +216,39 @@ section-2/step-04/
     we recommend starting fresh from Step 04 with the changes already applied.
     You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
 
-## Option 1: Continue from Step 03
+=== "Option 2: Start Fresh from Step 04 [Recommended]"
 
-If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
-
-=== "Linux / macOS"
+    Navigate to the complete `section-2/step-04/multi-agent-system` directory:
+    
     ```bash
-    cp ../step-04/multi-agent-system/pom.xml ./pom.xml
-    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-    cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-    cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-    cp ../step-04/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
+    cd section-2/step-04/multi-agent-system
     ```
 
-=== "Windows"
-    ```cmd
-    copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
-    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-    copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-    copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-    copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
-    ```
+=== "Option 1: Continue from Step 03"
 
----
-
-## Option 2: Start Fresh from Step 04 [Recommended]
-
-Navigate to the complete `section-2/step-04/multi-agent-system` directory:
-
-```bash
-cd section-2/step-04/multi-agent-system
-```
+    If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
+    
+    === "Linux / macOS"
+        ```bash
+        cp ../step-04/multi-agent-system/pom.xml ./pom.xml
+        cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
+        cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
+        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
+        cp ../step-04/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
+        ```
+    
+    === "Windows"
+        ```cmd
+        copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
+        copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
+        copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
+        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+        copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
+        ```
 
 ---
 
@@ -268,7 +269,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedback
 - **System message**: Focuses on economic viability (is the car worth repairing?)
 - **Specific output format**: Returns `"DISPOSITION_NOT_REQUIRED"` when the car is repairable
 - **outputKey**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
-- **Three feedback sources**: Analyzes rental, car wash, and maintenance feedback
+- **Three feedback sources**: Analyzes rental, cleaning, and maintenance feedback
 
 **Decision Criteria:**
 
@@ -286,7 +287,7 @@ This agent connects to the remote disposition agent.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
-```java hl_lines="10-13" title="DispositionAgent.java"
+```java hl_lines="13" title="DispositionAgent.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
@@ -295,18 +296,12 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.ja
 #### `@A2AClientAgent` Annotation
 
 ```java
-@A2AClientAgent(
-    a2aServerUrl = "http://localhost:8888",
-    outputKey = "dispositionAgentResult",
-    description = "Car disposition specialist. Recommends how to dispose of a car (scrap, sell, donate)."
-)
+@A2AClientAgent(a2aServerUrl = "http://localhost:8888")
 ```
 
 This annotation transforms the method into an **A2A client**:
 
 - **`a2aServerUrl`**: The URL of the remote A2A server
-- **`outputKey`**: Where to store the result in AgenticScope's state
-- **`description`**: Describes the agent's purpose (helps with agent discovery)
 
 #### The Method Signature
 
@@ -346,7 +341,7 @@ The `FeedbackWorkflow` needs to include the new disposition analysis.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 
-```java hl_lines="22" title="FeedbackWorkflow.java"
+```java hl_lines="16-17" title="FeedbackWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -355,12 +350,13 @@ Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 Added `DispositionFeedbackAgent` to the parallel workflow:
 
 ```java
-@SubAgent(type = DispositionFeedbackAgent.class, outputKey = "dispositionRequest")
+@ParallelAgent(outputKey = "feedbackResult",
+            subAgents = { CleaningFeedbackAgent.class, MaintenanceFeedbackAgent.class, DispositionFeedbackAgent.class })
 ```
 
 Now **three agents run concurrently**:
 
-- `CarWashFeedbackAgent` — analyzes cleaning needs
+- `CleaningFeedbackAgent` — analyzes cleaning needs
 - `MaintenanceFeedbackAgent` — analyzes maintenance needs
 - `DispositionFeedbackAgent` — analyzes disposal needs
 
@@ -372,7 +368,7 @@ The `ActionWorkflow` needs to handle disposition requests.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 
-```java hl_lines="21 31 43-46" title="ActionWorkflow.java"
+```java hl_lines="17-18 39-42" title="ActionWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
 ```
 
@@ -381,7 +377,8 @@ Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 #### Added DispositionAgent to SubAgents
 
 ```java
-@SubAgent(type = DispositionAgent.class, outputKey = "actionResult")
+@ConditionalAgent(outputKey = "actionResult",
+            subAgents = { DispositionAgent.class, MaintenanceAgent.class, CleaningAgent.class })
 ```
 
 #### Added Activation Condition
@@ -399,10 +396,10 @@ The conditional workflow now has **priority ordering**:
 
 1. **Disposition** (highest priority) — if disposal is needed
 2. **Maintenance** — if maintenance is needed and disposal isn't
-3. **Car Wash** — if washing is needed and neither disposal nor maintenance is
+3. **Cleaning** — if cleaning is needed and neither disposal nor maintenance is
 4. **Skip** — if nothing is needed
 
-This ensures critical issues (disposal) are handled before routine tasks (washing).
+This ensures critical issues (disposal) are handled before routine tasks (cleaning).
 
 ### Step 5: Update CarProcessingWorkflow
 
@@ -410,7 +407,7 @@ Update the output method to handle disposition:
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java hl_lines="21 34 37-39" title="CarProcessingWorkflow.java"
+```java hl_lines="33" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -419,16 +416,16 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 The `@Output` method now checks for disposition requests first:
 
 ```java
- @Output
-static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String carWashRequest) {
+@Output
+static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String cleaningRequest) {
     RequiredAction requiredAction;
     // Check maintenance first (higher priority)
-    if (isRequired(dispositionRequest)) {              // Highest priority
+    if (isRequired(dispositionRequest)) {   // Highest priority
         requiredAction = RequiredAction.DISPOSITION;
     } else if (isRequired(maintenanceRequest)) {
         requiredAction = RequiredAction.MAINTENANCE;
-    } else if (isRequired(carWashRequest)) {
-        requiredAction = RequiredAction.CAR_WASH;
+    } else if (isRequired(cleaningRequest)) {
+        requiredAction = RequiredAction.CLEANING;
     } else {
         requiredAction = RequiredAction.NONE;
     }
@@ -454,7 +451,7 @@ Update the service to handle disposition status:
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java hl_lines="53-54" title="CarManagementService.java"
+```java hl_lines="54-55" title="CarManagementService.java"
 --8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -463,7 +460,9 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 Added handling for `RequiredAction.DISPOSITION`:
 
 ```java
-case DISPOSITION -> carInfo.setStatus(CarStatus.DISPOSED);
+} else if (carConditions.requiredAction() == RequiredAction.DISPOSITION) {
+    carInfo.status = CarStatus.PENDING_DISPOSITION;
+}
 ```
 
 When disposition is required, the car is marked as disposed and removed from the active fleet.
@@ -492,8 +491,7 @@ In `src/main/java/com/demo`, create `DispositionTool.java`:
 
 **Key Points:**
 
-- **@Dependent scope**: Required for tool detection
-- **Three methods**: `scrapCar()`, `sellCar()`, `donateCar()`
+- **One method**: `requestDisposition`
 - **@Tool annotation**: Makes each method available to the AI agent
 - **Detailed descriptions**: Help the AI agent choose the appropriate action
 
@@ -524,7 +522,7 @@ The **AgentCard** describes the agent's capabilities, skills, and interface.
 
 In `src/main/java/com/demo`, create `DispositionAgentCard.java`:
 
-```java title="DispositionAgentCard.java"
+```java hl_lines="19-21" title="DispositionAgentCard.java"
 --8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentCard.java"
 ```
 
@@ -535,7 +533,7 @@ In `src/main/java/com/demo`, create `DispositionAgentCard.java`:
 ```java
 @Produces
 @PublicAgentCard
-public AgentCard agentCard()
+public AgentCard agentCard();
 ```
 
 This makes the AgentCard available at the `/card` endpoint. 
@@ -546,7 +544,7 @@ Clients can query this endpoint to discover the agent's capabilities.
 **Basic Information:**
 ```java
 .name("Disposition Agent")
-.description("Determines how a car should be disposed...")
+.description("Determines how a car should be disposed of based on the car condition and disposition request.")
 .url("http://localhost:8888/")
 .version("1.0.0")
 ```
@@ -554,15 +552,15 @@ Clients can query this endpoint to discover the agent's capabilities.
 **Capabilities:**
 ```java
 .capabilities(new AgentCapabilities.Builder()
-    .streaming(true)           // Supports streaming responses
-    .pushNotifications(false)  // No push notifications
-    .stateTransitionHistory(false)  // No state history tracking
-    .build())
+        .streaming(true)
+        .pushNotifications(false)
+        .stateTransitionHistory(false)
+        .build())
 ```
 
 **Skills:**
 ```java
-.skills(Collections.singletonList(new AgentSkill.Builder()
+.skills(List.of(new AgentSkill.Builder()
     .id("disposition")
     .name("Car disposition")
     .description("Makes a request to dispose of a car (SCRAP, SELL, or DONATE)")
@@ -576,7 +574,7 @@ Skills describe what the agent can do. This helps clients discover appropriate a
 ```java
 .preferredTransport(TransportProtocol.JSONRPC.asString())
 .additionalInterfaces(List.of(
-    new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
+        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
 ```
 
 Specifies that this agent communicates via JSON-RPC over HTTP.
@@ -711,7 +709,7 @@ Click **Return**.
 1. **Parallel Analysis** (FeedbackWorkflow):
     1. `DispositionFeedbackAgent`: "Disposition required — severe damage"
     2. `MaintenanceFeedbackAgent`: "Major repairs needed"
-    3. `CarWashFeedbackAgent`: "Not applicable"
+    3. `CleaningFeedbackAgent`: "Not applicable"
 
 2. **Conditional Routing** (ActionWorkflow):
     1. Disposition condition: `true` (required)
@@ -731,9 +729,7 @@ Click **Return**.
 
 **Terminal 1 (Remote A2A Server):**
 ```
-[DispositionAgentExecutor] Received task: process disposition
-[DispositionAgent] Analyzing car: Ford Mustang (2022)
-⛍ DispositionTool result: Car disposition requested for Ford Mustang (2022), Car #11: Scrap the car
+⛍ DispositionTool result: Ford F-150 (2021), Car #11: Scrap the car
 ```
 
 **Terminal 2 (Main Application):**
@@ -772,7 +768,7 @@ sequenceDiagram
     Note over Workflow,FeedbackWF: Parallel Analysis
     Workflow->>FeedbackWF: Execute
     par Concurrent Execution
-        FeedbackWF->>FeedbackWF: CarWashFeedbackAgent
+        FeedbackWF->>FeedbackWF: CleaningFeedbackAgent
     and
         FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
     and
