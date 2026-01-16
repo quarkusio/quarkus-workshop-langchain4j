@@ -1,7 +1,7 @@
 package com.carmanagement.agentic.workflow;
 
 import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
-import com.carmanagement.agentic.agents.CarWashAgent;
+import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.model.CarConditions;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
@@ -16,7 +16,7 @@ public interface CarProcessingWorkflow {
      */
     @SequenceAgent(
             outputKey = "carConditions",
-            subAgents = { CarWashAgent.class, CarConditionFeedbackAgent.class })
+            subAgents = { CleaningAgent.class, CarConditionFeedbackAgent.class })
     CarConditions processCarReturn(
             String carMake,
             String carModel,
@@ -24,11 +24,11 @@ public interface CarProcessingWorkflow {
             Long carNumber,
             String carCondition,
             String rentalFeedback,
-            String carWashFeedback);
+            String cleaningFeedback);
 
     @Output
-    static CarConditions output(String carCondition, String carWashAgentResult) {
-        boolean carWashRequired = !carWashAgentResult.toUpperCase().contains("NOT_REQUIRED");
-        return new CarConditions(carCondition, carWashRequired);
+    static CarConditions output(String carCondition, String cleaningAgentResult) {
+        boolean cleaningRequired = !cleaningAgentResult.toUpperCase().contains("NOT_REQUIRED");
+        return new CarConditions(carCondition, cleaningRequired);
     }
 }

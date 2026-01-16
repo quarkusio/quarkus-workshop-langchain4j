@@ -1,11 +1,15 @@
 package com.carmanagement.resource;
 
-import com.carmanagement.service.CarManagementService;
-import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
+
 import org.jboss.resteasy.reactive.RestQuery;
+
+import io.quarkus.logging.Log;
+
+import com.carmanagement.service.CarManagementService;
 
 /**
  * REST resource for car management operations.
@@ -39,23 +43,23 @@ public class CarManagementResource {
     }
     
     /**
-     * Process a car return from car wash.
+     * Process a car return from cleaning.
      * 
      * @param carNumber The car number
-     * @param carWashFeedback Optional car wash feedback
+     * @param cleaningFeedback Optional cleaning feedback
      * @return Result of the processing
      */
     @POST
-    @Path("/car-wash-return/{carNumber}")
-    public Response processCarWashReturn(Long carNumber, @RestQuery String carWashFeedback) {
+    @Path("/cleaningReturn/{carNumber}")
+    public Response processCleaningReturn(Long carNumber, @RestQuery String cleaningFeedback) {
         
         try {
-            String result = carManagementService.processCarReturn(carNumber, "", carWashFeedback);
+            String result = carManagementService.processCarReturn(carNumber, "", cleaningFeedback);
             return Response.ok(result).build();
         } catch (Exception e) {
             Log.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error processing car wash return: " + e.getMessage())
+                    .entity("Error processing cleaning return: " + e.getMessage())
                     .build();
         }
     }
