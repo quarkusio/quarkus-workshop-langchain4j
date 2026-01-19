@@ -39,6 +39,20 @@ tr:hover {
     background-color: #f9f9f9;
 }
 
+tr.highlight-row {
+    background-color: #fff3cd;
+    animation: fadeHighlight 3s ease-out;
+}
+
+@keyframes fadeHighlight {
+    0% {
+        background-color: #ffc107;
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
 .feedback-input {
     width: 200px;
     padding: 5px;
@@ -53,10 +67,42 @@ tr:hover {
     border: none;
     border-radius: 3px;
     cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease;
 }
 
-.return-button:hover {
+.return-button:hover:not(:disabled) {
     background-color: #45a049;
+}
+
+.return-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.return-button.loading {
+    padding-right: 30px;
+}
+
+.return-button.loading::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    right: 8px;
+    margin-top: -6px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Status pills */
