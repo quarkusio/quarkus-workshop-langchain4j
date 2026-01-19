@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://quarkus.io/quarkus-workshop-langchain4j/section-2/step-02/">
+      
       
         <link rel="prev" href="../step-01/">
       
@@ -15,8 +17,11 @@
         <link rel="next" href="../step-03/">
       
       
+        
+      
+      
       <link rel="icon" href="../../images/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -24,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -48,14 +53,16 @@
     
       <link rel="stylesheet" href="../../extra.css">
     
+      <link rel="stylesheet" href="../../assets/stylesheets/panzoom.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
-    
-  </head>
+  <meta name="panzoom-theme" content="material">
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -94,7 +101,7 @@ You are not viewing the latest version.
 </a>
 
             </div>
-            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
           </aside>
         
       </div>
@@ -163,11 +170,13 @@ You are not viewing the latest version.
     
     
     
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -199,13 +208,14 @@ You are not viewing the latest version.
     </div>
   </div>
 </div>
+      
     
     
       <div class="md-header__source">
-        <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/quarkusio/quarkus-langchain4j-workshop" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -247,10 +257,10 @@ You are not viewing the latest version.
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/quarkusio/quarkus-langchain4j-workshop" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -270,9 +280,16 @@ You are not viewing the latest version.
       <a href="../../requirements/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Requirements
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -309,6 +326,7 @@ You are not viewing the latest version.
       
         
       
+    
     
     
       
@@ -327,9 +345,16 @@ You are not viewing the latest version.
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Section 1 - AI Apps
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -338,7 +363,11 @@ You are not viewing the latest version.
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Section 1 - AI Apps
+            
+  
+    Section 1 - AI Apps
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -352,9 +381,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-01/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 1 - Introduction to Quarkus LangChain4j
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -373,9 +409,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-02/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 2 - Playing with model parameters
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -394,9 +437,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-03/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 3 - Streaming responses
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -415,9 +465,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-04/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 4 - Using system messages
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -436,9 +493,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-05/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 5 - Introduction to the RAG pattern
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -457,9 +521,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-06/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 6 - Deconstructing the RAG
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -478,9 +549,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-07/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 7 - Function calling and tools
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -499,9 +577,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-08/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 8 - Model Context Protocol
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -520,9 +605,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-09/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 9 - Guardrails
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -541,9 +633,16 @@ You are not viewing the latest version.
       <a href="../../section-1/step-10/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 10 - Observability and Fault Tolerance
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -582,6 +681,7 @@ You are not viewing the latest version.
       
     
     
+    
       
         
         
@@ -598,9 +698,16 @@ You are not viewing the latest version.
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Section 2 - Agentic Workflows
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -609,7 +716,11 @@ You are not viewing the latest version.
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Section 2 - Agentic Workflows
+            
+  
+    Section 2 - Agentic Workflows
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -623,9 +734,16 @@ You are not viewing the latest version.
       <a href="../step-01/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 1 - Implementing AI Agents
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -653,9 +771,16 @@ You are not viewing the latest version.
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 2 - Composing simple agent workflows
+  
+
+    
   </span>
+  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -664,9 +789,16 @@ You are not viewing the latest version.
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 2 - Composing simple agent workflows
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -689,7 +821,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#agentic-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Agentic Workflows
+      
+        Agentic Workflows
+      
     </span>
   </a>
   
@@ -698,7 +832,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#new-requirement-track-car-conditions" class="md-nav__link">
     <span class="md-ellipsis">
-      New Requirement: Track Car Conditions
+      
+        New Requirement: Track Car Conditions
+      
     </span>
   </a>
   
@@ -707,7 +843,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#what-youll-learn" class="md-nav__link">
     <span class="md-ellipsis">
-      What You&rsquo;ll Learn
+      
+        What You&rsquo;ll Learn
+      
     </span>
   </a>
   
@@ -716,7 +854,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding Workflows
+      
+        Understanding Workflows
+      
     </span>
   </a>
   
@@ -725,7 +865,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#what-are-we-going-to-build" class="md-nav__link">
     <span class="md-ellipsis">
-      What Are We Going to Build?
+      
+        What Are We Going to Build?
+      
     </span>
   </a>
   
@@ -734,7 +876,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      
+        Prerequisites
+      
     </span>
   </a>
   
@@ -744,7 +888,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#option-1-continue-from-step-01" class="md-nav__link">
     <span class="md-ellipsis">
-      Option 1: Continue from Step 01
+      
+        Option 1: Continue from Step 01
+      
     </span>
   </a>
   
@@ -753,7 +899,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#option-2-start-fresh-from-step-02" class="md-nav__link">
     <span class="md-ellipsis">
-      Option 2: Start Fresh from Step 02
+      
+        Option 2: Start Fresh from Step 02
+      
     </span>
   </a>
   
@@ -767,7 +915,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-1-create-the-carconditionfeedbackagent" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 1: Create the CarConditionFeedbackAgent
+      
+        Step 1: Create the CarConditionFeedbackAgent
+      
     </span>
   </a>
   
@@ -777,7 +927,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#systemmessage" class="md-nav__link">
     <span class="md-ellipsis">
-      @SystemMessage
+      
+        @SystemMessage
+      
     </span>
   </a>
   
@@ -786,7 +938,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#usermessage" class="md-nav__link">
     <span class="md-ellipsis">
-      @UserMessage
+      
+        @UserMessage
+      
     </span>
   </a>
   
@@ -795,7 +949,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#agent-with-outputkey" class="md-nav__link">
     <span class="md-ellipsis">
-      @Agent with outputKey
+      
+        @Agent with outputKey
+      
     </span>
   </a>
   
@@ -809,7 +965,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-2-create-the-carconditions-model" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 2: Create the CarConditions Model
+      
+        Step 2: Create the CarConditions Model
+      
     </span>
   </a>
   
@@ -818,7 +976,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-3-update-the-carwashagent" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3: Update the CarWashAgent
+      
+        Step 3: Update the CarWashAgent
+      
     </span>
   </a>
   
@@ -827,7 +987,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-4-create-the-workflow-directory" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 4: Create the Workflow Directory
+      
+        Step 4: Create the Workflow Directory
+      
     </span>
   </a>
   
@@ -836,7 +998,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-5-define-the-carprocessingworkflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 5: Define the CarProcessingWorkflow
+      
+        Step 5: Define the CarProcessingWorkflow
+      
     </span>
   </a>
   
@@ -846,7 +1010,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#sequenceagent-annotation" class="md-nav__link">
     <span class="md-ellipsis">
-      @SequenceAgent Annotation
+      
+        @SequenceAgent Annotation
+      
     </span>
   </a>
   
@@ -855,7 +1021,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#method-signature" class="md-nav__link">
     <span class="md-ellipsis">
-      Method Signature
+      
+        Method Signature
+      
     </span>
   </a>
   
@@ -864,7 +1032,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#output" class="md-nav__link">
     <span class="md-ellipsis">
-      @Output
+      
+        @Output
+      
     </span>
   </a>
   
@@ -878,7 +1048,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-6-update-the-carmanagementservice" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 6: Update the CarManagementService
+      
+        Step 6: Update the CarManagementService
+      
     </span>
   </a>
   
@@ -888,7 +1060,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#injection" class="md-nav__link">
     <span class="md-ellipsis">
-      Injection
+      
+        Injection
+      
     </span>
   </a>
   
@@ -897,7 +1071,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#workflow-invocation" class="md-nav__link">
     <span class="md-ellipsis">
-      Workflow Invocation
+      
+        Workflow Invocation
+      
     </span>
   </a>
   
@@ -906,7 +1082,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#using-the-results" class="md-nav__link">
     <span class="md-ellipsis">
-      Using the Results
+      
+        Using the Results
+      
     </span>
   </a>
   
@@ -920,7 +1098,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#try-it-out" class="md-nav__link">
     <span class="md-ellipsis">
-      Try It Out
+      
+        Try It Out
+      
     </span>
   </a>
   
@@ -930,7 +1110,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#notice-the-new-ui" class="md-nav__link">
     <span class="md-ellipsis">
-      Notice the New UI
+      
+        Notice the New UI
+      
     </span>
   </a>
   
@@ -939,7 +1121,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#test-the-workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Test the Workflow
+      
+        Test the Workflow
+      
     </span>
   </a>
   
@@ -948,7 +1132,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#check-the-logs" class="md-nav__link">
     <span class="md-ellipsis">
-      Check the Logs
+      
+        Check the Logs
+      
     </span>
   </a>
   
@@ -962,7 +1148,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#how-data-flows-through-the-workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      How Data Flows Through the Workflow
+      
+        How Data Flows Through the Workflow
+      
     </span>
   </a>
   
@@ -972,7 +1160,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#example-fire-in-the-trunk" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: &ldquo;Fire in the trunk&rdquo;
+      
+        Example: &ldquo;Fire in the trunk&rdquo;
+      
     </span>
   </a>
   
@@ -986,7 +1176,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-the-declarative-workflow-api" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding the Declarative Workflow API
+      
+        Understanding the Declarative Workflow API
+      
     </span>
   </a>
   
@@ -995,7 +1187,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#key-takeaways" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Takeaways
+      
+        Key Takeaways
+      
     </span>
   </a>
   
@@ -1004,7 +1198,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#experiment-further" class="md-nav__link">
     <span class="md-ellipsis">
-      Experiment Further
+      
+        Experiment Further
+      
     </span>
   </a>
   
@@ -1014,7 +1210,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#1-inspect-the-agenticscope" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Inspect the AgenticScope
+      
+        1. Inspect the AgenticScope
+      
     </span>
   </a>
   
@@ -1023,7 +1221,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#2-add-more-input-to-the-condition-agent" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Add More Input to the Condition Agent
+      
+        2. Add More Input to the Condition Agent
+      
     </span>
   </a>
   
@@ -1032,7 +1232,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#3-try-different-feedback-combinations" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Try Different Feedback Combinations
+      
+        3. Try Different Feedback Combinations
+      
     </span>
   </a>
   
@@ -1046,7 +1248,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-parallel-vs-sequence" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding Parallel vs. Sequence
+      
+        Understanding Parallel vs. Sequence
+      
     </span>
   </a>
   
@@ -1055,7 +1259,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
-      Troubleshooting
+      
+        Troubleshooting
+      
     </span>
   </a>
   
@@ -1064,7 +1270,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
-      What&rsquo;s Next?
+      
+        What&rsquo;s Next?
+      
     </span>
   </a>
   
@@ -1089,9 +1297,16 @@ You are not viewing the latest version.
       <a href="../step-03/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 3 - Building nested agent workflows
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1110,9 +1325,16 @@ You are not viewing the latest version.
       <a href="../step-04/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Step 4 - Using remote agents (A2A)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1131,9 +1353,16 @@ You are not viewing the latest version.
       <a href="../conclusion/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Mastering Agentic Systems
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1159,9 +1388,16 @@ You are not viewing the latest version.
       <a href="../../conclusion/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Conclusion
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1198,7 +1434,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#agentic-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Agentic Workflows
+      
+        Agentic Workflows
+      
     </span>
   </a>
   
@@ -1207,7 +1445,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#new-requirement-track-car-conditions" class="md-nav__link">
     <span class="md-ellipsis">
-      New Requirement: Track Car Conditions
+      
+        New Requirement: Track Car Conditions
+      
     </span>
   </a>
   
@@ -1216,7 +1456,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#what-youll-learn" class="md-nav__link">
     <span class="md-ellipsis">
-      What You&rsquo;ll Learn
+      
+        What You&rsquo;ll Learn
+      
     </span>
   </a>
   
@@ -1225,7 +1467,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding Workflows
+      
+        Understanding Workflows
+      
     </span>
   </a>
   
@@ -1234,7 +1478,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#what-are-we-going-to-build" class="md-nav__link">
     <span class="md-ellipsis">
-      What Are We Going to Build?
+      
+        What Are We Going to Build?
+      
     </span>
   </a>
   
@@ -1243,7 +1489,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      
+        Prerequisites
+      
     </span>
   </a>
   
@@ -1253,7 +1501,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#option-1-continue-from-step-01" class="md-nav__link">
     <span class="md-ellipsis">
-      Option 1: Continue from Step 01
+      
+        Option 1: Continue from Step 01
+      
     </span>
   </a>
   
@@ -1262,7 +1512,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#option-2-start-fresh-from-step-02" class="md-nav__link">
     <span class="md-ellipsis">
-      Option 2: Start Fresh from Step 02
+      
+        Option 2: Start Fresh from Step 02
+      
     </span>
   </a>
   
@@ -1276,7 +1528,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-1-create-the-carconditionfeedbackagent" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 1: Create the CarConditionFeedbackAgent
+      
+        Step 1: Create the CarConditionFeedbackAgent
+      
     </span>
   </a>
   
@@ -1286,7 +1540,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#systemmessage" class="md-nav__link">
     <span class="md-ellipsis">
-      @SystemMessage
+      
+        @SystemMessage
+      
     </span>
   </a>
   
@@ -1295,7 +1551,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#usermessage" class="md-nav__link">
     <span class="md-ellipsis">
-      @UserMessage
+      
+        @UserMessage
+      
     </span>
   </a>
   
@@ -1304,7 +1562,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#agent-with-outputkey" class="md-nav__link">
     <span class="md-ellipsis">
-      @Agent with outputKey
+      
+        @Agent with outputKey
+      
     </span>
   </a>
   
@@ -1318,7 +1578,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-2-create-the-carconditions-model" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 2: Create the CarConditions Model
+      
+        Step 2: Create the CarConditions Model
+      
     </span>
   </a>
   
@@ -1327,7 +1589,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-3-update-the-carwashagent" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3: Update the CarWashAgent
+      
+        Step 3: Update the CarWashAgent
+      
     </span>
   </a>
   
@@ -1336,7 +1600,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-4-create-the-workflow-directory" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 4: Create the Workflow Directory
+      
+        Step 4: Create the Workflow Directory
+      
     </span>
   </a>
   
@@ -1345,7 +1611,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-5-define-the-carprocessingworkflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 5: Define the CarProcessingWorkflow
+      
+        Step 5: Define the CarProcessingWorkflow
+      
     </span>
   </a>
   
@@ -1355,7 +1623,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#sequenceagent-annotation" class="md-nav__link">
     <span class="md-ellipsis">
-      @SequenceAgent Annotation
+      
+        @SequenceAgent Annotation
+      
     </span>
   </a>
   
@@ -1364,7 +1634,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#method-signature" class="md-nav__link">
     <span class="md-ellipsis">
-      Method Signature
+      
+        Method Signature
+      
     </span>
   </a>
   
@@ -1373,7 +1645,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#output" class="md-nav__link">
     <span class="md-ellipsis">
-      @Output
+      
+        @Output
+      
     </span>
   </a>
   
@@ -1387,7 +1661,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#step-6-update-the-carmanagementservice" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 6: Update the CarManagementService
+      
+        Step 6: Update the CarManagementService
+      
     </span>
   </a>
   
@@ -1397,7 +1673,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#injection" class="md-nav__link">
     <span class="md-ellipsis">
-      Injection
+      
+        Injection
+      
     </span>
   </a>
   
@@ -1406,7 +1684,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#workflow-invocation" class="md-nav__link">
     <span class="md-ellipsis">
-      Workflow Invocation
+      
+        Workflow Invocation
+      
     </span>
   </a>
   
@@ -1415,7 +1695,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#using-the-results" class="md-nav__link">
     <span class="md-ellipsis">
-      Using the Results
+      
+        Using the Results
+      
     </span>
   </a>
   
@@ -1429,7 +1711,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#try-it-out" class="md-nav__link">
     <span class="md-ellipsis">
-      Try It Out
+      
+        Try It Out
+      
     </span>
   </a>
   
@@ -1439,7 +1723,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#notice-the-new-ui" class="md-nav__link">
     <span class="md-ellipsis">
-      Notice the New UI
+      
+        Notice the New UI
+      
     </span>
   </a>
   
@@ -1448,7 +1734,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#test-the-workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Test the Workflow
+      
+        Test the Workflow
+      
     </span>
   </a>
   
@@ -1457,7 +1745,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#check-the-logs" class="md-nav__link">
     <span class="md-ellipsis">
-      Check the Logs
+      
+        Check the Logs
+      
     </span>
   </a>
   
@@ -1471,7 +1761,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#how-data-flows-through-the-workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      How Data Flows Through the Workflow
+      
+        How Data Flows Through the Workflow
+      
     </span>
   </a>
   
@@ -1481,7 +1773,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#example-fire-in-the-trunk" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: &ldquo;Fire in the trunk&rdquo;
+      
+        Example: &ldquo;Fire in the trunk&rdquo;
+      
     </span>
   </a>
   
@@ -1495,7 +1789,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-the-declarative-workflow-api" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding the Declarative Workflow API
+      
+        Understanding the Declarative Workflow API
+      
     </span>
   </a>
   
@@ -1504,7 +1800,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#key-takeaways" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Takeaways
+      
+        Key Takeaways
+      
     </span>
   </a>
   
@@ -1513,7 +1811,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#experiment-further" class="md-nav__link">
     <span class="md-ellipsis">
-      Experiment Further
+      
+        Experiment Further
+      
     </span>
   </a>
   
@@ -1523,7 +1823,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#1-inspect-the-agenticscope" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Inspect the AgenticScope
+      
+        1. Inspect the AgenticScope
+      
     </span>
   </a>
   
@@ -1532,7 +1834,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#2-add-more-input-to-the-condition-agent" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Add More Input to the Condition Agent
+      
+        2. Add More Input to the Condition Agent
+      
     </span>
   </a>
   
@@ -1541,7 +1845,9 @@ You are not viewing the latest version.
           <li class="md-nav__item">
   <a href="#3-try-different-feedback-combinations" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Try Different Feedback Combinations
+      
+        3. Try Different Feedback Combinations
+      
     </span>
   </a>
   
@@ -1555,7 +1861,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#understanding-parallel-vs-sequence" class="md-nav__link">
     <span class="md-ellipsis">
-      Understanding Parallel vs. Sequence
+      
+        Understanding Parallel vs. Sequence
+      
     </span>
   </a>
   
@@ -1564,7 +1872,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
-      Troubleshooting
+      
+        Troubleshooting
+      
     </span>
   </a>
   
@@ -1573,7 +1883,9 @@ You are not viewing the latest version.
         <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
-      What&rsquo;s Next?
+      
+        What&rsquo;s Next?
+      
     </span>
   </a>
   
@@ -1589,9 +1901,11 @@ You are not viewing the latest version.
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
+
 
   
   
@@ -1685,7 +1999,28 @@ We will visit those further along in this workshop. For now, let’s focus on th
 <li><strong>Updated UI</strong>: Displays the current condition of each car</li>
 </ol>
 <p><strong>The Flow:</strong></p>
-<pre class="mermaid"><code>sequenceDiagram
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>sequenceDiagram
     participant User
     participant Workflow as CarProcessingWorkflow
     participant Agent1 as CarWashAgent
@@ -1701,7 +2036,11 @@ We will visit those further along in this workshop. For now, let’s focus on th
     Agent2-&gt;&gt;Scope: Read inputs (including carWashAgentResult)
     Agent2-&gt;&gt;Scope: Write output (carCondition)
     Workflow-&gt;&gt;Scope: Extract results
-    Workflow-&gt;&gt;User: Return CarConditions</code></pre>
+    Workflow-&gt;&gt;User: Return CarConditions</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
 <hr>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link"></a></h2>
 <p>Before starting:</p>
@@ -1818,13 +2157,38 @@ This is where <code>AgenticScope</code> comes in.</p>
 <li>This state is automatically updated with <strong>outputs</strong> from each agent using their <code>outputKey</code>.</li>
 </ul>
 <p><strong>How It Works:</strong></p>
-<pre class="mermaid"><code>graph LR
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>graph LR
     A[Workflow Inputs] --&gt;|Populate| B[AgenticScope]
     B --&gt;|Read state| C[Agent 1]
     C --&gt;|Write state| B
     B --&gt;|Read state| D[Agent 2]
     D --&gt;|Write state| B
-    B --&gt;|Extract| E[Workflow Result]</code></pre>
+    B --&gt;|Extract| E[Workflow Result]</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
 <p>When an agent completes, its result is stored in the <code>AgenticScope</code>’s state using the <code>outputKey</code> specified in the <code>@Agent</code> annotation.
 The next agent in the workflow can access this value as an input parameter using the name specified in the <code>outputKey</code> annotation.</p>
 </div>
@@ -2126,7 +2490,28 @@ It returns a <code>CarConditions</code> object containing results from both agen
 <h2 id="how-data-flows-through-the-workflow">How Data Flows Through the Workflow<a class="headerlink" href="#how-data-flows-through-the-workflow" title="Permanent link"></a></h2>
 <p>Let’s trace a complete example:</p>
 <h3 id="example-fire-in-the-trunk">Example: “Fire in the trunk”<a class="headerlink" href="#example-fire-in-the-trunk" title="Permanent link"></a></h3>
-<pre class="mermaid"><code>sequenceDiagram
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>sequenceDiagram
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
     participant Scope as AgenticScope
@@ -2155,7 +2540,11 @@ It returns a <code>CarConditions</code> object containing results from both agen
     Workflow-&gt;&gt;Workflow: output("Fire damage in trunk", "Wash requested...")
     Workflow-&gt;&gt;Service: return CarConditions(generalCondition="Fire damage in trunk", carWashRequired=true)
 
-    Service-&gt;&gt;Service: Update car condition and status</code></pre>
+    Service-&gt;&gt;Service: Update car condition and status</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
 <p><strong>Key Points:</strong></p>
 <ol>
 <li>All workflow inputs are stored in <code>AgenticScope</code>’s state</li>
@@ -2354,14 +2743,21 @@ You learned how agents collaborate through <code>AgenticScope</code> and how seq
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "content.tabs.link", "content.code.annotate", "navigation.instant", "navigation.indexes", "navigation.tracking", "navigation.footer", "navigation.tabs.sticky", "content.code.select", "content.code.copy"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "content.tabs.link", "content.code.annotate", "navigation.instant", "navigation.indexes", "navigation.tracking", "navigation.footer", "navigation.tabs.sticky", "content.code.select", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../assets/javascripts/panzoom.min.js"></script>
+      
+        <script src="../../assets/javascripts/zoompan.js"></script>
       
     
   </body>
