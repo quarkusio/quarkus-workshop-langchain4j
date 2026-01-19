@@ -47,3 +47,4 @@ site/
 __pycache__/
 
 .continue
+/docs/Pipfile.lock
