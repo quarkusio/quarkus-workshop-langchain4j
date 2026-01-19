@@ -68,7 +68,7 @@ function loadAllCars() {
             // Process the cars data
             populateFleetStatusTable(carsData);
             populateRentalReturnTable(carsData.filter(car => car.status === 'RENTED'));
-            populateCarWashTable(carsData.filter(car => car.status === 'AT_CAR_WASH'));
+            populateCleaningTable(carsData.filter(car => car.status === 'AT_CLEANING'));
             populateMaintenanceTable(carsData.filter(car => car.status === 'IN_MAINTENANCE'));
         })
         .catch(error => {
@@ -245,13 +245,13 @@ function populateRentalReturnTable(cars) {
     });
 }
 
-// Function to populate the Car Wash table
-function populateCarWashTable(cars) {
-    const tableBody = document.getElementById('car-wash-table-body');
+// Function to populate the Cleaning table
+function populateCleaningTable(cars) {
+    const tableBody = document.getElementById('cleaning-table-body');
     tableBody.innerHTML = ''; // Clear existing rows
     
     if (cars.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6">No cars currently at car wash</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6">No cars currently at cleaning</td></tr>';
         return;
     }
     
@@ -263,8 +263,8 @@ function populateCarWashTable(cars) {
             <td>${car.model}</td>
             <td>${car.year}</td>
             <td>
-                <form id="rentalReturnForm" onsubmit="returnFromCarWash(event, ${car.id})">
-                    <input type="text" class="feedback-input" id="carwash-feedback-${car.id}" placeholder="Enter feedback">
+                <form id="rentalReturnForm" onsubmit="returnFromCleaning(event, ${car.id})">
+                    <input type="text" class="feedback-input" id="cleaning-feedback-${car.id}" placeholder="Enter feedback">
                     <button class="return-button">Return</button>
                 </form>
             </td>
@@ -328,12 +328,12 @@ function returnFromRental(event, carId) {
     });
 }
 
-// Function to return a car from car wash
-function returnFromCarWash(event, carId) {
+// Function to return a car from cleaning
+function returnFromCleaning(event, carId) {
     event.preventDefault();
-    const feedback = document.getElementById(`carwash-feedback-${carId}`).value;
+    const feedback = document.getElementById(`cleaning-feedback-${carId}`).value;
     
-    fetch(`/car-management/car-wash-return/${carId}?carWashFeedback=${encodeURIComponent(feedback)}`, {
+    fetch(`/car-management/cleaningReturn/${carId}?cleaningFeedback=${encodeURIComponent(feedback)}`, {
         method: 'POST'
     })
     .then(response => {
@@ -343,12 +343,12 @@ function returnFromCarWash(event, carId) {
         return response.text();
     })
     .then(data => {
-        showNotification('Car successfully returned from car wash');
+        showNotification('Car successfully returned from cleaning');
         loadAllCars(); // Refresh all tables
     })
     .catch(error => {
-        console.error('Error returning car from car wash:', error);
-        displayError('Failed to process car wash return. Please try again.');
+        console.error('Error returning car from cleaning:', error);
+        displayError('Failed to process cleaning return. Please try again.');
     });
 }
 
@@ -381,8 +381,8 @@ function getStatusClass(status) {
     switch(status) {
         case 'RENTED':
             return 'status-rented';
-        case 'AT_CAR_WASH':
-            return 'status-carwash';
+        case 'AT_CLEANING':
+            return 'status-cleaning';
         case 'IN_MAINTENANCE':
             return 'status-maintenance';
         case 'AVAILABLE':
@@ -397,8 +397,8 @@ function getStatusPillClass(status) {
     switch(status) {
         case 'RENTED':
             return 'status-pill-rented';
-        case 'AT_CAR_WASH':
-            return 'status-pill-carwash';
+        case 'AT_CLEANING':
+            return 'status-pill-cleaning';
         case 'IN_MAINTENANCE':
             return 'status-pill-maintenance';
         case 'AVAILABLE':
@@ -413,8 +413,8 @@ function getStatusDisplay(status) {
     switch(status) {
         case 'RENTED':
             return 'Rented';
-        case 'AT_CAR_WASH':
-            return 'At Car Wash';
+        case 'AT_CLEANING':
+            return 'At Cleaning';
         case 'IN_MAINTENANCE':
             return 'In Maintenance';
         case 'AVAILABLE':
