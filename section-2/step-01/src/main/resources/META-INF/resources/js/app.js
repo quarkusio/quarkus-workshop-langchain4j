@@ -6,6 +6,7 @@ let currentSortDirection = 'asc';
 let carsData = []; // Store the cars data globally for sorting
 let currentFilterText = '';
 let currentFilterField = 'all';
+let lastUpdatedCarId = null; // Track the last updated car for highlighting
 
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -198,6 +199,15 @@ function populateFleetStatusTable(cars) {
     filteredCars.forEach(car => {
         const row = document.createElement('tr');
         
+        // Highlight the row if it was just updated
+        if (car.id === lastUpdatedCarId) {
+            row.classList.add('highlight-row');
+            // Clear the highlight after animation completes
+            setTimeout(() => {
+                lastUpdatedCarId = null;
+            }, 3000);
+        }
+        
         // Get status pill class based on car status
         const statusPillClass = getStatusPillClass(car.status);
         
@@ -276,6 +286,13 @@ function populateCleaningTable(cars) {
 function returnFromRental(event, carId) {
     event.preventDefault();
     const feedback = document.getElementById(`rental-feedback-${carId}`).value;
+    const button = event.target.querySelector('button[type="submit"]');
+    
+    // Add loading state
+    button.disabled = true;
+    button.classList.add('loading');
+    const originalText = button.textContent;
+    button.textContent = 'Processing...';
     
     fetch(`/car-management/rental-return/${carId}?rentalFeedback=${encodeURIComponent(feedback)}`, {
         method: 'POST'
@@ -287,12 +304,17 @@ function returnFromRental(event, carId) {
         return response.text();
     })
     .then(data => {
+        lastUpdatedCarId = carId; // Mark this car for highlighting
         showNotification('Car successfully returned from rental');
         loadAllCars(); // Refresh all tables
     })
     .catch(error => {
         console.error('Error returning car from rental:', error);
         displayError('Failed to process rental return. Please try again.');
+        // Re-enable button on error
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.textContent = originalText;
     });
 }
 
@@ -300,6 +322,13 @@ function returnFromRental(event, carId) {
 function returnFromCleaning(event, carId) {
     event.preventDefault();
     const feedback = document.getElementById(`cleaning-feedback-${carId}`).value;
+    const button = event.target.querySelector('button');
+    
+    // Add loading state
+    button.disabled = true;
+    button.classList.add('loading');
+    const originalText = button.textContent;
+    button.textContent = 'Processing...';
     
     fetch(`/car-management/cleaningReturn/${carId}?cleaningFeedback=${encodeURIComponent(feedback)}`, {
         method: 'POST'
@@ -311,12 +340,17 @@ function returnFromCleaning(event, carId) {
         return response.text();
     })
     .then(data => {
+        lastUpdatedCarId = carId; // Mark this car for highlighting
         showNotification('Car successfully returned from cleaning');
         loadAllCars(); // Refresh all tables
     })
     .catch(error => {
         console.error('Error returning car from cleaning:', error);
         displayError('Failed to process cleaning return. Please try again.');
+        // Re-enable button on error
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.textContent = originalText;
     });
 }
 

@@ -47,4 +47,3 @@ site/
 __pycache__/
 
 .continue
-/.mvn/wrapper/maven-wrapper.jar
