@@ -77,7 +77,7 @@ tr:hover {
     background-color: #ff9800; /* Orange */
 }
 
-.status-pill-carwash {
+.status-pill-cleaning {
     background-color: #03a9f4; /* Blue */
 }
 
@@ -90,7 +90,7 @@ tr:hover {
     border-left: 5px solid #ffecb3;
 }
 
-#car-wash-section {
+#cleaning-section {
     border-left: 5px solid #b3e0ff;
 }
 
@@ -137,7 +137,7 @@ tr:hover {
     border-top: 3px solid #ffecb3;
 }
 
-#car-wash-section.tab-content {
+#cleaning-section.tab-content {
     border-top: 3px solid #b3e0ff;
 }
 
