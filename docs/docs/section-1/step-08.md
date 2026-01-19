@@ -25,10 +25,10 @@ Let's create a Quarkus MCP server from scratch (or, you can use the step-08-mcp-
 In your terminal, make sure you're in the main directory of the workshop, and then execute the following command:
 
 ```shell
- quarkus create app dev.langchain4j.quarkus.workshop:quarkus-langchain4j-workshop-08-mcp-server:1.0-SNAPSHOT -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson
+ quarkus create app dev.langchain4j.quarkus.workshop:quarkus-workshop-langchain4j-08-mcp-server:1.0-SNAPSHOT -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson
 ```
 
-You should now see a new `quarkus-langchain4j-workshop-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file. This will be our REST client to call the remote weather API. ==Populate it with the below code:==
+You should now see a new `quarkus-workshop-langchain4j-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file. This will be our REST client to call the remote weather API. ==Populate it with the below code:==
 
 ```java title="WeatherClient.java"
 --8<-- "../../section-1/step-08-mcp-server/src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java"
@@ -59,7 +59,7 @@ quarkus.rest-client."weatherclient".uri=https://api.open-meteo.com/
 
 Easy right? With just a few lines of code, we were able to build a full-blown MCP server that would require much more work with any other stack or language out there! Quarkus FTW!
 
-==Go ahead and start the server from the `quarkus-langchain4j-workshop-08-mcp-server` folder in a separate terminal window/tab:==
+==Go ahead and start the server from the `quarkus-workshop-langchain4j-08-mcp-server` folder in a separate terminal window/tab:==
 
 ```shell
  ./mvnw quarkus:dev

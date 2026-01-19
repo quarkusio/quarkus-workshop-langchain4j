@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.langchain4j</groupId>
-    <artifactId>quarkus-langchain4j-workshop-06</artifactId>
+    <artifactId>quarkus-workshop-langchain4j-06</artifactId>
     <version>1.0.0</version>
 
     <properties>

@@ -1,6 +1,7 @@
 site_name: Quarkus LangChain4j Workshop
 site_url: https://quarkus.io/quarkus-workshop-langchain4j
 repo_url: https://github.com/quarkusio/quarkus-langchain4j-workshop
+
 edit_uri: edit/main/docs/
 docs_dir: docs
 
