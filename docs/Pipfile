@@ -12,6 +12,7 @@ mkdocs-panzoom-plugin = "*"
 mkdocs-build-plantuml-plugin = "*"
 mkdocs-video= "*"
 mike = "*"
+regex = "*"
 
 [dev-packages]
 
