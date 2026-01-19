@@ -1,12 +1,12 @@
 package com.carmanagement.service;
 
-import com.carmanagement.agentic.agents.CarWashAgent;
-import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.CarStatus;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
+import com.carmanagement.agentic.agents.CleaningAgent;
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.CarStatus;
 
 /**
  * Service for managing car returns from various operations.
@@ -15,7 +15,7 @@ import jakarta.transaction.Transactional;
 public class CarManagementService {
 
     @Inject
-    CarWashAgent carWashAgent;
+    CleaningAgent cleaningAgent;
 
     // --8<-- [start:processCarReturn]
     /**
@@ -23,26 +23,26 @@ public class CarManagementService {
      *
      * @param carNumber The car number
      * @param rentalFeedback Optional rental feedback
-     * @param carWashFeedback Optional car wash feedback
+     * @param cleaningFeedback Optional cleaning feedback
      * @return Result of the processing
      */
     @Transactional
-    public String processCarReturn(Long carNumber, String rentalFeedback, String carWashFeedback) {
+    public String processCarReturn(Long carNumber, String rentalFeedback, String cleaningFeedback) {
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
         }
 
         // Process the car result
-        String result = carWashAgent.processCarWash(
+        String result = cleaningAgent.processCleaning(
                 carInfo.make,
                 carInfo.model,
                 carInfo.year,
                 carNumber,
                 rentalFeedback != null ? rentalFeedback : "",
-                carWashFeedback != null ? carWashFeedback : "");
+                cleaningFeedback != null ? cleaningFeedback : "");
 
-        if (result.toUpperCase().contains("CARWASH_NOT_REQUIRED")) {
+        if (result.toUpperCase().contains("CLEANING_NOT_REQUIRED")) {
             carInfo.status = CarStatus.AVAILABLE;
             carInfo.persist();
         }

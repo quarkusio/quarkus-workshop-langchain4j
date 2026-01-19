@@ -8,9 +8,11 @@ setuptools = "*"
 mkdocs = "*"
 mkdocs-material = "*"
 mkdocs-macros-plugin = "*"
+mkdocs-panzoom-plugin = "*"
 mkdocs-build-plantuml-plugin = "*"
 mkdocs-video= "*"
 mike = "*"
+regex = "*"
 
 [dev-packages]
 

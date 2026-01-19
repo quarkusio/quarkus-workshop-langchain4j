@@ -1,5 +1,7 @@
 site_name: Quarkus LangChain4j Workshop
-repo_url: https://github.com/quarkusio/quarkus-workshop-langchain4j
+site_url: https://quarkus.io/quarkus-workshop-langchain4j
+repo_url: https://github.com/quarkusio/quarkus-langchain4j-workshop
+
 edit_uri: edit/main/docs/
 docs_dir: docs
 
@@ -24,7 +26,6 @@ nav:
     - Step 4 - Using remote agents (A2A): 'section-2/step-04.md'
     - Mastering Agentic Systems: 'section-2/conclusion.md'
   - Conclusion: 'conclusion.md'
-
 
 theme:
   name: material
@@ -107,6 +108,8 @@ markdown_extensions:
 
 plugins:
   - search
+  - panzoom:
+      full_screen: True
   - build_plantuml:
       render: "server"
       server: "https://www.plantuml.com/plantuml"
