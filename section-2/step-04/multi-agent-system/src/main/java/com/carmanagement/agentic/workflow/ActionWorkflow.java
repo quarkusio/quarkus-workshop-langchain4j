@@ -1,6 +1,6 @@
 package com.carmanagement.agentic.workflow;
 
-import com.carmanagement.agentic.agents.CarWashAgent;
+import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.agentic.agents.DispositionAgent;
 import com.carmanagement.agentic.agents.MaintenanceAgent;
 import dev.langchain4j.agentic.declarative.ActivationCondition;
@@ -15,14 +15,14 @@ public interface ActionWorkflow {
      * Runs the appropriate action agent based on the feedback analysis.
      */
     @ConditionalAgent(outputKey = "actionResult",
-            subAgents = { MaintenanceAgent.class, CarWashAgent.class, DispositionAgent.class })
+            subAgents = { DispositionAgent.class, MaintenanceAgent.class, CleaningAgent.class })
     String processAction(
             String carMake,
             String carModel,
             Integer carYear,
             Long carNumber,
             String carCondition,
-            String carWashRequest,
+            String cleaningRequest,
             String maintenanceRequest,
             String dispositionRequest);
 
@@ -31,9 +31,9 @@ public interface ActionWorkflow {
         return isRequired(maintenanceRequest);
     }
 
-    @ActivationCondition(CarWashAgent.class)
-    static boolean activateCarWash(String carWashRequest) {
-        return isRequired(carWashRequest);
+    @ActivationCondition(CleaningAgent.class)
+    static boolean activateCleaning(String cleaningRequest) {
+        return isRequired(cleaningRequest);
     }
 
     @ActivationCondition(DispositionAgent.class)

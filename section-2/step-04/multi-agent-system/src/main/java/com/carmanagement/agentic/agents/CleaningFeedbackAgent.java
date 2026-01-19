@@ -5,14 +5,16 @@ import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
 /**
- * Agent that analyzes feedback to determine if a car should be disposed of.
+ * Agent that analyzes feedback to determine if a cleaning is needed.
  */
-public interface DispositionFeedbackAgent {
+public interface CleaningFeedbackAgent {
 
     @SystemMessage("""
-        You are a car disposition analyzer for a car rental company. Your job is to determine if a car should be disposed of based on feedback.
-        Analyze the maintenance feedback and car information to decide if the car should be scrapped, sold, or donated.
-        If the car is in decent shape, respond with "DISPOSITION_NOT_REQUIRED".
+        You are a cleaning analyzer for a car rental company. Your job is to determine if a car needs cleaning based on feedback.
+        Analyze the feedback and car information to decide if a cleaning is needed.
+        If the feedback mentions dirt, mud, stains, or anything that suggests the car is dirty, recommend a cleaning.
+        Be specific about what type of cleaning is needed (exterior, interior, detailing, waxing).
+        If no interior or exterior car cleaning services are needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".
         Include the reason for your choice but keep your response short.
         """)
     @UserMessage("""
@@ -27,8 +29,8 @@ public interface DispositionFeedbackAgent {
         Cleaning Feedback: {cleaningFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
-    @Agent(outputKey="dispositionRequest", description="Car disposition analyzer. Using feedback, determines if a car should be disposed of.")
-    String analyzeForDisposition(
+    @Agent(description = "Cleaning analyzer. Using feedback, determines if a cleaning is needed.", outputKey = "cleaningRequest")
+    String analyzeForCleaning(
             String carMake,
             String carModel,
             Integer carYear,

@@ -27,7 +27,7 @@ public interface MaintenanceFeedbackAgent {
         
         Feedback:
         Rental Feedback: {rentalFeedback}
-        Car Wash Feedback: {carWashFeedback}
+        Cleaning Feedback: {cleaningFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
     @Agent(description = "Car maintenance analyzer. Using feedback, determines if a car needs maintenance.", outputKey = "maintenanceRequest")
@@ -38,7 +38,7 @@ public interface MaintenanceFeedbackAgent {
             Long carNumber,
             String carCondition,
             String rentalFeedback,
-            String carWashFeedback,
+            String cleaningFeedback,
             String maintenanceFeedback);
 }
 

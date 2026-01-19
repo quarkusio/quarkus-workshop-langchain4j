@@ -1,17 +1,16 @@
 package com.demo;
 
-import java.util.Collections;
 import java.util.List;
 
-import io.a2a.spec.AgentInterface;
-import io.a2a.spec.TransportProtocol;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
 import io.a2a.server.PublicAgentCard;
 import io.a2a.spec.AgentCapabilities;
 import io.a2a.spec.AgentCard;
+import io.a2a.spec.AgentInterface;
 import io.a2a.spec.AgentSkill;
+import io.a2a.spec.TransportProtocol;
 
 @ApplicationScoped
 public class DispositionAgentCard {
@@ -30,9 +29,9 @@ public class DispositionAgentCard {
                         .pushNotifications(false)
                         .stateTransitionHistory(false)
                         .build())
-                .defaultInputModes(Collections.singletonList("text"))
-                .defaultOutputModes(Collections.singletonList("text"))
-                .skills(Collections.singletonList(new AgentSkill.Builder()
+                .defaultInputModes(List.of("text"))
+                .defaultOutputModes(List.of("text"))
+                .skills(List.of(new AgentSkill.Builder()
                                 .id("disposition")
                                 .name("Car disposition")
                                 .description("Makes a request to dispose of a car (SCRAP, SELL, or DONATE)")
