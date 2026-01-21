@@ -49,6 +49,7 @@ LangChain4j provides 4 fundamental workflow patterns that can be combined to cre
 ### Sequential Workflows (`@SequenceAgent`)
 
 With sequential workflows, agents execute **one after another** in a defined order.
+(This is why it's also called "Prompt Chaining")
 
 ```mermaid
 graph LR
