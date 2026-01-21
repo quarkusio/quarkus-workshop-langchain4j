@@ -30,7 +30,7 @@ The workshop is divided into two sections:
 
 Each step builds on the previous one, with the results stored in separate directories (`step-XX`):
 
-- Final solution for Section 1: `section-1/step-11`
+- Final solution for Section 1: `section-1/step-10`
 - Final solution for Section 2: `section-2/step-04`
 
 ---
@@ -51,7 +51,7 @@ Each step builds on the previous one, with the results stored in separate direct
 
 ---
 
-## Let's Get Started!
+## Let's Get Started
 
 First, check the [requirements](./requirements.md) page to prepare your environment.
 
