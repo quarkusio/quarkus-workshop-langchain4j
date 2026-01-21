@@ -32,7 +32,7 @@ public interface CleaningAgent {
         {cleaningRequest}
         """)
     @Agent(description = "Cleaning specialist. Determines what cleaning services are needed.",
-            outputKey = "actionResult")
+            outputKey = "analysisResult")
     @ToolBox(CleaningTool.class)
     String processCleaning(
             String carMake,

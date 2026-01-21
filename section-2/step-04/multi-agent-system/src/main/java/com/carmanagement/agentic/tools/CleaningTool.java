@@ -1,10 +1,6 @@
 package com.carmanagement.agentic.tools;
 
 import jakarta.enterprise.context.Dependent;
-import jakarta.transaction.Transactional;
-
-import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.CarStatus;
 import dev.langchain4j.agent.tool.Tool;
 
 /**
@@ -28,7 +24,6 @@ public class CleaningTool {
      * @return A summary of the cleaning request
      */
     @Tool("Requests a cleaning with the specified options")
-    @Transactional
     public String requestCleaning(
             Long carNumber,
             String carMake,
@@ -42,13 +37,6 @@ public class CleaningTool {
         
         // In a real implementation, this would make an API call to a cleaning service
         // or update a database with the cleaning request
-        
-        // Update car status to AT_CLEANING
-        CarInfo carInfo = CarInfo.findById(carNumber);
-        if (carInfo != null) {
-            carInfo.status = CarStatus.AT_CLEANING;
-            carInfo.persist();
-        }
         
         String result = generateCleaningSummary(carNumber, carMake, carModel, carYear,
                                               exteriorWash, interiorCleaning, detailing,
