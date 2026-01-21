@@ -6,14 +6,15 @@ import dev.langchain4j.agentic.declarative.ActivationCondition;
 import dev.langchain4j.agentic.declarative.ConditionalAgent;
 
 /**
- * Workflow for processing car actions conditionally.
+ * Workflow for assigning cars to appropriate teams based on feedback analysis.
  */
-public interface ActionWorkflow {
+public interface CarAssignmentWorkflow {
 
     /**
-     * Runs the appropriate action agent based on the feedback analysis.
+     * Assigns the car to the appropriate team based on the feedback analysis.
      */
-    @ConditionalAgent(outputKey = "actionResult",
+    // --8<-- [start:conditional-agent]
+    @ConditionalAgent(outputKey = "analysisResult",
             subAgents = { MaintenanceAgent.class,  CleaningAgent.class })
     String processAction(
             String carMake,
@@ -25,18 +26,19 @@ public interface ActionWorkflow {
             String maintenanceRequest);
 
     @ActivationCondition(MaintenanceAgent.class)
-    static boolean activateMaintenance(String maintenanceRequest) {
+    static boolean assignToMaintenance(String maintenanceRequest) {
         return isRequired(maintenanceRequest);
     }
 
     @ActivationCondition(CleaningAgent.class)
-    static boolean activateCleaning(String cleaningRequest) {
+    static boolean assignToCleaning(String cleaningRequest) {
         return isRequired(cleaningRequest);
     }
 
     private static boolean isRequired(String value) {
         return value != null && !value.isEmpty() && !value.toUpperCase().contains("NOT_REQUIRED");
     }
+    // --8<-- [end:conditional-agent]
 }
 
 
