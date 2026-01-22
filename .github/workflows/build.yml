@@ -40,8 +40,9 @@ jobs:
           - section-2/step-01
           - section-2/step-02
           - section-2/step-03
-          - section-2/step-04/multi-agent-system
-          - section-2/step-04/remote-a2a-agent
+          - section-2/step-04
+          - section-2/step-05/multi-agent-system
+          - section-2/step-05/remote-a2a-agent
 
     name: "Build ${{ matrix.app }}"
     steps:
