@@ -1,10 +1,8 @@
 package com.carmanagement.agentic.tools;
 
 import jakarta.enterprise.context.Dependent;
-
-import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.CarStatus;
 import dev.langchain4j.agent.tool.Tool;
+import io.quarkus.logging.Log;
 
 /**
  * Tool for requesting cleaning operations.
@@ -41,17 +39,11 @@ public class CleaningTool {
         // In a real implementation, this would make an API call to a cleaning service
         // or update a database with the cleaning request
         
-        // Update car status to AT_CLEANING
-        CarInfo carInfo = CarInfo.findById(carNumber);
-        if (carInfo != null) {
-            carInfo.status = CarStatus.AT_CLEANING;
-            carInfo.persist();
-        }
-        
+        Log.info("  └─ CleaningAgent activated");
         String result = generateCleaningSummary(carNumber, carMake, carModel, carYear,
                                               exteriorWash, interiorCleaning, detailing,
                                               waxing, requestText);
-        System.out.println("\uD83D\uDE97 CleaningTool result: " + result);
+        Log.debug("🚗 CleaningTool result: " + result);
         return result;
     }
 

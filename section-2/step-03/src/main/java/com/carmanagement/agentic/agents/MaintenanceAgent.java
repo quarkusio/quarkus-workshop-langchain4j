@@ -27,7 +27,7 @@ public interface MaintenanceAgent {
         {maintenanceRequest}
         """)
     @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.",
-            outputKey = "actionResult")
+            outputKey = "analysisResult")
     @ToolBox(MaintenanceTool.class)
     String processMaintenance(
             String carMake,
