@@ -25,7 +25,7 @@
     
     
       
-        <title>Step 2 - Composing simple agent workflows - Quarkus LangChain4j Workshop</title>
+        <title>Step 2 - Creating simple agentic workflows - Quarkus LangChain4j Workshop</title>
       
     
     
@@ -132,7 +132,7 @@ You are not viewing the latest version.
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Step 2 - Composing simple agent workflows
+              Step 2 - Creating simple agentic workflows
             
           </span>
         </div>
@@ -775,7 +775,7 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 2 - Composing simple agent workflows
+    Step 2 - Creating simple agentic workflows
   
 
     
@@ -793,7 +793,7 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 2 - Composing simple agent workflows
+    Step 2 - Creating simple agentic workflows
   
 
     
@@ -860,6 +860,67 @@ You are not viewing the latest version.
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Understanding Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sequential-workflows-sequenceagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequential Workflows (@SequenceAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parallel-workflows-parallelagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel Workflows (@ParallelAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-workflows-conditionalagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Workflows (@ConditionalAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loop-workflows-loopagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loop Workflows (@LoopAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composing-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composing Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -885,15 +946,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-create-the-carconditionfeedbackagent" class="md-nav__link">
+  <a href="#create-the-carconditionfeedbackagent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Create the CarConditionFeedbackAgent
+        Create the CarConditionFeedbackAgent
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 1: Create the CarConditionFeedbackAgent">
+    <nav class="md-nav" aria-label="Create the CarConditionFeedbackAgent">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -935,10 +996,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-create-the-carconditions-model" class="md-nav__link">
+  <a href="#create-the-carconditions-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Create the CarConditions Model
+        Create the CarConditions Model
       
     </span>
   </a>
@@ -946,10 +1007,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-update-the-cleaningagent" class="md-nav__link">
+  <a href="#update-the-cleaningagent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Update the CleaningAgent
+        Update the CleaningAgent
       
     </span>
   </a>
@@ -957,10 +1018,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-create-the-workflow-directory" class="md-nav__link">
+  <a href="#create-the-workflow-directory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Create the Workflow Directory
+        Create the Workflow Directory
       
     </span>
   </a>
@@ -968,15 +1029,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-define-the-carprocessingworkflow" class="md-nav__link">
+  <a href="#define-the-carprocessingworkflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 5: Define the CarProcessingWorkflow
+        Define the CarProcessingWorkflow
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 5: Define the CarProcessingWorkflow">
+    <nav class="md-nav" aria-label="Define the CarProcessingWorkflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1018,15 +1079,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-update-the-carmanagementservice" class="md-nav__link">
+  <a href="#update-the-carmanagementservice" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6: Update the CarManagementService
+        Update the CarManagementService
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 6: Update the CarManagementService">
+    <nav class="md-nav" aria-label="Update the CarManagementService">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1273,7 +1334,7 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 3 - Building nested agent workflows
+    Step 3 - Composing multiple agentic workflows
   
 
     
@@ -1445,6 +1506,67 @@ You are not viewing the latest version.
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Understanding Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sequential-workflows-sequenceagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequential Workflows (@SequenceAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parallel-workflows-parallelagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel Workflows (@ParallelAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-workflows-conditionalagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Workflows (@ConditionalAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loop-workflows-loopagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loop Workflows (@LoopAgent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composing-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composing Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1470,15 +1592,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-create-the-carconditionfeedbackagent" class="md-nav__link">
+  <a href="#create-the-carconditionfeedbackagent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Create the CarConditionFeedbackAgent
+        Create the CarConditionFeedbackAgent
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 1: Create the CarConditionFeedbackAgent">
+    <nav class="md-nav" aria-label="Create the CarConditionFeedbackAgent">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1520,10 +1642,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-create-the-carconditions-model" class="md-nav__link">
+  <a href="#create-the-carconditions-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Create the CarConditions Model
+        Create the CarConditions Model
       
     </span>
   </a>
@@ -1531,10 +1653,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-update-the-cleaningagent" class="md-nav__link">
+  <a href="#update-the-cleaningagent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Update the CleaningAgent
+        Update the CleaningAgent
       
     </span>
   </a>
@@ -1542,10 +1664,10 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-create-the-workflow-directory" class="md-nav__link">
+  <a href="#create-the-workflow-directory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Create the Workflow Directory
+        Create the Workflow Directory
       
     </span>
   </a>
@@ -1553,15 +1675,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-define-the-carprocessingworkflow" class="md-nav__link">
+  <a href="#define-the-carprocessingworkflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 5: Define the CarProcessingWorkflow
+        Define the CarProcessingWorkflow
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 5: Define the CarProcessingWorkflow">
+    <nav class="md-nav" aria-label="Define the CarProcessingWorkflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1603,15 +1725,15 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-update-the-carmanagementservice" class="md-nav__link">
+  <a href="#update-the-carmanagementservice" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6: Update the CarManagementService
+        Update the CarManagementService
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 6: Update the CarManagementService">
+    <nav class="md-nav" aria-label="Update the CarManagementService">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1890,42 +2012,167 @@ This is different from the supervisor pattern where a special agent determines w
 <hr>
 <h2 id="understanding-workflows">Understanding Workflows<a class="headerlink" href="#understanding-workflows" title="Permanent link"></a></h2>
 <p>With Quarkus LangChain4j, you can compose multiple agents to work together as a <em>team</em>.
-Much like the building blocks of a programming language, <code>quarkus-langchain4j-agentic</code> provides a few basic patterns to build different types of workflows:</p>
-<table>
-<thead>
-<tr>
-<th>Workflow Type</th>
-<th>Description</th>
-<th>Use Case</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Sequential</strong></td>
-<td>Agents execute one after another in order</td>
-<td>When one agent needs the output from a previous agent</td>
-</tr>
-<tr>
-<td><strong>Parallel</strong></td>
-<td>Agents execute simultaneously on separate threads</td>
-<td>When agents can work independently for faster execution</td>
-</tr>
-<tr>
-<td><strong>Loop</strong></td>
-<td>Agents run repeatedly until a condition is met</td>
-<td>When iterative refinement is needed</td>
-</tr>
-<tr>
-<td><strong>Conditional</strong></td>
-<td>Agents only execute if a condition is satisfied</td>
-<td>When different paths are needed based on context</td>
-</tr>
-</tbody>
-</table>
+Much like the building blocks of a programming language, <code>quarkus-langchain4j-agentic</code> provides a few basic patterns to build different types of workflows.</p>
+<p>LangChain4j provides 4 fundamental workflow patterns that can be combined to create sophisticated agentic systems:</p>
+<h3 id="sequential-workflows-sequenceagent">Sequential Workflows (<code>@SequenceAgent</code>)<a class="headerlink" href="#sequential-workflows-sequenceagent" title="Permanent link"></a></h3>
+<p>With sequential workflows, agents execute <strong>one after another</strong> in a defined order.
+(This is why it’s also called “Prompt Chaining”)</p>
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>graph LR
+    A[Agent 1] --&gt; B[Agent 2] --&gt; C[Agent 3]
+    style A fill:#90EE90
+    style B fill:#90EE90
+    style C fill:#90EE90</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
+<p><strong>When to use:</strong> Each agent needs the output from the previous agent.</p>
+<p><strong>Example:</strong> Process feedback → Update condition → Send notification</p>
+<hr>
+<h3 id="parallel-workflows-parallelagent">Parallel Workflows (<code>@ParallelAgent</code>)<a class="headerlink" href="#parallel-workflows-parallelagent" title="Permanent link"></a></h3>
+<p>Parallel workflows allow agents to be executed <strong>simultaneously</strong> on separate threads.</p>
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>graph TD
+    Start[Start] --&gt; A[Agent 1]
+    Start --&gt; B[Agent 2]
+    Start --&gt; C[Agent 3]
+    A --&gt; End[Continue]
+    B --&gt; End
+    C --&gt; End
+    style A fill:#87CEEB
+    style B fill:#87CEEB
+    style C fill:#87CEEB</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
+<p><strong>When to use:</strong> When agents can work independently and you want faster execution, and/or you want to aggregate the results of both.</p>
+<p><strong>Example:</strong> Analyze for cleaning needs AND maintenance needs at the same time</p>
+<p><strong>Performance benefit:</strong> If each agent takes 2 seconds, sequential = 4 seconds total, parallel = ~2 seconds total!</p>
+<hr>
+<h3 id="conditional-workflows-conditionalagent">Conditional Workflows (<code>@ConditionalAgent</code>)<a class="headerlink" href="#conditional-workflows-conditionalagent" title="Permanent link"></a></h3>
+<p>Conditional Workflows will execute agents <strong>only if their activation condition is met</strong>.</p>
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>graph TD
+    Start[Start] --&gt; Check1{Condition 1?}
+    Check1 --&gt;|Yes| A[Agent 1]
+    Check1 --&gt;|No| Check2{Condition 2?}
+    A --&gt; End[Continue]
+    Check2 --&gt;|Yes| B[Agent 2]
+    Check2 --&gt;|No| End
+    B --&gt; End
+    style A fill:#FFD700
+    style B fill:#FFD700</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
+<p><strong>When to use:</strong> When different execution paths are needed based on runtime data (e.g. the output of a previous agent execution).</p>
+<p><strong>Example:</strong> If maintenance needed → send to maintenance, else if cleaning needed → send to cleaning</p>
+<hr>
+<h3 id="loop-workflows-loopagent">Loop Workflows (<code>@LoopAgent</code>)<a class="headerlink" href="#loop-workflows-loopagent" title="Permanent link"></a></h3>
+<p>With Loop workflows, agents run <strong>repeatedly until a condition is met</strong>.</p>
+<div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
+    
+    <nav class="panzoom-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>graph TD
+    Start[Start] --&gt; A[Agent]
+    A --&gt; Check{Continue?}
+    Check --&gt;|Yes| A
+    Check --&gt;|No| End[Done]
+    style A fill:#FFA07A</code></pre> 
+    <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
+Hold "Alt" / "Option" to enable pan &amp; zoom
+</div>
+</div>
+<p><strong>When to use:</strong> When iterative refinement or retries are needed.</p>
+<p><strong>Example:</strong> Keep refining a report until quality threshold is met (with e.g. a max of 5 attempts)</p>
+<hr>
+<h3 id="composing-workflows">Composing Workflows<a class="headerlink" href="#composing-workflows" title="Permanent link"></a></h3>
+<p>These basic workflows can be <strong>nested within workflows</strong> to create more advanced logic.
+You can use probabilistic AI when it makes sense, and create deterministic workflows to control the flow.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>LangChain4j provides these basic 4 basic workflows out of the box, but it also provides additional
-building blocks to create more advanced and custom goal-oriented agentic AI patterns, such as the <a href="https://docs.langchain4j.dev/tutorials/agents#supervisor-design-and-customization" target="_blank">supervisor pattern</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#goal-oriented-agentic-pattern" target="_blank">goal-oriented pattern</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#peer-to-peer-agentic-pattern" target="_blank">peer-to-peer</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#human-in-the-loop" target="_blank">human in the loop</a>, etc.</p>
+<p class="admonition-title">Autonomous and Goal Oriented Agentic AI Patterns</p>
+<p>LangChain4j also provides additional building blocks to create more advanced and custom goal-oriented agentic AI patterns, such as the <a href="https://docs.langchain4j.dev/tutorials/agents#supervisor-design-and-customization" target="_blank">supervisor pattern</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#goal-oriented-agentic-pattern" target="_blank">goal-oriented pattern</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#peer-to-peer-agentic-pattern" target="_blank">peer-to-peer</a>, <a href="https://docs.langchain4j.dev/tutorials/agents#human-in-the-loop" target="_blank">human in the loop</a>, etc.</p>
 <p>We will visit these further along in this workshop. For now, let’s focus on the basics.</p>
 </div>
 <p>In this step, we’ll use a <strong>sequential workflow</strong> to:</p>
@@ -2028,7 +2275,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
 </div>
 <hr>
-<h2 id="step-1-create-the-carconditionfeedbackagent">Step 1: Create the CarConditionFeedbackAgent<a class="headerlink" href="#step-1-create-the-carconditionfeedbackagent" title="Permanent link"></a></h2>
+<h2 id="create-the-carconditionfeedbackagent">Create the CarConditionFeedbackAgent<a class="headerlink" href="#create-the-carconditionfeedbackagent" title="Permanent link"></a></h2>
 <p>Create a new agent that analyzes feedback to determine a car’s current condition.</p>
 <p>In <code>src/main/java/com/carmanagement/agentic/agents</code>, create <code>CarConditionFeedbackAgent.java</code>:</p>
 <div class="highlight"><span class="filename">CarConditionFeedbackAgent.java</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
@@ -2140,7 +2387,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 The next agent in the workflow can access this value as an input parameter using the name specified in the <code>outputKey</code> annotation.</p>
 </div>
 <hr>
-<h2 id="step-2-create-the-carconditions-model">Step 2: Create the CarConditions Model<a class="headerlink" href="#step-2-create-the-carconditions-model" title="Permanent link"></a></h2>
+<h2 id="create-the-carconditions-model">Create the CarConditions Model<a class="headerlink" href="#create-the-carconditions-model" title="Permanent link"></a></h2>
 <p>Before creating the workflow, we need a data model to return both the car condition and whether a cleaning is required.</p>
 <p>In <code>src/main/java/com/carmanagement/model</code>, create <code>CarConditions.java</code>:</p>
 <div class="highlight"><span class="filename">CarConditions.java</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.model</span><span class="p">;</span>
@@ -2156,7 +2403,7 @@ The next agent in the workflow can access this value as an input parameter using
 </code></pre></div>
 <p>This simple record combines the results from both agents in our workflow.</p>
 <hr>
-<h2 id="step-3-update-the-cleaningagent">Step 3: Update the CleaningAgent<a class="headerlink" href="#step-3-update-the-cleaningagent" title="Permanent link"></a></h2>
+<h2 id="update-the-cleaningagent">Update the CleaningAgent<a class="headerlink" href="#update-the-cleaningagent" title="Permanent link"></a></h2>
 <p>The <code>CleaningAgent</code> needs to specify an <code>outputKey</code> so its result can be accessed by the workflow.</p>
 <p>Update <code>src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java</code>:</p>
 <div class="highlight"><span class="filename">CleaningAgent.java</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
@@ -2208,7 +2455,7 @@ The next agent in the workflow can access this value as an input parameter using
 <p><strong>Key change:</strong></p>
 <p>The <code>@Agent</code> annotation adds <code>outputKey = "cleaningAgentResult"</code>. This stores the agent’s response in the <code>AgenticScope</code>’s state, making it available to subsequent agents and the workflow output method.</p>
 <hr>
-<h2 id="step-4-create-the-workflow-directory">Step 4: Create the Workflow Directory<a class="headerlink" href="#step-4-create-the-workflow-directory" title="Permanent link"></a></h2>
+<h2 id="create-the-workflow-directory">Create the Workflow Directory<a class="headerlink" href="#create-the-workflow-directory" title="Permanent link"></a></h2>
 <p>If continuing from Step 01, create the workflow directory:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked id="__tabbed_3_1" name="__tabbed_3" type="radio"><input id="__tabbed_3_2" name="__tabbed_3" type="radio"><div class="tabbed-labels"><label for="__tabbed_3_1">Linux / macOS</label><label for="__tabbed_3_2">Windows</label></div>
 <div class="tabbed-content">
@@ -2223,7 +2470,7 @@ The next agent in the workflow can access this value as an input parameter using
 </div>
 </div>
 <hr>
-<h2 id="step-5-define-the-carprocessingworkflow">Step 5: Define the CarProcessingWorkflow<a class="headerlink" href="#step-5-define-the-carprocessingworkflow" title="Permanent link"></a></h2>
+<h2 id="define-the-carprocessingworkflow">Define the CarProcessingWorkflow<a class="headerlink" href="#define-the-carprocessingworkflow" title="Permanent link"></a></h2>
 <p>Now, create the workflow that orchestrates both agents.</p>
 <p>In <code>src/main/java/com/carmanagement/agentic/workflow</code>, create <code>CarProcessingWorkflow.java</code>:</p>
 <div class="highlight"><span class="filename">CarProcessingWorkflow.java</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.workflow</span><span class="p">;</span>
@@ -2307,7 +2554,7 @@ The next agent in the workflow can access this value as an input parameter using
 <p>This is more powerful than just returning the last agent’s result: you can combine outputs from multiple agents into a single output!</p>
 </div>
 <hr>
-<h2 id="step-6-update-the-carmanagementservice">Step 6: Update the CarManagementService<a class="headerlink" href="#step-6-update-the-carmanagementservice" title="Permanent link"></a></h2>
+<h2 id="update-the-carmanagementservice">Update the CarManagementService<a class="headerlink" href="#update-the-carmanagementservice" title="Permanent link"></a></h2>
 <p>Now update the service to use the workflow instead of calling agents directly.</p>
 <p>Update <code>src/main/java/com/carmanagement/service/CarManagementService.java</code>:</p>
 <div class="highlight"><span class="filename">CarManagementService.java</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.service</span><span class="p">;</span>
@@ -2538,7 +2785,7 @@ This means these agents could run in <strong>parallel</strong> for better respon
 <p>We chose a <strong>sequential</strong> workflow in this step because:</p>
 <ol>
 <li>It’s simpler to understand as your first workflow</li>
-<li>It sets us up for <a href="../step-03" target="_blank">Step 03</a>, where we’ll add more agents that DO depend on each other</li>
+<li>It sets us up for <a href="../step-03.md" target="_blank">Step 03</a>, where we’ll add more agents that DO depend on each other</li>
 </ol>
 <p>Feel free to try converting this to a parallel workflow as an experiment! Replace <code>@SequenceAgent</code> with <code>@ParallelAgent</code> and see what happens.</p>
 </div>
@@ -2615,13 +2862,13 @@ You learned how agents collaborate through <code>AgenticScope</code> and how seq
         
         
           
-          <a href="../step-03/" class="md-footer__link md-footer__link--next" aria-label="Next: Step 3 - Building nested agent workflows">
+          <a href="../step-03/" class="md-footer__link md-footer__link--next" aria-label="Next: Step 3 - Composing multiple agentic workflows">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Step 3 - Building nested agent workflows
+                Step 3 - Composing multiple agentic workflows
               </div>
             </div>
             <div class="md-footer__button md-icon">
