@@ -19,5 +19,5 @@ VALUES
     (nextval('car_info_id_seq'), 'BMW', 'X5', 2022, 'Recently serviced, excellent condition', NULL, 'AT_CLEANING'),
     (nextval('car_info_id_seq'), 'Mercedes-Benz', 'C-Class', 2020, 'Minor dent on passenger door', CURRENT_DATE + INTERVAL '12 months', 'RENTED'),
     (nextval('car_info_id_seq'), 'Audi', 'A4', 2021, 'Windshield has small chip', NULL, 'RENTED'),
-    (nextval('car_info_id_seq'), 'Nissan', 'Altima', 2017, 'Interior needs cleaning', CURRENT_DATE + INTERVAL '6 months', 'PENDING_DISPOSITION'),
+    (nextval('car_info_id_seq'), 'Nissan', 'Altima', 2017, 'SCRAP: completely wrecked, ready for the junk yard', CURRENT_DATE + INTERVAL '6 months', 'PENDING_DISPOSITION'),
     (nextval('car_info_id_seq'), 'Audi', 'Q4', 2019, 'Brake pads recently replaced', NULL, 'RENTED');

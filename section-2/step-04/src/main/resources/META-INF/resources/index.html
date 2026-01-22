@@ -59,11 +59,12 @@
     
     <!-- Section 2-4: Returns with Tabs -->
     <div id="returns-section" class="section">
-        <h2>Returns</h2>
+        <h2>Returns and Dispositions</h2>
         <div class="tabs">
             <button class="tab-button active" data-tab="rental-return">Rental Return</button>
             <button class="tab-button" data-tab="cleaning">Cleaning Return</button>
             <button class="tab-button" data-tab="maintenance">Maintenance Return</button>
+            <button class="tab-button" data-tab="disposition">Dispositions</button>
         </div>
         
         <!-- Rental Return Tab Content -->
@@ -129,6 +130,26 @@
             </table>
         </div>
         
+        <!-- Disposition Tab Content -->
+        <div id="disposition-section" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Car Number</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Disposition Decision</th>
+                    </tr>
+                </thead>
+                <tbody id="disposition-table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="6">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     
     <script src="/js/app.js"></script>

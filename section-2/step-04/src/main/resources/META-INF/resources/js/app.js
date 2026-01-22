@@ -71,6 +71,7 @@ function loadAllCars() {
             populateRentalReturnTable(carsData.filter(car => car.status === 'RENTED'));
             populateCleaningTable(carsData.filter(car => car.status === 'AT_CLEANING'));
             populateMaintenanceTable(carsData.filter(car => car.status === 'IN_MAINTENANCE'));
+            populateDispositionTable(carsData.filter(car => car.status === 'PENDING_DISPOSITION'));
         })
         .catch(error => {
             console.error('Error fetching cars:', error);
@@ -313,6 +314,29 @@ function populateMaintenanceTable(cars) {
     });
 }
 
+// Function to populate the Disposition table
+function populateDispositionTable(cars) {
+    const tableBody = document.getElementById('disposition-table-body');
+    tableBody.innerHTML = ''; // Clear existing rows
+    
+    if (cars.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5">No cars pending disposition</td></tr>';
+        return;
+    }
+    
+    cars.forEach(car => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${car.id}</td>
+            <td>${car.make}</td>
+            <td>${car.model}</td>
+            <td>${car.year}</td>
+            <td>${car.condition || 'Pending analysis'}</td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
 
 // Function to return a car from rental
 function returnFromRental(event, carId) {

@@ -320,7 +320,7 @@ function populateDispositionTable(cars) {
     tableBody.innerHTML = ''; // Clear existing rows
     
     if (cars.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6">No cars pending disposition</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5">No cars pending disposition</td></tr>';
         return;
     }
     
@@ -331,8 +331,7 @@ function populateDispositionTable(cars) {
             <td>${car.make}</td>
             <td>${car.model}</td>
             <td>${car.year}</td>
-            <td>${car.condition || 'N/A'}</td>
-            <td>${car.dispositionDate ? new Date(car.dispositionDate).toLocaleDateString() : 'Not scheduled'}</td>
+            <td>${car.condition || 'Pending analysis'}</td>
         `;
         
         tableBody.appendChild(row);

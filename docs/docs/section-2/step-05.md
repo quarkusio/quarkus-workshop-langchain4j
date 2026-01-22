@@ -1,17 +1,18 @@
 # Step 05 - Using Remote Agents (A2A)
 
-## New Requirement: Car Disposal Decisions
+## New Requirement: Distributing the Disposition Service
 
-The Miles of Smiles management team has yet another new challenge: they need to decide what to do with cars that are beyond economical repair.
+In Step 4, you implemented a complete disposition system using the Supervisor Pattern with local agents. The system works well, but the Miles of Smiles management team has a new architectural requirement:
 
-When cars are returned with severe damage or major mechanical issues, the company needs to:
+**The disposition decision-making logic needs to be maintained by a separate team and run as an independent service.**
 
-1. **Analyze if disposal is needed**: determine if repair costs exceed the car's value
-2. **Consult a specialized disposition expert**: a remote AI agent that makes disposal recommendations
-3. **Execute the disposal decision**: scrap, sell, or donate the car
+This is a common real-world scenario where:
 
-The disposition expert is maintained by a separate (remote) team and runs in its own system. 
-You'll learn how to integrate it using the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"}.
+1. **Different teams own different capabilities**: The disposition team has specialized expertise and wants to maintain their own service
+2. **The service needs to be reusable**: Multiple client applications (not just car management) might need disposition recommendations
+3. **Independent scaling is required**: The disposition service might need different resources than the main application
+
+You'll learn how to convert Step 4's local `DispositionAgent` into a remote service using the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"}.
 
 ---
 
@@ -20,12 +21,13 @@ You'll learn how to integrate it using the [**Agent-to-Agent (A2A) protocol**](h
 In this step, you will:
 
 - Understand the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} for distributed agent communication
+- **Convert** Step 4's local `DispositionAgent` into a remote A2A service
 - Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
 - Create an **A2A server** that exposes an AI agent as a remote service
 - Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
 - Understand the difference between **Tasks** and **Messages** in A2A protocol
 - Run **multiple Quarkus applications** that communicate via A2A
-- Integrate remote agents into existing workflows
+- See the architectural trade-offs: lose Supervisor Pattern sophistication, gain distribution benefits
 
 !!!note
    
@@ -125,12 +127,12 @@ sequenceDiagram
 
 ![App Blueprint](../images/agentic-app-4.png){: .center}
 
-We'll extend the car management system with:
+We'll convert Step 4's architecture to use remote agents:
 
-1. **DispositionFeedbackAgent**: Analyzes if a car should be disposed (scrap/sell/donate)
-2. **DispositionAgent (Client)**: Connects to the remote disposition expert via A2A
-3. **Remote A2A Server**: A separate Quarkus application exposing the disposition expert
-4. **Disposition Workflow**: Integrates disposition analysis into the car processing flow
+1. **Keep DispositionFeedbackAgent**: Still analyzes if a car should be disposed (same as Step 4)
+2. **Convert DispositionAgent to A2A Client**: Changes from local agent to remote A2A client
+3. **Create Remote A2A Server**: A separate Quarkus application exposing the disposition service
+4. **Replace Supervisor with Conditional Workflow**: Trade AI-driven orchestration for simpler rule-based routing (architectural trade-off for distribution)
 
 **The Complete Architecture:**
 
@@ -169,9 +171,10 @@ graph TD
 
 Before starting:
 
-- Completed [Step 04](step-04.md){target="_blank"} (or have the `section-2/step-04` code available)
+- **Completed [Step 04](step-04.md){target="_blank"}** - This step directly builds on Step 4's disposition functionality
 - Application from Step 04 is stopped (Ctrl+C)
 - Ports 8080 and 8888 are available (you'll run two applications simultaneously)
+- Understanding of Step 4's Supervisor Pattern (we'll be replacing it with a simpler pattern)
 
 ---
 
@@ -254,11 +257,11 @@ section-2/step-05/
 
 ## Part 1: Build the Client-Side Components
 
-### Step 1: Create the DispositionFeedbackAgent
+### Step 1: Update the DispositionFeedbackAgent
 
-This agent analyzes feedback to determine if a car should be disposed.
+This agent is similar to Step 4's version but with a simplified system message. In Step 4, we had more sophisticated keyword detection; here we simplify it for the A2A example.
 
-In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
+In `src/main/java/com/carmanagement/agentic/agents`, update `DispositionFeedbackAgent.java`:
 
 ```java hl_lines="15 30 37-39" title="DispositionFeedbackAgent.java"
 --8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
@@ -280,12 +283,22 @@ The agent considers:
 - Age and condition of the vehicle
 - Safety concerns
 
-### Step 2: Create the DispositionAgent (Client)
+### Step 2: Convert the DispositionAgent to A2A Client
 
-This is where the A2A magic happens! 
-This agent connects to the remote disposition agent.
+**This is the key change from Step 4!** Instead of a local agent with full system messages and logic, we now have a simple client that delegates to a remote service.
 
-In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
+**Step 4 Version (Local):**
+- Had detailed `@SystemMessage` with disposition criteria
+- Received `carValue` parameter from PricingAgent
+- Made decisions locally using AI
+
+**Step 5 Version (A2A Client):**
+- No `@SystemMessage` - just a client interface
+- Uses `@A2AClientAgent` to connect to remote service
+- Receives `dispositionRequest` instead of `carValue`
+- Delegates all decision-making to the remote service
+
+In `src/main/java/com/carmanagement/agentic/agents`, update `DispositionAgent.java`:
 
 ```java hl_lines="13" title="DispositionAgent.java"
 --8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
@@ -337,7 +350,7 @@ The remote agent can access them by name.
 
 ### Step 3: Update FeedbackWorkflow
 
-The `FeedbackWorkflow` needs to include the new disposition analysis.
+The `FeedbackWorkflow` is the same as Step 4 - it includes disposition analysis alongside cleaning and maintenance.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 
@@ -362,11 +375,20 @@ Now **three agents run concurrently**:
 
 This parallel execution is efficient: all three analyses happen at the same time!
 
-### Step 4: Update CarAssignmentWorkflow
+### Step 4: Create CarAssignmentWorkflow
 
-The `CarAssignmentWorkflow` needs to handle disposition requests.
+**Key Architectural Change from Step 4:**
 
-Update `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
+In Step 4, we used `FleetSupervisorAgent` with `@SupervisorAgent` - an AI-driven orchestrator that made intelligent decisions about which agents to invoke.
+
+In Step 5, we're replacing it with `CarAssignmentWorkflow` using `@ConditionalAgent` - a simpler, rule-based router.
+
+**Why the change?**
+- **Trade-off for distribution**: The Supervisor Pattern requires all sub-agents to be local. To use remote agents via A2A, we need a simpler routing mechanism.
+- **Simpler but less flexible**: Conditional routing uses hardcoded rules instead of AI reasoning.
+- **Still effective**: For this use case, rule-based routing works well.
+
+Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
 
 ```java hl_lines="17-18 39-42" title="CarAssignmentWorkflow.java"
 --8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
@@ -403,7 +425,13 @@ This ensures critical issues (disposal) are handled before routine tasks (cleani
 
 ### Step 5: Update CarProcessingWorkflow
 
-Update the output method to handle disposition:
+**Change from Step 4:**
+
+Step 4 used: `FeedbackWorkflow → FleetSupervisorAgent → CarConditionFeedbackAgent`
+
+Step 5 uses: `FeedbackWorkflow → CarAssignmentWorkflow → CarConditionFeedbackAgent`
+
+We've replaced the AI-driven supervisor with rule-based conditional routing.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
@@ -692,7 +720,7 @@ Listening on: http://localhost:8080
 
 Open your browser to [http://localhost:8080](http://localhost:8080){target=_blank}.
 
-After reloading the UI, you should see the Returns section is now called **Returns and Dispositions**. You'll also notice that there is a new tab to list the cars that are pending disposition.
+You'll see the same UI as Step 4 with the **Returns and Dispositions** section and the **Dispositions** tab (introduced in Step 4).
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
 
@@ -853,6 +881,8 @@ This separation allows:
 - **Type-safe integration**: Method parameters automatically become task inputs
 - **Remote agents integrate seamlessly**: Works with existing workflows and agents
 - **Two runtimes communicate**: Real-world simulation of distributed agent systems
+- **Architectural trade-offs**: We traded Step 4's sophisticated Supervisor Pattern for simpler Conditional routing to enable distribution
+- **Distribution benefits**: The disposition service can now be maintained independently, scaled separately, and reused by other applications
 
 ---
 
@@ -955,14 +985,20 @@ This shows the raw A2A protocol messages.
 
 ## What's Next?
 
-You've successfully built a distributed agent system using the A2A protocol!
+You've successfully converted Step 4's local disposition system into a distributed agent system using the A2A protocol!
 
 You learned how to:
 
+- Convert local agents to remote A2A services
 - Connect to remote agents using `@A2AClientAgent`
 - Build A2A servers with AgentCard and AgentExecutor
 - Integrate remote agents into complex workflows
 - Run multiple Quarkus applications that communicate via A2A
+- Understand the architectural trade-offs between local and distributed agents
+
+**Key Progression:**
+- **Step 4**: Sophisticated local orchestration with Supervisor Pattern
+- **Step 5**: Distributed architecture with A2A protocol
 
 This completes **Section 2: Agentic Systems**! You've progressed from simple agents to complex distributed workflows with remote agent communication.
 

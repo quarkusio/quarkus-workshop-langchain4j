@@ -413,6 +413,14 @@ flowchart TD
 - Condition describes cleaning needs
 - Supervisor routed to CleaningAgent only
 
+### Observe the Disposition Tab
+
+After processing a car with severe damage, check the **Dispositions** tab in the Returns section. You'll see cars that have been marked for disposition with their condition and planned disposition action.
+
+![Disposition Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
+
+The UI now includes a dedicated tab to track all vehicles pending disposition, making it easy to see which cars need to be scrapped, sold, or donated.
+
 ### Observe the Supervisor's Decisions
 
 Watch the console logs to see the two-phase processing:
@@ -593,6 +601,6 @@ The supervisor agent can now:
 - Make economically sound SCRAP/SELL/DONATE/KEEP decisions
 - Route to appropriate action agents based on feedback
 
-In **Step 05**, you'll learn about **Agent-to-Agent (A2A) communication** — connecting your workflows to remote agents running in separate systems, including converting the DispositionAgent to a remote service!
+In **Step 05**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local DispositionAgent you just built into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
 
 [Continue to Step 05 - Using Remote Agents (A2A)](step-05.md)
