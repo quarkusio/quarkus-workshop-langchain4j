@@ -2,7 +2,7 @@
 
 Congratulations! You've completed **Section 2: Agentic Systems** of the Quarkus LangChain4j workshop.
 
-Over the past four steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems. 
+Over the past five steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems.
 Let's reflect on what you've built and why these patterns matter.
 
 ---
@@ -68,7 +68,26 @@ You mastered the art of **composing workflows within workflows**, unlocking trul
 
 ---
 
-### Step 04: Distributed Agents with A2A
+### Step 04: Supervisor Pattern for Dynamic Orchestration
+
+You learned how to build **autonomous, context-aware orchestration** using supervisor agents.
+
+**What you built:**
+- `FleetSupervisorAgent`: AI-driven supervisor using `@SupervisorAgent` annotation
+- `PricingAgent`: Vehicle valuation specialist
+- Adaptive workflow that adjusts based on business conditions
+
+**Key concepts:**
+- **Supervisor pattern**: AI agents that orchestrate other agents
+- **Autonomous orchestration**: Supervisor decides which agents to invoke
+- **Context-aware routing**: Decisions based on multiple factors (demand, condition, value)
+- **Flexible business logic**: Adjust behavior via prompts, not code changes
+
+**Why it matters:** Real-world systems need to adapt to changing conditions. Supervisor agents provide intelligent, context-aware orchestration that can handle complex scenarios without hardcoded logic. This makes systems more flexible and easier to maintain.
+
+---
+
+### Step 05: Distributed Agents with A2A
 
 You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
 
@@ -108,9 +127,9 @@ With Quarkus LangChain4j's agentic module, you get:
 - Type safety throughout
 - Explicit control flow
 
-The workshop did not cover the supervisor pattern, but it's another powerful way to control autonomy by having a higher-level agent oversee and correct lower-level agents.
-The supervisor plans tasks and monitors execution, intervening when necessary.
-The supervisor is controlling the flow of other agents, but the agents themselves remain autonomous within their tasks.
+You learned about the **supervisor pattern** in Step 04, which is a powerful way to control autonomy by having a higher-level agent oversee and coordinate lower-level agents.
+The supervisor plans tasks and monitors execution, making dynamic decisions about which agents to invoke.
+The supervisor controls the flow of other agents, but the agents themselves remain autonomous within their tasks.
 
 ### Composability and Reusability
 

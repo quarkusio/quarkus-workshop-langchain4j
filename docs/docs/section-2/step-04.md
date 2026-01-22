@@ -1,17 +1,29 @@
-# Step 04 - Using Remote Agents (A2A)
+# Step 04 - Supervisor Pattern for Dynamic Orchestration
 
-## New Requirement: Car Disposal Decisions
+## Supervisor Pattern for Dynamic Orchestration
 
-The Miles of Smiles management team has yet another new challenge: they need to decide what to do with cars that are beyond economical repair.
+In the previous step, you created **nested workflows** that combined sequential, parallel, and conditional patterns to build sophisticated multi-level orchestration.
 
-When cars are returned with severe damage or major mechanical issues, the company needs to:
+However, those workflows used **fixed, deterministic routing** - the conditions were hardcoded and predictable. What if you need **dynamic, context-aware orchestration** where an AI agent decides which sub-agents to invoke based on the current situation?
 
-1. **Analyze if disposal is needed**: determine if repair costs exceed the car's value
-2. **Consult a specialized disposition expert**: a remote AI agent that makes disposal recommendations
-3. **Execute the disposal decision**: scrap, sell, or donate the car
+In this step, you'll learn about the **Supervisor Pattern** - a powerful approach where a supervisor agent autonomously orchestrates other agents based on runtime context and business conditions.
 
-The disposition expert is maintained by a separate (remote) team and runs in its own system. 
-You'll learn how to integrate it using the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"}.
+---
+
+## New Requirement from Miles of Smiles Management: Intelligent Disposition Decisions
+
+The Miles of Smiles management team has identified a new challenge: they need to make **intelligent decisions about vehicle disposition** when cars return with severe damage.
+
+The system needs to:
+
+1. **Detect severe damage** that might make a car uneconomical to repair
+2. **Estimate vehicle value** to inform disposition decisions
+3. **Decide disposition strategy** (SCRAP, SELL, DONATE, or KEEP) based on:
+   - Car value
+   - Age of the vehicle
+   - Severity of damage
+   - Repair cost estimates
+4. **Let an AI supervisor orchestrate** the entire decision-making process
 
 ---
 
@@ -19,959 +31,576 @@ You'll learn how to integrate it using the [**Agent-to-Agent (A2A) protocol**](h
 
 In this step, you will:
 
-- Understand the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} for distributed agent communication
-- Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
-- Create an **A2A server** that exposes an AI agent as a remote service
-- Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
-- Understand the difference between **Tasks** and **Messages** in A2A protocol
-- Run **multiple Quarkus applications** that communicate via A2A
-- Integrate remote agents into existing workflows
-
-!!!note
-   
-    At the moment the A2A integration is quite low-level and requires some boilerplate code.
-    The Quarkus LangChain4j team is working on higher-level abstractions to simplify A2A usage in future releases.
+- Understand the **Supervisor Pattern** and when to use it
+- Implement a supervisor agent using `@SupervisorAgent` annotation
+- Create specialized agents for **feedback analysis** and **action execution**
+- Build a **PricingAgent** to estimate vehicle market values
+- Create a **DispositionAgent** to make SCRAP/SELL/DONATE/KEEP decisions
+- See how supervisors provide **autonomous, adaptive orchestration**
 
 ---
 
-## Understanding the A2A Protocol
+## Understanding the Supervisor Pattern
 
-The [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} is an open protocol for AI agents to communicate across different systems and platforms.
+### What is a Supervisor Agent?
 
-### Why A2A?
+A **supervisor agent** is an AI agent that:
 
-- **Separation of concerns**: Different teams can develop specialized agents independently
-- **Scalability**: Distribute agent workload across multiple systems
-- **Reusability**: One agent can serve multiple client applications
-- **Technology independence**: Agents can be implemented in different languages/frameworks
+- **Coordinates other agents** (called sub-agents)
+- **Makes runtime decisions** about which agents to invoke
+- **Adapts to context** using business rules and current conditions
+- **Provides autonomous orchestration** without hardcoded logic
 
-### A2A Architecture
+### Supervisor vs. Conditional Workflows
+
+| Aspect | Conditional Workflow | Supervisor Agent |
+|--------|---------------------|------------------|
+| **Decision Logic** | Hardcoded conditions | AI-driven decisions |
+| **Flexibility** | Fixed rules | Adapts to context |
+| **Complexity** | Simple boolean checks | Complex reasoning |
+| **Maintenance** | Update code for changes | Update prompts/context |
+
+### When to Use Supervisors
+
+Use supervisor agents when you need:
+
+- **Context-aware routing**: Decisions based on multiple factors
+- **Business rule flexibility**: Easy to adjust without code changes
+- **Complex orchestration**: Multiple agents with interdependencies
+- **Adaptive behavior**: System that learns and improves
+
+---
+
+## What is Being Added?
+
+We're going to enhance our car management system with:
+
+- **DispositionFeedbackAgent**: Detects severe damage requiring disposition evaluation
+- **PricingAgent**: Estimates vehicle market value
+- **DispositionAgent**: Decides SCRAP/SELL/DONATE/KEEP based on value and condition
+- **FleetSupervisorAgent**: Orchestrates feedback and action agents autonomously
+- **Updated workflow**: Two-phase processing (feedback → supervisor → actions)
+
+### The New Architecture
+
+```mermaid
+graph TB
+    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential]
+    
+    A --> B[Step 1: FeedbackWorkflow<br/>Parallel Analysis]
+    B --> B1[CleaningFeedbackAgent]
+    B --> B2[MaintenanceFeedbackAgent]
+    B --> B3[DispositionFeedbackAgent<br/>NEW]
+    B1 --> BEnd[All feedback complete]
+    B2 --> BEnd
+    B3 --> BEnd
+    
+    BEnd --> C[Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration]
+    C --> C1{AI Supervisor<br/>Analyzes Feedback}
+    C1 -->|Severe Damage| C2[PricingAgent<br/>Estimate Value]
+    C2 --> C3[DispositionAgent<br/>SCRAP/SELL/DONATE/KEEP]
+    C1 -->|Repairable| C4[MaintenanceAgent]
+    C1 -->|Minor Issues| C5[CleaningAgent]
+    
+    C3 --> CEnd[Supervisor Decision]
+    C4 --> CEnd
+    C5 --> CEnd
+    
+    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Final Summary]
+    D --> End([Updated Car with Status])
+    
+    style A fill:#90EE90
+    style B fill:#87CEEB
+    style C fill:#FFB6C1
+    style D fill:#90EE90
+    style C1 fill:#FFA07A
+    style B3 fill:#FFD700
+    style C2 fill:#FFD700
+    style C3 fill:#FFD700
+    style Start fill:#E8E8E8
+    style End fill:#E8E8E8
+```
+
+**The Key Innovation:**
+
+The **FleetSupervisorAgent** receives feedback from three parallel agents and then autonomously decides:
+
+- If severe damage detected → invoke PricingAgent → DispositionAgent
+- If repairable damage → invoke MaintenanceAgent
+- If only cleaning needed → invoke CleaningAgent
+
+---
+
+## Key Implementation Details
+
+### DispositionFeedbackAgent (NEW)
+
+Detects severe damage that requires disposition evaluation:
+
+```java title="DispositionFeedbackAgent.java" hl_lines="12-28 44"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
+```
+
+**Key Points:**
+
+- Analyzes feedback for severe damage keywords ("wrecked", "totaled", "crashed")
+- Outputs "DISPOSITION_REQUIRED" or "DISPOSITION_NOT_REQUIRED"
+- Runs in parallel with other feedback agents
+- Provides early detection of cars that need disposition evaluation
+
+### PricingAgent
+
+Estimates vehicle market value for disposition decisions:
+
+```java title="PricingAgent.java" hl_lines="13-42 50-53"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
+```
+
+**Key Points:**
+
+- Uses detailed pricing guidelines (brand base values, depreciation, condition adjustments)
+- Considers make, model, year, and condition
+- Returns structured output with value and justification
+- Invoked by supervisor when disposition evaluation is needed
+
+### DispositionAgent (NEW)
+
+Makes intelligent disposition decisions:
+
+```java title="DispositionAgent.java" hl_lines="13-30 44"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
+```
+
+**Key Points:**
+
+- Receives car value from PricingAgent
+- Decides: SCRAP, SELL, DONATE, or KEEP
+- Considers repair cost vs. value, age, and damage severity
+- Provides clear reasoning for the decision
+
+### FleetSupervisorAgent
+
+Orchestrates the entire processing workflow:
+
+```java title="FleetSupervisorAgent.java" hl_lines="12-48 50-60"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
+```
+
+**Key Points:**
+
+- `@SupervisorAgent` annotation enables autonomous orchestration
+- `subAgents` lists all available action agents (not feedback agents)
+- Receives feedback results as input parameters
+- Makes intelligent routing decisions based on feedback analysis
+- Two-phase approach: supervisor coordinates actions AFTER feedback is complete
+
+### Updated FeedbackWorkflow
+
+Now includes disposition feedback:
+
+```java title="FeedbackWorkflow.java" hl_lines="17"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
+```
+
+### Updated CarProcessingWorkflow
+
+Sequential workflow with supervisor:
+
+```java title="CarProcessingWorkflow.java" hl_lines="21 35-60"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
+```
+
+**Changes:**
+
+- FeedbackWorkflow runs first (produces `dispositionRequest`, `maintenanceRequest`, `cleaningRequest`)
+- FleetSupervisorAgent receives feedback and orchestrates actions
+- Output logic checks `dispositionRequest` first for highest priority routing
+
+---
+
+## Try the Supervisor Pattern
+
+### Start the Application
+
+1. Navigate to the step-04 directory:
+
+```bash
+cd section-2/step-04
+./mvnw quarkus:dev
+```
+
+2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
+
+### Test Disposition Scenarios
+
+Try these scenarios to see how the supervisor pattern autonomously orchestrates agents:
+
+#### Scenario 1: Severe Damage - Disposition Required
+
+Enter the following text in the feedback field for the **Honda Civic**:
+
+```text
+The car was in a serious collision. Front end is completely destroyed and airbags deployed.
+```
+
+**What happens:**
+
+```mermaid
+flowchart TD
+    Start([Input: Car was in serious collision<br/>Front end destroyed, airbags deployed])
+    
+    Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
+    
+    FW --> DFA[DispositionFeedbackAgent]
+    FW --> MFA[MaintenanceFeedbackAgent]
+    FW --> CFA[CleaningFeedbackAgent]
+    
+    DFA --> DR[Detects: DISPOSITION_REQUIRED ✓<br/>Keywords: collision, destroyed]
+    MFA --> MR[Detects: maintenance issues ✓]
+    CFA --> CR[Detects: cleaning needed ✓]
+    
+    DR --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    MR --> FSA
+    CR --> FSA
+    
+    FSA -->|Disposition has highest priority| PA[Invoke PricingAgent]
+    PA --> PV[Estimate: $8,500<br/>2020 Honda Civic with severe damage]
+    PV --> DA[Invoke DispositionAgent]
+    DA --> DD[Decision: SCRAP<br/>Repair cost > 50% of value]
+    DD --> Result([Result: PENDING_DISPOSITION<br/>Condition: SCRAP - severe damage])
+    
+    style FW fill:#FAE5D3
+    style FSA fill:#D5F5E3
+    style PA fill:#F9E79F
+    style DA fill:#F9E79F
+    style Result fill:#D2B4DE
+```
+
+**Expected Result:**
+- Status: `PENDING_DISPOSITION`
+- Condition includes disposition decision (e.g., "SCRAP - severe damage, repair cost exceeds value")
+- PricingAgent estimated the car's value
+- DispositionAgent made a SCRAP decision based on economics
+
+#### Scenario 2: Total Loss
+
+Enter the following text in the **Toyota Camry** feedback field:
+
+```text
+The car is totaled after a major accident, completely inoperable
+```
+
+**What happens:**
+
+```mermaid
+flowchart TD
+    Start([Input: Car is totaled<br/>completely inoperable])
+    
+    Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
+    
+    FW --> DFA[DispositionFeedbackAgent]
+    FW --> MFA[MaintenanceFeedbackAgent]
+    FW --> CFA[CleaningFeedbackAgent]
+    
+    DFA --> DR[Detects: DISPOSITION_REQUIRED ✓<br/>Keywords: totaled, inoperable]
+    MFA --> MR[Analysis complete]
+    CFA --> CR[Analysis complete]
+    
+    DR --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    MR --> FSA
+    CR --> FSA
+    
+    FSA -->|Severe damage detected| PA[Invoke PricingAgent]
+    PA --> PV[Estimate: $12,000<br/>2019 Toyota Camry, totaled]
+    PV --> DA[Invoke DispositionAgent]
+    DA --> DD[Decision: SCRAP or SELL<br/>Beyond economical repair]
+    DD --> Result([Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled])
+    
+    style FW fill:#FAE5D3
+    style FSA fill:#D5F5E3
+    style PA fill:#F9E79F
+    style DA fill:#F9E79F
+    style Result fill:#D2B4DE
+```
+
+**Expected Result:**
+- Status: `PENDING_DISPOSITION`
+- Disposition decision: SCRAP or SELL (beyond economical repair)
+- PricingAgent estimated value before total loss
+- DispositionAgent determined vehicle is not worth repairing
+
+#### Scenario 3: Repairable Damage
+
+Enter the following text in the **Mercedes Benz** feedback field:
+
+```text
+Engine making noise, needs inspection
+```
+
+**What happens:**
+
+```mermaid
+flowchart TD
+    Start([Input: Engine making noise<br/>needs inspection])
+    
+    Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
+    
+    FW --> DFA[DispositionFeedbackAgent]
+    FW --> MFA[MaintenanceFeedbackAgent]
+    FW --> CFA[CleaningFeedbackAgent]
+    
+    DFA --> DR[Detects: no severe damage ✗]
+    MFA --> MR[Detects: maintenance needed ✓]
+    CFA --> CR[Detects: no cleaning needed ✗]
+    
+    DR --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    MR --> FSA
+    CR --> FSA
+    
+    FSA -->|No disposition, maintenance is priority| MA[Invoke MaintenanceAgent]
+    MA --> Result([Result: IN_MAINTENANCE<br/>Condition: Engine inspection required])
+    
+    style FW fill:#FAE5D3
+    style FSA fill:#D5F5E3
+    style MA fill:#F9E79F
+    style Result fill:#D2B4DE
+```
+
+**Expected Result:**
+- Status: `IN_MAINTENANCE`
+- Condition describes the maintenance issue
+- Supervisor routed to MaintenanceAgent (not disposition)
+
+#### Scenario 4: Minor Issues
+
+Enter the following text in the **Ford F-150** feedback field:
+
+```text
+Car is dirty, needs cleaning
+```
+
+**What happens:**
+
+```mermaid
+flowchart TD
+    Start([Input: Car is dirty<br/>needs cleaning])
+    
+    Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
+    
+    FW --> DFA[DispositionFeedbackAgent]
+    FW --> MFA[MaintenanceFeedbackAgent]
+    FW --> CFA[CleaningFeedbackAgent]
+    
+    DFA --> DR[Detects: no severe damage ✗]
+    MFA --> MR[Detects: no maintenance needed ✗]
+    CFA --> CR[Detects: cleaning needed ✓]
+    
+    DR --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    MR --> FSA
+    CR --> FSA
+    
+    FSA -->|No disposition or maintenance| CA[Invoke CleaningAgent]
+    CA --> Result([Result: IN_CLEANING<br/>Condition: Requires thorough cleaning])
+    
+    style FW fill:#FAE5D3
+    style FSA fill:#D5F5E3
+    style CA fill:#F9E79F
+    style Result fill:#D2B4DE
+```
+
+**Expected Result:**
+- Status: `IN_CLEANING`
+- Condition describes cleaning needs
+- Supervisor routed to CleaningAgent only
+
+### Observe the Disposition Tab
+
+After processing a car with severe damage, check the **Dispositions** tab in the Returns section. You'll see cars that have been marked for disposition with their condition and planned disposition action.
+
+![Disposition Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
+
+The UI now includes a dedicated tab to track all vehicles pending disposition, making it easy to see which cars need to be scrapped, sold, or donated.
+
+### Observe the Supervisor's Decisions
+
+Watch the console logs to see the two-phase processing:
+
+```bash
+Phase 1: FeedbackWorkflow executing (parallel)...
+  ├─ CleaningFeedbackAgent analyzing...
+  ├─ MaintenanceFeedbackAgent analyzing...
+  └─ DispositionFeedbackAgent analyzing...
+  
+Phase 2: FleetSupervisorAgent orchestrating...
+  ├─ Received: DISPOSITION_REQUIRED (severe damage detected)
+  ├─ Invoking: PricingAgent (estimating value)...
+  ├─ Invoking: DispositionAgent (making decision)...
+  └─ Decision: SCRAP - severe damage, repair cost exceeds value
+  
+Phase 3: CarConditionFeedbackAgent updating...
+  └─ Condition: SCRAP - severe damage, low value
+```
+
+---
+
+## Why the Supervisor Pattern Matters
+
+### Autonomous Decision-Making
+
+The supervisor uses AI reasoning to make complex decisions:
 
 ```mermaid
 graph LR
-    subgraph "Quarkus Runtime 1: Car Management System"
-        W[CarProcessingWorkflow] 
-        DA["DispositionAgent<br/>@A2AClientAgent"]
-        W --> DA
-    end
-
-    subgraph "A2A Protocol Layer"
-        AP[JSON-RPC over HTTP]
-    end
-
-    subgraph "Quarkus Runtime 2: Disposition Service"
-        AC[AgentCard<br/>Agent Metadata]
-        AE[AgentExecutor<br/>Request Handler]
-        AI[DispositionAgent<br/>AI Service]
-        T[DispositionTool]
-
-        AC -.describes.-> AI
-        AE --> AI
-        AI --> T
-    end
-
-    DA -->|A2A Request| AP
-    AP -->|A2A Response| DA
-    AP <-->|JSON-RPC| AE
-
+    Input[Feedback:<br/>Disposition Required?<br/>Maintenance Needed?<br/>Cleaning Needed?] --> Supervisor[FleetSupervisorAgent<br/>AI Reasoning]
+    Supervisor --> Decision{Dynamic<br/>Orchestration}
+    Decision -->|Severe Damage| Disposition[PricingAgent<br/>→ DispositionAgent]
+    Decision -->|Repairable| Maintenance[MaintenanceAgent]
+    Decision -->|Minor Issues| Cleaning[CleaningAgent]
 ```
 
-**The Flow:**
+### Economic Intelligence
 
-1. **Client agent** (`DispositionAgent` with `@A2AClientAgent`) sends a request to the remote agent
-2. **A2A Protocol Layer** ([JSON-RPC](https://www.jsonrpc.org/){target="_blank"}) transports the request over HTTP
-3. **AgentCard** describes the remote agent's capabilities (skills, inputs, outputs)
-4. **AgentExecutor** receives the request and orchestrates the execution
-5. **Remote AI agent** (`DispositionAgent` AI service) processes the request using tools
-6. Response flows back through the same path
+The system makes economically sound decisions:
 
-!!!info "Additional A2A Info"
-    For more information about the A2A protocol and the actors involved, see the [A2A documentation](https://a2a-protocol.org/latest/topics/key-concepts/#core-actors-in-a2a-interactions){target="_blank"}. 
+- **Car value < $5,000 + major damage** → SCRAP
+- **Repair cost > 50% of value** → SELL or SCRAP
+- **Old car (10+ years) + damage** → Disposition evaluation
+- **Valuable car + minor damage** → KEEP and repair
+
+### Flexibility Without Code Changes
+
+To adjust behavior, you can:
+
+- **Update prompts**: Change the supervisor's decision criteria
+- **Adjust thresholds**: Modify pricing guidelines or disposition rules
+- **Add context**: Provide more information (repair history, customer value)
+
+No code changes required!
 
 ---
 
-## Understanding Tasks vs. Messages
+## Comparing Patterns
 
-The A2A protocol distinguishes between [two types of interactions](https://a2a-protocol.org/latest/topics/life-of-a-task/){target="_blank"}:
-
-| Concept | Description | Use Case |
-|---------|-------------|----------|
-| **Task** | A long-running job with a defined goal and tracked state | "Determine if this car should be scrapped" |
-| **Message** | A single conversational exchange with no tracked state | Chat messages, quick questions |
-
-In this step, we'll use **Tasks** because car disposition analysis is a discrete job with a clear objective.
-
-**Task Lifecycle:**
-
-```mermaid
-sequenceDiagram
-    participant Client as Client Agent
-    participant Server as A2A Server
-    participant Executor as AgentExecutor
-    participant AI as AI Agent
-
-    Client->>Server: Create Task (POST /tasks)
-    Server->>Executor: Initialize TaskUpdater
-    Executor->>AI: Execute with input
-    AI->>AI: Process and use tools
-    AI->>Executor: Return result
-    Executor->>Server: Update task status
-    Server->>Client: Task result
-```
-
----
-
-## What Are We Going to Build?
-
-![App Blueprint](../images/agentic-app-4.png){: .center}
-
-We'll extend the car management system with:
-
-1. **DispositionFeedbackAgent**: Analyzes if a car should be disposed (scrap/sell/donate)
-2. **DispositionAgent (Client)**: Connects to the remote disposition expert via A2A
-3. **Remote A2A Server**: A separate Quarkus application exposing the disposition expert
-4. **Disposition Workflow**: Integrates disposition analysis into the car processing flow
-
-**The Complete Architecture:**
-
-```mermaid
-graph TD
-    subgraph "Main Application (localhost:8080)"
-        R[Rental/Cleaning/Maintenance Returns]
-        FW[FeedbackWorkflow<br/>Parallel]
-        DFA[DispositionFeedbackAgent]
-        AW[CarAssignmentWorkflow<br/>Conditional]
-        DAC["DispositionAgent<br/>@A2AClientAgent"]
-
-        R --> FW
-        FW --> DFA
-        DFA --> AW
-        AW --> DAC
-    end
-
-    subgraph "Remote Disposition Service (localhost:8888)"
-        AC[AgentCard]
-        AE[AgentExecutor]
-        DAI[DispositionAgent<br/>AI Service]
-        DT[DispositionTool]
-
-        AE --> DAI
-        DAI --> DT
-    end
-
-    DAC -->|A2A Protocol| AE
-
-```
-
----
-
-## Prerequisites
-
-Before starting:
-
-- Completed [Step 03](step-03.md){target="_blank"} (or have the `section-2/step-03` code available)
-- Application from Step 03 is stopped (Ctrl+C)
-- Ports 8080 and 8888 are available (you'll run two applications simultaneously)
-
----
-
-## Understanding the Project Structure
-
-The Step 04 code includes **two separate Quarkus applications**:
-
-```
-section-2/step-04/
-├── multi-agent-system/          # Main car management application (port 8080)
-│   ├── src/main/java/com/carmanagement/
-│   │   ├── agentic/
-│   │   │   ├── agents/
-│   │   │   │   ├── DispositionAgent.java          # A2A client agent
-│   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
-│   │   │   └── workflow/
-│   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
-│   │   │       ├── CarAssignmentWorkflow.java     # Conditional routing
-│   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
-│   └── pom.xml
-│
-└── remote-a2a-agent/            # Remote disposition service (port 8888)
-    ├── src/main/java/com/demo/
-    │   ├── DispositionAgentCard.java       # Describes agent capabilities
-    │   ├── DispositionAgentExecutor.java   # Handles A2A requests
-    │   ├── DispositionAgent.java           # AI service
-    │   └── DispositionTool.java            # Tool for scrap/sell/donate
-    └── pom.xml
-```
-
-**Why Two Applications?**
-
-- Simulates a real-world scenario where different teams maintain different agents
-- The disposition service could be reused by multiple client applications
-- Demonstrates cross-application agent communication via A2A
-
----
-
-!!! warning "Warning: this chapter involves many steps"
-    In order to build out the solution, you will need to go through quite a few steps.
-    While it is entirely possible to make the code changes manually (or via copy/paste),
-    we recommend starting fresh from Step 04 with the changes already applied.
-    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
-
-=== "Option 2: Start Fresh from Step 04 [Recommended]"
-
-    Navigate to the complete `section-2/step-04/multi-agent-system` directory:
-    
-    ```bash
-    cd section-2/step-04/multi-agent-system
-    ```
-
-=== "Option 1: Continue from Step 03"
-
-    If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
-    
-    === "Linux / macOS"
-        ```bash
-        cp ../step-04/multi-agent-system/pom.xml ./pom.xml
-        cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-        cp ../step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-        cp ../step-04/multi-agent-system/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-        cp ../step-04/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
-        ```
-    
-    === "Windows"
-        ```cmd
-        copy ..\step-04\multi-agent-system\pom.xml .\pom.xml
-        copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-        copy ..\step-04\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-        copy ..\step-04\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-        copy ..\step-04\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
-        ```
-
----
-
-## Part 1: Build the Client-Side Components
-
-### Step 1: Create the DispositionFeedbackAgent
-
-This agent analyzes feedback to determine if a car should be disposed.
-
-In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
-
-```java hl_lines="15 30 37-39" title="DispositionFeedbackAgent.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
-```
-
-**Key Points:**
-
-- **System message**: Focuses on economic viability (is the car worth repairing?)
-- **Specific output format**: Returns `"DISPOSITION_NOT_REQUIRED"` when the car is repairable
-- **outputKey**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
-- **Three feedback sources**: Analyzes rental, cleaning, and maintenance feedback
-
-**Decision Criteria:**
-
-The agent considers:
-
-- Severity of damage (structural, engine, transmission)
-- Repair costs vs. car value
-- Age and condition of the vehicle
-- Safety concerns
-
-### Step 2: Create the DispositionAgent (Client)
-
-This is where the A2A magic happens! 
-This agent connects to the remote disposition agent.
-
-In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
-
-```java hl_lines="13" title="DispositionAgent.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
-```
-
-**Let's break it down:**
-
-#### `@A2AClientAgent` Annotation
+### Before: Conditional Workflow (Step 03)
 
 ```java
-@A2AClientAgent(a2aServerUrl = "http://localhost:8888")
-```
+@ConditionalAgent(subAgents = {MaintenanceAgent.class, CleaningAgent.class})
+String processAction(...);
 
-This annotation transforms the method into an **A2A client**:
-
-- **`a2aServerUrl`**: The URL of the remote A2A server
-
-#### The Method Signature
-
-```java
-String processDisposition(
-    String carMake,
-    String carModel,
-    Integer carYear,
-    Long carNumber,
-    String carCondition,
-    String dispositionRequest
-)
-```
-
-These parameters are sent to the remote agent as task inputs. 
-The remote agent can access them by name.
-
-#### How It Works
-
-1. When this method is called, Quarkus LangChain4j:
-    1. Creates an A2A Task with the method parameters as inputs
-    2. Sends the task to the remote server via JSON-RPC
-    3. Waits for the remote agent to complete the task
-    4. Returns the result as a String
-
-2. No manual HTTP requests needed
-3. Type-safe: compile-time checking of parameters
-4. Automatic error handling and retries
-
----
-
-## Part 2: Update the Workflows
-
-### Step 3: Update FeedbackWorkflow
-
-The `FeedbackWorkflow` needs to include the new disposition analysis.
-
-Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
-
-```java hl_lines="16-17" title="FeedbackWorkflow.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
-```
-
-**Key changes:**
-
-Added `DispositionFeedbackAgent` to the parallel workflow:
-
-```java
-@ParallelAgent(outputKey = "feedbackResult",
-            subAgents = { CleaningFeedbackAgent.class, MaintenanceFeedbackAgent.class, DispositionFeedbackAgent.class })
-```
-
-Now **three agents run concurrently**:
-
-- `CleaningFeedbackAgent` — analyzes cleaning needs
-- `MaintenanceFeedbackAgent` — analyzes maintenance needs
-- `DispositionFeedbackAgent` — analyzes disposal needs
-
-This parallel execution is efficient: all three analyses happen at the same time!
-
-### Step 4: Update CarAssignmentWorkflow
-
-The `CarAssignmentWorkflow` needs to handle disposition requests.
-
-Update `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
-
-```java hl_lines="17-18 39-42" title="CarAssignmentWorkflow.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
-```
-
-**Key changes:**
-
-#### Added DispositionAgent to SubAgents
-
-```java
-@ConditionalAgent(outputKey = "analysisResult",
-            subAgents = { DispositionAgent.class, MaintenanceAgent.class, CleaningAgent.class })
-```
-
-#### Added Activation Condition
-
-```java
-@ActivationCondition(DispositionAgent.class)
-static boolean assignToDisposition(String dispositionRequest) {
-    return isRequired(dispositionRequest);
+@ActivationCondition(MaintenanceAgent.class)
+static boolean assignToMaintenance(String maintenanceRequest) {
+    return isRequired(maintenanceRequest);  // Simple boolean check
 }
 ```
 
-#### Updated Execution Priority
+**Limitations:**
 
-The conditional workflow now has **priority ordering**:
+- Fixed logic
+- Simple conditions
+- No disposition handling
+- Requires code changes
 
-1. **Disposition** (highest priority) — if disposal is needed
-2. **Maintenance** — if maintenance is needed and disposal isn't
-3. **Cleaning** — if cleaning is needed and neither disposal nor maintenance is
-4. **Skip** — if nothing is needed
-
-This ensures critical issues (disposal) are handled before routine tasks (cleaning).
-
-### Step 5: Update CarProcessingWorkflow
-
-Update the output method to handle disposition:
-
-Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
-
-```java hl_lines="33" title="CarProcessingWorkflow.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
-```
-
-**Key changes:**
-
-The `@Output` method now checks for disposition requests first:
+### After: Supervisor Agent (Step 04)
 
 ```java
-@Output
-static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String cleaningRequest) {
-    CarAssignment carAssignment;
-    // Check maintenance first (higher priority)
-    if (isRequired(dispositionRequest)) {   // Highest priority
-        carAssignment = CarAssignment.DISPOSITION;
-    } else if (isRequired(maintenanceRequest)) {
-        carAssignment = CarAssignment.MAINTENANCE;
-    } else if (isRequired(cleaningRequest)) {
-        carAssignment = CarAssignment.CLEANING;
-    } else {
-        carAssignment = CarAssignment.NONE;
+@SupervisorAgent(
+    subAgents = {
+        PricingAgent.class,
+        DispositionAgent.class,
+        MaintenanceAgent.class,
+        CleaningAgent.class
     }
-    return new CarConditions(carCondition, carAssignment);
-}
-```
-
-Disposition has the highest priority in the result.
-
-### Step 6: Update CarAssignment Enum
-
-Update the `CarAssignment` enum to include disposition:
-
-Update `src/main/java/com/carmanagement/model/CarAssignment.java`:
-
-```java hl_lines="7" title="CarAssignment.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarAssignment.java"
-```
-
-### Step 7: Update CarManagementService
-
-Update the service to handle disposition status:
-
-Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
-
-```java hl_lines="54-55" title="CarManagementService.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
-```
-
-**Key changes:**
-
-Added handling for `CarAssignment.DISPOSITION`:
-
-```java
-} else if (carConditions.carAssignment() == CarAssignment.DISPOSITION) {
-    carInfo.status = CarStatus.PENDING_DISPOSITION;
-}
-```
-
-When disposition is required, the car is marked as disposed and removed from the active fleet.
-
----
-
-## Part 3: Build the Remote A2A Server
-
-Now let's build the remote disposition service that will handle A2A requests.
-
-Navigate to the remote-a2a-agent directory:
-
-```bash
-cd section-2/step-04/remote-a2a-agent
-```
-
-### Step 8: Create the DispositionTool
-
-The tool that executes disposition actions (scrap, sell, donate).
-
-In `src/main/java/com/demo`, create `DispositionTool.java`:
-
-```java title="DispositionTool.java"
---8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionTool.java"
-```
-
-**Key Points:**
-
-- **One method**: `requestDisposition`
-- **@Tool annotation**: Makes each method available to the AI agent
-- **Detailed descriptions**: Help the AI agent choose the appropriate action
-
-### Step 9: Create the DispositionAgent (AI Service)
-
-The AI agent that actually makes disposition decisions.
-
-In `src/main/java/com/demo`, create `DispositionAgent.java`:
-
-```java title="DispositionAgent.java"
---8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgent.java"
-```
-
-**Key Points:**
-
-- **`@RegisterAiService`**: Registers this as an AI service (not an agentic agent)
-- **`@ToolBox(DispositionTool.class)`**: Has access to the DispositionTool
-- **System message**: Defines the agent as a car disposition specialist
-- **Decision criteria**: Considers condition, age, safety, and recommendation from the feedback agent
-
-!!!note "AI Service vs. Agentic Agent"
-    Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
-    The A2A server can expose both types.
-
-### Step 10: Create the AgentCard
-
-The **AgentCard** describes the agent's capabilities, skills, and interface.
-
-In `src/main/java/com/demo`, create `DispositionAgentCard.java`:
-
-```java hl_lines="19-21" title="DispositionAgentCard.java"
---8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentCard.java"
-```
-
-**Let's break it down:**
-
-#### `@PublicAgentCard` Annotation
-
-```java
-@Produces
-@PublicAgentCard
-public AgentCard agentCard();
-```
-
-This makes the AgentCard available at the `/card` endpoint. 
-Clients can query this endpoint to discover the agent's capabilities.
-
-#### AgentCard Components
-
-**Basic Information:**
-```java
-.name("Disposition Agent")
-.description("Determines how a car should be disposed of based on the car condition and disposition request.")
-.url("http://localhost:8888/")
-.version("1.0.0")
-```
-
-**Capabilities:**
-```java
-.capabilities(new AgentCapabilities.Builder()
-        .streaming(true)
-        .pushNotifications(false)
-        .stateTransitionHistory(false)
-        .build())
-```
-
-**Skills:**
-```java
-.skills(List.of(new AgentSkill.Builder()
-    .id("disposition")
-    .name("Car disposition")
-    .description("Makes a request to dispose of a car (SCRAP, SELL, or DONATE)")
-    .tags(List.of("disposition"))
-    .build()))
-```
-
-Skills describe what the agent can do. This helps clients discover appropriate agents for their needs.
-
-**Transport Protocol:**
-```java
-.preferredTransport(TransportProtocol.JSONRPC.asString())
-.additionalInterfaces(List.of(
-        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
-```
-
-Specifies that this agent communicates via JSON-RPC over HTTP.
-
-### Step 11: Create the AgentExecutor
-
-The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
-
-In `src/main/java/com/demo`, create `DispositionAgentExecutor.java`:
-
-```java title="DispositionAgentExecutor.java"
---8<-- "../../section-2/step-04/remote-a2a-agent/src/main/java/com/demo/DispositionAgentExecutor.java"
-```
-
-**Let's break it down:**
-
-#### CDI Bean with AgentExecutor Factory
-
-```java
-@ApplicationScoped
-public class DispositionAgentExecutor {
-    @Produces
-    public AgentExecutor agentExecutor(DispositionAgent dispositionAgent)
-```
-
-Produces an `AgentExecutor` bean that Quarkus LangChain4j will use to handle A2A task requests.
-
-#### Task Processing
-
-```java
-public void execute(RequestContext context, EventQueue eventQueue) {
-    TaskUpdater updater = new TaskUpdater(context, eventQueue);
-
-    // Extract input parts from the task
-    Map<String, MessagePart> inputParts = context.task().input();
-```
-
-The `RequestContext` contains the incoming task with all input parameters sent by the client.
-
-#### Extract Parameters
-
-```java
-String carMake = getTextPart(inputParts, "carMake");
-String carModel = getTextPart(inputParts, "carModel");
-Integer carYear = getIntegerPart(inputParts, "carYear");
-// ... etc
-```
-
-Extracts each parameter by name from the task input. These names must match the client agent's method parameters.
-
-#### Call the AI Agent
-
-```java
-String result = dispositionAgent.processDisposition(
-    carMake, carModel, carYear, carNumber, carCondition, dispositionRequest
+)
+String superviseCarProcessing(
+    String carMake, String carModel, Integer carYear,
+    String carCondition, String rentalFeedback,
+    String cleaningRequest, String maintenanceRequest,
+    String dispositionRequest  // NEW: Disposition feedback
 );
 ```
 
-Invokes the AI agent to process the disposition request.
+**Advantages:**
 
-#### Update Task Status
-
-```java
-updater.finishTask(List.of(MessagePart.text(result)));
-```
-
-Sends the result back to the client via the `TaskUpdater`. This completes the A2A task.
-
-#### Helper Methods
-
-```java
-private String getTextPart(Map<String, MessagePart> parts, String key) {
-    MessagePart part = parts.get(key);
-    return part != null ? part.content() : "";
-}
-```
-
-Safely extracts text values from MessagePart objects.
-
----
-
-## Try It Out
-
-You'll need to run **two applications simultaneously**.
-
-### Terminal 1: Start the Remote A2A Server
-
-```bash
-cd section-2/step-04/remote-a2a-agent
-./mvnw quarkus:dev
-```
-
-Wait for:
-```
-Listening on: http://localhost:8888
-```
-
-The disposition service is now running and ready to accept A2A requests!
-
-### Terminal 2: Start the Main Application
-
-Open a **new terminal** and run:
-
-```bash
-cd section-2/step-04/multi-agent-system
-./mvnw quarkus:dev
-```
-
-Wait for:
-```
-Listening on: http://localhost:8080
-```
-
-### Test the Complete Flow
-
-Open your browser to [http://localhost:8080](http://localhost:8080){target=_blank}.
-
-After reloading the UI, you should see the Returns section is now called **Returns and Dispositions**. You'll also notice that there is a new tab to list the cars that are pending disposition.
-
-![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
-
-On the Maintenance Return tab, enter feedback indicating severe damage for the Ford F-150:
-
-```
-looks like this car hit a tree
-```
-
-Click **Return**.
-
-**What happens?**
-
-1. **Parallel Analysis** (FeedbackWorkflow):
-    1. `DispositionFeedbackAgent`: "Disposition required — severe damage"
-    2. `MaintenanceFeedbackAgent`: "Major repairs needed"
-    3. `CleaningFeedbackAgent`: "Not applicable"
-
-2. **Conditional Routing** (CarAssignmentWorkflow):
-    1. Disposition condition: `true` (required)
-    2. → Executes `DispositionAgent` (A2A client)
-
-3. **A2A Communication**:
-    1. Client sends task to `http://localhost:8888`
-    2. `AgentExecutor` receives and processes task
-    3. `DispositionAgent` (AI service) analyzes using `DispositionTool`
-    4. Result flows back to client
-
-4. **UI Update**:
-    1. Car status → `DISPOSED`
-    2. Car appears in the Dispositions tab
-
-### Check the Logs
-
-**Terminal 1 (Remote A2A Server):**
-```
-⛍ DispositionTool result: Ford F-150 (2021), Car #11: Scrap the car
-```
-
-**Terminal 2 (Main Application):**
-```
-[DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
-[CarAssignmentWorkflow] Activating DispositionAgent
-[DispositionAgent @A2AClientAgent] Sending task to http://localhost:8888
-[DispositionAgent @A2AClientAgent] Received result: Car should be scrapped...
-```
-
-Notice the **cross-application communication** via A2A!
-
----
-
-## How It All Works Together
-
-Let's trace the complete flow:
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Service as CarManagementService
-    participant Workflow as CarProcessingWorkflow
-    participant FeedbackWF as FeedbackWorkflow
-    participant ActionWF as CarAssignmentWorkflow
-    participant Client as DispositionAgent<br/>@A2AClientAgent
-    participant A2A as A2A Protocol<br/>(JSON-RPC)
-    participant Executor as AgentExecutor
-    participant Remote as DispositionAgent<br/>AI Service
-    participant Tool as DispositionTool
-
-    User->>Service: Return car with severe damage
-    Service->>Workflow: processCarReturn(...)
-
-    rect rgb(255, 243, 205)
-    Note over Workflow,FeedbackWF: Parallel Analysis
-    Workflow->>FeedbackWF: Execute
-    par Concurrent Execution
-        FeedbackWF->>FeedbackWF: CleaningFeedbackAgent
-    and
-        FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
-    and
-        FeedbackWF->>FeedbackWF: DispositionFeedbackAgent<br/>Result: "DISPOSITION_REQUIRED"
-    end
-    end
-
-    rect rgb(248, 215, 218)
-    Note over Workflow,ActionWF: Conditional Routing
-    Workflow->>ActionWF: Execute
-    ActionWF->>ActionWF: Check: dispositionRequest required? YES
-    ActionWF->>Client: Execute DispositionAgent
-    end
-
-    rect rgb(212, 237, 218)
-    Note over Client,Tool: A2A Communication
-    Client->>A2A: Create Task with inputs
-    A2A->>Executor: POST /tasks
-    Executor->>Remote: processDisposition(...)
-    Remote->>Tool: scrapCar() / sellCar() / donateCar()
-    Tool->>Tool: Execute disposal action
-    Tool->>Remote: Return result
-    Remote->>Executor: Return recommendation
-    Executor->>A2A: Update task status
-    A2A->>Client: Return result
-    end
-
-    Client->>Workflow: Return disposition result
-    Workflow->>Service: Return CarConditions
-    Service->>Service: Set status to DISPOSED
-    Service->>User: Update UI
-```
-
----
-
-## Understanding the A2A Implementation
-
-### Client Side (`@A2AClientAgent`)
-
-The client agent is remarkably simple:
-
-```java
-@A2AClientAgent(a2aServerUrl = "http://localhost:8888", ...)
-String processDisposition(...)
-```
-
-Quarkus LangChain4j handles:
-
-- Creating the A2A task
-- Serializing method parameters as task inputs
-- Sending the HTTP request via JSON-RPC
-- Waiting for the response
-- Deserializing the result
-- Error handling and retries
-
-### Server Side (AgentCard + AgentExecutor)
-
-The server requires more components:
-
-| Component | Purpose |
-|-----------|---------|
-| **AgentCard** | Describes agent capabilities, published at `/card` endpoint |
-| **AgentExecutor** | Receives and processes A2A task requests |
-| **TaskUpdater** | Updates task status and sends results back to client |
-| **AI Agent** | The actual AI service that processes requests |
-| **Tools** | Actions the AI agent can perform |
-
-This separation allows:
-- Agents to focus on business logic
-- A2A infrastructure to handle protocol details
-- Multiple agents to be exposed from one server
-
----
-
-## Key Takeaways
-
-- **A2A enables distributed agents**: Different teams can maintain specialized agents in separate systems
-- **`@A2AClientAgent` is powerful**: Simple annotation transforms a method into an A2A client
-- **AgentCard describes capabilities**: Clients can discover what remote agents can do
-- **AgentExecutor handles protocol**: Separates A2A infrastructure from agent logic
-- **Tasks vs. Messages**: A2A supports both task-based and conversational interactions
-- **Type-safe integration**: Method parameters automatically become task inputs
-- **Remote agents integrate seamlessly**: Works with existing workflows and agents
-- **Two runtimes communicate**: Real-world simulation of distributed agent systems
+- AI-driven decisions
+- Context-aware reasoning
+- Handles complex disposition scenarios
+- Easy to adjust via prompts
+- Economic intelligence built-in
 
 ---
 
 ## Experiment Further
 
-### 1. Add Agent Discovery
+### 1. Add More Disposition Criteria
 
-The AgentCard is published at `http://localhost:8888/card`. Try:
+Enhance the DispositionAgent to consider:
 
-```bash
-curl http://localhost:8888/card | jq
-```
+- Repair history (frequent repairs → disposition)
+- Market demand for specific models
+- Seasonal factors (convertibles in winter)
+- Fleet composition (too many of same model)
 
-You'll see the full agent description including skills, capabilities, and transport protocols.
+### 2. Implement Multi-Tier Pricing
 
-### 2. Test Different Disposition Scenarios
+Create different pricing strategies:
 
-Try these feedback examples:
+- Wholesale value (for SCRAP decisions)
+- Retail value (for SELL decisions)
+- Donation value (for tax purposes)
 
-**Scenario 1: Sell the car**
-```
-Minor engine issues, good body condition, low mileage. Repair cost: $800.
-```
+### 3. Add Disposition Workflow
 
-**Scenario 2: Donate the car**
-```
-Old car, high mileage, runs but needs work. Market value low.
-```
+Create a separate workflow for cars marked PENDING_DISPOSITION:
 
-**Scenario 3: Scrap the car**
-```
-Total loss from flood damage, electrical system destroyed.
-```
+- Get multiple price quotes
+- Check auction values
+- Evaluate donation options
+- Final disposition decision
 
-Observe how the remote agent makes different decisions!
+### 4. Test Edge Cases
 
-### 3. Create Your Own A2A Agent
+What happens when:
 
-What other specialized agents could be useful?
-
-- **Pricing Agent**: Determines optimal rental pricing based on demand
-- **Route Planner Agent**: Plans maintenance schedules for the fleet
-- **Insurance Agent**: Assesses insurance claims for damaged cars
-
-Try creating a simple A2A server for one of these!
-
-### 4. Monitor A2A Communication
-
-Add logging to see the JSON-RPC messages:
-
-```properties
-# In application.properties
-quarkus.log.category."io.a2a".level=DEBUG
-```
-
-This shows the raw A2A protocol messages.
+- Luxury car with severe damage?
+- Old car in excellent condition?
+- Multiple disposition-worthy issues?
+- Repair cost estimate unavailable?
 
 ---
 
 ## Troubleshooting
 
-??? warning "Connection refused to localhost:8888"
-    Make sure the remote A2A server is running in Terminal 1. Check for:
-    ```
-    Listening on: http://localhost:8888
-    ```
+??? warning "Supervisor not invoking DispositionAgent"
+    - Check that DispositionFeedbackAgent is detecting severe damage keywords
+    - Verify "DISPOSITION_REQUIRED" is in the output
+    - Review supervisor's system message for disposition routing logic
+    - Add logging to see feedback values
 
-    If you see "Port already in use", another application is using port 8888. You can change it in `remote-a2a-agent/src/main/resources/application.properties`:
-    ```properties
-    quarkus.http.port=8889
-    ```
+??? warning "Cars not getting PENDING_DISPOSITION status"
+    - Check the output logic in CarProcessingWorkflow
+    - Verify `dispositionRequest` parameter is being passed
+    - Ensure `isDisposition()` method checks for correct keywords
+    - Check CarManagementService status mapping
 
-    Then update the client's `a2aServerUrl` accordingly.
-
-??? warning "Task execution timeout"
-    If the remote agent takes too long to respond, you might see a timeout error. The default timeout is sufficient for most cases, but you can increase it if needed by configuring the A2A client.
-
-??? warning "Parameter mismatch errors"
-    If you see errors about missing parameters, verify that:
-
-    - Client agent method parameter names match what AgentExecutor extracts
-    - The `getTextPart()` / `getIntegerPart()` calls use the correct keys
-    - All required parameters are being sent by the client
-
-??? warning "Agent not activating"
-    If the DispositionAgent never executes, check:
-
-    - The `@ActivationCondition` method is correctly implemented
-    - The `dispositionRequest` contains `"DISPOSITION_REQUIRED"`
-    - The condition is being checked in the correct order
-
-??? warning "Both applications on same port"
-    If you see "Port already in use" on 8080:
-
-    - Make sure you stopped the application from Step 03
-    - Only run the main application from `multi-agent-system`, not from a previous step directory
-    - Check for zombie Java processes: `ps aux | grep java`
+??? warning "PricingAgent returning unexpected values"
+    - Review the pricing guidelines in the `@SystemMessage`
+    - Check that car information (make, model, year) is passed correctly
+    - Verify the LLM is following the output format
+    - Test with different car makes/models/years
 
 ---
 
 ## What's Next?
 
-You've successfully built a distributed agent system using the A2A protocol!
+You've implemented the **Supervisor Pattern** for autonomous, context-aware orchestration with intelligent disposition decisions!
 
-You learned how to:
+The supervisor agent can now:
 
-- Connect to remote agents using `@A2AClientAgent`
-- Build A2A servers with AgentCard and AgentExecutor
-- Integrate remote agents into complex workflows
-- Run multiple Quarkus applications that communicate via A2A
+- Detect severe damage requiring disposition
+- Estimate vehicle value
+- Make economically sound SCRAP/SELL/DONATE/KEEP decisions
+- Route to appropriate action agents based on feedback
 
-This completes **Section 2: Agentic Systems**! You've progressed from simple agents to complex distributed workflows with remote agent communication.
+In **Step 05**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local DispositionAgent you just built into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
 
-**Congratulations!** You now have the skills to build sophisticated multi-agent systems with Quarkus LangChain4j!
-
----
-
-## Additional Resources
-
-- [A2A Protocol Specification](https://a2a.dev)
-- [Quarkus LangChain4j Documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/)
-- [Quarkus LangChain4j Agentic Module](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agentic.html)
+[Continue to Step 05 - Using Remote Agents (A2A)](step-05.md)

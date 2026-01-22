@@ -454,7 +454,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 
 **Key Points:**
 
-- Focuses on mechanical issues and maintenance needs
+- Focuses on mechanical issues, body damage, and maintenance needs
 - Returns "MAINTENANCE_NOT_REQUIRED" for easy conditional checking
 - Uses `outputKey` to store result in AgenticScope
 

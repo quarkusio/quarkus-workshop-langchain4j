@@ -30,8 +30,7 @@ public interface MaintenanceFeedbackAgent {
         Cleaning Feedback: {cleaningFeedback}
         Maintenance Feedback: {maintenanceFeedback}
         """)
-    @Agent(description = "Car maintenance analyzer. Using feedback, determines if a car needs maintenance.",
-            outputKey = "maintenanceRequest")
+    @Agent(description = "Car maintenance analyzer. Using feedback, determines if a car needs maintenance.", outputKey = "maintenanceRequest")
     String analyzeForMaintenance(
             String carMake,
             String carModel,
