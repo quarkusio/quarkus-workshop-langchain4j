@@ -75,7 +75,6 @@ You learned how to build **autonomous, context-aware orchestration** using super
 **What you built:**
 - `FleetSupervisorAgent`: AI-driven supervisor using `@SupervisorAgent` annotation
 - `PricingAgent`: Vehicle valuation specialist
-- `FleetDemand` enum: Context for dynamic decision-making
 - Adaptive workflow that adjusts based on business conditions
 
 **Key concepts:**

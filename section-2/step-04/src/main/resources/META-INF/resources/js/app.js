@@ -6,7 +6,6 @@ let currentSortDirection = 'asc';
 let carsData = []; // Store the cars data globally for sorting
 let currentFilterText = '';
 let currentFilterField = 'all';
-let currentFleetDemand = 'MEDIUM'; // Default fleet demand level
 let lastUpdatedCarId = null; // Track the last updated car for highlighting
 
 // Wait for the DOM to be fully loaded

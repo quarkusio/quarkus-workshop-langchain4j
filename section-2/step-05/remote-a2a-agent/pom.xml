@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.langchain4j</groupId>
-    <artifactId>quarkus-workshop-langchain4j-2-04-remote-a2a-agent</artifactId>
+    <artifactId>quarkus-workshop-langchain4j-2-05-remote-a2a-agent</artifactId>
     <version>1.0.0</version>
 
 
