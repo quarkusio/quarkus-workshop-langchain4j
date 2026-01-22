@@ -8,7 +8,7 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.model.RequiredAction;
+import io.quarkus.logging.Log;
 
 /**
  * Service for managing car returns from various operations.
@@ -35,6 +35,11 @@ public class CarManagementService {
             return "Car not found with number: " + carNumber;
         }
 
+        Log.info("FeedbackWorkflow executing...");
+        Log.info("  ├─ CleaningFeedbackAgent analyzing...");
+        Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
+        Log.info("CarAssignmentWorkflow evaluating conditions...");
+        
         // Process the car return using the workflow and get the AgenticScope
         CarConditions carConditions = carProcessingWorkflow.processCarReturn(
                 carInfo.make,
@@ -46,12 +51,22 @@ public class CarManagementService {
                 cleaningFeedback != null ? cleaningFeedback : "",
                 maintenanceFeedback != null ? maintenanceFeedback : "");
 
+        Log.info("CarConditionFeedbackAgent updating...");
+        
         // Update the car's condition with the result from CarConditionFeedbackAgent
         carInfo.condition = carConditions.generalCondition();
 
-        // If no action is required, then the car should be available for the next rental
-        if (carConditions.requiredAction() == RequiredAction.NONE) {
-            carInfo.status = CarStatus.AVAILABLE;
+        // Update the car status based on the required action
+        switch (carConditions.carAssignment()) {
+            case MAINTENANCE:
+                carInfo.status = CarStatus.IN_MAINTENANCE;
+                break;
+            case CLEANING:
+                carInfo.status = CarStatus.AT_CLEANING;
+                break;
+            case NONE:
+                carInfo.status = CarStatus.AVAILABLE;
+                break;
         }
         
         // Persist the changes to the database

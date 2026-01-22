@@ -140,7 +140,7 @@ graph TD
         R[Rental/Cleaning/Maintenance Returns]
         FW[FeedbackWorkflow<br/>Parallel]
         DFA[DispositionFeedbackAgent]
-        AW[ActionWorkflow<br/>Conditional]
+        AW[CarAssignmentWorkflow<br/>Conditional]
         DAC["DispositionAgent<br/>@A2AClientAgent"]
 
         R --> FW
@@ -189,7 +189,7 @@ section-2/step-04/
 │   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
 │   │   │   └── workflow/
 │   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
-│   │   │       ├── ActionWorkflow.java            # Conditional routing
+│   │   │       ├── CarAssignmentWorkflow.java     # Conditional routing
 │   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
 │   └── pom.xml
 │
@@ -362,14 +362,14 @@ Now **three agents run concurrently**:
 
 This parallel execution is efficient: all three analyses happen at the same time!
 
-### Step 4: Update ActionWorkflow
+### Step 4: Update CarAssignmentWorkflow
 
-The `ActionWorkflow` needs to handle disposition requests.
+The `CarAssignmentWorkflow` needs to handle disposition requests.
 
-Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
+Update `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
 
-```java hl_lines="17-18 39-42" title="ActionWorkflow.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java"
+```java hl_lines="17-18 39-42" title="CarAssignmentWorkflow.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
 ```
 
 **Key changes:**
@@ -377,7 +377,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 #### Added DispositionAgent to SubAgents
 
 ```java
-@ConditionalAgent(outputKey = "actionResult",
+@ConditionalAgent(outputKey = "analysisResult",
             subAgents = { DispositionAgent.class, MaintenanceAgent.class, CleaningAgent.class })
 ```
 
@@ -385,7 +385,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/ActionWorkflow.java`:
 
 ```java
 @ActivationCondition(DispositionAgent.class)
-static boolean activateDisposition(String dispositionRequest) {
+static boolean assignToDisposition(String dispositionRequest) {
     return isRequired(dispositionRequest);
 }
 ```
@@ -418,31 +418,31 @@ The `@Output` method now checks for disposition requests first:
 ```java
 @Output
 static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String cleaningRequest) {
-    RequiredAction requiredAction;
+    CarAssignment carAssignment;
     // Check maintenance first (higher priority)
     if (isRequired(dispositionRequest)) {   // Highest priority
-        requiredAction = RequiredAction.DISPOSITION;
+        carAssignment = CarAssignment.DISPOSITION;
     } else if (isRequired(maintenanceRequest)) {
-        requiredAction = RequiredAction.MAINTENANCE;
+        carAssignment = CarAssignment.MAINTENANCE;
     } else if (isRequired(cleaningRequest)) {
-        requiredAction = RequiredAction.CLEANING;
+        carAssignment = CarAssignment.CLEANING;
     } else {
-        requiredAction = RequiredAction.NONE;
+        carAssignment = CarAssignment.NONE;
     }
-    return new CarConditions(carCondition, requiredAction);
+    return new CarConditions(carCondition, carAssignment);
 }
 ```
 
 Disposition has the highest priority in the result.
 
-### Step 6: Update RequiredAction Enum
+### Step 6: Update CarAssignment Enum
 
-Update the `RequiredAction` enum to include disposition:
+Update the `CarAssignment` enum to include disposition:
 
-Update `src/main/java/com/carmanagement/model/RequiredAction.java`:
+Update `src/main/java/com/carmanagement/model/CarAssignment.java`:
 
-```java hl_lines="7" title="RequiredAction.java"
---8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/RequiredAction.java"
+```java hl_lines="7" title="CarAssignment.java"
+--8<-- "../../section-2/step-04/multi-agent-system/src/main/java/com/carmanagement/model/CarAssignment.java"
 ```
 
 ### Step 7: Update CarManagementService
@@ -457,10 +457,10 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 **Key changes:**
 
-Added handling for `RequiredAction.DISPOSITION`:
+Added handling for `CarAssignment.DISPOSITION`:
 
 ```java
-} else if (carConditions.requiredAction() == RequiredAction.DISPOSITION) {
+} else if (carConditions.carAssignment() == CarAssignment.DISPOSITION) {
     carInfo.status = CarStatus.PENDING_DISPOSITION;
 }
 ```
@@ -711,7 +711,7 @@ Click **Return**.
     2. `MaintenanceFeedbackAgent`: "Major repairs needed"
     3. `CleaningFeedbackAgent`: "Not applicable"
 
-2. **Conditional Routing** (ActionWorkflow):
+2. **Conditional Routing** (CarAssignmentWorkflow):
     1. Disposition condition: `true` (required)
     2. → Executes `DispositionAgent` (A2A client)
 
@@ -735,7 +735,7 @@ Click **Return**.
 **Terminal 2 (Main Application):**
 ```
 [DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
-[ActionWorkflow] Activating DispositionAgent
+[CarAssignmentWorkflow] Activating DispositionAgent
 [DispositionAgent @A2AClientAgent] Sending task to http://localhost:8888
 [DispositionAgent @A2AClientAgent] Received result: Car should be scrapped...
 ```
@@ -754,7 +754,7 @@ sequenceDiagram
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
     participant FeedbackWF as FeedbackWorkflow
-    participant ActionWF as ActionWorkflow
+    participant ActionWF as CarAssignmentWorkflow
     participant Client as DispositionAgent<br/>@A2AClientAgent
     participant A2A as A2A Protocol<br/>(JSON-RPC)
     participant Executor as AgentExecutor

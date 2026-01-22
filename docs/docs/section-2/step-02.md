@@ -42,18 +42,103 @@ In this step, you will:
 ## Understanding Workflows
 
 With Quarkus LangChain4j, you can compose multiple agents to work together as a _team_.
-Much like the building blocks of a programming language, `quarkus-langchain4j-agentic` provides a few basic patterns to build different types of workflows:
+Much like the building blocks of a programming language, `quarkus-langchain4j-agentic` provides a few basic patterns to build different types of workflows.
 
-| Workflow Type   | Description | Use Case                                                |
-|-----------------|-------------|---------------------------------------------------------|
-| **Sequential**  | Agents execute one after another in order | When one agent needs the output from a previous agent   |
-| **Parallel**    | Agents execute simultaneously on separate threads | When agents can work independently for faster execution |
-| **Loop**        | Agents run repeatedly until a condition is met | When iterative refinement is needed                     |
-| **Conditional** | Agents only execute if a condition is satisfied | When different paths are needed based on context        |
+LangChain4j provides 4 fundamental workflow patterns that can be combined to create sophisticated agentic systems:
 
-!!!note
-    LangChain4j provides these basic 4 basic workflows out of the box, but it also provides additional
-    building blocks to create more advanced and custom goal-oriented agentic AI patterns, such as the [supervisor pattern](https://docs.langchain4j.dev/tutorials/agents#supervisor-design-and-customization){target="_blank"}, [goal-oriented pattern](https://docs.langchain4j.dev/tutorials/agents#goal-oriented-agentic-pattern){target="_blank"}, [peer-to-peer](https://docs.langchain4j.dev/tutorials/agents#peer-to-peer-agentic-pattern){target="_blank"}, [human in the loop](https://docs.langchain4j.dev/tutorials/agents#human-in-the-loop){target="_blank"}, etc.
+### Sequential Workflows (`@SequenceAgent`)
+
+With sequential workflows, agents execute **one after another** in a defined order.
+(This is why it's also called "Prompt Chaining")
+
+```mermaid
+graph LR
+    A[Agent 1] --> B[Agent 2] --> C[Agent 3]
+    style A fill:#90EE90
+    style B fill:#90EE90
+    style C fill:#90EE90
+```
+
+**When to use:** Each agent needs the output from the previous agent.
+
+**Example:** Process feedback → Update condition → Send notification
+
+---
+
+### Parallel Workflows (`@ParallelAgent`)
+
+Parallel workflows allow agents to be executed **simultaneously** on separate threads.
+
+```mermaid
+graph TD
+    Start[Start] --> A[Agent 1]
+    Start --> B[Agent 2]
+    Start --> C[Agent 3]
+    A --> End[Continue]
+    B --> End
+    C --> End
+    style A fill:#87CEEB
+    style B fill:#87CEEB
+    style C fill:#87CEEB
+```
+
+**When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of both.
+
+**Example:** Analyze for cleaning needs AND maintenance needs at the same time
+
+**Performance benefit:** If each agent takes 2 seconds, sequential = 4 seconds total, parallel = ~2 seconds total!
+
+---
+
+### Conditional Workflows (`@ConditionalAgent`)
+
+Conditional Workflows will execute agents **only if their activation condition is met**.
+
+```mermaid
+graph TD
+    Start[Start] --> Check1{Condition 1?}
+    Check1 -->|Yes| A[Agent 1]
+    Check1 -->|No| Check2{Condition 2?}
+    A --> End[Continue]
+    Check2 -->|Yes| B[Agent 2]
+    Check2 -->|No| End
+    B --> End
+    style A fill:#FFD700
+    style B fill:#FFD700
+```
+
+**When to use:** When different execution paths are needed based on runtime data (e.g. the output of a previous agent execution).
+
+**Example:** If maintenance needed → send to maintenance, else if cleaning needed → send to cleaning
+
+---
+
+### Loop Workflows (`@LoopAgent`)
+
+With Loop workflows, agents run **repeatedly until a condition is met**.
+
+```mermaid
+graph TD
+    Start[Start] --> A[Agent]
+    A --> Check{Continue?}
+    Check -->|Yes| A
+    Check -->|No| End[Done]
+    style A fill:#FFA07A
+```
+
+**When to use:** When iterative refinement or retries are needed.
+
+**Example:** Keep refining a report until quality threshold is met (with e.g. a max of 5 attempts)
+
+---
+
+### Composing Workflows
+
+These basic workflows can be **nested within workflows** to create more advanced logic.
+You can use probabilistic AI when it makes sense, and create deterministic workflows to control the flow.
+
+!!!note "Autonomous and Goal Oriented Agentic AI Patterns"
+    LangChain4j also provides additional building blocks to create more advanced and custom goal-oriented agentic AI patterns, such as the [supervisor pattern](https://docs.langchain4j.dev/tutorials/agents#supervisor-design-and-customization){target="_blank"}, [goal-oriented pattern](https://docs.langchain4j.dev/tutorials/agents#goal-oriented-agentic-pattern){target="_blank"}, [peer-to-peer](https://docs.langchain4j.dev/tutorials/agents#peer-to-peer-agentic-pattern){target="_blank"}, [human in the loop](https://docs.langchain4j.dev/tutorials/agents#human-in-the-loop){target="_blank"}, etc.
     
     We will visit these further along in this workshop. For now, let's focus on the basics.
 
@@ -141,7 +226,7 @@ Before starting:
 
 ---
 
-## Step 1: Create the CarConditionFeedbackAgent
+## Create the CarConditionFeedbackAgent
 
 Create a new agent that analyzes feedback to determine a car's current condition.
 
@@ -209,7 +294,7 @@ Other agents or the workflow can then access this value.
 
 ---
 
-## Step 2: Create the CarConditions Model
+## Create the CarConditions Model
 
 Before creating the workflow, we need a data model to return both the car condition and whether a cleaning is required.
 
@@ -223,7 +308,7 @@ This simple record combines the results from both agents in our workflow.
 
 ---
 
-## Step 3: Update the CleaningAgent
+## Update the CleaningAgent
 
 The `CleaningAgent` needs to specify an `outputKey` so its result can be accessed by the workflow.
 
@@ -239,7 +324,7 @@ The `@Agent` annotation adds `outputKey = "cleaningAgentResult"`. This stores th
 
 ---
 
-## Step 4: Create the Workflow Directory
+## Create the Workflow Directory
 
 If continuing from Step 01, create the workflow directory:
 
@@ -255,7 +340,7 @@ If continuing from Step 01, create the workflow directory:
 
 ---
 
-## Step 5: Define the CarProcessingWorkflow
+## Define the CarProcessingWorkflow
 
 Now, create the workflow that orchestrates both agents.
 
@@ -325,7 +410,7 @@ static CarConditions output(String carCondition, String cleaningAgentResult) {
 
 ---
 
-## Step 6: Update the CarManagementService
+## Update the CarManagementService
 
 Now update the service to use the workflow instead of calling agents directly.
 
@@ -535,7 +620,7 @@ How does the condition agent synthesize feedback from multiple sources?
     We chose a **sequential** workflow in this step because:
 
     1. It's simpler to understand as your first workflow
-    2. It sets us up for [Step 03](../step-03){target="_blank"}, where we'll add more agents that DO depend on each other
+    2. It sets us up for [Step 03](../step-03.md){target="_blank"}, where we'll add more agents that DO depend on each other
 
     Feel free to try converting this to a parallel workflow as an experiment! Replace `@SequenceAgent` with `@ParallelAgent` and see what happens.
 

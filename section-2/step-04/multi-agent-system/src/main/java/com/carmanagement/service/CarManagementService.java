@@ -8,7 +8,6 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.model.RequiredAction;
 
 /**
  * Service for managing car returns from various operations.
@@ -49,10 +48,20 @@ public class CarManagementService {
         // Update the car's condition with the result from CarConditionFeedbackAgent
         carInfo.condition = carConditions.generalCondition();
 
-        if (carConditions.requiredAction() == RequiredAction.NONE) {
-            carInfo.status = CarStatus.AVAILABLE;
-        } else if (carConditions.requiredAction() == RequiredAction.DISPOSITION) {
-            carInfo.status = CarStatus.PENDING_DISPOSITION;
+        // Update the car status based on the required action
+        switch (carConditions.carAssignment()) {
+            case DISPOSITION:
+                carInfo.status = CarStatus.PENDING_DISPOSITION;
+                break;
+            case MAINTENANCE:
+                carInfo.status = CarStatus.IN_MAINTENANCE;
+                break;
+            case CLEANING:
+                carInfo.status = CarStatus.AT_CLEANING;
+                break;
+            case NONE:
+                carInfo.status = CarStatus.AVAILABLE;
+                break;
         }
         
         // Persist the changes to the database
