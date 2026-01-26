@@ -1,10 +1,10 @@
-# Step 04 - Supervisor Pattern for Dynamic Orchestration
+# Step 04 - Supervisor Pattern for Autonomous Agentic Orchestration
 
-## Supervisor Pattern for Dynamic Orchestration
+## Supervisor Pattern for Autonomous Agentic Orchestration
 
 In the previous step, you created **nested workflows** that combined sequential, parallel, and conditional patterns to build sophisticated multi-level orchestration.
 
-However, those workflows used **fixed, deterministic routing** - the conditions were hardcoded and predictable. What if you need **dynamic, context-aware orchestration** where an AI agent decides which sub-agents to invoke based on the current situation?
+However, those workflows used **fixed, deterministic routing** - the conditions were hardcoded and predictable, which is great for maintaining control over the agentic workflow. But what if outcomes are less predictable and you need **dynamic, context-aware orchestration** where an AI agent decides which sub-agents to invoke based on the current situation?
 
 In this step, you'll learn about the **Supervisor Pattern** - a powerful approach where a supervisor agent autonomously orchestrates other agents based on runtime context and business conditions.
 
@@ -19,10 +19,10 @@ The system needs to:
 1. **Detect severe damage** that might make a car uneconomical to repair
 2. **Estimate vehicle value** to inform disposition decisions
 3. **Decide disposition strategy** (SCRAP, SELL, DONATE, or KEEP) based on:
-   - Car value
-   - Age of the vehicle
-   - Severity of damage
-   - Repair cost estimates
+       - Car value
+       - Age of the vehicle
+       - Severity of damage
+       - Repair cost estimates
 4. **Let an AI supervisor orchestrate** the entire decision-making process
 
 ---
@@ -46,7 +46,7 @@ In this step, you will:
 
 A **supervisor agent** is an AI agent that:
 
-- **Coordinates other agents** (called sub-agents)
+- **Autonomously coordinates other (sub-)agents**
 - **Makes runtime decisions** about which agents to invoke
 - **Adapts to context** using business rules and current conditions
 - **Provides autonomous orchestration** without hardcoded logic
@@ -64,10 +64,9 @@ A **supervisor agent** is an AI agent that:
 
 Use supervisor agents when you need:
 
-- **Context-aware routing**: Decisions based on multiple factors
-- **Business rule flexibility**: Easy to adjust without code changes
-- **Complex orchestration**: Multiple agents with interdependencies
-- **Adaptive behavior**: System that learns and improves
+- **Context-aware routing** where decisions are based on multiple factors that are hard to predict
+- **Business rule flexibility** that are easier to adjust without code changes
+- **Complex orchestration** with multiple agents that have interdependencies
 
 ---
 
@@ -75,11 +74,11 @@ Use supervisor agents when you need:
 
 We're going to enhance our car management system with:
 
-- **DispositionFeedbackAgent**: Detects severe damage requiring disposition evaluation
-- **PricingAgent**: Estimates vehicle market value
-- **DispositionAgent**: Decides SCRAP/SELL/DONATE/KEEP based on value and condition
-- **FleetSupervisorAgent**: Orchestrates feedback and action agents autonomously
-- **Updated workflow**: Two-phase processing (feedback → supervisor → actions)
+- a **FleetSupervisorAgent** that will orchestrate feedback and action agents autonomously
+- a **DispositionFeedbackAgent** that detects severe damage requiring disposition evaluation
+- a **PricingAgent** that estimates vehicle market value
+- a **DispositionAgent** which will decide to SCRAP/SELL/DONATE/KEEP based on value and condition
+- an **Updated workflow** with two-phase processing (feedback → supervisor → actions)
 
 ### The New Architecture
 
@@ -131,105 +130,172 @@ The **FleetSupervisorAgent** receives feedback from three parallel agents and th
 
 ---
 
-## Key Implementation Details
+## Implementing the Supervisor Pattern
 
-### DispositionFeedbackAgent (NEW)
+Let's build the new autonomous dispositioning system step by step.
 
-Detects severe damage that requires disposition evaluation:
+## Prerequisites
 
-```java title="DispositionFeedbackAgent.java" hl_lines="12-28 44"
+Before starting:
+
+- Completed [Step 03](step-03.md){target="_blank"} (or have the `section-2/step-03` code available)
+- Application from Step 03 is stopped (Ctrl+C)
+
+=== "Option 1: Continue from Step 03"
+
+    If you want to continue building on your Step 03 code, copy the updated UI files from `step-04`:
+
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-03
+        cp ../step-04/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
+        cp ../step-04/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
+        cp ../step-04/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-03
+        copy ..\step-04\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
+        copy ..\step-04\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
+        copy ..\step-04\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
+        ```
+
+=== "Option 2: Start Fresh from Step 04"
+
+    Navigate to the complete `section-2/step-04` directory:
+
+    ```bash
+    cd section-2/step-04
+    ```
+
+---
+
+### Create the DispositionFeedbackAgent
+
+Create an agent that detects severe damage requiring disposition evaluation.
+
+In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionFeedbackAgent.java`:
+
+```java title="DispositionFeedbackAgent.java" hl_lines="15-19 22 25 42"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
 ```
 
-**Key Points:**
+This agent runs in **parallel** with the other feedback agents,
+looking for keywords like "wrecked", "totaled", or "crashed" that indicate severe damage.
 
-- Analyzes feedback for severe damage keywords ("wrecked", "totaled", "crashed")
-- Outputs "DISPOSITION_REQUIRED" or "DISPOSITION_NOT_REQUIRED"
-- Runs in parallel with other feedback agents
-- Provides early detection of cars that need disposition evaluation
+### Create the PricingAgent
 
-### PricingAgent
+The Miles & Smiles management feels comfortable using AI to determine the value of their cars. A wise decision? That remains to be seen 😉.
 
-Estimates vehicle market value for disposition decisions:
+Either way, let's create the agent.
+We'll add some prompt engineering in the system message to 'train' the AI model on how to calculate
+the value based on the brand, its state and its age.
+As a reminder, the agent will be invoked by the supervisor when pricing is needed.
 
-```java title="PricingAgent.java" hl_lines="13-42 50-53"
+In `src/main/java/com/carmanagement/agentic/agents`, create `PricingAgent.java`:
+
+```java title="PricingAgent.java" hl_lines="16 35-37 39-41 50-53"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
 ```
 
-**Key Points:**
+### Create the DispositionAgent
 
-- Uses detailed pricing guidelines (brand base values, depreciation, condition adjustments)
-- Considers make, model, year, and condition
-- Returns structured output with value and justification
-- Invoked by supervisor when disposition evaluation is needed
+Management also feels comfortable letting an AI model decide whether to SCRAP, SELL, DONATE, or KEEP the vehicle based on repair economics.
 
-### DispositionAgent (NEW)
+Create an agent that makes disposition decisions based on the value outcome of the
+PricingAgent's value estimate as well as the car's age and condition.
 
-Makes intelligent disposition decisions:
+In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
-```java title="DispositionAgent.java" hl_lines="13-30 44"
+```java title="DispositionAgent.java" hl_lines="16 22 29 41 43"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
-**Key Points:**
+### Create the FleetSupervisorAgent
 
-- Receives car value from PricingAgent
-- Decides: SCRAP, SELL, DONATE, or KEEP
-- Considers repair cost vs. value, age, and damage severity
-- Provides clear reasoning for the decision
+Now create the **supervisor agent** that orchestrates everything.
+What's absolutely key here is to make the prompt **as clear as possible** about the
+workflow and the agents that are available to it. The more precise you are,
+the better the supervisor will be at deciding which agents to invoke.
 
-### FleetSupervisorAgent
+In `src/main/java/com/carmanagement/agentic/agents`, create `FleetSupervisorAgent.java`:
 
-Orchestrates the entire processing workflow:
-
-```java title="FleetSupervisorAgent.java" hl_lines="12-48 50-60"
+```java title="FleetSupervisorAgent.java" hl_lines="13 15 20 22"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
 ```
 
 **Key Points:**
 
-- `@SupervisorAgent` annotation enables autonomous orchestration
-- `subAgents` lists all available action agents (not feedback agents)
-- Receives feedback results as input parameters
-- Makes intelligent routing decisions based on feedback analysis
-- Two-phase approach: supervisor coordinates actions AFTER feedback is complete
+- The `@SupervisorAgent` annotation enables **autonomous orchestration**.
+- The supervisor receives feedback analysis results and **decides which action agents to invoke**.
+- Notice how the `subAgents` parameter lists only action agents (not feedback agents) - the supervisor coordinates actions after feedback is complete.
+- The **prompt clearly explains the workflow and available agents**.
 
-### Updated FeedbackWorkflow
+### Update the FeedbackWorkflow
 
-Now includes disposition feedback:
+We need to update the `FeedbackWorkflow` and add the `DispositionFeedbackAgent` to the parallel feedback workflow.
 
-```java title="FeedbackWorkflow.java" hl_lines="17"
+Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
+
+```java title="FeedbackWorkflow.java" hl_lines="5 19"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
-### Updated CarProcessingWorkflow
+### Update the CarProcessingWorkflow
 
-Sequential workflow with supervisor:
+Since we want the supervisor to determine which agents need to be called,
+we will replace the previous conditional workflow with the supervisor agent,
+and add the additional car assignment logic based on the output of the supervisor agent.
 
-```java title="CarProcessingWorkflow.java" hl_lines="21 35-60"
+Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
+
+```java title="CarProcessingWorkflow.java" hl_lines="4 22 39-49"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
-**Changes:**
+!!!question "Why both check dispositionRequest and supervisorDecision?"
+    Both checks serve different purposes in the workflow:
+    
+    1. **First check** (dispositionRequest): Catches severe damage from initial feedback analysis
+    2. **Second check** (supervisorDecision): Catches final disposition decision (SCRAP/SELL/DONATE) after pricing evaluation
+    
+    While there's logical overlap (severe damage → supervisor invokes DispositionAgent → outputs SCRAP/SELL/DONATE),
+    both checks provide defense in depth.
+    The first ensures immediate routing for catastrophic damage, while the second catches the supervisor's final action decision.
 
-- FeedbackWorkflow runs first (produces `dispositionRequest`, `maintenanceRequest`, `cleaningRequest`)
-- FleetSupervisorAgent receives feedback and orchestrates actions
-- Output logic checks `dispositionRequest` first for highest priority routing
+### Update the Service Layer
+
+Finally, we need to add the new disposition status to the processCarReturn method.
+
+In `src/main/java/com/carmanagement/service/CarManagementService.java`, add disposition handling in the `processCarReturn` method:
+
+```java
+// Add after existing status checks:
+if (carConditions.carAssignment() == CarAssignment.DISPOSITION) {
+    carInfo.status = CarStatus.PENDING_DISPOSITION;
+}
+```
 
 ---
 
 ## Try the Supervisor Pattern
 
-### Start the Application
+Nicely done! You've implemented the supervisor pattern to autonomously orchestrate agents. Let's test it:
 
-1. Navigate to the step-04 directory:
+Start the application:
 
-```bash
-cd section-2/step-04
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
 
-2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
+
+Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
 ### Test Disposition Scenarios
 
@@ -284,11 +350,15 @@ flowchart TD
 
 #### Scenario 2: Total Loss
 
-Enter the following text in the **Toyota Camry** feedback field:
+Enter the following text in the **Ford F-150** feedback field from the Maintenance Returns tab:
 
 ```text
 The car is totaled after a major accident, completely inoperable
 ```
+
+In this scenario, the car had already been sent to maintenance by the returns team,
+but the maintenance team is not able to repair the car.
+Our autonomous system can handle this scenario as well.
 
 **What happens:**
 
@@ -367,13 +437,14 @@ flowchart TD
 ```
 
 **Expected Result:**
+
 - Status: `IN_MAINTENANCE`
 - Condition describes the maintenance issue
 - Supervisor routed to MaintenanceAgent (not disposition)
 
 #### Scenario 4: Minor Issues
 
-Enter the following text in the **Ford F-150** feedback field:
+Enter the following text in the **Audi A4** feedback field (in the Maintenance Return tab):
 
 ```text
 Car is dirty, needs cleaning
@@ -409,6 +480,7 @@ flowchart TD
 ```
 
 **Expected Result:**
+
 - Status: `IN_CLEANING`
 - Condition describes cleaning needs
 - Supervisor routed to CleaningAgent only
@@ -417,115 +489,7 @@ flowchart TD
 
 After processing a car with severe damage, check the **Dispositions** tab in the Returns section. You'll see cars that have been marked for disposition with their condition and planned disposition action.
 
-![Disposition Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
-
 The UI now includes a dedicated tab to track all vehicles pending disposition, making it easy to see which cars need to be scrapped, sold, or donated.
-
-### Observe the Supervisor's Decisions
-
-Watch the console logs to see the two-phase processing:
-
-```bash
-Phase 1: FeedbackWorkflow executing (parallel)...
-  ├─ CleaningFeedbackAgent analyzing...
-  ├─ MaintenanceFeedbackAgent analyzing...
-  └─ DispositionFeedbackAgent analyzing...
-  
-Phase 2: FleetSupervisorAgent orchestrating...
-  ├─ Received: DISPOSITION_REQUIRED (severe damage detected)
-  ├─ Invoking: PricingAgent (estimating value)...
-  ├─ Invoking: DispositionAgent (making decision)...
-  └─ Decision: SCRAP - severe damage, repair cost exceeds value
-  
-Phase 3: CarConditionFeedbackAgent updating...
-  └─ Condition: SCRAP - severe damage, low value
-```
-
----
-
-## Why the Supervisor Pattern Matters
-
-### Autonomous Decision-Making
-
-The supervisor uses AI reasoning to make complex decisions:
-
-```mermaid
-graph LR
-    Input[Feedback:<br/>Disposition Required?<br/>Maintenance Needed?<br/>Cleaning Needed?] --> Supervisor[FleetSupervisorAgent<br/>AI Reasoning]
-    Supervisor --> Decision{Dynamic<br/>Orchestration}
-    Decision -->|Severe Damage| Disposition[PricingAgent<br/>→ DispositionAgent]
-    Decision -->|Repairable| Maintenance[MaintenanceAgent]
-    Decision -->|Minor Issues| Cleaning[CleaningAgent]
-```
-
-### Economic Intelligence
-
-The system makes economically sound decisions:
-
-- **Car value < $5,000 + major damage** → SCRAP
-- **Repair cost > 50% of value** → SELL or SCRAP
-- **Old car (10+ years) + damage** → Disposition evaluation
-- **Valuable car + minor damage** → KEEP and repair
-
-### Flexibility Without Code Changes
-
-To adjust behavior, you can:
-
-- **Update prompts**: Change the supervisor's decision criteria
-- **Adjust thresholds**: Modify pricing guidelines or disposition rules
-- **Add context**: Provide more information (repair history, customer value)
-
-No code changes required!
-
----
-
-## Comparing Patterns
-
-### Before: Conditional Workflow (Step 03)
-
-```java
-@ConditionalAgent(subAgents = {MaintenanceAgent.class, CleaningAgent.class})
-String processAction(...);
-
-@ActivationCondition(MaintenanceAgent.class)
-static boolean assignToMaintenance(String maintenanceRequest) {
-    return isRequired(maintenanceRequest);  // Simple boolean check
-}
-```
-
-**Limitations:**
-
-- Fixed logic
-- Simple conditions
-- No disposition handling
-- Requires code changes
-
-### After: Supervisor Agent (Step 04)
-
-```java
-@SupervisorAgent(
-    subAgents = {
-        PricingAgent.class,
-        DispositionAgent.class,
-        MaintenanceAgent.class,
-        CleaningAgent.class
-    }
-)
-String superviseCarProcessing(
-    String carMake, String carModel, Integer carYear,
-    String carCondition, String rentalFeedback,
-    String cleaningRequest, String maintenanceRequest,
-    String dispositionRequest  // NEW: Disposition feedback
-);
-```
-
-**Advantages:**
-
-- AI-driven decisions
-- Context-aware reasoning
-- Handles complex disposition scenarios
-- Easy to adjust via prompts
-- Economic intelligence built-in
 
 ---
 
