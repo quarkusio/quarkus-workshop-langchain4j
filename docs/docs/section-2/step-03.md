@@ -387,9 +387,13 @@ All agents and workflows share the same scope, enabling seamless data flow acros
 ## Optional: Implement It Yourself
 
 If you want hands-on practice implementing these patterns, you can build the solution step-by-step.
-Be warned though, there are quite a few changes to make,
-so if you're short on time and would like to learn about the next concepts, feel free to skip to the next step.
-As a middle-of-the-road solution, you can also read on and walk through the implementation steps in the source code of section-2/step-03.
+
+!!!warning "Short on time?"
+    There are quite a few changes to make,
+    so if you're short on time and would like to learn about the next concepts,
+    feel free to skip to the next step.
+    As a middle-of-the-road solution, you can also read on and walk through the implementation
+    steps in the source code of section-2/step-03 without making all the code changes yourself.
 
 ### What You'll Build
 
@@ -448,7 +452,7 @@ Before starting:
 
 Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java`:
 
-```java title="MaintenanceFeedbackAgent.java" hl_lines="10 12-21 30-32 35"
+```java title="MaintenanceFeedbackAgent.java" hl_lines="10 17-18 29-31 34"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
@@ -462,7 +466,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 
 Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java`:
 
-```java title="CleaningFeedbackAgent.java" hl_lines="17 33"
+```java title="CleaningFeedbackAgent.java" hl_lines="16-17 28-30 33"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java"
 ```
 
@@ -473,6 +477,9 @@ Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.jav
 - Stores result in AgenticScope for later use
 
 ### Create the Parallel Feedback Workflow
+
+Now, we'll create a **parallel** workflow that runs both feedback agents simultaneously.
+This is where the `@ParallelAgent` annotation comes into play.
 
 Create `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
 
@@ -494,19 +501,24 @@ These agents will examine the analysis results and determine what should happen 
 
 Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java`:
 
-```java title="MaintenanceAgent.java"
+```java title="MaintenanceAgent.java" hl_lines="30"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
 #### Update CleaningAgent
 
+The CleaningAgent we created previously should now return analysisResult as well, so the results are aggregated.
+
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
-```java title="CleaningAgent.java"
+```java title="CleaningAgent.java" hl_lines="35"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java"
 ```
 
 ### Create the Conditional Car Assignment Workflow
+
+The Car Assignment workflow is the conditional workflow which will active the appropriate
+service agent path based on the analysis results. Notice the same analysisResult from the previous 2 agents we created.
 
 Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
 
