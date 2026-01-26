@@ -55,14 +55,15 @@ public class DispositionAgentExecutor {
                     }
                 }
             
-                // Call the agent with all parameters as strings
+                // Call the agent with all parameters
                 String agentResponse = dispositionAgent.processDisposition(
                         inputs.get(0),                      // carMake
                         inputs.get(1),                      // carModel
                         Integer.parseInt(inputs.get(2)),    // carYear
                         Long.parseLong(inputs.get(3)),      // carNumber
                         inputs.get(4),                      // carCondition
-                        inputs.get(5));                     // dispositionRequest
+                        inputs.get(5),                      // carValue
+                        inputs.get(6));                     // rentalFeedback
                 
                 // Return the result
                 TextPart responsePart = new TextPart(agentResponse, null);
