@@ -15,7 +15,8 @@ public interface CarConditionFeedbackAgent {
         Analyze all feedback and provide an updated condition description.
         
         IMPORTANT: If disposition was required and a disposition decision was made (SCRAP/SELL/DONATE),
-        include that decision and brief reasoning (e.g., "SCRAP - severe damage, low value").
+        include that decision and brief reasoning (e.g., "SCRAP - severe damage, low value"). 
+        ONLY include this if you have an actual disposition decision. Don't make it up.
         
         CRITICAL: Your response MUST be 200 characters or less. Be extremely concise.
         Do not add any headers or prefixes to your response.
@@ -30,7 +31,7 @@ public interface CarConditionFeedbackAgent {
             Feedback from agents:
             Disposition Analysis: {dispositionRequest}
             Cleaning Recommendation: {cleaningRequest}
-            Maintenance Recommendation: {maintenanceRequest}
+            Maintenance Recommendation: {maintenanceRequest}            
             
             Supervisor Decision: {supervisorDecision}
             """)
@@ -48,4 +49,3 @@ public interface CarConditionFeedbackAgent {
             String supervisorDecision);
 }
 
-// Made with Bob

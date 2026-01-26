@@ -35,6 +35,9 @@ public class DispositionAgentExecutor {
         return new AgentExecutor() {
             @Override
             public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
+                System.out.println("🚗 ========================================");
+                System.out.println("🚗 REMOTE A2A DISPOSITION AGENT CALLED!");
+                System.out.println("🚗 ========================================");
 
                 TaskUpdater updater = new TaskUpdater(context, eventQueue);
                 if (context.getTask() == null) {
@@ -46,15 +49,25 @@ public class DispositionAgentExecutor {
                 
                 // Process the request message
                 Message message = context.getMessage();
+                System.out.println("📨 Processing message with " + (message.getParts() != null ? message.getParts().size() : 0) + " parts");
                 if (message.getParts() != null) {
                     for (Part<?> part : message.getParts()) {
                         if (part instanceof TextPart textPart) {
-                            System.out.println("\uD83D\uDCAC Text part: " + textPart.getText());
+                            System.out.println("💬 Text part: " + textPart.getText());
                             inputs.add(textPart.getText());
                         }
                     }
                 }
             
+                System.out.println("📋 Calling DispositionAgent with " + inputs.size() + " parameters:");
+                System.out.println("   - carMake: " + inputs.get(0));
+                System.out.println("   - carModel: " + inputs.get(1));
+                System.out.println("   - carYear: " + inputs.get(2));
+                System.out.println("   - carNumber: " + inputs.get(3));
+                System.out.println("   - carCondition: " + inputs.get(4));
+                System.out.println("   - carValue: " + inputs.get(5));
+                System.out.println("   - rentalFeedback: " + inputs.get(6));
+                
                 // Call the agent with all parameters
                 String agentResponse = dispositionAgent.processDisposition(
                         inputs.get(0),                      // carMake
@@ -64,6 +77,9 @@ public class DispositionAgentExecutor {
                         inputs.get(4),                      // carCondition
                         inputs.get(5),                      // carValue
                         inputs.get(6));                     // rentalFeedback
+                
+                System.out.println("✅ DispositionAgent response: " + agentResponse);
+                System.out.println("🚗 ========================================");
                 
                 // Return the result
                 TextPart responsePart = new TextPart(agentResponse, null);

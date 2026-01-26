@@ -264,14 +264,13 @@ The only change needed in the main application is converting the `DispositionAge
 **This is the key change from Step 4!** Instead of a local agent with full system messages and logic, we now have a simple client that delegates to a remote service.
 
 **Step 4 Version (Local):**
+
 - Had detailed `@SystemMessage` with disposition criteria
-- Received `carValue` parameter from PricingAgent
 - Made decisions locally using AI
 
 **Step 5 Version (A2A Client):**
-- No `@SystemMessage` - just a client interface
+
 - Uses `@A2AClientAgent` to connect to remote service
-- Receives `dispositionRequest` instead of `carValue`
 - Delegates all decision-making to the remote service
 
 In `src/main/java/com/carmanagement/agentic/agents`, update `DispositionAgent.java`:
@@ -301,12 +300,14 @@ String processDisposition(
     Integer carYear,
     Long carNumber,
     String carCondition,
-    String dispositionRequest
+    String carValue,
+    String rentalFeedback
 )
 ```
 
-These parameters are sent to the remote agent as task inputs. 
-The remote agent can access them by name.
+These parameters are sent to the remote agent as task inputs. The parameters match exactly what the remote DispositionAgent expects (same as Step 4's local version).
+
+**Important:** The `carValue` parameter comes from the PricingAgent that the supervisor invokes first, and `rentalFeedback` provides context about the damage.
 
 #### How It Works
 

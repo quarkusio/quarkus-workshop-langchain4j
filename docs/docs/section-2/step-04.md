@@ -190,9 +190,41 @@ Orchestrates the entire processing workflow:
 
 - `@SupervisorAgent` annotation enables autonomous orchestration
 - `subAgents` lists all available action agents (not feedback agents)
+- `@SupervisorRequest` static method provides the initial user request to the supervisor
+  - This method constructs a message that tells the supervisor what to do
+  - It receives all the method parameters and formats them into a clear request
+  - Without this, the supervisor would not know what action to take
 - Receives feedback results as input parameters
 - Makes intelligent routing decisions based on feedback analysis
 - Two-phase approach: supervisor coordinates actions AFTER feedback is complete
+
+**Understanding `@SupervisorRequest`:**
+
+The `@SupervisorRequest` annotation is crucial for supervisor agents to function. It provides the initial context and instructions that the supervisor needs to make decisions:
+
+```java
+@SupervisorRequest
+static String request(
+    String carMake,
+    String carModel,
+    // ... other parameters
+) {
+    return String.format("""
+        Process this car based on the feedback analysis results:
+        
+        Car: %d %s %s (#%d)
+        Current Condition: %s
+        
+        Feedback Analysis Results:
+        - Cleaning Request: %s
+        - Maintenance Request: %s
+        - Disposition Request: %s
+        ...
+        """, carYear, carMake, carModel, ...);
+}
+```
+
+This method is automatically called by the framework before the supervisor begins orchestration, providing it with the necessary context to make informed decisions about which sub-agents to invoke.
 
 ### Updated FeedbackWorkflow
 

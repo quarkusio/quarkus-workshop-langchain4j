@@ -1,6 +1,7 @@
 package com.carmanagement.agentic.agents;
 
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
+import dev.langchain4j.agentic.declarative.SupervisorRequest;
 import dev.langchain4j.service.SystemMessage;
 
 /**
@@ -55,5 +56,39 @@ public interface FleetSupervisorAgent {
         String maintenanceRequest,
         String dispositionRequest
     );
+
+    @SupervisorRequest
+    static String request(
+        String carMake,
+        String carModel,
+        Integer carYear,
+        Long carNumber,
+        String carCondition,
+        String cleaningRequest,
+        String maintenanceRequest,
+        String dispositionRequest,
+        String rentalFeedback
+    ) {
+        return String.format("""
+            Process this car based on the feedback analysis results:
+            
+            Car: %d %s %s (#%d)
+            Current Condition: %s
+            
+            Feedback Analysis Results:
+            - Cleaning Request: %s
+            - Maintenance Request: %s
+            - Disposition Request: %s
+            
+            Additional Context:
+            - Rental Feedback: %s
+            
+            Based on the decision logic in your system message, invoke the appropriate action agents.
+            """,
+            carYear, carMake, carModel, carNumber, carCondition,
+            cleaningRequest, maintenanceRequest, dispositionRequest,
+            rentalFeedback
+        );
+    }
 }
 
