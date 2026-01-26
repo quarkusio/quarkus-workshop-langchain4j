@@ -191,9 +191,9 @@ Orchestrates the entire processing workflow:
 - `@SupervisorAgent` annotation enables autonomous orchestration
 - `subAgents` lists all available action agents (not feedback agents)
 - `@SupervisorRequest` static method provides the initial user request to the supervisor
-  - This method constructs a message that tells the supervisor what to do
-  - It receives all the method parameters and formats them into a clear request
-  - Without this, the supervisor would not know what action to take
+      - This method constructs a message that tells the supervisor what to do
+      - It receives all the method parameters and formats them into a clear request
+      - Without this, the supervisor would not know what action to take
 - Receives feedback results as input parameters
 - Makes intelligent routing decisions based on feedback analysis
 - Two-phase approach: supervisor coordinates actions AFTER feedback is complete
