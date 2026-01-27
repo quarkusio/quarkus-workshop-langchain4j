@@ -25,6 +25,7 @@ nav:
     - Step 3 - Composing multiple agentic workflows: 'section-2/step-03.md'
     - Step 4 - Supervisor pattern for dynamic orchestration: 'section-2/step-04.md'
     - Step 5 - Using remote agents (A2A): 'section-2/step-05.md'
+    - Step 6 - Human-in-the-Loop pattern: 'section-2/step-06.md'
     - Mastering Agentic Systems: 'section-2/conclusion.md'
   - Conclusion: 'conclusion.md'
 

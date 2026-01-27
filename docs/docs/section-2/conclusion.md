@@ -2,7 +2,7 @@
 
 Congratulations! You've completed **Section 2: Agentic Systems** of the Quarkus LangChain4j workshop.
 
-Over the past five steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems.
+Over the past six steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight.
 Let's reflect on what you've built and why these patterns matter.
 
 ---
@@ -106,6 +106,28 @@ You extended beyond single-application boundaries to build **distributed multi-a
 - **Protocol abstraction**: Declarative annotations hide complex protocol details
 
 **Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
+
+---
+
+### Step 06: Human-in-the-Loop Pattern
+
+You learned how to add **human oversight** to autonomous systems, ensuring critical decisions receive human approval before execution.
+
+**What you built:**
+- `DispositionProposalAgent`: Creates disposition proposals for human review
+- `HumanApprovalAgent`: Simulates human approval decisions (in production, integrates with real approval systems)
+- Enhanced `FleetSupervisorAgent`: Routes high-value vehicles through approval workflow
+- Value-based routing: Different paths for high-value vs. low-value vehicles
+- Approval tracking: Status and reasoning stored for audit trails
+
+**Key concepts:**
+- **Human-in-the-Loop (HITL)**: AI proposes, humans decide, system executes only if approved
+- **Two-phase workflow**: Proposal generation → Human review → Conditional execution
+- **Value-based routing**: Different workflows based on business thresholds
+- **Fallback paths**: Alternative actions when proposals are rejected
+- **Audit trails**: Complete tracking of approval decisions and reasoning
+
+**Why it matters:** Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.
 
 ---
 
@@ -245,6 +267,20 @@ Local Agent (client) → A2A Protocol → Remote Agent (server)
 
 ---
 
+### Pattern 7: Human-in-the-Loop (HITL)
+
+**Structure:**
+```
+Agent Analysis → Proposal Creation → Human Review → Conditional Execution
+                                                   └→ Fallback (if rejected)
+```
+
+**When to use:** High-stakes decisions, compliance requirements, trust-building, edge cases
+
+**Example:** `DispositionProposalAgent` → `HumanApprovalAgent` → Execute if approved
+
+---
+
 ## From AI Services to Agentic Systems
 
 Remember Section 1, where you built traditional AI services? Here's how agentic systems differ:
@@ -362,6 +398,7 @@ You've mastered:
 - AgenticScope's state for agent collaboration
 - Nested workflow architectures
 - Distributed systems with A2A protocol
+- Human-in-the-Loop pattern for safe, controlled decision-making
 
 You're now equipped to build production-ready agentic systems that solve real-world problems.
 
