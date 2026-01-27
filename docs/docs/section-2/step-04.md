@@ -238,29 +238,60 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `FleetSupervisorAgen
 
 **Understanding `@SupervisorRequest`:**
 
-The `@SupervisorRequest` annotation is crucial for supervisor agents to function. It provides the initial context and instructions that the supervisor needs to make decisions:
+The `@SupervisorRequest` annotation is crucial for supervisor agents to function. It provides the initial context and instructions that the supervisor needs to make decisions.
+
+The implementation uses **conditional logic** to provide different instructions based on whether disposition is required:
 
 ```java
 @SupervisorRequest
-static String request(
-    String carMake,
-    String carModel,
-    // ... other parameters
-) {
+static String request(...) {
+    // Determine if disposition is required
+    boolean dispositionRequired = dispositionRequest != null &&
+                                 dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
+    
+    if (!dispositionRequired) {
+        // Simple path: clear instructions to avoid unnecessary agent invocations
+        return String.format("""
+            ═══════════════════════════════════════════════════════════════════════════
+            ✅ NO DISPOSITION REQUIRED
+            ═══════════════════════════════════════════════════════════════════════════
+            
+            Car: %d %s %s (#%d)
+            Current Condition: %s
+            
+            INSTRUCTIONS:
+            - DO NOT invoke PricingAgent
+            - DO NOT invoke DispositionAgent
+            - Only invoke MaintenanceAgent if maintenance needed
+            - Only invoke CleaningAgent if cleaning needed
+            """, ...);
+    }
+    
+    // Complex path: step-by-step workflow for disposition
     return String.format("""
-        Process this car based on the feedback analysis results:
+        ═══════════════════════════════════════════════════════════════════════════
+        ⚠️  DISPOSITION REQUIRED - FOLLOW WORKFLOW
+        ═══════════════════════════════════════════════════════════════════════════
         
-        Car: %d %s %s (#%d)
-        Current Condition: %s
+        STEP 1: Invoke PricingAgent to get car value
+        STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)
+        STEP 3: If DispositionAgent decides KEEP:
+                - Invoke MaintenanceAgent if maintenance needed
+                - Invoke CleaningAgent if cleaning needed
         
-        Feedback Analysis Results:
-        - Cleaning Request: %s
-        - Maintenance Request: %s
-        - Disposition Request: %s
-        ...
-        """, carYear, carMake, carModel, ...);
+        IMPORTANT: When invoking DispositionAgent:
+        - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)
+        - Use the EXACT format from PricingAgent's response
+        """, ...);
 }
 ```
+
+**Key Benefits of This Approach:**
+
+- **Explicit guidance**: The supervisor receives clear, formatted instructions that reduce ambiguity
+- **Prevents unnecessary invocations**: When no disposition is needed, explicitly tells the supervisor NOT to invoke PricingAgent/DispositionAgent
+- **Step-by-step workflow**: For complex disposition cases, provides a numbered sequence to follow
+- **Format specifications**: Includes important details like how to pass the carValue parameter
 
 This method is automatically called by the framework before the supervisor begins orchestration, providing it with the necessary context to make informed decisions about which sub-agents to invoke.
 
@@ -516,12 +547,6 @@ flowchart TD
 - Status: `IN_CLEANING`
 - Condition describes cleaning needs
 - Supervisor routed to CleaningAgent only
-
-### Observe the Disposition Tab
-
-After processing a car with severe damage, check the **Dispositions** tab in the Returns section. You'll see cars that have been marked for disposition with their condition and planned disposition action.
-
-The UI now includes a dedicated tab to track all vehicles pending disposition, making it easy to see which cars need to be scrapped, sold, or donated.
 
 ---
 

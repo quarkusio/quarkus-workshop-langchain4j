@@ -69,25 +69,63 @@ public interface FleetSupervisorAgent {
         String dispositionRequest,
         String rentalFeedback
     ) {
+        // Determine if disposition is required
+        boolean dispositionRequired = dispositionRequest != null &&
+                                     dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
+        
+        if (!dispositionRequired) {
+            // No disposition needed - simple path
+            return String.format("""
+                ═══════════════════════════════════════════════════════════════════════════
+                ✅ NO DISPOSITION REQUIRED
+                ═══════════════════════════════════════════════════════════════════════════
+                
+                Car: %d %s %s (#%d)
+                Current Condition: %s
+                
+                Disposition Request: %s
+                Cleaning Request: %s
+                Maintenance Request: %s
+                
+                INSTRUCTIONS:
+                - DO NOT invoke PricingAgent
+                - DO NOT invoke DispositionAgent
+                - Only invoke MaintenanceAgent if maintenance needed
+                - Only invoke CleaningAgent if cleaning needed
+                """,
+                carYear, carMake, carModel, carNumber, carCondition,
+                dispositionRequest, cleaningRequest, maintenanceRequest
+            );
+        }
+        
+        // Disposition required - complex path
         return String.format("""
-            Process this car based on the feedback analysis results:
+            ═══════════════════════════════════════════════════════════════════════════
+            ⚠️  DISPOSITION REQUIRED - FOLLOW WORKFLOW
+            ═══════════════════════════════════════════════════════════════════════════
             
             Car: %d %s %s (#%d)
             Current Condition: %s
+            Rental Feedback: %s
             
-            Feedback Analysis Results:
-            - Cleaning Request: %s
-            - Maintenance Request: %s
-            - Disposition Request: %s
+            Disposition Request: %s
+            Cleaning Request: %s
+            Maintenance Request: %s
             
-            Additional Context:
-            - Rental Feedback: %s
+            STEP 1: Invoke PricingAgent to get car value
+            STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)
+            STEP 3: If DispositionAgent decides KEEP:
+                    - Invoke MaintenanceAgent if maintenance needed
+                    - Invoke CleaningAgent if cleaning needed
             
-            Based on the decision logic in your system message, invoke the appropriate action agents.
+            IMPORTANT: When invoking DispositionAgent:
+            - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)
+            - Use the EXACT format from PricingAgent's response
+            
+            Follow the decision logic in your system message carefully.
             """,
-            carYear, carMake, carModel, carNumber, carCondition,
-            cleaningRequest, maintenanceRequest, dispositionRequest,
-            rentalFeedback
+            carYear, carMake, carModel, carNumber, carCondition, rentalFeedback,
+            dispositionRequest, cleaningRequest, maintenanceRequest
         );
     }
 }
