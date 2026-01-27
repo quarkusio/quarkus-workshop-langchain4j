@@ -41,7 +41,7 @@ public interface DispositionAgent {
         
         Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.
         """)
-    @Agent(outputKey = "dispositionAction", description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
+    @Agent(description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
     @A2AClientAgent(a2aServerUrl = "http://localhost:8888", outputKey = "dispositionAction")
     String processDisposition(
             String carMake,

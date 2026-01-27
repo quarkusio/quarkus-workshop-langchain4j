@@ -561,10 +561,10 @@ You'll see the same UI as Step 4 with the **Returns and Dispositions** section a
 
 ![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
 
-On the Maintenance Return tab, enter feedback indicating severe damage for the Ford F-150:
+On the Rental Return tab, enter feedback indicating severe damage for the Honda Civic:
 
 ```
-looks like this car hit a tree
+looks like this car hit a tree and is damaged beyond repair
 ```
 
 Click **Return**.
