@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2771,10 +2771,15 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>All agents and workflows share the same scope, enabling seamless data flow across levels.</p>
 <hr>
 <h2 id="optional-implement-it-yourself">Optional: Implement It Yourself<a class="headerlink" href="#optional-implement-it-yourself" title="Permanent link"></a></h2>
-<p>If you want hands-on practice implementing these patterns, you can build the solution step-by-step.
-Be warned though, there are quite a few changes to make,
-so if you’re short on time and would like to learn about the next concepts, feel free to skip to the next step.
-As a middle-of-the-road solution, you can also read on and walk through the implementation steps in the source code of section-2/step-03.</p>
+<p>If you want hands-on practice implementing these patterns, you can build the solution step-by-step.</p>
+<div class="admonition warning">
+<p class="admonition-title">Short on time?</p>
+<p>There are quite a few changes to make,
+so if you’re short on time and would like to learn about the next concepts,
+feel free to skip to the next step.
+As a middle-of-the-road solution, you can also read on and walk through the implementation
+steps in the source code of section-2/step-03 without making all the code changes yourself.</p>
+</div>
 <h3 id="what-youll-build">What You’ll Build<a class="headerlink" href="#what-youll-build" title="Permanent link"></a></h3>
 <p>Starting from your current code in <code>section-2/step-02</code>, you’ll add:</p>
 <ol>
@@ -2839,31 +2844,31 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="cm"> */</span>
 <a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="hll"><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">MaintenanceFeedbackAgent</span><span class="w"> </span><span class="p">{</span>
 </span><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="hll"><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
-</span><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="hll"><span class="s">        You are a car maintenance analyzer for a car rental company. Your job is to determine if a car needs maintenance based on feedback.</span>
-</span><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="hll"><span class="s">        Analyze the feedback and car information to decide if maintenance is needed.</span>
-</span><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="hll"><span class="s">        If the feedback mentions mechanical issues, strange noises, performance problems, significant body damage or anything that suggests</span>
-</span><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="hll"><span class="s">        the car needs maintenance, recommend appropriate maintenance.</span>
-</span><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="hll"><span class="s">        Be specific about what type of maintenance is needed (oil change, tire rotation, brake service, engine service, transmission service, body work).</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="s">        You are a car maintenance analyzer for a car rental company. Your job is to determine if a car needs maintenance based on feedback.</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="s">        Analyze the feedback and car information to decide if maintenance is needed.</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="s">        If the feedback mentions mechanical issues, strange noises, performance problems, significant body damage or anything that suggests</span>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="s">        the car needs maintenance, recommend appropriate maintenance.</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="hll"><span class="s">        Be specific about what type of maintenance is needed (oil change, tire rotation, brake service, engine service, transmission service, body work).</span>
 </span><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="hll"><span class="s">        If no service of any kind, repairs or maintenance are needed, respond with "MAINTENANCE_NOT_REQUIRED".</span>
-</span><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="hll"><span class="s">        Include the reason for your choice but keep your response short.</span>
-</span><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="hll"><span class="s">        """</span><span class="p">)</span>
-</span><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="hll"><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-</span><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">        Car Information:</span>
+</span><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="s">        Include the reason for your choice but keep your response short.</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">        Car Information:</span>
 <a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">        Make: {carMake}</span>
 <a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">        Model: {carModel}</span>
 <a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="s">        Year: {carYear}</span>
 <a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">        Previous Condition: {carCondition}</span>
 <a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a>
 <a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">        Feedback:</span>
-<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="s">        Rental Feedback: {rentalFeedback}</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="hll"><span class="s">        Cleaning Feedback: {cleaningFeedback}</span>
+<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="hll"><span class="s">        Rental Feedback: {rentalFeedback}</span>
+</span><a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="hll"><span class="s">        Cleaning Feedback: {cleaningFeedback}</span>
 </span><a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="hll"><span class="s">        Maintenance Feedback: {maintenanceFeedback}</span>
-</span><a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="hll"><span class="s">        """</span><span class="p">)</span>
-</span><a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car maintenance analyzer. Using feedback, determines if a car needs maintenance."</span><span class="p">,</span>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"maintenanceRequest"</span><span class="p">)</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForMaintenance</span><span class="p">(</span>
-</span><a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
+</span><a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car maintenance analyzer. Using feedback, determines if a car needs maintenance."</span><span class="p">,</span>
+<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"maintenanceRequest"</span><span class="p">)</span>
+</span><a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForMaintenance</span><span class="p">(</span>
+<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
 <a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
 <a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
 <a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
@@ -2896,8 +2901,8 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="s">        You are a cleaning analyzer for a car rental company. Your job is to determine if a car needs cleaning based on feedback.</span>
 <a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="s">        Analyze the feedback and car information to decide if a cleaning is needed.</span>
 <a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="s">        If the feedback mentions dirt, mud, stains, or anything that suggests the car is dirty, recommend a cleaning.</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="s">        Be specific about what type of cleaning is needed (exterior, interior, detailing, waxing).</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="hll"><span class="s">        If no interior or exterior car cleaning services are needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="hll"><span class="s">        Be specific about what type of cleaning is needed (exterior, interior, detailing, waxing).</span>
+</span><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="hll"><span class="s">        If no interior or exterior car cleaning services are needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".</span>
 </span><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="s">        Include the reason for your choice but keep your response short.</span>
 <a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="s">        """</span><span class="p">)</span>
 <a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
@@ -2908,10 +2913,10 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="s">        Previous Condition: {carCondition}</span>
 <a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>
 <a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="s">        Feedback:</span>
-<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="s">        Rental Feedback: {rentalFeedback}</span>
-<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="s">        Cleaning Feedback: {cleaningFeedback}</span>
-<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="s">        Maintenance Feedback: {maintenanceFeedback}</span>
-<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="hll"><span class="s">        Rental Feedback: {rentalFeedback}</span>
+</span><a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="hll"><span class="s">        Cleaning Feedback: {cleaningFeedback}</span>
+</span><a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="hll"><span class="s">        Maintenance Feedback: {maintenanceFeedback}</span>
+</span><a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="s">        """</span><span class="p">)</span>
 <a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Cleaning analyzer. Using feedback, determines if a cleaning is needed."</span><span class="p">,</span>
 <a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cleaningRequest"</span><span class="p">)</span>
 </span><a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeForCleaning</span><span class="p">(</span>
@@ -2932,6 +2937,8 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <li>Stores result in AgenticScope for later use</li>
 </ul>
 <h3 id="create-the-parallel-feedback-workflow">Create the Parallel Feedback Workflow<a class="headerlink" href="#create-the-parallel-feedback-workflow" title="Permanent link"></a></h3>
+<p>Now, we’ll create a <strong>parallel</strong> workflow that runs both feedback agents simultaneously.
+This is where the <code>@ParallelAgent</code> annotation comes into play.</p>
 <p>Create <code>src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java</code>:</p>
 <div class="highlight"><span class="filename">FeedbackWorkflow.java</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.workflow</span><span class="p">;</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
@@ -2999,8 +3006,8 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a><span class="s">        {maintenanceRequest}</span>
 <a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="s">        """</span><span class="p">)</span>
 <a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car maintenance specialist. Using car information and request, determines what maintenance services are needed."</span><span class="p">,</span>
-<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"analysisResult"</span><span class="p">)</span>
-<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">MaintenanceTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"analysisResult"</span><span class="p">)</span>
+</span><a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">MaintenanceTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 <a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processMaintenance</span><span class="p">(</span>
 <a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
 <a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
@@ -3010,6 +3017,7 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-16-38" name="__codelineno-16-38" href="#__codelineno-16-38"></a><span class="p">}</span>
 </code></pre></div>
 <h4 id="update-cleaningagent">Update CleaningAgent<a class="headerlink" href="#update-cleaningagent" title="Permanent link"></a></h4>
+<p>The CleaningAgent we created previously should now return analysisResult as well, so the results are aggregated.</p>
 <p>Update <code>src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java</code>:</p>
 <div class="highlight"><span class="filename">CleaningAgent.java</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
@@ -3045,8 +3053,8 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a><span class="s">        {cleaningRequest}</span>
 <a id="__codelineno-17-33" name="__codelineno-17-33" href="#__codelineno-17-33"></a><span class="s">        """</span><span class="p">)</span>
 <a id="__codelineno-17-34" name="__codelineno-17-34" href="#__codelineno-17-34"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Cleaning specialist. Determines what cleaning services are needed."</span><span class="p">,</span>
-<a id="__codelineno-17-35" name="__codelineno-17-35" href="#__codelineno-17-35"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"analysisResult"</span><span class="p">)</span>
-<a id="__codelineno-17-36" name="__codelineno-17-36" href="#__codelineno-17-36"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">CleaningTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<a id="__codelineno-17-35" name="__codelineno-17-35" href="#__codelineno-17-35"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"analysisResult"</span><span class="p">)</span>
+</span><a id="__codelineno-17-36" name="__codelineno-17-36" href="#__codelineno-17-36"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">CleaningTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 <a id="__codelineno-17-37" name="__codelineno-17-37" href="#__codelineno-17-37"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processCleaning</span><span class="p">(</span>
 <a id="__codelineno-17-38" name="__codelineno-17-38" href="#__codelineno-17-38"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
 <a id="__codelineno-17-39" name="__codelineno-17-39" href="#__codelineno-17-39"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
@@ -3056,6 +3064,8 @@ As a middle-of-the-road solution, you can also read on and walk through the impl
 <a id="__codelineno-17-43" name="__codelineno-17-43" href="#__codelineno-17-43"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="create-the-conditional-car-assignment-workflow">Create the Conditional Car Assignment Workflow<a class="headerlink" href="#create-the-conditional-car-assignment-workflow" title="Permanent link"></a></h3>
+<p>The Car Assignment workflow is the conditional workflow which will active the appropriate
+service agent path based on the analysis results. Notice the same analysisResult from the previous 2 agents we created.</p>
 <p>Create <code>src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java</code>:</p>
 <div class="highlight"><span class="filename">CarAssignmentWorkflow.java</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.workflow</span><span class="p">;</span>
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
