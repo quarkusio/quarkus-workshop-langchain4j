@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2469,13 +2469,13 @@ You will then be able to walk through this chapter and focus on the examples and
 <a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>
 <a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="s">        Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.</span>
 <a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"dispositionAction"</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car disposition specialist. Determines how to dispose of a car based on value and condition."</span><span class="p">)</span>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car disposition specialist. Determines how to dispose of a car based on value and condition."</span><span class="p">)</span>
 <a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="w">    </span><span class="nd">@A2AClientAgent</span><span class="p">(</span><span class="n">a2aServerUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"http://localhost:8888"</span><span class="p">,</span><span class="w"> </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"dispositionAction"</span><span class="p">)</span>
 <a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processDisposition</span><span class="p">(</span>
 <a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
 <a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
 <a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
 <a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
 <a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carValue</span><span class="p">,</span>
 <a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">);</span>
@@ -2936,8 +2936,8 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <p>Open your browser to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>.</p>
 <p>You’ll see the same UI as Step 4 with the <strong>Returns and Dispositions</strong> section and the <strong>Dispositions</strong> tab (introduced in Step 4).</p>
 <p><img alt="Maintenance Returns Tab" class="center" src="../../images/agentic-UI-maintenance-returns-2.png"></p>
-<p>On the Maintenance Return tab, enter feedback indicating severe damage for the Ford F-150:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>looks like this car hit a tree
+<p>On the Rental Return tab, enter feedback indicating severe damage for the Honda Civic:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>looks like this car hit a tree and is damaged beyond repair
 </code></pre></div>
 <p>Click <strong>Return</strong>.</p>
 <p><strong>What happens?</strong></p>

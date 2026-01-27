@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1165,17 +1165,6 @@ You are not viewing the latest version.
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#observe-the-disposition-tab" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Observe the Disposition Tab
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1675,17 +1664,6 @@ You are not viewing the latest version.
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#observe-the-disposition-tab" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Observe the Disposition Tab
-      
-    </span>
-  </a>
   
 </li>
         
@@ -2252,28 +2230,66 @@ the better the supervisor will be at deciding which agents to invoke.</p>
 <a id="__codelineno-6-69" name="__codelineno-6-69" href="#__codelineno-6-69"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">dispositionRequest</span><span class="p">,</span>
 <a id="__codelineno-6-70" name="__codelineno-6-70" href="#__codelineno-6-70"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span>
 <a id="__codelineno-6-71" name="__codelineno-6-71" href="#__codelineno-6-71"></a><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-72" name="__codelineno-6-72" href="#__codelineno-6-72"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-6-73" name="__codelineno-6-73" href="#__codelineno-6-73"></a><span class="s">            Process this car based on the feedback analysis results:</span>
-<a id="__codelineno-6-74" name="__codelineno-6-74" href="#__codelineno-6-74"></a>
-<a id="__codelineno-6-75" name="__codelineno-6-75" href="#__codelineno-6-75"></a><span class="s">            Car: %d %s %s (#%d)</span>
-<a id="__codelineno-6-76" name="__codelineno-6-76" href="#__codelineno-6-76"></a><span class="s">            Current Condition: %s</span>
-<a id="__codelineno-6-77" name="__codelineno-6-77" href="#__codelineno-6-77"></a>
-<a id="__codelineno-6-78" name="__codelineno-6-78" href="#__codelineno-6-78"></a><span class="s">            Feedback Analysis Results:</span>
-<a id="__codelineno-6-79" name="__codelineno-6-79" href="#__codelineno-6-79"></a><span class="s">            - Cleaning Request: %s</span>
-<a id="__codelineno-6-80" name="__codelineno-6-80" href="#__codelineno-6-80"></a><span class="s">            - Maintenance Request: %s</span>
-<a id="__codelineno-6-81" name="__codelineno-6-81" href="#__codelineno-6-81"></a><span class="s">            - Disposition Request: %s</span>
+<a id="__codelineno-6-72" name="__codelineno-6-72" href="#__codelineno-6-72"></a><span class="w">        </span><span class="c1">// Determine if disposition is required</span>
+<a id="__codelineno-6-73" name="__codelineno-6-73" href="#__codelineno-6-73"></a><span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dispositionRequest</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<a id="__codelineno-6-74" name="__codelineno-6-74" href="#__codelineno-6-74"></a><span class="w">                                     </span><span class="n">dispositionRequest</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"DISPOSITION_REQUIRED"</span><span class="p">);</span>
+<a id="__codelineno-6-75" name="__codelineno-6-75" href="#__codelineno-6-75"></a>
+<a id="__codelineno-6-76" name="__codelineno-6-76" href="#__codelineno-6-76"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dispositionRequired</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-77" name="__codelineno-6-77" href="#__codelineno-6-77"></a><span class="w">            </span><span class="c1">// No disposition needed - simple path</span>
+<a id="__codelineno-6-78" name="__codelineno-6-78" href="#__codelineno-6-78"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-6-79" name="__codelineno-6-79" href="#__codelineno-6-79"></a><span class="s">                ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-6-80" name="__codelineno-6-80" href="#__codelineno-6-80"></a><span class="s">                ✅ NO DISPOSITION REQUIRED</span>
+<a id="__codelineno-6-81" name="__codelineno-6-81" href="#__codelineno-6-81"></a><span class="s">                ═══════════════════════════════════════════════════════════════════════════</span>
 <a id="__codelineno-6-82" name="__codelineno-6-82" href="#__codelineno-6-82"></a>
-<a id="__codelineno-6-83" name="__codelineno-6-83" href="#__codelineno-6-83"></a><span class="s">            Additional Context:</span>
-<a id="__codelineno-6-84" name="__codelineno-6-84" href="#__codelineno-6-84"></a><span class="s">            - Rental Feedback: %s</span>
+<a id="__codelineno-6-83" name="__codelineno-6-83" href="#__codelineno-6-83"></a><span class="s">                Car: %d %s %s (#%d)</span>
+<a id="__codelineno-6-84" name="__codelineno-6-84" href="#__codelineno-6-84"></a><span class="s">                Current Condition: %s</span>
 <a id="__codelineno-6-85" name="__codelineno-6-85" href="#__codelineno-6-85"></a>
-<a id="__codelineno-6-86" name="__codelineno-6-86" href="#__codelineno-6-86"></a><span class="s">            Based on the decision logic in your system message, invoke the appropriate action agents.</span>
-<a id="__codelineno-6-87" name="__codelineno-6-87" href="#__codelineno-6-87"></a><span class="s">            """</span><span class="p">,</span>
-<a id="__codelineno-6-88" name="__codelineno-6-88" href="#__codelineno-6-88"></a><span class="w">            </span><span class="n">carYear</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
-<a id="__codelineno-6-89" name="__codelineno-6-89" href="#__codelineno-6-89"></a><span class="w">            </span><span class="n">cleaningRequest</span><span class="p">,</span><span class="w"> </span><span class="n">maintenanceRequest</span><span class="p">,</span><span class="w"> </span><span class="n">dispositionRequest</span><span class="p">,</span>
-<a id="__codelineno-6-90" name="__codelineno-6-90" href="#__codelineno-6-90"></a><span class="w">            </span><span class="n">rentalFeedback</span>
-<a id="__codelineno-6-91" name="__codelineno-6-91" href="#__codelineno-6-91"></a><span class="w">        </span><span class="p">);</span>
-<a id="__codelineno-6-92" name="__codelineno-6-92" href="#__codelineno-6-92"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-6-93" name="__codelineno-6-93" href="#__codelineno-6-93"></a><span class="p">}</span>
+<a id="__codelineno-6-86" name="__codelineno-6-86" href="#__codelineno-6-86"></a><span class="s">                Disposition Request: %s</span>
+<a id="__codelineno-6-87" name="__codelineno-6-87" href="#__codelineno-6-87"></a><span class="s">                Cleaning Request: %s</span>
+<a id="__codelineno-6-88" name="__codelineno-6-88" href="#__codelineno-6-88"></a><span class="s">                Maintenance Request: %s</span>
+<a id="__codelineno-6-89" name="__codelineno-6-89" href="#__codelineno-6-89"></a>
+<a id="__codelineno-6-90" name="__codelineno-6-90" href="#__codelineno-6-90"></a><span class="s">                INSTRUCTIONS:</span>
+<a id="__codelineno-6-91" name="__codelineno-6-91" href="#__codelineno-6-91"></a><span class="s">                - DO NOT invoke PricingAgent</span>
+<a id="__codelineno-6-92" name="__codelineno-6-92" href="#__codelineno-6-92"></a><span class="s">                - DO NOT invoke DispositionAgent</span>
+<a id="__codelineno-6-93" name="__codelineno-6-93" href="#__codelineno-6-93"></a><span class="s">                - Only invoke MaintenanceAgent if maintenance needed</span>
+<a id="__codelineno-6-94" name="__codelineno-6-94" href="#__codelineno-6-94"></a><span class="s">                - Only invoke CleaningAgent if cleaning needed</span>
+<a id="__codelineno-6-95" name="__codelineno-6-95" href="#__codelineno-6-95"></a><span class="s">                """</span><span class="p">,</span>
+<a id="__codelineno-6-96" name="__codelineno-6-96" href="#__codelineno-6-96"></a><span class="w">                </span><span class="n">carYear</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
+<a id="__codelineno-6-97" name="__codelineno-6-97" href="#__codelineno-6-97"></a><span class="w">                </span><span class="n">dispositionRequest</span><span class="p">,</span><span class="w"> </span><span class="n">cleaningRequest</span><span class="p">,</span><span class="w"> </span><span class="n">maintenanceRequest</span>
+<a id="__codelineno-6-98" name="__codelineno-6-98" href="#__codelineno-6-98"></a><span class="w">            </span><span class="p">);</span>
+<a id="__codelineno-6-99" name="__codelineno-6-99" href="#__codelineno-6-99"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-6-100" name="__codelineno-6-100" href="#__codelineno-6-100"></a>
+<a id="__codelineno-6-101" name="__codelineno-6-101" href="#__codelineno-6-101"></a><span class="w">        </span><span class="c1">// Disposition required - complex path</span>
+<a id="__codelineno-6-102" name="__codelineno-6-102" href="#__codelineno-6-102"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-6-103" name="__codelineno-6-103" href="#__codelineno-6-103"></a><span class="s">            ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-6-104" name="__codelineno-6-104" href="#__codelineno-6-104"></a><span class="s">            ⚠️  DISPOSITION REQUIRED - FOLLOW WORKFLOW</span>
+<a id="__codelineno-6-105" name="__codelineno-6-105" href="#__codelineno-6-105"></a><span class="s">            ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-6-106" name="__codelineno-6-106" href="#__codelineno-6-106"></a>
+<a id="__codelineno-6-107" name="__codelineno-6-107" href="#__codelineno-6-107"></a><span class="s">            Car: %d %s %s (#%d)</span>
+<a id="__codelineno-6-108" name="__codelineno-6-108" href="#__codelineno-6-108"></a><span class="s">            Current Condition: %s</span>
+<a id="__codelineno-6-109" name="__codelineno-6-109" href="#__codelineno-6-109"></a><span class="s">            Rental Feedback: %s</span>
+<a id="__codelineno-6-110" name="__codelineno-6-110" href="#__codelineno-6-110"></a>
+<a id="__codelineno-6-111" name="__codelineno-6-111" href="#__codelineno-6-111"></a><span class="s">            Disposition Request: %s</span>
+<a id="__codelineno-6-112" name="__codelineno-6-112" href="#__codelineno-6-112"></a><span class="s">            Cleaning Request: %s</span>
+<a id="__codelineno-6-113" name="__codelineno-6-113" href="#__codelineno-6-113"></a><span class="s">            Maintenance Request: %s</span>
+<a id="__codelineno-6-114" name="__codelineno-6-114" href="#__codelineno-6-114"></a>
+<a id="__codelineno-6-115" name="__codelineno-6-115" href="#__codelineno-6-115"></a><span class="s">            STEP 1: Invoke PricingAgent to get car value</span>
+<a id="__codelineno-6-116" name="__codelineno-6-116" href="#__codelineno-6-116"></a><span class="s">            STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)</span>
+<a id="__codelineno-6-117" name="__codelineno-6-117" href="#__codelineno-6-117"></a><span class="s">            STEP 3: If DispositionAgent decides KEEP:</span>
+<a id="__codelineno-6-118" name="__codelineno-6-118" href="#__codelineno-6-118"></a><span class="s">                    - Invoke MaintenanceAgent if maintenance needed</span>
+<a id="__codelineno-6-119" name="__codelineno-6-119" href="#__codelineno-6-119"></a><span class="s">                    - Invoke CleaningAgent if cleaning needed</span>
+<a id="__codelineno-6-120" name="__codelineno-6-120" href="#__codelineno-6-120"></a>
+<a id="__codelineno-6-121" name="__codelineno-6-121" href="#__codelineno-6-121"></a><span class="s">            IMPORTANT: When invoking DispositionAgent:</span>
+<a id="__codelineno-6-122" name="__codelineno-6-122" href="#__codelineno-6-122"></a><span class="s">            - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)</span>
+<a id="__codelineno-6-123" name="__codelineno-6-123" href="#__codelineno-6-123"></a><span class="s">            - Use the EXACT format from PricingAgent's response</span>
+<a id="__codelineno-6-124" name="__codelineno-6-124" href="#__codelineno-6-124"></a>
+<a id="__codelineno-6-125" name="__codelineno-6-125" href="#__codelineno-6-125"></a><span class="s">            Follow the decision logic in your system message carefully.</span>
+<a id="__codelineno-6-126" name="__codelineno-6-126" href="#__codelineno-6-126"></a><span class="s">            """</span><span class="p">,</span>
+<a id="__codelineno-6-127" name="__codelineno-6-127" href="#__codelineno-6-127"></a><span class="w">            </span><span class="n">carYear</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span>
+<a id="__codelineno-6-128" name="__codelineno-6-128" href="#__codelineno-6-128"></a><span class="w">            </span><span class="n">dispositionRequest</span><span class="p">,</span><span class="w"> </span><span class="n">cleaningRequest</span><span class="p">,</span><span class="w"> </span><span class="n">maintenanceRequest</span>
+<a id="__codelineno-6-129" name="__codelineno-6-129" href="#__codelineno-6-129"></a><span class="w">        </span><span class="p">);</span>
+<a id="__codelineno-6-130" name="__codelineno-6-130" href="#__codelineno-6-130"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-131" name="__codelineno-6-131" href="#__codelineno-6-131"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Key Points:</strong></p>
 <ul>
@@ -2289,27 +2305,57 @@ the better the supervisor will be at deciding which agents to invoke.</p>
 </li>
 </ul>
 <p><strong>Understanding <code>@SupervisorRequest</code>:</strong></p>
-<p>The <code>@SupervisorRequest</code> annotation is crucial for supervisor agents to function. It provides the initial context and instructions that the supervisor needs to make decisions:</p>
+<p>The <code>@SupervisorRequest</code> annotation is crucial for supervisor agents to function. It provides the initial context and instructions that the supervisor needs to make decisions.</p>
+<p>The implementation uses <strong>conditional logic</strong> to provide different instructions based on whether disposition is required:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@SupervisorRequest</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">request</span><span class="p">(</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="c1">// ... other parameters</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="s">        Process this car based on the feedback analysis results:</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">        Car: %d %s %s (#%d)</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="s">        Current Condition: %s</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s">        Feedback Analysis Results:</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="s">        - Cleaning Request: %s</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="s">        - Maintenance Request: %s</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="s">        - Disposition Request: %s</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">        ...</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">        """</span><span class="p">,</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="p">}</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">request</span><span class="p">(...)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="c1">// Determine if disposition is required</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dispositionRequest</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">                                 </span><span class="n">dispositionRequest</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"DISPOSITION_REQUIRED"</span><span class="p">);</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dispositionRequired</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">        </span><span class="c1">// Simple path: clear instructions to avoid unnecessary agent invocations</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">            ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="s">            ✅ NO DISPOSITION REQUIRED</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="s">            ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="s">            Car: %d %s %s (#%d)</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="s">            Current Condition: %s</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">            INSTRUCTIONS:</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">            - DO NOT invoke PricingAgent</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="s">            - DO NOT invoke DispositionAgent</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="s">            - Only invoke MaintenanceAgent if maintenance needed</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="s">            - Only invoke CleaningAgent if cleaning needed</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="s">            """</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="c1">// Complex path: step-by-step workflow for disposition</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="s">        ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="s">        ⚠️  DISPOSITION REQUIRED - FOLLOW WORKFLOW</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="s">        ═══════════════════════════════════════════════════════════════════════════</span>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="s">        STEP 1: Invoke PricingAgent to get car value</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="s">        STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="s">        STEP 3: If DispositionAgent decides KEEP:</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="s">                - Invoke MaintenanceAgent if maintenance needed</span>
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="s">                - Invoke CleaningAgent if cleaning needed</span>
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="s">        IMPORTANT: When invoking DispositionAgent:</span>
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="s">        - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)</span>
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="s">        - Use the EXACT format from PricingAgent's response</span>
+<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a><span class="s">        """</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a><span class="p">}</span>
 </code></pre></div>
+<p><strong>Key Benefits of This Approach:</strong></p>
+<ul>
+<li><strong>Explicit guidance</strong>: The supervisor receives clear, formatted instructions that reduce ambiguity</li>
+<li><strong>Prevents unnecessary invocations</strong>: When no disposition is needed, explicitly tells the supervisor NOT to invoke PricingAgent/DispositionAgent</li>
+<li><strong>Step-by-step workflow</strong>: For complex disposition cases, provides a numbered sequence to follow</li>
+<li><strong>Format specifications</strong>: Includes important details like how to pass the carValue parameter</li>
+</ul>
 <p>This method is automatically called by the framework before the supervisor begins orchestration, providing it with the necessary context to make informed decisions about which sub-agents to invoke.</p>
 <h3 id="updated-feedbackworkflow">Updated FeedbackWorkflow<a class="headerlink" href="#updated-feedbackworkflow" title="Permanent link"></a></h3>
 <p>We need to update the <code>FeedbackWorkflow</code> and add the <code>DispositionFeedbackAgent</code> to the parallel feedback workflow.</p>
@@ -2700,9 +2746,6 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li>Condition describes cleaning needs</li>
 <li>Supervisor routed to CleaningAgent only</li>
 </ul>
-<h3 id="observe-the-disposition-tab">Observe the Disposition Tab<a class="headerlink" href="#observe-the-disposition-tab" title="Permanent link"></a></h3>
-<p>After processing a car with severe damage, check the <strong>Dispositions</strong> tab in the Returns section. You’ll see cars that have been marked for disposition with their condition and planned disposition action.</p>
-<p>The UI now includes a dedicated tab to track all vehicles pending disposition, making it easy to see which cars need to be scrapped, sold, or donated.</p>
 <hr>
 <h2 id="experiment-further">Experiment Further<a class="headerlink" href="#experiment-further" title="Permanent link"></a></h2>
 <h3 id="1-add-more-disposition-criteria">1. Add More Disposition Criteria<a class="headerlink" href="#1-add-more-disposition-criteria" title="Permanent link"></a></h3>
