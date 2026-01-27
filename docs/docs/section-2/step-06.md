@@ -347,6 +347,25 @@ This makes the threshold configurable without code changes.
 
 Now let's see the Human-in-the-Loop pattern in action!
 
+!!!warning "Keep the Remote A2A Service Running"
+    Before starting the step-06 application, make sure you have the **remote A2A service from step-05** running in a separate terminal.
+    
+    **Why?** The DispositionAgent used in this step is still running as a remote service (from step-05) and communicates via Agent-to-Agent (A2A) protocol.
+    
+    **Port Configuration:**
+    
+    - Remote A2A service (step-05): `http://localhost:8888`
+    - Main application (step-06): `http://localhost:8080`
+    
+    **To start the remote service:**
+    
+    ```bash
+    cd section-2/step-05/remote-a2a-agent
+    ./mvnw quarkus:dev
+    ```
+    
+    Keep this terminal running while you work with step-06. Both services need to be running for the Human-in-the-Loop workflow to work correctly.
+
 ### Start the Application
 
 1. Navigate to the step-06 directory:
