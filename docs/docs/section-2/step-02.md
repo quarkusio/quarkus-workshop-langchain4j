@@ -620,7 +620,7 @@ How does the condition agent synthesize feedback from multiple sources?
     We chose a **sequential** workflow in this step because:
 
     1. It's simpler to understand as your first workflow
-    2. It sets us up for [Step 03](../step-03.md){target="_blank"}, where we'll add more agents that DO depend on each other
+    2. It sets us up for [Step 03](step-03.md){target="_blank"}, where we'll add more agents that DO depend on each other
 
     Feel free to try converting this to a parallel workflow as an experiment! Replace `@SequenceAgent` with `@ParallelAgent` and see what happens.
 
@@ -648,6 +648,6 @@ How does the condition agent synthesize feedback from multiple sources?
 You've successfully built your first multi-agent workflow!
 You learned how agents collaborate through `AgenticScope` and how sequential workflows coordinate their execution.
 
-In **Step 03**, you'll learn about **nested workflows**, combining sequential, parallel, and conditional workflows to build sophisticated agent systems!
+In **Step 03**, you'll learn about **composing Multiple Agentic Workflows**, combining sequential, parallel, and conditional workflows to build sophisticated agent systems!
 
-[Continue to Step 03 - Building Nested Agent Workflows](step-03.md)
+[Continue to Step 03 - Composing Multiple Agentic Workflows](step-03.md)

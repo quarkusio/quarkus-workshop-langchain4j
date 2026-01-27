@@ -469,4 +469,4 @@ In this step, you built a **single autonomous agent** that makes decisions and u
 
 In **Step 02**, you'll learn how to compose **multiple agents into workflows** — where agents collaborate to solve complex problems together!
 
-[Continue to Step 02 - Composing Simple Agent Workflows](step-02.md)
+[Continue to Step 02 - Composing Simple Agentic Workflows](step-02.md)
