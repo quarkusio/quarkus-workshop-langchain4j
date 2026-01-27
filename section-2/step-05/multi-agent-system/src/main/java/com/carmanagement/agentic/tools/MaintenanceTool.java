@@ -1,6 +1,7 @@
 package com.carmanagement.agentic.tools;
 
 import dev.langchain4j.agent.tool.Tool;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.Dependent;
 
 /**
@@ -37,8 +38,7 @@ public class MaintenanceTool {
             boolean transmissionService,
             String requestText) {
         
-        // In a real implementation, this would make an API call to a maintenance service
-        // or update a database with the maintenance request
+        // In a more elaborate implementation, we might make an API call to a maintenance service here
         
         StringBuilder summary = new StringBuilder();
         summary.append("Maintenance requested for ").append(carMake).append(" ")
@@ -69,8 +69,9 @@ public class MaintenanceTool {
             summary.append("Additional notes: ").append(requestText);
         }
         
+        Log.info("  └─ MaintenanceAgent activated");
         String result = summary.toString();
-        System.out.println("\uD83D\uDE97 MaintenanceTool result: " + result);
+        Log.debug("🚗 MaintenanceTool result: " + result);
         return result;
     }
 }

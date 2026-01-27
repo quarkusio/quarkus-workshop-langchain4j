@@ -53,3 +53,4 @@ public interface PricingAgent {
     )
     String estimateValue(String carMake, String carModel, Integer carYear, String carCondition);
 }
+
