@@ -39,8 +39,6 @@ public interface DispositionAgent {
         - Year: {carYear}
         - Car Number: {carNumber}
         - Current Condition: {carCondition}
-        - Estimated Value: {carValue}
-        - Damage/Feedback: {rentalFeedback}
         
         Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.
         """)
@@ -49,8 +47,6 @@ public interface DispositionAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
-            String carCondition,
-            String carValue,
-            String rentalFeedback);
+            Integer carNumber,
+            String carCondition);
 }

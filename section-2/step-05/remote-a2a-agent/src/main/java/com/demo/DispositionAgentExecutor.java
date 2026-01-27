@@ -65,19 +65,15 @@ public class DispositionAgentExecutor {
                 System.out.println("   - carYear: " + inputs.get(2));
                 System.out.println("   - carNumber: " + inputs.get(3));
                 System.out.println("   - carCondition: " + inputs.get(4));
-                System.out.println("   - carValue: " + inputs.get(5));
-                System.out.println("   - rentalFeedback: " + inputs.get(6));
-                
+
                 // Call the agent with all parameters
                 String agentResponse = dispositionAgent.processDisposition(
                         inputs.get(0),                      // carMake
                         inputs.get(1),                      // carModel
                         Integer.parseInt(inputs.get(2)),    // carYear
-                        Long.parseLong(inputs.get(3)),      // carNumber
-                        inputs.get(4),                      // carCondition
-                        inputs.get(5),                      // carValue
-                        inputs.get(6));                     // rentalFeedback
-                
+                        Integer.parseInt(inputs.get(3)),    // carNumber
+                        inputs.get(4));                     // carCondition
+
                 System.out.println("✅ DispositionAgent response: " + agentResponse);
                 System.out.println("🚗 ========================================");
                 

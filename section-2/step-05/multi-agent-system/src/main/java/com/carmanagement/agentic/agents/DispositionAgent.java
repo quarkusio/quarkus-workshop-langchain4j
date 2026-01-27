@@ -36,20 +36,16 @@ public interface DispositionAgent {
         - Year: {carYear}
         - Car Number: {carNumber}
         - Current Condition: {carCondition}
-        - Estimated Value: {carValue}
-        - Damage/Feedback: {rentalFeedback}
         
         Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.
         """)
-    @Agent(outputKey = "dispositionAction", description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
-    @A2AClientAgent(a2aServerUrl = "http://localhost:8888", outputKey = "dispositionAction")
+    @A2AClientAgent(a2aServerUrl = "http://localhost:8888", outputKey = "dispositionAction",
+            description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
     String processDisposition(
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
-            String carCondition,
-            String carValue,
-            String rentalFeedback);
+            Integer carNumber,
+            String carCondition);
 }
 
