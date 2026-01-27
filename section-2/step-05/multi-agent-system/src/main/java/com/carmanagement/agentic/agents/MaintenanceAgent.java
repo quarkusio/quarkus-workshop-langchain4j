@@ -1,9 +1,9 @@
 package com.carmanagement.agentic.agents;
 
 import com.carmanagement.agentic.tools.MaintenanceTool;
-import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.agentic.Agent;
 import io.quarkiverse.langchain4j.ToolBox;
 
 /**
@@ -26,7 +26,8 @@ public interface MaintenanceAgent {
         Maintenance Request:
         {maintenanceRequest}
         """)
-    @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.", outputKey = "maintenanceAction")
+    @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.",
+            outputKey = "analysisResult")
     @ToolBox(MaintenanceTool.class)
     String processMaintenance(
             String carMake,

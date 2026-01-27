@@ -9,10 +9,15 @@ import dev.langchain4j.service.UserMessage;
  */
 public interface CarConditionFeedbackAgent {
 
-    @SystemMessage("""       
-        You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on feedback.
-        Analyze all feedback and the previous car condition to provide an updated condition description.
-        Always provide a very short (no more than 200 characters) condition description, even if there's minimal feedback.
+    @SystemMessage("""
+        You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on all processing feedback.
+        
+        Analyze all feedback and provide an updated condition description.
+        
+        IMPORTANT: If disposition was required and a disposition decision was made (SCRAP/SELL/DONATE),
+        include that decision and brief reasoning (e.g., "SCRAP - severe damage, low value").
+        
+        CRITICAL: Your response MUST be 200 characters or less. Be extremely concise.
         Do not add any headers or prefixes to your response.
         """)
     @UserMessage("""
@@ -22,11 +27,14 @@ public interface CarConditionFeedbackAgent {
             Year: {carYear}
             Previous Condition: {carCondition}
             
-            Feedback from other agents:
+            Feedback from agents:
+            Disposition Analysis: {dispositionRequest}
             Cleaning Recommendation: {cleaningRequest}
             Maintenance Recommendation: {maintenanceRequest}
+            
+            Supervisor Decision: {supervisorDecision}
             """)
-    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.",
+    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on all feedback including disposition decisions.",
             outputKey = "carCondition")
     String analyzeForCondition(
             String carMake,
@@ -34,8 +42,8 @@ public interface CarConditionFeedbackAgent {
             Integer carYear,
             Long carNumber,
             String carCondition,
+            String dispositionRequest,
             String cleaningRequest,
-            String maintenanceRequest);
+            String maintenanceRequest,
+            String supervisorDecision);
 }
-
-

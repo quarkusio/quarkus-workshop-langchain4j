@@ -132,7 +132,6 @@ We'll convert Step 4's architecture to use remote agents:
 1. **Keep DispositionFeedbackAgent**: Still analyzes if a car should be disposed (same as Step 4)
 2. **Convert DispositionAgent to A2A Client**: Changes from local agent to remote A2A client
 3. **Create Remote A2A Server**: A separate Quarkus application exposing the disposition service
-4. **Replace Supervisor with Conditional Workflow**: Trade AI-driven orchestration for simpler rule-based routing (architectural trade-off for distribution)
 
 **The Complete Architecture:**
 
@@ -142,13 +141,15 @@ graph TD
         R[Rental/Cleaning/Maintenance Returns]
         FW[FeedbackWorkflow<br/>Parallel]
         DFA[DispositionFeedbackAgent]
-        AW[CarAssignmentWorkflow<br/>Conditional]
+        FSA[FleetSupervisorAgent<br/>Supervisor]
+        PA[PricingAgent]
         DAC["DispositionAgent<br/>@A2AClientAgent"]
 
         R --> FW
         FW --> DFA
-        DFA --> AW
-        AW --> DAC
+        DFA --> FSA
+        FSA --> PA
+        PA --> DAC
     end
 
     subgraph "Remote Disposition Service (localhost:8888)"
@@ -171,10 +172,10 @@ graph TD
 
 Before starting:
 
-- **Completed [Step 04](step-04.md){target="_blank"}** - This step directly builds on Step 4's disposition functionality
+- **Completed [Step 04](step-04.md){target="_blank"}** - This step directly builds on Step 4's architecture
 - Application from Step 04 is stopped (Ctrl+C)
 - Ports 8080 and 8888 are available (you'll run two applications simultaneously)
-- Understanding of Step 4's Supervisor Pattern (we'll be replacing it with a simpler pattern)
+- Understanding of Step 4's Supervisor Pattern (we keep the same pattern, just make DispositionAgent remote)
 
 ---
 
@@ -192,7 +193,6 @@ section-2/step-05/
 │   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
 │   │   │   └── workflow/
 │   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
-│   │   │       ├── CarAssignmentWorkflow.java     # Conditional routing
 │   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
 │   └── pom.xml
 │
@@ -255,47 +255,22 @@ section-2/step-05/
 
 ---
 
-## Part 1: Build the Client-Side Components
+## Part 1: Convert DispositionAgent to A2A Client
 
-### Step 1: Update the DispositionFeedbackAgent
+The only change needed in the main application is converting the `DispositionAgent` from a local agent to an A2A client agent.
 
-This agent is similar to Step 4's version but with a simplified system message. In Step 4, we had more sophisticated keyword detection; here we simplify it for the A2A example.
-
-In `src/main/java/com/carmanagement/agentic/agents`, update `DispositionFeedbackAgent.java`:
-
-```java hl_lines="15 30 37-39" title="DispositionFeedbackAgent.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
-```
-
-**Key Points:**
-
-- **System message**: Focuses on economic viability (is the car worth repairing?)
-- **Specific output format**: Returns `"DISPOSITION_NOT_REQUIRED"` when the car is repairable
-- **outputKey**: `"dispositionRequest"` (stores the analysis in AgenticScope's state)
-- **Three feedback sources**: Analyzes rental, cleaning, and maintenance feedback
-
-**Decision Criteria:**
-
-The agent considers:
-
-- Severity of damage (structural, engine, transmission)
-- Repair costs vs. car value
-- Age and condition of the vehicle
-- Safety concerns
-
-### Step 2: Convert the DispositionAgent to A2A Client
+### Step 1: Update the DispositionAgent to A2A Client
 
 **This is the key change from Step 4!** Instead of a local agent with full system messages and logic, we now have a simple client that delegates to a remote service.
 
 **Step 4 Version (Local):**
+
 - Had detailed `@SystemMessage` with disposition criteria
-- Received `carValue` parameter from PricingAgent
 - Made decisions locally using AI
 
 **Step 5 Version (A2A Client):**
-- No `@SystemMessage` - just a client interface
+
 - Uses `@A2AClientAgent` to connect to remote service
-- Receives `dispositionRequest` instead of `carValue`
 - Delegates all decision-making to the remote service
 
 In `src/main/java/com/carmanagement/agentic/agents`, update `DispositionAgent.java`:
@@ -325,12 +300,14 @@ String processDisposition(
     Integer carYear,
     Long carNumber,
     String carCondition,
-    String dispositionRequest
+    String carValue,
+    String rentalFeedback
 )
 ```
 
-These parameters are sent to the remote agent as task inputs. 
-The remote agent can access them by name.
+These parameters are sent to the remote agent as task inputs. The parameters match exactly what the remote DispositionAgent expects (same as Step 4's local version).
+
+**Important:** The `carValue` parameter comes from the PricingAgent that the supervisor invokes first, and `rentalFeedback` provides context about the damage.
 
 #### How It Works
 
@@ -346,160 +323,9 @@ The remote agent can access them by name.
 
 ---
 
-## Part 2: Update the Workflows
+## Part 2: Build the Remote A2A Server
 
-### Step 3: Update FeedbackWorkflow
-
-The `FeedbackWorkflow` is the same as Step 4 - it includes disposition analysis alongside cleaning and maintenance.
-
-Update `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
-
-```java hl_lines="16-17" title="FeedbackWorkflow.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
-```
-
-**Key changes:**
-
-Added `DispositionFeedbackAgent` to the parallel workflow:
-
-```java
-@ParallelAgent(outputKey = "feedbackResult",
-            subAgents = { CleaningFeedbackAgent.class, MaintenanceFeedbackAgent.class, DispositionFeedbackAgent.class })
-```
-
-Now **three agents run concurrently**:
-
-- `CleaningFeedbackAgent` — analyzes cleaning needs
-- `MaintenanceFeedbackAgent` — analyzes maintenance needs
-- `DispositionFeedbackAgent` — analyzes disposal needs
-
-This parallel execution is efficient: all three analyses happen at the same time!
-
-### Step 4: Create CarAssignmentWorkflow
-
-**Key Architectural Change from Step 4:**
-
-In Step 4, we used `FleetSupervisorAgent` with `@SupervisorAgent` - an AI-driven orchestrator that made intelligent decisions about which agents to invoke.
-
-In Step 5, we're replacing it with `CarAssignmentWorkflow` using `@ConditionalAgent` - a simpler, rule-based router.
-
-**Why the change?**
-- **Trade-off for distribution**: The Supervisor Pattern requires all sub-agents to be local. To use remote agents via A2A, we need a simpler routing mechanism.
-- **Simpler but less flexible**: Conditional routing uses hardcoded rules instead of AI reasoning.
-- **Still effective**: For this use case, rule-based routing works well.
-
-Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
-
-```java hl_lines="17-18 39-42" title="CarAssignmentWorkflow.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
-```
-
-**Key changes:**
-
-#### Added DispositionAgent to SubAgents
-
-```java
-@ConditionalAgent(outputKey = "analysisResult",
-            subAgents = { DispositionAgent.class, MaintenanceAgent.class, CleaningAgent.class })
-```
-
-#### Added Activation Condition
-
-```java
-@ActivationCondition(DispositionAgent.class)
-static boolean assignToDisposition(String dispositionRequest) {
-    return isRequired(dispositionRequest);
-}
-```
-
-#### Updated Execution Priority
-
-The conditional workflow now has **priority ordering**:
-
-1. **Disposition** (highest priority) — if disposal is needed
-2. **Maintenance** — if maintenance is needed and disposal isn't
-3. **Cleaning** — if cleaning is needed and neither disposal nor maintenance is
-4. **Skip** — if nothing is needed
-
-This ensures critical issues (disposal) are handled before routine tasks (cleaning).
-
-### Step 5: Update CarProcessingWorkflow
-
-**Change from Step 4:**
-
-Step 4 used: `FeedbackWorkflow → FleetSupervisorAgent → CarConditionFeedbackAgent`
-
-Step 5 uses: `FeedbackWorkflow → CarAssignmentWorkflow → CarConditionFeedbackAgent`
-
-We've replaced the AI-driven supervisor with rule-based conditional routing.
-
-Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
-
-```java hl_lines="33" title="CarProcessingWorkflow.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
-```
-
-**Key changes:**
-
-The `@Output` method now checks for disposition requests first:
-
-```java
-@Output
-static CarConditions output(String carCondition, String dispositionRequest, String maintenanceRequest, String cleaningRequest) {
-    CarAssignment carAssignment;
-    // Check maintenance first (higher priority)
-    if (isRequired(dispositionRequest)) {   // Highest priority
-        carAssignment = CarAssignment.DISPOSITION;
-    } else if (isRequired(maintenanceRequest)) {
-        carAssignment = CarAssignment.MAINTENANCE;
-    } else if (isRequired(cleaningRequest)) {
-        carAssignment = CarAssignment.CLEANING;
-    } else {
-        carAssignment = CarAssignment.NONE;
-    }
-    return new CarConditions(carCondition, carAssignment);
-}
-```
-
-Disposition has the highest priority in the result.
-
-### Step 6: Update CarAssignment Enum
-
-Update the `CarAssignment` enum to include disposition:
-
-Update `src/main/java/com/carmanagement/model/CarAssignment.java`:
-
-```java hl_lines="7" title="CarAssignment.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/model/CarAssignment.java"
-```
-
-### Step 7: Update CarManagementService
-
-Update the service to handle disposition status:
-
-Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
-
-```java hl_lines="54-55" title="CarManagementService.java"
---8<-- "../../section-2/step-05/multi-agent-system/src/main/java/com/carmanagement/service/CarManagementService.java"
-```
-
-**Key changes:**
-
-Added handling for `CarAssignment.DISPOSITION`:
-
-```java
-} else if (carConditions.carAssignment() == CarAssignment.DISPOSITION) {
-    carInfo.status = CarStatus.PENDING_DISPOSITION;
-}
-```
-
-When disposition is required, the car is marked as disposed and removed from the active fleet.
-
----
-
-## Part 3: Build the Remote A2A Server
-
-Now let's build the remote disposition service that will handle A2A requests.
+Now let's build the remote disposition service that will handle A2A requests from the main application.
 
 Navigate to the remote-a2a-agent directory:
 
@@ -507,7 +333,7 @@ Navigate to the remote-a2a-agent directory:
 cd section-2/step-05/remote-a2a-agent
 ```
 
-### Step 8: Create the DispositionTool
+### Step 2: Create the DispositionTool
 
 The tool that executes disposition actions (scrap, sell, donate).
 
@@ -523,7 +349,7 @@ In `src/main/java/com/demo`, create `DispositionTool.java`:
 - **@Tool annotation**: Makes each method available to the AI agent
 - **Detailed descriptions**: Help the AI agent choose the appropriate action
 
-### Step 9: Create the DispositionAgent (AI Service)
+### Step 3: Create the DispositionAgent (AI Service)
 
 The AI agent that actually makes disposition decisions.
 
@@ -537,14 +363,15 @@ In `src/main/java/com/demo`, create `DispositionAgent.java`:
 
 - **`@RegisterAiService`**: Registers this as an AI service (not an agentic agent)
 - **`@ToolBox(DispositionTool.class)`**: Has access to the DispositionTool
-- **System message**: Defines the agent as a car disposition specialist
-- **Decision criteria**: Considers condition, age, safety, and recommendation from the feedback agent
+- **System message**: Identical to step-04's local DispositionAgent - defines decision criteria for SCRAP/SELL/DONATE/KEEP
+- **Parameters**: Same as step-04 - includes carValue (from PricingAgent) and rentalFeedback
+- **Decision logic**: Identical to step-04 - considers value, age, condition, and damage
 
 !!!note "AI Service vs. Agentic Agent"
     Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
     The A2A server can expose both types.
 
-### Step 10: Create the AgentCard
+### Step 4: Create the AgentCard
 
 The **AgentCard** describes the agent's capabilities, skills, and interface.
 
@@ -607,7 +434,7 @@ Skills describe what the agent can do. This helps clients discover appropriate a
 
 Specifies that this agent communicates via JSON-RPC over HTTP.
 
-### Step 11: Create the AgentExecutor
+### Step 5: Create the AgentExecutor
 
 The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
 
@@ -635,52 +462,62 @@ Produces an `AgentExecutor` bean that Quarkus LangChain4j will use to handle A2A
 ```java
 public void execute(RequestContext context, EventQueue eventQueue) {
     TaskUpdater updater = new TaskUpdater(context, eventQueue);
+    if (context.getTask() == null) {
+        updater.submit();
+    }
+    updater.startWork();
 
-    // Extract input parts from the task
-    Map<String, MessagePart> inputParts = context.task().input();
+    List<String> inputs = new ArrayList<>();
+    
+    // Process the request message
+    Message message = context.getMessage();
+    if (message.getParts() != null) {
+        for (Part<?> part : message.getParts()) {
+            if (part instanceof TextPart textPart) {
+                inputs.add(textPart.getText());
+            }
+        }
+    }
 ```
 
-The `RequestContext` contains the incoming task with all input parameters sent by the client.
+The `RequestContext` contains the incoming message with all input parameters sent by the client as text parts.
 
 #### Extract Parameters
 
 ```java
-String carMake = getTextPart(inputParts, "carMake");
-String carModel = getTextPart(inputParts, "carModel");
-Integer carYear = getIntegerPart(inputParts, "carYear");
-// ... etc
+String agentResponse = dispositionAgent.processDisposition(
+        inputs.get(0),                      // carMake
+        inputs.get(1),                      // carModel
+        Integer.parseInt(inputs.get(2)),    // carYear
+        Long.parseLong(inputs.get(3)),      // carNumber
+        inputs.get(4),                      // carCondition
+        inputs.get(5),                      // carValue (from PricingAgent)
+        inputs.get(6));                     // rentalFeedback
 ```
 
-Extracts each parameter by name from the task input. These names must match the client agent's method parameters.
+Extracts each parameter by index from the message parts. The order and parameters match step-04's local DispositionAgent exactly.
 
-#### Call the AI Agent
+#### Return the Result
 
 ```java
-String result = dispositionAgent.processDisposition(
-    carMake, carModel, carYear, carNumber, carCondition, dispositionRequest
-);
+TextPart responsePart = new TextPart(agentResponse, null);
+List<Part<?>> parts = List.of(responsePart);
+updater.addArtifact(parts, null, null, null);
+updater.complete();
 ```
 
-Invokes the AI agent to process the disposition request.
+Creates a text part with the agent's response and sends it back to the client via the `TaskUpdater`. This completes the A2A task.
 
-#### Update Task Status
-
-```java
-updater.finishTask(List.of(MessagePart.text(result)));
-```
-
-Sends the result back to the client via the `TaskUpdater`. This completes the A2A task.
-
-#### Helper Methods
+#### Cancel Handler
 
 ```java
-private String getTextPart(Map<String, MessagePart> parts, String key) {
-    MessagePart part = parts.get(key);
-    return part != null ? part.content() : "";
+@Override
+public void cancel(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
+    throw new UnsupportedOperationError();
 }
 ```
 
-Safely extracts text values from MessagePart objects.
+The cancel method is required by the interface but not implemented for this simple agent.
 
 ---
 
@@ -739,8 +576,10 @@ Click **Return**.
     2. `MaintenanceFeedbackAgent`: "Major repairs needed"
     3. `CleaningFeedbackAgent`: "Not applicable"
 
-2. **Conditional Routing** (CarAssignmentWorkflow):
-    1. Disposition condition: `true` (required)
+2. **Supervisor Orchestration** (FleetSupervisorAgent):
+    1. Analyzes feedback and determines disposition is required
+    2. Invokes PricingAgent to estimate vehicle value
+    3. Invokes DispositionAgent (remote via A2A)
     2. → Executes `DispositionAgent` (A2A client)
 
 3. **A2A Communication**:
@@ -763,7 +602,9 @@ Click **Return**.
 **Terminal 2 (Main Application):**
 ```
 [DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
-[CarAssignmentWorkflow] Activating DispositionAgent
+[FleetSupervisorAgent] Invoking PricingAgent for value estimation
+[PricingAgent] Estimated Value: $12,500
+[FleetSupervisorAgent] Invoking DispositionAgent
 [DispositionAgent @A2AClientAgent] Sending task to http://localhost:8888
 [DispositionAgent @A2AClientAgent] Received result: Car should be scrapped...
 ```
@@ -782,7 +623,8 @@ sequenceDiagram
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
     participant FeedbackWF as FeedbackWorkflow
-    participant ActionWF as CarAssignmentWorkflow
+    participant Supervisor as FleetSupervisorAgent
+    participant Pricing as PricingAgent
     participant Client as DispositionAgent<br/>@A2AClientAgent
     participant A2A as A2A Protocol<br/>(JSON-RPC)
     participant Executor as AgentExecutor

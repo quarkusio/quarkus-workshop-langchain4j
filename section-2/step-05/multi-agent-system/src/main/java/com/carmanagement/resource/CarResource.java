@@ -3,6 +3,7 @@ package com.carmanagement.resource;
 import com.carmanagement.model.CarInfo;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class CarResource {
      */
     @GET
     @Path("/{id}")
-    public Response getCarById(Long id) {
+    public Response getCarById(@PathParam("id") Long id) {
         CarInfo car = CarInfo.findById(id);
         if (car == null) {
             return Response.status(Response.Status.NOT_FOUND)

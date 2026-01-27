@@ -39,7 +39,7 @@ public class DispositionAgentCard {
                                 .build()))
                 .preferredTransport(TransportProtocol.JSONRPC.asString())
                 .additionalInterfaces(List.of(
-                        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
+                        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888/")))
                 .build();
     }
 }
