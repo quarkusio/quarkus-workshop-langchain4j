@@ -35,12 +35,7 @@ public class CarManagementService {
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
         }
-                
-        Log.info("FeedbackWorkflow executing...");
-        Log.info("  ├─ CleaningFeedbackAgent analyzing...");
-        Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
-        Log.info("FleetSupervisorAgent orchestrating car processing...");
-        
+                        
         // Process the car return using the workflow with supervisor
         CarConditions carConditions = carProcessingWorkflow.processCarReturn(
                 carInfo.make,
@@ -51,8 +46,6 @@ public class CarManagementService {
                 rentalFeedback != null ? rentalFeedback : "",
                 cleaningFeedback != null ? cleaningFeedback : "",
                 maintenanceFeedback != null ? maintenanceFeedback : "");
-
-        Log.info("CarConditionFeedbackAgent updating...");
         
         // Update the car's condition with the result from CarConditionFeedbackAgent
         carInfo.condition = carConditions.generalCondition();

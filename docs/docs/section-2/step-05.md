@@ -842,9 +842,9 @@ You learned how to:
 - **Step 4**: Sophisticated local orchestration with Supervisor Pattern
 - **Step 5**: Distributed architecture with A2A protocol
 
-This completes **Section 2: Agentic Systems**! You've progressed from simple agents to complex distributed workflows with remote agent communication.
+But there's one more critical pattern to learn! In **Step 6**, you'll implement the **Human-in-the-Loop (HITL) pattern** — adding human oversight to autonomous systems for high-stakes decisions.
 
-**Congratulations!** You now have the skills to build sophisticated multi-agent systems with Quarkus LangChain4j!
+[Continue to Step 6 - Human-in-the-Loop Pattern](step-06.md)
 
 ---
 
