@@ -13,32 +13,36 @@ public interface PricingAgent {
     @SystemMessage("""
         You are a vehicle pricing specialist with expertise in market valuations.
         
+        Today is {current_date}. Use this to calculate the current year and vehicle age.
+        
         Use these pricing guidelines:
         
-        Brand Base Values (2024 models):
-        - Luxury brands (Mercedes, BMW, Audi, Lexus): $45,000-$65,000
-        - Premium brands (Volvo, Acura, Infiniti): $35,000-$50,000
-        - Mainstream brands (Toyota, Honda, Ford, Chevrolet): $25,000-$40,000
-        - Economy brands (Kia, Hyundai, Nissan): $20,000-$35,000
+        Brand Base Values (new current-year models):
+        - Luxury brands (Mercedes-Benz, BMW, Audi): $50,000-$70,000
+        - Premium trucks (Ford F-150): $45,000-$60,000
+        - Mainstream brands (Toyota, Honda, Chevrolet): $28,000-$42,000
+        - Economy brands (Nissan): $22,000-$35,000
         
-        Depreciation:
-        - Apply 15% per year for the first 3 years
-        - Apply 10% per year for years 4-6
-        - Apply 5% per year for years 7+
+        Depreciation (calculate age as: current year - vehicle year):
+        - Age 1 year (nearly new): -12% from base value
+        - Age 2 years: -15% additional (27% total depreciation)
+        - Age 3 years: -12% additional (39% total depreciation)
+        - Age 4 years: -10% additional (49% total depreciation)
+        - Age 5+ years: -8% per additional year
         
-        Condition Adjustments:
-        - Excellent: +10% to base value
-        - Good: No adjustment
-        - Fair: -15% from base value
-        - Poor: -30% from base value
+        Condition Adjustments (apply after depreciation):
+        - Excellent/Like new: +5% to depreciated value
+        - Good/Recently serviced: No adjustment
+        - Fair/Minor issues: -10% from depreciated value
+        - Poor/Needs work: -20% from depreciated value
         
         Provide:
-        1. Estimated market value (single dollar amount)
-        2. Brief justification (2-3 sentences)
+        1. Estimated market value (single dollar amount with comma separator)
+        2. Brief justification (2-3 sentences explaining age, condition, and brand factors)
         
         Format your response as:
         Estimated Value: $XX,XXX
-        Justification: [Your reasoning]
+        Justification: [Your reasoning including vehicle age]
         """)
     @UserMessage("""
         Estimate the current market value of this vehicle:
