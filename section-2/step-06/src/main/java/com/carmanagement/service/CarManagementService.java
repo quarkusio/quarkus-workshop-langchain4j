@@ -26,10 +26,7 @@ public class CarManagementService {
     /**
      * Process a car return from any operation.
      * This method runs asynchronously to handle workflow pauses for human approval.
-     *
-     * NOTE: No @Transactional here because the workflow may block for minutes waiting
-     * for human input. Transactions are handled at the appropriate level within the workflow.
-     *
+     * 
      * @param carNumber The car number
      * @param rentalFeedback Optional rental feedback
      * @param cleaningFeedback Optional cleaning feedback
@@ -44,12 +41,7 @@ public class CarManagementService {
             if (carInfo == null) {
                 return "Car not found with number: " + carNumber;
             }
-                    
-            Log.info("FeedbackWorkflow executing...");
-            Log.info("  ├─ CleaningFeedbackAgent analyzing...");
-            Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
-            Log.info("FleetSupervisorAgent orchestrating car processing...");
-            
+                                
             // Process the car return using the workflow with supervisor
             // This may PAUSE if human approval is needed
             CarConditions carConditions = carProcessingWorkflow.processCarReturn(

@@ -39,7 +39,7 @@ public class HumanApprovalTool {
         
         try {
             // Create proposal and get CompletableFuture that completes when human decides
-            CompletableFuture<ApprovalProposal> approvalFuture = 
+            CompletableFuture<ApprovalProposal> approvalFuture =
                 approvalService.createProposalAndWaitForDecision(
                     carNumber, carMake, carModel, carYear, carValue,
                     proposedDisposition, dispositionReason, carCondition, rentalFeedback

@@ -1,6 +1,7 @@
 package com.demo;
 
 import dev.langchain4j.agent.tool.Tool;
+import io.quarkus.logging.Log;
 import jakarta.inject.Singleton;
 
 /**
@@ -43,7 +44,7 @@ public class DispositionTool {
      */
     @Tool(name = "DispositionTool")
     public String requestDisposition(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -53,12 +54,12 @@ public class DispositionTool {
         // In a real implementation, this would make an API call to a disposition service
         // or update a database with the disposition request
 
-        String result = "Car disposition requested for " + carMake + " " +
-                carModel + " (" + carYear + "), Car #" +
-                carNumber + ": " +
-                dispositionOption.getDescription() +
-                "\n";
-        System.out.println("⛍ DispositionTool result: " + result);
+        String result = String.format("Car disposition requested for %s %s (%d), Car #%d: %s",
+                carMake, carModel, carYear, carNumber, dispositionOption.getDescription());
+        
+        Log.infof("Disposition requested: %s %s (%d) #%d -> %s",
+                carMake, carModel, carYear, carNumber, dispositionOption);
+        
         return result;
     }
 }

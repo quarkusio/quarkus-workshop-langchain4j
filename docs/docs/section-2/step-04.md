@@ -507,7 +507,7 @@ flowchart TD
 
 #### Scenario 4: Minor Issues
 
-Enter the following text in the **Audi A4** feedback field (in the Maintenance Return tab):
+Enter the following text in the **BMW X5** feedback field (in the Maintenance Return tab):
 
 ```text
 Car is dirty, needs cleaning

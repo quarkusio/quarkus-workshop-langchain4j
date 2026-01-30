@@ -29,12 +29,14 @@ public interface DispositionProposalAgent {
         - If car is valuable and damage is minor: KEEP
         
         Your response must include:
-        1. Proposed Action: SCRAP/SELL/DONATE/KEEP
+        1. Proposed Action with unique marker: __SCRAP__ or __SELL__ or __DONATE__ or __KEEP__
         2. Reasoning: Clear explanation of your recommendation
         
         Format your response as:
-        Proposed Action: [SCRAP/SELL/DONATE/KEEP]
+        Proposed Action: __[SCRAP/SELL/DONATE/KEEP]__
         Reasoning: [Your detailed explanation]
+        
+        CRITICAL: Use double underscores around the action (e.g., __KEEP__ not KEEP)
         """)
     @UserMessage("""
         Create a disposition proposal for this vehicle:

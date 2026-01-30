@@ -90,7 +90,7 @@ public class ApprovalResource {
     /**
      * Reject a proposal.
      * This is called when a human clicks the "Reject" button in the UI.
-     * 
+     *
      * @param proposalId The proposal ID
      * @param request Request body containing reason and approvedBy
      */
@@ -122,6 +122,56 @@ public class ApprovalResource {
             Log.error("Error rejecting proposal", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(Map.of("error", "Error processing rejection: " + e.getMessage()))
+                    .build();
+        }
+    }
+
+    /**
+     * Make a decision on a proposal with explicit KEEP_CAR or DISPOSE_CAR action.
+     * Simplified approach where the UI directly specifies the desired outcome.
+     *
+     * @param proposalId The proposal ID
+     * @param request Request body containing decision (KEEP_CAR or DISPOSE_CAR), reason, and approvedBy
+     */
+    @POST
+    @Path("/{proposalId}/decide")
+    public Response decideProposal(
+            @PathParam("proposalId") Long proposalId,
+            Map<String, String> request) {
+        
+        try {
+            String decision = request.get("decision"); // KEEP_CAR or DISPOSE_CAR
+            String reason = request.getOrDefault("reason", "Decision by human reviewer");
+            String approvedBy = request.getOrDefault("approvedBy", "Workshop User");
+
+            if (decision == null || (!decision.equals("KEEP_CAR") && !decision.equals("DISPOSE_CAR"))) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(Map.of("error", "Decision must be either KEEP_CAR or DISPOSE_CAR"))
+                        .build();
+            }
+
+            Log.infof("Decision '%s' received for proposal %d by %s", decision, proposalId, approvedBy);
+
+            // Store the decision in the reason so the workflow can use it
+            String fullReason = decision + ": " + reason;
+            
+            // We still use the approve/reject mechanism, but the decision is in the reason
+            ApprovalProposal proposal = approvalService.processDecision(
+                    proposalId, true, fullReason, approvedBy);
+
+            return Response.ok(proposal).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        } catch (Exception e) {
+            Log.error("Error processing decision", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error processing decision: " + e.getMessage()))
                     .build();
         }
     }

@@ -1,42 +1,47 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarConditions;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
 /**
- * Agent that analyzes feedback to update the car condition.
+ * Agent that analyzes feedback to determine the final car condition and assignment.
+ * This is the final decision-maker that interprets all previous agent outputs.
  */
 public interface CarConditionFeedbackAgent {
 
     @SystemMessage("""
-        You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on all processing feedback.
+        Analyze car processing results and output a JSON summary.
         
-        Analyze all feedback and provide an updated condition description.
+        Output format:
+        {
+          "generalCondition": "concise description (max 200 chars)",
+          "carAssignment": "DISPOSITION|MAINTENANCE|CLEANING|NONE"
+        }
         
-        IMPORTANT: If disposition was required and a disposition decision was made (SCRAP/SELL/DONATE),
-        include that decision and brief reasoning (e.g., "SCRAP - severe damage, low value").
-        
-        CRITICAL: Your response MUST be 200 characters or less. Be extremely concise.
-        Do not add any headers or prefixes to your response.
+        Rules:
+        - carAssignment: Check the ACTUAL DispositionAgent decision in supervisorDecision, not just the request
+        - If supervisorDecision mentions SCRAP/SELL/DONATE (but NOT KEEP) → DISPOSITION
+        - Else if maintenanceRequest ≠ "MAINTENANCE_NOT_REQUIRED" → MAINTENANCE
+        - Else if cleaningRequest ≠ "CLEANING_NOT_REQUIRED" → CLEANING
+        - Else → NONE
+        - IMPORTANT: If DispositionAgent decided KEEP, do NOT assign DISPOSITION - check maintenance/cleaning instead
+        - generalCondition: Summarize the action and reason
         """)
     @UserMessage("""
-            Car Information:
-            Make: {carMake}
-            Model: {carModel}
-            Year: {carYear}
-            Previous Condition: {carCondition}
-            
-            Feedback from agents:
-            Disposition Analysis: {dispositionRequest}
-            Cleaning Recommendation: {cleaningRequest}
-            Maintenance Recommendation: {maintenanceRequest}
+            Car: {carYear} {carMake} {carModel} (#{carNumber})
             
             Supervisor Decision: {supervisorDecision}
+            
+            Requests:
+            - Disposition: {dispositionRequest}
+            - Maintenance: {maintenanceRequest}
+            - Cleaning: {cleaningRequest}
             """)
-    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on all feedback including disposition decisions.",
-            outputKey = "carCondition")
-    String analyzeForCondition(
+    @Agent(description = "Final car condition analyzer. Determines the car's condition and assignment based on all feedback.",
+            outputKey = "carConditions")
+    CarConditions analyzeForCondition(
             String carMake,
             String carModel,
             Integer carYear,
