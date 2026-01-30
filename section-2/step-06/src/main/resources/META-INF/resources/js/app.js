@@ -736,75 +736,39 @@ function createApprovalCard(proposal) {
     return card;
 }
 
-// Get appropriate approval buttons based on the proposed disposition
+// Get approval buttons - simplified to always show Keep vs Dispose
 function getApprovalButtons(proposal) {
-    const disposition = proposal.proposedDisposition.toUpperCase();
-    
-    // Determine button labels based on what's being proposed
-    // The buttons should clearly indicate the ACTION that will be taken
-    let leftButton, rightButton;
-    
-    if (disposition === 'KEEP') {
-        // Proposal is to KEEP the car
-        // Left button (reject) = Dispose the car instead
-        // Right button (approve) = Keep the car as recommended
-        leftButton = {
-            label: '🗑️ Dispose',
-            action: 'false',
-            class: 'btn-reject'
-        };
-        rightButton = {
-            label: '✅ Keep & Repair',
-            action: 'true',
-            class: 'btn-approve'
-        };
-    } else {
-        // Proposal is to dispose (SCRAP/SELL/DONATE)
-        // Left button (reject) = Keep the car instead
-        // Right button (approve) = Dispose as recommended
-        leftButton = {
-            label: '✅ Keep & Repair',
-            action: 'false',
-            class: 'btn-approve'
-        };
-        rightButton = {
-            label: `🗑️ ${disposition.charAt(0) + disposition.slice(1).toLowerCase()}`,
-            action: 'true',
-            class: 'btn-reject'
-        };
-    }
-    
     return `
-        <button class="${leftButton.class}" onclick="handleProposalDecision(${proposal.id}, ${leftButton.action})">
-            ${leftButton.label}
+        <button class="btn-approve" onclick="handleProposalDecision(${proposal.id}, 'KEEP_CAR')">
+            ✅ Keep & Repair
         </button>
-        <button class="${rightButton.class}" onclick="handleProposalDecision(${proposal.id}, ${rightButton.action})">
-            ${rightButton.label}
+        <button class="btn-reject" onclick="handleProposalDecision(${proposal.id}, 'DISPOSE_CAR')">
+            🗑️ Dispose
         </button>
     `;
 }
 
 // Handle approval/rejection decision for a proposal
-async function handleProposalDecision(proposalId, approved) {
+async function handleProposalDecision(proposalId, decision) {
     try {
         const reasonInput = document.getElementById(`reason-${proposalId}`);
         const reason = reasonInput ? reasonInput.value.trim() : '';
         
-        const endpoint = approved ? 'approve' : 'reject';
-        const response = await fetch(`/api/approvals/${proposalId}/${endpoint}`, {
+        const response = await fetch(`/api/approvals/${proposalId}/decide`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                reason: reason || (approved ? 'Approved by human reviewer' : 'Rejected by human reviewer'),
+                decision: decision, // KEEP_CAR or DISPOSE_CAR
+                reason: reason || `${decision === 'KEEP_CAR' ? 'Keep and repair' : 'Dispose'} decision by human reviewer`,
                 approvedBy: 'Workshop User'
             })
         });
         
         if (response.ok) {
-            const decision = approved ? 'APPROVED' : 'REJECTED';
-            showNotification(`✅ Proposal ${decision} - Workflow will complete shortly`, 'success');
+            const actionText = decision === 'KEEP_CAR' ? 'KEEP & REPAIR' : 'DISPOSE';
+            showNotification(`✅ Decision: ${actionText} - Workflow will complete shortly`, 'success');
             
             // Remove the approval card with animation
             const card = document.getElementById(`approval-${proposalId}`);

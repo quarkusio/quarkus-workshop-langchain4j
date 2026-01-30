@@ -22,10 +22,11 @@ public class MaintenanceTool {
      * @param brakeService Whether to request brake service
      * @param engineService Whether to request engine service
      * @param transmissionService Whether to request transmission service
+     * @param bodyWork Whether to request body work (dent repair, paint, collision repair)
      * @param requestText The maintenance request text
      * @return A summary of the maintenance request
      */
-    @Tool("Requests maintenance with the specified options")
+    @Tool("Requests maintenance with the specified options including body work for dents, paint, and collision repairs")
     public String requestMaintenance(
             Long carNumber,
             String carMake,
@@ -36,6 +37,7 @@ public class MaintenanceTool {
             boolean brakeService,
             boolean engineService,
             boolean transmissionService,
+            boolean bodyWork,
             String requestText) {
         
         // In a more elaborate implementation, we might make an API call to a maintenance service here
@@ -63,6 +65,10 @@ public class MaintenanceTool {
         
         if (transmissionService) {
             summary.append("- Transmission service\n");
+        }
+        
+        if (bodyWork) {
+            summary.append("- Body work (dent repair, paint, collision repair)\n");
         }
         
         if (requestText != null && !requestText.isEmpty()) {

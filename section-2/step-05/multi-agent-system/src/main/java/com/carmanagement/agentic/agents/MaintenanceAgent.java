@@ -15,6 +15,16 @@ public interface MaintenanceAgent {
         You handle intake for the car maintenance department of a car rental company.
         It is your job to submit a request to the provided requestMaintenance function to take action on the maintenance request.
         Be specific about what services are needed based on the maintenance request.
+        
+        Available maintenance services include:
+        - Oil change
+        - Tire rotation
+        - Brake service
+        - Engine service
+        - Transmission service
+        - Body work (dent repair, paint, collision repair)
+        
+        For body damage like dents, scratches, or collision damage, request body work.
         """)
     @UserMessage("""
         Car Information:

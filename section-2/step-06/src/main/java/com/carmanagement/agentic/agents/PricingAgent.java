@@ -1,6 +1,7 @@
 package com.carmanagement.agentic.agents;
 
 import dev.langchain4j.agentic.Agent;
+import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
@@ -56,5 +57,29 @@ public interface PricingAgent {
         description = "Pricing specialist that estimates vehicle market value based on make, model, year, and condition"
     )
     String estimateValue(String carMake, String carModel, Integer carYear, String carCondition);
+    
+    @Output
+    static String output(String carValue) {
+        // Ensure the output is always a string, even if the LLM returns just a number
+        // This prevents type mismatch errors when passing to other agents
+        if (carValue == null) {
+            return "$0";
+        }
+        // If it's already formatted with $, return as-is
+        if (carValue.contains("$")) {
+            return carValue;
+        }
+        // If it's just a number, format it with $
+        try {
+            // Try to parse as number and format
+            String numStr = carValue.replaceAll("[^0-9]", "");
+            if (!numStr.isEmpty()) {
+                return "$" + numStr;
+            }
+        } catch (Exception e) {
+            // If parsing fails, just return the original
+        }
+        return carValue;
+    }
 }
 

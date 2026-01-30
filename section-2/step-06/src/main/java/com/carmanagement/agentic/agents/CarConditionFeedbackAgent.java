@@ -1,49 +1,45 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarConditions;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
 /**
- * Agent that analyzes feedback to update the car condition.
+ * Agent that analyzes feedback to determine the final car condition and assignment.
+ * This is the final decision-maker that interprets all previous agent outputs.
  */
 public interface CarConditionFeedbackAgent {
 
     @SystemMessage("""
-        You analyze car conditions based on processing feedback.
-        Provide a concise condition description (max 200 characters).
-        Follow the instructions in the user message exactly.
+        Analyze car processing results and output a JSON summary.
+        
+        Output format:
+        {
+          "generalCondition": "concise description (max 200 chars)",
+          "carAssignment": "DISPOSITION|MAINTENANCE|CLEANING|NONE",
+          "dispositionStatus": "DISPOSITION_APPROVED|DISPOSITION_REJECTED|DISPOSITION_NOT_REQUIRED",
+          "dispositionReason": "reason or null"
+        }
+        
+        Rules:
+        - carAssignment: DISPOSE_CAR→DISPOSITION, KEEP_CAR+maintenance→MAINTENANCE, KEEP_CAR+cleaning→CLEANING, KEEP_CAR+none→NONE
+        - dispositionStatus: APPROVED_BY_USER→DISPOSITION_APPROVED, REJECTED_BY_USER→DISPOSITION_REJECTED, else→DISPOSITION_NOT_REQUIRED
+        - generalCondition: Summarize the action and reason
         """)
     @UserMessage("""
-            Supervisor Decision Text:
-            "{supervisorDecision}"
+            Car: {carYear} {carMake} {carModel} (#{carNumber})
             
-            STEP 1: Does the text above contain the exact phrase "APPROVED_BY_USER"?
-            - YES → The disposition was APPROVED. Go to STEP 2.
-            - NO → Go to STEP 3.
+            Supervisor Decision: {supervisorDecision}
             
-            STEP 2: Extract the disposition action (look for SCRAP, SELL, DONATE, or KEEP in the text)
-            - If SCRAP found → Output: "SCRAP - engine fire, approved for disposal"
-            - If SELL found → Output: "SELL - [reason], approved for sale"
-            - If DONATE found → Output: "DONATE - [reason], approved for donation"
-            - If KEEP found → Output: "KEEP - [reason], approved to keep"
-            STOP HERE.
-            
-            STEP 3: Does the text contain the exact phrase "REJECTED_BY_USER"?
-            - YES → Output: "Needs repair - [issue from feedback], disposition rejected"
-            - NO → Describe the maintenance/cleaning action from the text
-            
-            Additional Context (for reference only):
-            - Car: {carYear} {carMake} {carModel}
-            - Disposition Request: {dispositionRequest}
-            - Maintenance Request: {maintenanceRequest}
-            - Cleaning Request: {cleaningRequest}
-            
-            Output ONLY the condition description (max 200 chars).
+            Requests:
+            - Disposition: {dispositionRequest}
+            - Maintenance: {maintenanceRequest}
+            - Cleaning: {cleaningRequest}
             """)
-    @Agent(description = "Car condition analyzer. Determines the current condition of a car based on all feedback including disposition decisions.",
-            outputKey = "carCondition")
-    String analyzeForCondition(
+    @Agent(description = "Final car condition analyzer. Determines the car's condition, assignment, and approval status based on all feedback.",
+            outputKey = "carConditions")
+    CarConditions analyzeForCondition(
             String carMake,
             String carModel,
             Integer carYear,
