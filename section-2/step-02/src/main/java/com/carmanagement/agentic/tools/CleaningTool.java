@@ -1,6 +1,6 @@
 package com.carmanagement.agentic.tools;
 
-import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
 import com.carmanagement.model.CarInfo;
@@ -10,7 +10,7 @@ import dev.langchain4j.agent.tool.Tool;
 /**
  * Tool for requesting cleaning operations.
  */
-@Dependent
+@ApplicationScoped
 public class CleaningTool {
 
     /**

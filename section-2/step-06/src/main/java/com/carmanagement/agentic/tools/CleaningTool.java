@@ -1,13 +1,13 @@
 package com.carmanagement.agentic.tools;
 
-import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.ApplicationScoped;
 import dev.langchain4j.agent.tool.Tool;
 import io.quarkus.logging.Log;
 
 /**
  * Tool for requesting cleaning operations.
  */
-@Dependent
+@ApplicationScoped
 public class CleaningTool {
 
     /**

@@ -297,26 +297,11 @@ These tools can be local, like in the following `CleaningTool` example, or remot
 
 **Key Points:**
 
-- `@Dependent` scope is required (see explanation below)
 - `@Tool` annotation exposes this method to agents
     - The description helps the LLM understand when to use this tool
     - Parameters define what information the agent must provide
 - The method updates the car status to `AT_CLEANING`, if the `carInfo` is not `null`
 - The method returns a summary of the request (and prints a log messages)
-
-??? question "Why do we use @Dependent scope for the Tool?"
-    When a tool is added to an agent, LangChain4j introspects the tool object to find methods with `@Tool` annotations.
-
-    **The problem with other scopes:**
-    CDI creates proxies for beans with scopes like `@ApplicationScoped` or `@SessionScoped`. These proxy objects don't preserve the `@Tool` annotations, so LangChain4j can't detect them.
-
-    **The solution:**
-    Use `@Dependent` scope, which doesn't create proxies, allowing LangChain4j to see the annotations directly.
-
-    **Alternative:**
-    If you need other CDI scopes, you can use a `ToolProvider` to manually register tools (not covered in this workshop).
-
----
 
 ### Understanding Tool Execution Flow
 

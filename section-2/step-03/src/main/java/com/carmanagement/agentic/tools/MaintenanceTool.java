@@ -2,12 +2,12 @@ package com.carmanagement.agentic.tools;
 
 import dev.langchain4j.agent.tool.Tool;
 import io.quarkus.logging.Log;
-import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * Tool for requesting car maintenance operations.
  */
-@Dependent
+@ApplicationScoped
 public class MaintenanceTool {
 
     /**
