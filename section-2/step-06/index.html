@@ -991,17 +991,6 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-use-human-in-the-loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Use Human-in-the-Loop?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#hitl-vs-fully-autonomous" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1598,17 +1587,6 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-use-human-in-the-loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Use Human-in-the-Loop?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#hitl-vs-fully-autonomous" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2082,9 +2060,11 @@ You are not viewing the latest version.
 <p>They want to implement a <strong>human approval gate</strong> with these requirements:</p>
 <ol>
 <li><strong>Value threshold</strong>: Any vehicle worth more than <strong>$15,000</strong> requires human approval before disposition</li>
-<li><strong>Two-phase workflow</strong>: </li>
+<li><strong>Two-phase workflow</strong>:<ul>
 <li>Phase 1: AI creates a disposition <strong>proposal</strong></li>
 <li>Phase 2: Human reviews and <strong>approves or rejects</strong> the proposal</li>
+</ul>
+</li>
 <li><strong>Execution control</strong>: Only execute approved dispositions</li>
 <li><strong>Audit trail</strong>: Track approval status and reasoning for compliance</li>
 </ol>
@@ -2110,15 +2090,6 @@ You are not viewing the latest version.
 <li>Execution <strong>pauses</strong> to request human approval</li>
 <li>Humans review proposals and make final decisions</li>
 <li>System proceeds only after approval</li>
-</ul>
-<h3 id="why-use-human-in-the-loop">Why Use Human-in-the-Loop?<a class="headerlink" href="#why-use-human-in-the-loop" title="Permanent link"></a></h3>
-<p>HITL is essential when:</p>
-<ul>
-<li><strong>High-stakes decisions</strong>: Financial impact, safety concerns, legal implications</li>
-<li><strong>Regulatory compliance</strong>: Certain industries require human oversight</li>
-<li><strong>Trust building</strong>: Gradual transition from manual to autonomous processes</li>
-<li><strong>Edge cases</strong>: Unusual situations that AI might handle incorrectly</li>
-<li><strong>Accountability</strong>: Clear human responsibility for critical decisions</li>
 </ul>
 <h3 id="hitl-vs-fully-autonomous">HITL vs. Fully Autonomous<a class="headerlink" href="#hitl-vs-fully-autonomous" title="Permanent link"></a></h3>
 <table>
@@ -2204,13 +2175,6 @@ You are not viewing the latest version.
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
 </div>
-<p><strong>Key Points:</strong></p>
-<ol>
-<li><strong>Proposal Phase</strong>: AI analyzes and creates a recommendation</li>
-<li><strong>Approval Gate</strong>: Human reviews and decides</li>
-<li><strong>Execution Phase</strong>: System acts only if approved</li>
-<li><strong>Fallback</strong>: Alternative path if rejected</li>
-</ol>
 <hr>
 <h2 id="what-is-being-added">What is Being Added?<a class="headerlink" href="#what-is-being-added" title="Permanent link"></a></h2>
 <p>We’re enhancing our car management system with:</p>
@@ -2376,7 +2340,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li>Stored in AgenticScope with key <code>dispositionProposal</code></li>
 </ul>
 <h3 id="create-the-humanapprovalagent">Create the HumanApprovalAgent<a class="headerlink" href="#create-the-humanapprovalagent" title="Permanent link"></a></h3>
-<p>This agent implements TRUE Human-in-the-Loop by using a tool that <strong>actually pauses workflow execution</strong> until a human makes a decision through the UI.</p>
+<p>This agent implements Human-in-the-Loop by using a tool that <strong>pauses workflow execution</strong> until a human makes a decision through the UI.</p>
 <p>Create <code>src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java</code>:</p>
 <div class="highlight"><span class="filename">HumanApprovalAgent.java</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -2440,7 +2404,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </code></pre></div>
 <p><strong>Key Points:</strong></p>
 <ul>
-<li>Uses the <code>requestHumanApproval</code> tool which <strong>BLOCKS execution</strong> until human decides</li>
+<li>Uses the <code>requestHumanApproval</code> tool which <strong>blocks execution</strong> until human decides</li>
 <li>The tool calls <code>HumanInputService.requestInput()</code> which returns a <code>CompletableFuture</code></li>
 <li>Workflow execution pauses by calling <code>.get()</code> on the future</li>
 <li>Human sees pending approval in the UI and clicks Approve/Reject</li>
@@ -2448,6 +2412,8 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li>Returns structured decision: APPROVED/REJECTED with reasoning</li>
 <li>Stored in AgenticScope with key <code>approvalDecision</code></li>
 </ul>
+<p>!!!note @HumanInTheLoop annotation
+    LangChain4j also has a @HumanInTheLoop annotation that can be used to mark methods that require human approval. This is a simpler approach than using a tool, but as of now doesn’t provide the same level of control over the approval process.</p>
 <h3 id="create-the-humanapprovaltool">Create the HumanApprovalTool<a class="headerlink" href="#create-the-humanapprovaltool" title="Permanent link"></a></h3>
 <p>This tool implements the actual blocking mechanism for TRUE HITL.</p>
 <p>Create <code>src/main/java/com/carmanagement/agentic/tools/HumanApprovalTool.java</code>:</p>
@@ -3069,7 +3035,6 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <div class="admonition success">
 <p class="admonition-title">TRUE Human-in-the-Loop Implementation</p>
-<p>This is a <strong>TRUE HITL implementation</strong> where:</p>
 <ul>
 <li>✅ Workflow execution <strong>actually pauses</strong> when approval is needed</li>
 <li>✅ The workflow thread <strong>blocks</strong> on <code>CompletableFuture.get()</code></li>
