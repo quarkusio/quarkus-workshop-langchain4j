@@ -17,9 +17,9 @@ The Miles of Smiles management team has identified a risk: the system is making 
 They want to implement a **human approval gate** with these requirements:
 
 1. **Value threshold**: Any vehicle worth more than **$15,000** requires human approval before disposition
-2. **Two-phase workflow**: 
-   - Phase 1: AI creates a disposition **proposal**
-   - Phase 2: Human reviews and **approves or rejects** the proposal
+2. **Two-phase workflow**:
+       - Phase 1: AI creates a disposition **proposal**
+       - Phase 2: Human reviews and **approves or rejects** the proposal
 3. **Execution control**: Only execute approved dispositions
 4. **Audit trail**: Track approval status and reasoning for compliance
 
@@ -51,16 +51,6 @@ In this step, you will:
 - Execution **pauses** to request human approval
 - Humans review proposals and make final decisions
 - System proceeds only after approval
-
-### Why Use Human-in-the-Loop?
-
-HITL is essential when:
-
-- **High-stakes decisions**: Financial impact, safety concerns, legal implications
-- **Regulatory compliance**: Certain industries require human oversight
-- **Trust building**: Gradual transition from manual to autonomous processes
-- **Edge cases**: Unusual situations that AI might handle incorrectly
-- **Accountability**: Clear human responsibility for critical decisions
 
 ### HITL vs. Fully Autonomous
 
@@ -97,13 +87,6 @@ sequenceDiagram
         Note over System: Route to alternative<br/>processing path
     end
 ```
-
-**Key Points:**
-
-1. **Proposal Phase**: AI analyzes and creates a recommendation
-2. **Approval Gate**: Human reviews and decides
-3. **Execution Phase**: System acts only if approved
-4. **Fallback**: Alternative path if rejected
 
 ---
 
@@ -200,7 +183,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.
 
 ### Create the HumanApprovalAgent
 
-This agent implements TRUE Human-in-the-Loop by using a tool that **actually pauses workflow execution** until a human makes a decision through the UI.
+This agent implements Human-in-the-Loop by using a tool that **pauses workflow execution** until a human makes a decision through the UI.
 
 Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
 
@@ -210,13 +193,16 @@ Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
 
 **Key Points:**
 
-- Uses the `requestHumanApproval` tool which **BLOCKS execution** until human decides
+- Uses the `requestHumanApproval` tool which **blocks execution** until human decides
 - The tool calls `HumanInputService.requestInput()` which returns a `CompletableFuture`
 - Workflow execution pauses by calling `.get()` on the future
 - Human sees pending approval in the UI and clicks Approve/Reject
 - The future completes, workflow resumes with the human's decision
 - Returns structured decision: APPROVED/REJECTED with reasoning
 - Stored in AgenticScope with key `approvalDecision`
+
+!!!note @HumanInTheLoop annotation
+    LangChain4j also has a @HumanInTheLoop annotation that can be used to mark methods that require human approval. This is a simpler approach than using a tool, but as of now doesn't provide the same level of control over the approval process.
 
 ### Create the HumanApprovalTool
 
@@ -282,8 +268,6 @@ Create `src/main/java/com/carmanagement/resource/ApprovalResource.java`:
 - `POST /api/approvals/{id}/reject` - Reject a proposal
 
 !!!success "TRUE Human-in-the-Loop Implementation"
-    This is a **TRUE HITL implementation** where:
-    
     - ✅ Workflow execution **actually pauses** when approval is needed
     - ✅ The workflow thread **blocks** on `CompletableFuture.get()`
     - ✅ Human sees pending approvals in the **real-time UI**
