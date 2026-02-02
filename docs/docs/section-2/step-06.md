@@ -174,6 +174,9 @@ Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java"
 ```
 
+!!! note "Why two disposition agents?"
+    You might wonder why we have both DispositionProposalAgent and DispositionAgent (from Step 5). They serve different purposes: DispositionProposalAgent creates recommendations for human review on high-value vehicles (>$15K), while DispositionAgent makes autonomous decisions on lower-value vehicles. Think of it like needing manager approval for expensive purchases but having autonomy for small ones.
+
 **Key Points:**
 
 - Creates **proposals** rather than final decisions

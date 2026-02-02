@@ -55,10 +55,10 @@ public interface FleetSupervisorAgent {
                 → Include "APPROVAL_NOT_REQUIRED" in response
                 """;
 
-    String dispositionMessage = """
+        String dispositionMessage = """
            Disposition: REQUIRED
            
-           Follow this steps:
+           Follow these steps:
            
            1. Get value from PricingAgent (keep $ format)
            2. IF value > $15,000 (HIGH-VALUE):
