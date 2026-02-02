@@ -2,7 +2,6 @@ package com.carmanagement.agentic.agents;
 
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
-import dev.langchain4j.service.SystemMessage;
 
 /**
  * Supervisor agent that orchestrates the entire car processing workflow.
@@ -11,27 +10,6 @@ import dev.langchain4j.service.SystemMessage;
  */
 public interface FleetSupervisorAgent {
 
-    @SystemMessage("""
-        Fleet supervisor coordinating car processing. Your response MUST end with KEEP_CAR or DISPOSE_CAR.
-        
-        WORKFLOW:
-        
-        IF dispositionRequest = "DISPOSITION_NOT_REQUIRED":
-           → Handle cleaning/maintenance only → End with "KEEP_CAR"
-        
-        IF dispositionRequest = "DISPOSITION_REQUIRED":
-           1. Get value from PricingAgent (keep $ format)
-           2. IF value > $15,000 (HIGH-VALUE):
-              - Invoke DispositionProposalAgent → HumanApprovalAgent (workflow pauses)
-              - APPROVED: Use AI recommendation → KEEP→"KEEP_CAR", DISPOSE→"DISPOSE_CAR"
-              - REJECTED: Opposite of AI → KEEP→"DISPOSE_CAR", DISPOSE→"KEEP_CAR"
-           3. IF value ≤ $15,000 (LOW-VALUE):
-              - Invoke DispositionAgent directly
-              - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
-           4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed
-        
-        CRITICAL: Always end with KEEP_CAR or DISPOSE_CAR marker.
-        """)
     @SupervisorAgent(
         outputKey = "supervisorDecision",
         subAgents = {
@@ -72,31 +50,50 @@ public interface FleetSupervisorAgent {
         boolean dispositionRequired = dispositionRequest != null &&
                                      dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
         
-        if (!dispositionRequired) {
-            return String.format("""
-                Car: %d %s %s (#%d)
+        String noDispositionMessage = """
                 Disposition: NOT REQUIRED
-                Cleaning: %s | Maintenance: %s
                 → Include "APPROVAL_NOT_REQUIRED" in response
-                """,
-                carYear, carMake, carModel, carNumber,
-                cleaningRequest, maintenanceRequest
-            );
-        }
-        
+                """;
+
+    String dispositionMessage = """
+           Disposition: REQUIRED
+           
+           Follow this steps:
+           
+           1. Get value from PricingAgent (keep $ format)
+           2. IF value > $15,000 (HIGH-VALUE):
+              - Invoke DispositionProposalAgent → HumanApprovalAgent (workflow pauses)
+              - APPROVED: Use AI recommendation → KEEP→"KEEP_CAR", DISPOSE→"DISPOSE_CAR"
+              - REJECTED: Opposite of AI → KEEP→"DISPOSE_CAR", DISPOSE→"KEEP_CAR"
+           3. IF value ≤ $15,000 (LOW-VALUE):
+              - Invoke DispositionAgent directly
+              - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
+           4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed otherwise invoke DispositionAgent
+           
+           CRITICAL: End with KEEP_CAR or DISPOSE_CAR
+           """;
+
         return String.format("""
-            Car: %d %s %s (#%d) | Damage: %s
-            Disposition: REQUIRED | Cleaning: %s | Maintenance: %s
+            You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.
             
-            1. Get value from PricingAgent (keep $ format)
-            2. Value > $15K: DispositionProposalAgent → HumanApprovalAgent
-            3. Value ≤ $15K: DispositionAgent (pass carValue with $)
+            The feedback has already been analyzed and you have these inputs:
+            - cleaningRequest: What cleaning is needed (or "CLEANING_NOT_REQUIRED")
+            - maintenanceRequest: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
+            - dispositionRequest: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
             
-            CRITICAL: End with KEEP_CAR or DISPOSE_CAR
+            Your job is to invoke the appropriate ACTION agents for this car
+            
+            Car: %d %s %s (#%d)
+            Current Condition: %s
+            Rental Feedback: %s
+            
+            Cleaning Request: %s
+            Maintenance Request: %s
+            
+            %s
             """,
-            carYear, carMake, carModel, carNumber, rentalFeedback,
-            cleaningRequest, maintenanceRequest
-        );
+                carYear, carMake, carModel, carNumber, carCondition, rentalFeedback,
+                cleaningRequest, maintenanceRequest, dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
 
