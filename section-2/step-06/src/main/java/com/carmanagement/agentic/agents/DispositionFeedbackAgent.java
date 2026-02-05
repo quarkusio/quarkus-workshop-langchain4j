@@ -24,7 +24,8 @@ public interface DispositionFeedbackAgent {
         If the car has only minor or moderate issues that can be repaired, respond with:
         "DISPOSITION_NOT_REQUIRED"
         
-        Keep your response concise.
+        Keep your response concise. 
+        You MUST include either "DISPOSITION_REQUIRED" or "DISPOSITION_NOT_REQUIRED" in your response.
         """)
     @UserMessage("""
         Car Information:
