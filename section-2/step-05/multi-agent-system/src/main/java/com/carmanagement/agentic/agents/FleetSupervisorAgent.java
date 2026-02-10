@@ -37,7 +37,7 @@ public interface FleetSupervisorAgent {
         String carMake,
         String carModel,
         Integer carYear,
-        Long carNumber,
+        Integer carNumber,
         String carCondition,
         String cleaningRequest,
         String maintenanceRequest,
@@ -83,7 +83,7 @@ public interface FleetSupervisorAgent {
             - maintenanceRequest: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
             - dispositionRequest: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
             
-            Your job is to invoke the appropriate ACTION agents for this car
+            Your job is to invoke the appropriate ACTION agents for this car.
             
             Car: %d %s %s (#%d)
             Current Condition: %s
