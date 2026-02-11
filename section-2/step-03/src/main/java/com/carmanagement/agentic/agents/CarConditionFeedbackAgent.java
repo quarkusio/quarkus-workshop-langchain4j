@@ -32,7 +32,7 @@ public interface CarConditionFeedbackAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String carCondition,
             String cleaningRequest,
             String maintenanceRequest);

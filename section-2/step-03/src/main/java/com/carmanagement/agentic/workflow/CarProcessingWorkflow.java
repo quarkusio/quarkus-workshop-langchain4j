@@ -22,7 +22,7 @@ public interface CarProcessingWorkflow {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String carCondition,
             String rentalFeedback,
             String cleaningFeedback,

@@ -6,7 +6,7 @@ import dev.langchain4j.agentic.declarative.SupervisorRequest;
 /**
  * Supervisor agent that orchestrates the entire car processing workflow.
  * Coordinates feedback analysis agents and action agents based on car condition.
- * Implements TRUE human-in-the-loop pattern for high-value vehicle dispositions.
+ * Implements human-in-the-loop pattern for high-value vehicle dispositions.
  */
 public interface FleetSupervisorAgent {
 
@@ -25,7 +25,7 @@ public interface FleetSupervisorAgent {
         String carMake,
         String carModel,
         Integer carYear,
-        Long carNumber,
+        Integer carNumber,
         String carCondition,
         String rentalFeedback,
         String cleaningFeedback,
@@ -35,12 +35,12 @@ public interface FleetSupervisorAgent {
         String dispositionRequest
     );
 
-    @SupervisorRequest
+    @SupervisorRequest()
     static String request(
         String carMake,
         String carModel,
         Integer carYear,
-        Long carNumber,
+        Integer carNumber,
         String carCondition,
         String cleaningRequest,
         String maintenanceRequest,
@@ -51,12 +51,13 @@ public interface FleetSupervisorAgent {
                                      dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
         
         String noDispositionMessage = """
-                Disposition: NOT REQUIRED
-                → Include "APPROVAL_NOT_REQUIRED" in response
+            Disposition is not required. 
+            Proceed with normal maintenance and cleaning workflow. 
+            If cleaning or maintenance is required, invoke the appropriate agents.
                 """;
 
         String dispositionMessage = """
-           Disposition: REQUIRED
+           DISPOSITION_REQUIRED
            
            Follow these steps:
            
@@ -68,12 +69,12 @@ public interface FleetSupervisorAgent {
            3. IF value ≤ $15,000 (LOW-VALUE):
               - Invoke DispositionAgent directly
               - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
-           4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed otherwise invoke DispositionAgent
+           4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed
            
            CRITICAL: End with KEEP_CAR or DISPOSE_CAR
            """;
 
-        return String.format("""
+        return """
             You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.
             
             The feedback has already been analyzed and you have these inputs:
@@ -83,17 +84,17 @@ public interface FleetSupervisorAgent {
             
             Your job is to invoke the appropriate ACTION agents for this car
             
-            Car: %d %s %s (#%d)
-            Current Condition: %s
-            Rental Feedback: %s
+            Car: """ + carYear + " " + carMake + " " + carModel + " (#" + carNumber + ")" + """
             
-            Cleaning Request: %s
-            Maintenance Request: %s
+            Current Condition: """ + carCondition + """
             
-            %s
-            """,
-                carYear, carMake, carModel, carNumber, carCondition, rentalFeedback,
-                cleaningRequest, maintenanceRequest, dispositionRequired ? dispositionMessage : noDispositionMessage);
+            Rental Feedback: """ + rentalFeedback + """
+            
+            Cleaning Request: """ + cleaningRequest + """
+            
+            Maintenance Request: """ + maintenanceRequest + """
+            
+            Disposition Request: """ + (dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
 

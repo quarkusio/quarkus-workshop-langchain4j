@@ -39,7 +39,7 @@ public interface CleaningAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String rentalFeedback,
             String cleaningFeedback);
 }

@@ -33,7 +33,7 @@ public class CarManagementService {
      * @param maintenanceFeedback Optional maintenance feedback
      * @return Uni that completes with the result of the processing
      */
-    public Uni<String> processCarReturn(Long carNumber, String rentalFeedback, String cleaningFeedback,
+    public Uni<String> processCarReturn(Integer carNumber, String rentalFeedback, String cleaningFeedback,
                                    String maintenanceFeedback) {
         
         return Uni.createFrom().item(() -> {
@@ -87,7 +87,7 @@ public class CarManagementService {
      * Find car info in a read-only transaction
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    CarInfo findCarInfo(Long carNumber) {
+    CarInfo findCarInfo(Integer carNumber) {
         return CarInfo.findById(carNumber);
     }
     

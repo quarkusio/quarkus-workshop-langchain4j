@@ -9,9 +9,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 /**
  * Agent that determines how to dispose of a car based on value, condition, and damage.
  *
- * Note: Uses Integer for carNumber (instead of Long used in step-04) because the A2A protocol
- * requires explicit string-to-type parsing in DispositionAgentExecutor. Local agents in step-04
- * can use Long as LangChain4j handles type conversion automatically.
  */
 @RegisterAiService
 @ApplicationScoped

@@ -38,7 +38,7 @@ public class ApprovalResource {
      */
     @GET
     @Path("/{proposalId}")
-    public Response getProposal(@PathParam("proposalId") Long proposalId) {
+    public Response getProposal(@PathParam("proposalId") Integer proposalId) {
         ApprovalProposal proposal = approvalService.getProposal(proposalId);
         if (proposal == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -58,7 +58,7 @@ public class ApprovalResource {
     @POST
     @Path("/{proposalId}/approve")
     public Response approveProposal(
-            @PathParam("proposalId") Long proposalId,
+            @PathParam("proposalId") Integer proposalId,
             Map<String, String> request) {
         
         try {
@@ -97,7 +97,7 @@ public class ApprovalResource {
     @POST
     @Path("/{proposalId}/reject")
     public Response rejectProposal(
-            @PathParam("proposalId") Long proposalId,
+            @PathParam("proposalId") Integer proposalId,
             Map<String, String> request) {
         
         try {
@@ -136,7 +136,7 @@ public class ApprovalResource {
     @POST
     @Path("/{proposalId}/decide")
     public Response decideProposal(
-            @PathParam("proposalId") Long proposalId,
+            @PathParam("proposalId") Integer proposalId,
             Map<String, String> request) {
         
         try {

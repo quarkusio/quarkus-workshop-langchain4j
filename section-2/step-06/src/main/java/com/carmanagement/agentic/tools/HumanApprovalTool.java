@@ -23,7 +23,7 @@ public class HumanApprovalTool {
 
     @Tool("Request human approval for a high-value vehicle disposition proposal. This will PAUSE the workflow until a human approves or rejects the proposal via the UI.")
     public String requestHumanApproval(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,

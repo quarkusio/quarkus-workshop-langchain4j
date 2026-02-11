@@ -34,7 +34,7 @@ public class ApprovalService {
      * Map to store CompletableFutures waiting for approval decisions.
      * Key: carNumber, Value: CompletableFuture that completes when decision is made
      */
-    private final Map<Long, CompletableFuture<ApprovalProposal>> pendingApprovals = new ConcurrentHashMap<>();
+    private final Map<Integer, CompletableFuture<ApprovalProposal>> pendingApprovals = new ConcurrentHashMap<>();
     
     /**
      * Executor for async proposal creation to ensure transaction commits before blocking
@@ -57,7 +57,7 @@ public class ApprovalService {
      * @return CompletableFuture that completes when human approves/rejects
      */
     public CompletableFuture<ApprovalProposal> createProposalAndWaitForDecision(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -97,7 +97,7 @@ public class ApprovalService {
 
     @Transactional(TxType.REQUIRES_NEW)
     void createProposalInNewTransaction(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -141,7 +141,7 @@ public class ApprovalService {
      * @return The updated proposal
      */
     @Transactional(TxType.REQUIRES_NEW)
-    public ApprovalProposal processDecision(Long proposalId, boolean approved, String reason, String approvedBy) {
+    public ApprovalProposal processDecision(Integer proposalId, boolean approved, String reason, String approvedBy) {
         ApprovalProposal proposal = ApprovalProposal.findById(proposalId);
         if (proposal == null) {
             throw new IllegalArgumentException("Proposal not found: " + proposalId);
@@ -183,14 +183,14 @@ public class ApprovalService {
     /**
      * Get a specific proposal by ID.
      */
-    public ApprovalProposal getProposal(Long proposalId) {
+    public ApprovalProposal getProposal(Integer proposalId) {
         return ApprovalProposal.findById(proposalId);
     }
 
     /**
      * Check if there's a pending approval for a car.
      */
-    public ApprovalProposal getPendingProposalForCar(Long carNumber) {
+    public ApprovalProposal getPendingProposalForCar(Integer carNumber) {
         return ApprovalProposal.findPendingByCarNumber(carNumber);
     }
 }

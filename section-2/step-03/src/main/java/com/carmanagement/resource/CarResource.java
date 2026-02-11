@@ -31,7 +31,7 @@ public class CarResource {
      */
     @GET
     @Path("/{id}")
-    public Response getCarById(@PathParam("id") Long id) {
+    public Response getCarById(@PathParam("id") Integer id) {
         CarInfo car = CarInfo.findById(id);
         if (car == null) {
             return Response.status(Response.Status.NOT_FOUND)
