@@ -29,7 +29,7 @@ public class CarManagementService {
      * @return Result of the processing
      */
     @Transactional
-    public String processCarReturn(Long carNumber, String rentalFeedback, String cleaningFeedback,
+    public String processCarReturn(Integer carNumber, String rentalFeedback, String cleaningFeedback,
                                    String maintenanceFeedback) {
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo == null) {

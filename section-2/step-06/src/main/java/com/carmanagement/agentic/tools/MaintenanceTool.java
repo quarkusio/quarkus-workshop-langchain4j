@@ -28,7 +28,7 @@ public class MaintenanceTool {
      */
     @Tool("Requests maintenance with the specified options including body work for dents, paint, and collision repairs")
     public String requestMaintenance(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,

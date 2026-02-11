@@ -34,7 +34,7 @@ public class CarManagementResource {
     @POST
     @Path("/rental-return/{carNumber}")
     @Blocking
-    public Uni<Response> processRentalReturn(Long carNumber, @RestQuery String rentalFeedback) {
+    public Uni<Response> processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
         
         return carManagementService.processCarReturn(carNumber, rentalFeedback, "", "")
             .onItem().transform(result -> Response.ok(result).build())
@@ -55,7 +55,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/cleaningReturn/{carNumber}")
-    public Uni<Response> processCleaningReturn(Long carNumber, @RestQuery String cleaningFeedback) {
+    public Uni<Response> processCleaningReturn(Integer carNumber, @RestQuery String cleaningFeedback) {
         
         return carManagementService.processCarReturn(carNumber, "", cleaningFeedback, "")
             .onItem().transform(result -> Response.ok(result).build())
@@ -76,7 +76,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/maintenance-return/{carNumber}")
-    public Uni<Response> processMaintenanceReturn(Long carNumber, @RestQuery String maintenanceFeedback) {
+    public Uni<Response> processMaintenanceReturn(Integer carNumber, @RestQuery String maintenanceFeedback) {
         
         return carManagementService.processCarReturn(carNumber, "", "", maintenanceFeedback)
             .onItem().transform(result -> Response.ok(result).build())

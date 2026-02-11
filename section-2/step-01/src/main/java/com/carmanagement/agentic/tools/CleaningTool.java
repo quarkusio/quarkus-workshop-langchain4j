@@ -31,7 +31,7 @@ public class CleaningTool {
     @Tool("Requests a cleaning with the specified options")
     @Transactional
     public String requestCleaning(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,
@@ -60,7 +60,7 @@ public class CleaningTool {
 // --8<-- [end:CleaningTool]
 
     private String generateCleaningSummary(
-            Long carNumber,
+            Integer carNumber,
             String carMake,
             String carModel,
             Integer carYear,

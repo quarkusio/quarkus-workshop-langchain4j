@@ -30,7 +30,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/rental-return/{carNumber}")
-    public Response processRentalReturn(Long carNumber, @RestQuery String rentalFeedback) {
+    public Response processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "");
@@ -52,7 +52,7 @@ public class CarManagementResource {
      */
     @POST
     @Path("/cleaningReturn/{carNumber}")
-    public Response processCleaningReturn(Long carNumber, @RestQuery String cleaningFeedback) {
+    public Response processCleaningReturn(Integer carNumber, @RestQuery String cleaningFeedback) {
         
         try {
             String result = carManagementService.processCarReturn(carNumber, "", cleaningFeedback);

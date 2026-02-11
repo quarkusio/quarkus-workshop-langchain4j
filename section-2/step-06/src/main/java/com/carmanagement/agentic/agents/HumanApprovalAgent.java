@@ -50,7 +50,7 @@ public interface HumanApprovalAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String carValue,
             String proposedDisposition,
             String dispositionReason,

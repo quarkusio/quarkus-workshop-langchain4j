@@ -19,7 +19,7 @@ public class ApprovalProposal extends PanacheEntity {
      * The car number this proposal is for
      */
     @Column(nullable = false)
-    public Long carNumber;
+    public Integer carNumber;
 
     /**
      * Car make
@@ -102,7 +102,7 @@ public class ApprovalProposal extends PanacheEntity {
     /**
      * Find pending proposal for a specific car
      */
-    public static ApprovalProposal findPendingByCarNumber(Long carNumber) {
+    public static ApprovalProposal findPendingByCarNumber(Integer carNumber) {
         return find("carNumber = ?1 and status = ?2", carNumber, ApprovalStatus.PENDING).firstResult();
     }
 
