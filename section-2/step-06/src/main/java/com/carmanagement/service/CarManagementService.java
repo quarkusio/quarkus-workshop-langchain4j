@@ -11,7 +11,7 @@ import com.carmanagement.model.CarStatus;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 
-import java.time.Duration;
+import static dev.langchain4j.agentic.observability.HtmlReportGenerator.generateReport;
 
 /**
  * Service for managing car returns from various operations.
@@ -99,6 +99,10 @@ public class CarManagementService {
     void updateCarInfo(CarInfo carInfo) {
         // Merge the detached entity back into the persistence context
         CarInfo.getEntityManager().merge(carInfo);
+    }
+
+    public String report() {
+        return generateReport(carProcessingWorkflow.agentMonitor());
     }
 }
 

@@ -5,13 +5,14 @@ import com.carmanagement.agentic.agents.FleetSupervisorAgent;
 import com.carmanagement.model.CarConditions;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
+import dev.langchain4j.agentic.observability.MonitoredAgent;
 import io.quarkus.logging.Log;
 
 /**
  * Workflow for processing car returns using a supervisor agent for complete orchestration.
  * The supervisor coordinates both feedback analysis and action agents.
  */
-public interface CarProcessingWorkflow {
+public interface CarProcessingWorkflow extends MonitoredAgent {
 
     /**
      * Processes a car return by first analyzing feedback, then using supervisor to coordinate actions.

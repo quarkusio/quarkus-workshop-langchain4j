@@ -674,6 +674,90 @@ Track all approvals:
 
 ---
 
+## Agent Observability with MonitoredAgent
+
+Beyond the HITL workflow, step-06 also introduces **agent observability** - the ability to inspect what every agent in the system did, what inputs it received, what it produced, and how long it took.
+
+LangChain4j provides the `MonitoredAgent` interface and an `HtmlReportGenerator` utility in the `dev.langchain4j.agentic.observability` package. Together, they give you a full execution report of your agentic system with zero manual instrumentation.
+
+### Monitoring Agentic System Execution
+
+`MonitoredAgent` is a simple interface with a single method:
+
+```java
+public interface MonitoredAgent {
+    AgentMonitor agentMonitor();
+}
+```
+
+When your top-level workflow interface extends `MonitoredAgent`, LangChain4j automatically attaches an `AgentMonitor` listener to the entire agent tree. The `AgentMonitor` implements `AgentListener` and records every agent invocation across the system:
+
+- **Before each invocation**: captures the agent name, inputs, and start time
+- **After each invocation**: captures the output and finish time
+- **On errors**: captures the exception details
+- **Nested invocations**: tracks the full call hierarchy (e.g., FleetSupervisorAgent calling PricingAgent calling DispositionProposalAgent)
+
+The monitor groups executions by memory ID, so you can inspect each independent workflow run separately. It tracks ongoing, successful, and failed executions.
+
+To enable this feature, it is enough to do the following:
+
+**1. Extend `MonitoredAgent` in the workflow interface**
+
+In `CarProcessingWorkflow.java`, the interface simply extends `MonitoredAgent`:
+
+```java
+public interface CarProcessingWorkflow extends MonitoredAgent {
+
+    @SequenceAgent(outputKey = "carProcessingAgentResult",
+            subAgents = { FeedbackWorkflow.class, FleetSupervisorAgent.class,
+                          CarConditionFeedbackAgent.class })
+    CarConditions processCarReturn(/* ... */);
+}
+```
+
+That's it - no annotations on individual agents, no manual tracking code. The framework handles everything.
+
+**2. Generate an HTML report from the monitor**
+
+In `CarManagementService.java`, the `report()` method uses the static `HtmlReportGenerator.generateReport()` helper:
+
+```java
+import static dev.langchain4j.agentic.observability.HtmlReportGenerator.generateReport;
+
+public String report() {
+    return generateReport(carProcessingWorkflow.agentMonitor());
+}
+```
+
+This produces a self-contained HTML page with:
+
+- **Agent topology**: a visual map of all agents and their relationships (sequential, parallel, supervisor, etc.), including the data flow keys that connect them
+- **Execution timeline**: for each workflow run, a detailed breakdown showing every agent invocation with inputs, outputs, duration, and nesting level
+- **Error tracking**: any failed invocations are highlighted with their exception details
+
+### Viewing the Report
+
+The report is exposed via a REST endpoint in `CarManagementResource.java`:
+
+```java
+@GET
+@Path("/report")
+@Produces(MediaType.TEXT_HTML)
+public Response report() {
+    return Response.ok(carManagementService.report()).build();
+}
+```
+
+After processing one or more cars, click the **"Generate Report"** button in the UI (next to "Refresh Data") to open the report in a new tab. The report shows:
+
+1. The full agent topology of your system
+2. Every execution grouped by workflow run
+3. For each agent invocation: what went in, what came out, and how long it took
+
+This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.
+
+---
+
 ## What's Next?
 
 Congratulations! You've completed the final step of Section 2 and implemented the **Human-in-the-Loop pattern** for safe, controlled autonomous decision-making!
