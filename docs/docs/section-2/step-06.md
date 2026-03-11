@@ -34,7 +34,7 @@ In this step, you will:
 - Understand the **Human-in-the-Loop (HITL) pattern** and when to use it
 - Implement a **two-phase approval workflow** (proposal → review → execution)
 - Create a **DispositionProposalAgent** that generates proposals
-- Build a **HumanApprovalAgent** that simulates human decision-making
+- Build a **HumanApprovalAgent** using LangChain4j's **`@HumanInTheLoop`** annotation
 - Modify the **FleetSupervisorAgent** to route high-value vehicles through approval
 - Add **approval tracking** to the data model
 - See how HITL provides **safety and control** in autonomous systems
@@ -70,15 +70,15 @@ sequenceDiagram
     participant Proposal as Proposal Agent
     participant Human as Human Reviewer
     participant Execution as Execution Agent
-    
+
     System->>Proposal: Analyze situation
     Proposal->>Proposal: Create recommendation
     Proposal-->>System: Proposal ready
-    
+
     System->>Human: Request approval
     Note over Human: Human reviews<br/>proposal details
     Human-->>System: APPROVED/REJECTED
-    
+
     alt Approved
         System->>Execution: Execute proposal
         Execution-->>System: Action completed
@@ -95,7 +95,7 @@ sequenceDiagram
 We're enhancing our car management system with:
 
 - **DispositionProposalAgent**: Creates disposition proposals for review
-- **HumanApprovalAgent**: Simulates human approval decisions (in production, this would integrate with a real approval system)
+- **HumanApprovalAgent**: Uses LangChain4j's `@HumanInTheLoop` annotation to pause workflow execution and wait for a human decision through the UI
 - **Updated FleetSupervisorAgent**: Routes high-value vehicles through the approval workflow
 - **Enhanced CarConditions**: Tracks approval status and reasoning
 - **Value-based routing**: Different paths for high-value vs. low-value vehicles
@@ -105,7 +105,7 @@ We're enhancing our car management system with:
 ```mermaid
 graph TB
     Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential]
-    
+
     A --> B[Step 1: FeedbackWorkflow<br/>Parallel Analysis]
     B --> B1[CleaningFeedbackAgent]
     B --> B2[MaintenanceFeedbackAgent]
@@ -113,31 +113,31 @@ graph TB
     B1 --> BEnd[All feedback complete]
     B2 --> BEnd
     B3 --> BEnd
-    
+
     BEnd --> C[Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration]
     C --> C1{Disposition<br/>Required?}
-    
+
     C1 -->|Yes| PA[PricingAgent<br/>Estimate Value]
     PA --> VCheck{Value > $15k?}
-    
+
     VCheck -->|Yes - HIGH VALUE| Proposal[DispositionProposalAgent<br/>Create Proposal]
-    Proposal --> Approval[HumanApprovalAgent<br/>Review & Decide]
+    Proposal --> Approval[HumanApprovalAgent<br/>@HumanInTheLoop]
     Approval --> ApprovalCheck{Approved?}
     ApprovalCheck -->|Yes| Execute[Execute Disposition]
     ApprovalCheck -->|No| Fallback[Route to Maintenance/Cleaning]
-    
+
     VCheck -->|No - LOW VALUE| Direct[DispositionAgent<br/>Direct Decision]
     Direct --> Execute
-    
+
     C1 -->|No| Other[MaintenanceAgent or CleaningAgent]
-    
+
     Execute --> CEnd[Supervisor Decision]
     Fallback --> CEnd
     Other --> CEnd
-    
+
     CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Final Summary]
     D --> End([Updated Car with Approval Status])
-    
+
     style A fill:#90EE90
     style B fill:#87CEEB
     style C fill:#FFB6C1
@@ -186,49 +186,31 @@ Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.
 
 ### Create the HumanApprovalAgent
 
-This agent implements Human-in-the-Loop by using a tool that **pauses workflow execution** until a human makes a decision through the UI.
+This agent implements Human-in-the-Loop using LangChain4j's **`@HumanInTheLoop`** annotation. Instead of relying on a separate tool, the agent method itself **pauses workflow execution** until a human makes a decision through the UI.
 
 Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
 
-```java title="HumanApprovalAgent.java" hl_lines="14-35 38-58"
+```java title="HumanApprovalAgent.java" hl_lines="6 17"
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java"
 ```
 
 **Key Points:**
 
-- Uses the `requestHumanApproval` tool which **blocks execution** until human decides
-- The tool calls `HumanInputService.requestInput()` which returns a `CompletableFuture`
-- Workflow execution pauses by calling `.get()` on the future
+- The **`@HumanInTheLoop`** annotation from LangChain4j marks this agent method as requiring human interaction before completing
+- The method body contains the blocking logic directly — no separate tool class is needed
+- Calls `ApprovalService.createProposalAndWaitForDecision()` which returns a `CompletableFuture`
+- Workflow execution **pauses** by calling `.get(5, TimeUnit.MINUTES)` on the future
 - Human sees pending approval in the UI and clicks Approve/Reject
 - The future completes, workflow resumes with the human's decision
 - Returns structured decision: APPROVED/REJECTED with reasoning
 - Stored in AgenticScope with key `approvalDecision`
 
-!!!note @HumanInTheLoop annotation
-    LangChain4j also has a @HumanInTheLoop annotation that can be used to mark methods that require human approval. This is a simpler approach than using a tool, but as of now doesn't provide the same level of control over the approval process.
+!!! info "Why `@HumanInTheLoop` instead of a tool?"
+    In previous versions of this workshop, the human approval logic lived in a separate `HumanApprovalTool` class that the agent would invoke. LangChain4j's `@HumanInTheLoop` annotation simplifies this by letting you place the blocking logic directly in the agent method. The annotation signals to the framework that this agent requires human interaction, keeping everything in one place and eliminating the extra tool class.
 
-### Create the HumanApprovalTool
+### The ApprovalService
 
-This tool implements the actual blocking mechanism for TRUE HITL.
-
-Create `src/main/java/com/carmanagement/agentic/tools/HumanApprovalTool.java`:
-
-```java title="HumanApprovalTool.java"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/tools/HumanApprovalTool.java"
-```
-
-**Key Points:**
-
-- Creates an approval proposal in the database
-- Returns a `CompletableFuture<ApprovalProposal>` that completes when human decides
-- **Blocks by calling `.get(5, TimeUnit.MINUTES)`** - this is where the workflow pauses!
-- Workflow thread waits here until human clicks Approve/Reject in UI
-- Includes 5-minute timeout for safety
-- Returns human's decision to the agent
-
-### Create the ApprovalService
-
-This service manages the CompletableFutures that pause workflow execution.
+The `ApprovalService` manages the `CompletableFuture` instances that pause and resume workflow execution. This is the bridge between the `HumanApprovalAgent` and the REST endpoints that the UI calls.
 
 Create `src/main/java/com/carmanagement/service/ApprovalService.java`:
 
@@ -270,15 +252,16 @@ Create `src/main/java/com/carmanagement/resource/ApprovalResource.java`:
 - `POST /api/approvals/{id}/approve` - Approve a proposal
 - `POST /api/approvals/{id}/reject` - Reject a proposal
 
-!!!success "TRUE Human-in-the-Loop Implementation"
-    - ✅ Workflow execution **actually pauses** when approval is needed
-    - ✅ The workflow thread **blocks** on `CompletableFuture.get()`
-    - ✅ Human sees pending approvals in the **real-time UI**
-    - ✅ Human clicks **Approve/Reject buttons** in the UI
-    - ✅ The future **completes** with the human's decision
-    - ✅ Workflow **resumes** and continues with the decision
-    - ✅ Includes **timeout handling** (5 minutes)
-    - ✅ Full **audit trail** in the database
+!!!success "How the HITL Flow Works End-to-End"
+    1. The `FleetSupervisorAgent` detects a high-value vehicle and invokes the `DispositionProposalAgent`
+    2. The proposal is passed to the `HumanApprovalAgent`, which is annotated with `@HumanInTheLoop`
+    3. Inside the agent method, `ApprovalService.createProposalAndWaitForDecision()` persists the proposal to the database and returns a `CompletableFuture`
+    4. The agent method **blocks** on `future.get(5, TimeUnit.MINUTES)` — the workflow pauses here
+    5. The UI polls `GET /api/approvals/pending` and displays the proposal to the human reviewer
+    6. The human clicks **Approve** or **Reject**, which calls the corresponding REST endpoint
+    7. `ApprovalService.processDecision()` completes the `CompletableFuture` with the decision
+    8. The agent method **unblocks**, formats the decision, and returns it
+    9. The workflow **resumes** with the human's decision
 
 ### Update the FleetSupervisorAgent
 
@@ -310,8 +293,8 @@ Update `src/main/java/com/carmanagement/model/CarConditions.java`:
 
 **Key Points:**
 
-- Added `approvalStatus` field (APPROVED/REJECTED/NOT_REQUIRED)
-- Added `approvalReason` field for audit trail
+- Added `dispositionStatus` field (DISPOSITION_APPROVED/DISPOSITION_REJECTED/DISPOSITION_NOT_REQUIRED)
+- Added `dispositionReason` field for audit trail
 - Backward-compatible constructor for existing code
 
 ### Update Application Configuration
@@ -336,21 +319,21 @@ Now let's see the Human-in-the-Loop pattern in action!
 
 !!!warning "Keep the Remote A2A Service Running"
     Before starting the step-06 application, make sure you have the **remote A2A service from step-05** running in a separate terminal.
-    
+
     **Why?** The DispositionAgent used in this step is still running as a remote service (from step-05) and communicates via Agent-to-Agent (A2A) protocol.
-    
+
     **Port Configuration:**
-    
+
     - Remote A2A service (step-05): `http://localhost:8888`
     - Main application (step-06): `http://localhost:8080`
-    
+
     **To start the remote service:**
-    
+
     ```bash
     cd section-2/step-05/remote-a2a-agent
     ./mvnw quarkus:dev
     ```
-    
+
     Keep this terminal running while you work with step-06. Both services need to be running for the Human-in-the-Loop workflow to work correctly.
 
 ### Start the Application
@@ -392,25 +375,25 @@ The car was in a serious collision. Front end is completely destroyed and airbag
 ```mermaid
 flowchart TD
     Start([Input: Serious collision<br/>Front end destroyed])
-    
+
     Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
+
     FW --> FSA[FleetSupervisorAgent<br/>Orchestration]
     FSA --> PA[PricingAgent]
     PA --> Value[Estimate: ~$18,000<br/>2020 Honda Civic]
-    
+
     Value --> Check{Value > $15,000?}
     Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
     Proposal --> PropResult[Proposed: SCRAP<br/>Reasoning: Severe damage]
-    
-    PropResult --> Human[HumanApprovalAgent<br/>Reviews Proposal]
+
+    PropResult --> Human[HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow]
     Human --> Decision{Decision}
     Decision -->|APPROVED| Execute[Execute SCRAP]
     Decision -->|REJECTED| Fallback[Route to Maintenance]
-    
+
     Execute --> Result([Status: PENDING_DISPOSITION<br/>Approval: APPROVED])
     Fallback --> Result2([Status: IN_MAINTENANCE<br/>Approval: REJECTED])
-    
+
     style FW fill:#FAE5D3
     style FSA fill:#D5F5E3
     style PA fill:#F9E79F
@@ -426,9 +409,10 @@ flowchart TD
 
 - PricingAgent estimates value at ~$18,000 (above threshold)
 - DispositionProposalAgent creates SCRAP proposal
-- HumanApprovalAgent reviews and likely APPROVES (severe damage justifies scrapping)
-- Status: `PENDING_DISPOSITION`
-- Condition includes approval status and reasoning
+- HumanApprovalAgent pauses the workflow (via `@HumanInTheLoop`) and waits for human input
+- Human reviews the proposal in the UI and clicks Approve or Reject
+- Workflow resumes with the decision
+- Status: `PENDING_DISPOSITION` if approved, `IN_MAINTENANCE` if rejected
 
 #### Scenario 2: High-Value Vehicle - Approval Rejected
 
@@ -443,23 +427,23 @@ Minor fender bender, small dent in rear bumper
 ```mermaid
 flowchart TD
     Start([Input: Minor fender bender<br/>small dent])
-    
+
     Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
+
     FW --> FSA[FleetSupervisorAgent]
     FSA --> PA[PricingAgent]
     PA --> Value[Estimate: ~$25,000<br/>2021 Mercedes Benz]
-    
+
     Value --> Check{Value > $15,000?}
     Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
     Proposal --> PropResult[Proposed: SELL or KEEP<br/>Minor damage]
-    
-    PropResult --> Human[HumanApprovalAgent<br/>Reviews Proposal]
+
+    PropResult --> Human[HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow]
     Human --> Decision[Decision: REJECTED<br/>Too valuable for minor damage]
-    
+
     Decision --> Fallback[Route to Maintenance<br/>Repair instead]
     Fallback --> Result([Status: IN_MAINTENANCE<br/>Approval: REJECTED])
-    
+
     style FW fill:#FAE5D3
     style FSA fill:#D5F5E3
     style PA fill:#F9E79F
@@ -473,10 +457,10 @@ flowchart TD
 
 - PricingAgent estimates value at ~$25,000 (high value)
 - DispositionProposalAgent suggests SELL or KEEP
-- HumanApprovalAgent REJECTS (too valuable for disposition with minor damage)
+- HumanApprovalAgent pauses workflow, human REJECTS (too valuable for disposition with minor damage)
 - Fallback: Routes to MaintenanceAgent instead
 - Status: `IN_MAINTENANCE`
-- Approval status: `REJECTED` with reasoning
+- Disposition status: `DISPOSITION_REJECTED` with reasoning
 
 #### Scenario 3: Low-Value Vehicle - No Approval Needed
 
@@ -491,19 +475,19 @@ The truck is totaled, completely inoperable, very old
 ```mermaid
 flowchart TD
     Start([Input: Totaled truck<br/>very old])
-    
+
     Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
+
     FW --> FSA[FleetSupervisorAgent]
     FSA --> PA[PricingAgent]
     PA --> Value[Estimate: ~$8,000<br/>2019 Ford F-150, totaled]
-    
+
     Value --> Check{Value > $15,000?}
     Check -->|No| Direct[DispositionAgent<br/>Direct Decision]
     Direct --> Decision[Decision: SCRAP<br/>Beyond economical repair]
-    
+
     Decision --> Result([Status: PENDING_DISPOSITION<br/>Approval: NOT_REQUIRED])
-    
+
     style FW fill:#FAE5D3
     style FSA fill:#D5F5E3
     style PA fill:#F9E79F
@@ -515,10 +499,10 @@ flowchart TD
 **Expected Result:**
 
 - PricingAgent estimates value at ~$8,000 (below threshold)
-- Skips approval workflow (low value)
+- Skips approval workflow entirely (low value)
 - DispositionAgent makes direct SCRAP decision
 - Status: `PENDING_DISPOSITION`
-- Approval status: `NOT_REQUIRED`
+- Disposition status: `DISPOSITION_NOT_REQUIRED`
 
 ### Check the Logs
 
@@ -526,18 +510,20 @@ Watch the console output to see the approval workflow execution:
 
 ```bash
 FeedbackWorkflow executing...
-  ├─ DispositionFeedbackAgent: DISPOSITION_REQUIRED
+  |- DispositionFeedbackAgent: DISPOSITION_REQUIRED
 FleetSupervisorAgent orchestrating...
-  ├─ PricingAgent: Estimated value $18,000
-  ├─ Value check: $18,000 > $15,000 → Approval required
-  ├─ DispositionProposalAgent: Proposed SCRAP
-  ├─ HumanApprovalAgent: Reviewing proposal...
-  └─ Decision: APPROVED - Severe damage justifies scrapping
+  |- PricingAgent: Estimated value $18,000
+  |- Value check: $18,000 > $15,000 -> Approval required
+  |- DispositionProposalAgent: Proposed SCRAP
+  |- HumanApprovalAgent (@HumanInTheLoop): Workflow paused...
+  |- Waiting for human decision via UI...
+  |- Human decision received: APPROVED
+  |- Workflow resumed
 CarConditionFeedbackAgent updating...
-  └─ Approval status: APPROVED
+  |- Disposition status: DISPOSITION_APPROVED
 ```
 
-Notice how high-value vehicles go through the proposal → approval → execution flow!
+Notice how the workflow **truly pauses** at the `HumanApprovalAgent` and only resumes after the human makes a decision in the UI!
 
 ---
 
@@ -569,7 +555,7 @@ graph LR
     A[Fully Manual] --> B[HITL - High Threshold]
     B --> C[HITL - Low Threshold]
     C --> D[Fully Autonomous]
-    
+
     style A fill:#FF6B6B
     style B fill:#FFD700
     style C fill:#87CEEB
@@ -602,11 +588,14 @@ Before starting:
 
 1. **Copy the step-05 code** to create step-06 base
 2. **Create DispositionProposalAgent.java** with proposal generation logic
-3. **Create HumanApprovalAgent.java** with approval simulation
-4. **Update FleetSupervisorAgent.java** to add value-based routing
-5. **Update CarConditions.java** to add approval fields
-6. **Update application.properties** with approval threshold
-7. **Test** with different vehicle values
+3. **Create HumanApprovalAgent.java** using `@HumanInTheLoop` annotation with blocking approval logic
+4. **Create ApprovalService.java** to manage `CompletableFuture` instances for pausing/resuming workflows
+5. **Create ApprovalProposal.java** entity for persisting proposals
+6. **Create ApprovalResource.java** REST endpoints for the UI
+7. **Update FleetSupervisorAgent.java** to add value-based routing
+8. **Update CarConditions.java** to add disposition status fields
+9. **Update application.properties** with approval threshold
+10. **Test** with different vehicle values
 
 Follow the code examples shown earlier in this guide.
 
@@ -614,14 +603,13 @@ Follow the code examples shown earlier in this guide.
 
 ## Experiment Further
 
-### 1. Implement Real Human Approval
+### 1. Adjust the Approval Threshold
 
-Replace the simulated HumanApprovalAgent with a real approval system:
+Try different threshold values to see how they affect which vehicles require approval:
 
-- Store proposals in a database with PENDING status
-- Send email/Slack notifications to approvers
-- Create a web UI for reviewing proposals
-- Use async processing to wait for human response
+- Lower the threshold to $10,000 to require approval for more vehicles
+- Raise it to $25,000 to only catch the most expensive ones
+- Set it to $0 to require approval for all dispositions
 
 ### 2. Add Approval Workflows
 
@@ -664,18 +652,25 @@ Track all approvals:
 ??? warning "All vehicles going through approval workflow"
     Check that the value threshold is correctly configured in `application.properties` and that the PricingAgent is returning numeric values that can be compared.
 
-??? warning "Approval agent always approving/rejecting"
-    Review the approval criteria in HumanApprovalAgent's system message. The simulated logic may need adjustment based on your test scenarios.
+??? warning "Workflow not pausing for human approval"
+    Verify that:
+
+    - The `HumanApprovalAgent` has the `@HumanInTheLoop` annotation
+    - The `ApprovalService` is correctly creating the `CompletableFuture`
+    - The agent method is calling `.get()` on the future to block
 
 ??? warning "Approval status not being tracked"
     Verify that:
-    
-    - FleetSupervisorAgent stores `approvalStatus` and `approvalReason` in AgenticScope
-    - CarConditions model has the new fields
+
+    - FleetSupervisorAgent stores disposition status in AgenticScope
+    - CarConditions model has the `dispositionStatus` and `dispositionReason` fields
     - CarProcessingWorkflow retrieves these values from the scope
 
 ??? warning "Low-value vehicles still requiring approval"
     Check the value comparison logic in FleetSupervisorAgent. Ensure the PricingAgent output is being parsed correctly as a number.
+
+??? warning "Timeout errors when waiting for approval"
+    The `HumanApprovalAgent` has a 5-minute timeout by default. If you need more time, adjust the timeout value in the `.get(5, TimeUnit.MINUTES)` call. On timeout, the system defaults to REJECTED for safety.
 
 ---
 
@@ -685,8 +680,9 @@ Congratulations! You've completed the final step of Section 2 and implemented th
 
 The system now:
 
-- Routes high-value vehicles through human approval
-- Creates proposals for human review
+- Routes high-value vehicles through human approval using LangChain4j's `@HumanInTheLoop` annotation
+- Creates proposals for human review via the `DispositionProposalAgent`
+- Pauses workflow execution in the `HumanApprovalAgent` until a human decides
 - Tracks approval decisions for audit trails
 - Provides fallback paths for rejected proposals
 - Balances automation with human oversight

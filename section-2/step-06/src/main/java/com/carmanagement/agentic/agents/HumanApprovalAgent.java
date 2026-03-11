@@ -1,59 +1,78 @@
 package com.carmanagement.agentic.agents;
 
-import com.carmanagement.agentic.tools.HumanApprovalTool;
+import com.carmanagement.model.ApprovalProposal;
+import com.carmanagement.service.ApprovalService;
 import dev.langchain4j.agentic.Agent;
-import dev.langchain4j.service.SystemMessage;
-import dev.langchain4j.service.UserMessage;
-import io.quarkiverse.langchain4j.ToolBox;
+import dev.langchain4j.agentic.declarative.HumanInTheLoop;
+import io.quarkus.arc.Arc;
+import io.quarkus.logging.Log;
 
-/**
- * TRUE Human-in-the-Loop Agent that uses a tool to pause workflow execution
- * and wait for actual human approval through the UI.
- *
- * This agent has access to the requestHumanApproval tool which BLOCKS execution
- * until a human makes a decision via the REST API and UI.
- */
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 public interface HumanApprovalAgent {
 
-    @SystemMessage("""
-        You are a human approval coordinator for high-value vehicle dispositions.
-        
-        Your role is to request human approval for disposition proposals by using the requestHumanApproval tool.
-        
-        IMPORTANT: You MUST call the requestHumanApproval tool with ALL the provided information.
-        The tool will pause the workflow and wait for a human to approve or reject the proposal through the UI.
-        
-        After calling the tool, you will receive the human's decision. Format your response as:
-        
-        Decision: [APPROVED or REJECTED]
-        Reason: [The human's reasoning]
-        
-        Do not make decisions yourself - always use the tool to get human input.
-        """)
-    @UserMessage("""
-        A disposition proposal needs human approval:
-        
-        Vehicle: {carYear} {carMake} {carModel} (#{carNumber})
-        Estimated Value: {carValue}
-        Current Condition: {carCondition}
-        Damage Report: {rentalFeedback}
-        
-        Proposed Action: {proposedDisposition}
-        Reasoning: {dispositionReason}
-        
-        Use the requestHumanApproval tool to get human approval for this proposal.
-        Pass ALL the information to the tool.
-        """)
     @Agent(outputKey = "approvalDecision", description = "Coordinates human approval for high-value vehicle dispositions using the requestHumanApproval tool")
-    @ToolBox(HumanApprovalTool.class)
-    String reviewDispositionProposal(
+    @HumanInTheLoop(outputKey = "approvalDecision", description = "Coordinates human approval for high-value vehicle dispositions using the requestHumanApproval tool")
+    static String reviewDispositionProposal(
             String carMake,
             String carModel,
             Integer carYear,
             Integer carNumber,
             String carValue,
-            String proposedDisposition,
+            String dispositionProposal,
             String dispositionReason,
             String carCondition,
-            String rentalFeedback);
+            String rentalFeedback
+    ) {
+
+        Log.infof("🛑 HITL Tool: Creating approval proposal for car %d - %s %s %s",
+                carNumber, carYear, carMake, carModel);
+        Log.info("⏸️  WORKFLOW PAUSED - Waiting for human approval decision via UI");
+
+        ApprovalService approvalService = Arc.container().instance(ApprovalService.class).get();
+
+        try {
+            // Create proposal and get CompletableFuture that completes when human decides
+            CompletableFuture<ApprovalProposal> approvalFuture =
+                    approvalService.createProposalAndWaitForDecision(
+                            carNumber, carMake, carModel, carYear, carValue,
+                            dispositionProposal, dispositionReason, carCondition, rentalFeedback
+                    );
+
+            // BLOCK HERE until human makes decision (with 5 minute timeout)
+            ApprovalProposal result = approvalFuture.get(5, TimeUnit.MINUTES);
+
+            Log.infof("▶️  WORKFLOW RESUMED - Human decision received: %s", result.decision);
+
+            // Format response for the agent
+            return String.format("""
+                Human Decision: %s
+                Reason: %s
+                Approved By: %s
+                Decision Time: %s
+                """,
+                    result.decision,
+                    result.approvalReason != null ? result.approvalReason : "No reason provided",
+                    result.approvedBy != null ? result.approvedBy : "Unknown",
+                    result.decidedAt != null ? result.decidedAt.toString() : "Unknown"
+            );
+
+        } catch (TimeoutException e) {
+            Log.error("⏱️  TIMEOUT: No human decision received within 5 minutes, defaulting to REJECTED");
+            return """
+                Human Decision: REJECTED
+                Reason: Timeout - No human decision received within 5 minutes. Defaulting to rejection for safety.
+                Approved By: System (Timeout)
+                """;
+        } catch (Exception e) {
+            Log.errorf(e, "❌ ERROR: Failed to get human approval for car %d", carNumber);
+            return String.format("""
+                Human Decision: REJECTED
+                Reason: Error occurred while waiting for human approval: %s
+                Approved By: System (Error)
+                """, e.getMessage());
+        }
+    }
 }
