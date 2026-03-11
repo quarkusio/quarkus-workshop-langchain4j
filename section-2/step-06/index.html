@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1412,6 +1412,45 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#agent-observability-with-monitoredagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Observability with MonitoredAgent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent Observability with MonitoredAgent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-agentic-system-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Agentic System Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-the-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viewing the Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1993,6 +2032,45 @@ You are not viewing the latest version.
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-observability-with-monitoredagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Observability with MonitoredAgent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent Observability with MonitoredAgent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-agentic-system-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Agentic System Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-the-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viewing the Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3523,6 +3601,66 @@ You can explore the code there if you prefer to move forward quickly.</p>
 <summary>Timeout errors when waiting for approval</summary>
 <p>The <code>HumanApprovalAgent</code> has a 5-minute timeout by default. If you need more time, adjust the timeout value in the <code>.get(5, TimeUnit.MINUTES)</code> call. On timeout, the system defaults to REJECTED for safety.</p>
 </details>
+<hr>
+<h2 id="agent-observability-with-monitoredagent">Agent Observability with MonitoredAgent<a class="headerlink" href="#agent-observability-with-monitoredagent" title="Permanent link"></a></h2>
+<p>Beyond the HITL workflow, step-06 also introduces <strong>agent observability</strong> - the ability to inspect what every agent in the system did, what inputs it received, what it produced, and how long it took.</p>
+<p>LangChain4j provides the <code>MonitoredAgent</code> interface and an <code>HtmlReportGenerator</code> utility in the <code>dev.langchain4j.agentic.observability</code> package. Together, they give you a full execution report of your agentic system with zero manual instrumentation.</p>
+<h3 id="monitoring-agentic-system-execution">Monitoring Agentic System Execution<a class="headerlink" href="#monitoring-agentic-system-execution" title="Permanent link"></a></h3>
+<p><code>MonitoredAgent</code> is a simple interface with a single method:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">MonitoredAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="n">AgentMonitor</span><span class="w"> </span><span class="nf">agentMonitor</span><span class="p">();</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>When your top-level workflow interface extends <code>MonitoredAgent</code>, LangChain4j automatically attaches an <code>AgentMonitor</code> listener to the entire agent tree. The <code>AgentMonitor</code> implements <code>AgentListener</code> and records every agent invocation across the system:</p>
+<ul>
+<li><strong>Before each invocation</strong>: captures the agent name, inputs, and start time</li>
+<li><strong>After each invocation</strong>: captures the output and finish time</li>
+<li><strong>On errors</strong>: captures the exception details</li>
+<li><strong>Nested invocations</strong>: tracks the full call hierarchy (e.g., FleetSupervisorAgent calling PricingAgent calling DispositionProposalAgent)</li>
+</ul>
+<p>The monitor groups executions by memory ID, so you can inspect each independent workflow run separately. It tracks ongoing, successful, and failed executions.</p>
+<p>To enable this feature, it is enough to do the following:</p>
+<p><strong>1. Extend <code>MonitoredAgent</code> in the workflow interface</strong></p>
+<p>In <code>CarProcessingWorkflow.java</code>, the interface simply extends <code>MonitoredAgent</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarProcessingWorkflow</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">MonitoredAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="nd">@SequenceAgent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carProcessingAgentResult"</span><span class="p">,</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">            </span><span class="n">subAgents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">FeedbackWorkflow</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">FleetSupervisorAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">                          </span><span class="n">CarConditionFeedbackAgent</span><span class="p">.</span><span class="na">class</span><span class="w"> </span><span class="p">})</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">CarConditions</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span><span class="cm">/* ... */</span><span class="p">);</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>That’s it - no annotations on individual agents, no manual tracking code. The framework handles everything.</p>
+<p><strong>2. Generate an HTML report from the monitor</strong></p>
+<p>In <code>CarManagementService.java</code>, the <code>report()</code> method uses the static <code>HtmlReportGenerator.generateReport()</code> helper:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import static</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.observability.HtmlReportGenerator.generateReport</span><span class="p">;</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">report</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">generateReport</span><span class="p">(</span><span class="n">carProcessingWorkflow</span><span class="p">.</span><span class="na">agentMonitor</span><span class="p">());</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>This produces a self-contained HTML page with:</p>
+<ul>
+<li><strong>Agent topology</strong>: a visual map of all agents and their relationships (sequential, parallel, supervisor, etc.), including the data flow keys that connect them</li>
+<li><strong>Execution timeline</strong>: for each workflow run, a detailed breakdown showing every agent invocation with inputs, outputs, duration, and nesting level</li>
+<li><strong>Error tracking</strong>: any failed invocations are highlighted with their exception details</li>
+</ul>
+<h3 id="viewing-the-report">Viewing the Report<a class="headerlink" href="#viewing-the-report" title="Permanent link"></a></h3>
+<p>The report is exposed via a REST endpoint in <code>CarManagementResource.java</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nd">@GET</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nd">@Path</span><span class="p">(</span><span class="s">"/report"</span><span class="p">)</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nd">@Produces</span><span class="p">(</span><span class="n">MediaType</span><span class="p">.</span><span class="na">TEXT_HTML</span><span class="p">)</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">report</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">carManagementService</span><span class="p">.</span><span class="na">report</span><span class="p">()).</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>After processing one or more cars, click the <strong>“Generate Report”</strong> button in the UI (next to “Refresh Data”) to open the report in a new tab. The report shows:</p>
+<ol>
+<li>The full agent topology of your system</li>
+<li>Every execution grouped by workflow run</li>
+<li>For each agent invocation: what went in, what came out, and how long it took</li>
+</ol>
+<p>This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.</p>
 <hr>
 <h2 id="whats-next">What’s Next?<a class="headerlink" href="#whats-next" title="Permanent link"></a></h2>
 <p>Congratulations! You’ve completed the final step of Section 2 and implemented the <strong>Human-in-the-Loop pattern</strong> for safe, controlled autonomous decision-making!</p>
