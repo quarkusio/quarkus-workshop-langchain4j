@@ -118,7 +118,7 @@
         <dependency>
             <groupId>io.quarkiverse.micrometer.registry</groupId>
             <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.4.1</version>
+            <version>3.5.0</version>
         </dependency>
 
         <!-- Fault Tolerance -->
