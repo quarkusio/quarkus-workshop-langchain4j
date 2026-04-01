@@ -622,6 +622,6 @@ The supervisor agent can now:
 - Make economically sound SCRAP/SELL/DONATE/KEEP decisions
 - Route to appropriate action agents based on feedback
 
-In **Step 05**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local DispositionAgent you just built into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
+In **Step 05**, you'll learn about the **Human-in-the-Loop (HITL) pattern** — adding human oversight to autonomous systems so that high-value vehicle dispositions require human approval before execution!
 
-[Continue to Step 05 - Using Remote Agents (A2A)](step-05.md)
+[Continue to Step 05 - Human-in-the-Loop Pattern](step-05.md)
