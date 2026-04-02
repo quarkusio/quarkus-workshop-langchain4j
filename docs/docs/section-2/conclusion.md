@@ -87,29 +87,7 @@ You learned how to build **autonomous, context-aware orchestration** using super
 
 ---
 
-### Step 05: Distributed Agents with A2A
-
-You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
-
-**What you built:**
-- `DispositionAgent` (client): Connects to remote agents via `@A2AClientAgent`
-- Remote A2A server: Complete disposition service running independently
-- `AgentCard`: Describes remote agent capabilities
-- `AgentExecutor`: Handles A2A protocol communication
-- Two Quarkus applications communicating across HTTP
-
-**Key concepts:**
-- **A2A protocol**: Open standard for agent-to-agent communication
-- **Distributed architecture**: Agents running in separate systems
-- **Tasks vs. Messages**: Different interaction patterns for different needs
-- **Agent discovery**: AgentCard enables clients to find and understand remote agents
-- **Protocol abstraction**: Declarative annotations hide complex protocol details
-
-**Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
-
----
-
-### Step 06: Human-in-the-Loop Pattern
+### Step 05: Human-in-the-Loop Pattern
 
 You learned how to add **human oversight** to autonomous systems, ensuring critical decisions receive human approval before execution.
 
@@ -128,6 +106,28 @@ You learned how to add **human oversight** to autonomous systems, ensuring criti
 - **Audit trails**: Complete tracking of approval decisions and reasoning
 
 **Why it matters:** Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.
+
+---
+
+### Step 06: Distributed Agents with A2A
+
+You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
+
+**What you built:**
+- `PricingAgent` (client): Connects to remote agents via `@A2AClientAgent`
+- Remote A2A server: Complete pricing service running independently
+- `AgentCard`: Describes remote agent capabilities
+- `AgentExecutor`: Handles A2A protocol communication
+- Two Quarkus applications communicating across HTTP
+
+**Key concepts:**
+- **A2A protocol**: Open standard for agent-to-agent communication
+- **Distributed architecture**: Agents running in separate systems
+- **Tasks vs. Messages**: Different interaction patterns for different needs
+- **Agent discovery**: AgentCard enables clients to find and understand remote agents
+- **Protocol abstraction**: Declarative annotations hide complex protocol details
+
+**Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
 
 ---
 
