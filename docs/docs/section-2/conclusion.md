@@ -114,8 +114,8 @@ You learned how to add **human oversight** to autonomous systems, ensuring criti
 You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
 
 **What you built:**
-- `DispositionAgent` (client): Connects to remote agents via `@A2AClientAgent`
-- Remote A2A server: Complete disposition service running independently
+- `PricingAgent` (client): Connects to remote agents via `@A2AClientAgent`
+- Remote A2A server: Complete pricing service running independently
 - `AgentCard`: Describes remote agent capabilities
 - `AgentExecutor`: Handles A2A protocol communication
 - Two Quarkus applications communicating across HTTP
