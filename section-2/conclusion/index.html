@@ -854,7 +854,7 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 5 - Using remote agents (A2A)
+    Step 5 - Human-in-the-Loop pattern
   
 
     
@@ -882,7 +882,7 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 6 - Human-in-the-Loop pattern
+    Step 6 - Using remote agents (A2A)
   
 
     
@@ -1019,10 +1019,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-05-distributed-agents-with-a2a" class="md-nav__link">
+  <a href="#step-05-human-in-the-loop-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 05: Distributed Agents with A2A
+        Step 05: Human-in-the-Loop Pattern
       
     </span>
   </a>
@@ -1030,10 +1030,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-06-human-in-the-loop-pattern" class="md-nav__link">
+  <a href="#step-06-distributed-agents-with-a2a" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 06: Human-in-the-Loop Pattern
+        Step 06: Distributed Agents with A2A
       
     </span>
   </a>
@@ -1481,10 +1481,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-05-distributed-agents-with-a2a" class="md-nav__link">
+  <a href="#step-05-human-in-the-loop-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 05: Distributed Agents with A2A
+        Step 05: Human-in-the-Loop Pattern
       
     </span>
   </a>
@@ -1492,10 +1492,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-06-human-in-the-loop-pattern" class="md-nav__link">
+  <a href="#step-06-distributed-agents-with-a2a" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 06: Human-in-the-Loop Pattern
+        Step 06: Distributed Agents with A2A
       
     </span>
   </a>
@@ -1897,23 +1897,7 @@ Workflows let you compose specialized agents, each excellent at one task, into s
 - <strong>Flexible business logic</strong>: Adjust behavior via prompts, not code changes</p>
 <p><strong>Why it matters:</strong> Real-world systems need to adapt to changing conditions. Supervisor agents provide intelligent, context-aware orchestration that can handle complex scenarios without hardcoded logic. This makes systems more flexible and easier to maintain.</p>
 <hr>
-<h3 id="step-05-distributed-agents-with-a2a">Step 05: Distributed Agents with A2A<a class="headerlink" href="#step-05-distributed-agents-with-a2a" title="Permanent link"></a></h3>
-<p>You extended beyond single-application boundaries to build <strong>distributed multi-agent systems</strong> using the A2A protocol.</p>
-<p><strong>What you built:</strong>
-- <code>DispositionAgent</code> (client): Connects to remote agents via <code>@A2AClientAgent</code>
-- Remote A2A server: Complete disposition service running independently
-- <code>AgentCard</code>: Describes remote agent capabilities
-- <code>AgentExecutor</code>: Handles A2A protocol communication
-- Two Quarkus applications communicating across HTTP</p>
-<p><strong>Key concepts:</strong>
-- <strong>A2A protocol</strong>: Open standard for agent-to-agent communication
-- <strong>Distributed architecture</strong>: Agents running in separate systems
-- <strong>Tasks vs. Messages</strong>: Different interaction patterns for different needs
-- <strong>Agent discovery</strong>: AgentCard enables clients to find and understand remote agents
-- <strong>Protocol abstraction</strong>: Declarative annotations hide complex protocol details</p>
-<p><strong>Why it matters:</strong> Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.</p>
-<hr>
-<h3 id="step-06-human-in-the-loop-pattern">Step 06: Human-in-the-Loop Pattern<a class="headerlink" href="#step-06-human-in-the-loop-pattern" title="Permanent link"></a></h3>
+<h3 id="step-05-human-in-the-loop-pattern">Step 05: Human-in-the-Loop Pattern<a class="headerlink" href="#step-05-human-in-the-loop-pattern" title="Permanent link"></a></h3>
 <p>You learned how to add <strong>human oversight</strong> to autonomous systems, ensuring critical decisions receive human approval before execution.</p>
 <p><strong>What you built:</strong>
 - <code>DispositionProposalAgent</code>: Creates disposition proposals for human review
@@ -1928,6 +1912,22 @@ Workflows let you compose specialized agents, each excellent at one task, into s
 - <strong>Fallback paths</strong>: Alternative actions when proposals are rejected
 - <strong>Audit trails</strong>: Complete tracking of approval decisions and reasoning</p>
 <p><strong>Why it matters:</strong> Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.</p>
+<hr>
+<h3 id="step-06-distributed-agents-with-a2a">Step 06: Distributed Agents with A2A<a class="headerlink" href="#step-06-distributed-agents-with-a2a" title="Permanent link"></a></h3>
+<p>You extended beyond single-application boundaries to build <strong>distributed multi-agent systems</strong> using the A2A protocol.</p>
+<p><strong>What you built:</strong>
+- <code>PricingAgent</code> (client): Connects to remote agents via <code>@A2AClientAgent</code>
+- Remote A2A server: Complete pricing service running independently
+- <code>AgentCard</code>: Describes remote agent capabilities
+- <code>AgentExecutor</code>: Handles A2A protocol communication
+- Two Quarkus applications communicating across HTTP</p>
+<p><strong>Key concepts:</strong>
+- <strong>A2A protocol</strong>: Open standard for agent-to-agent communication
+- <strong>Distributed architecture</strong>: Agents running in separate systems
+- <strong>Tasks vs. Messages</strong>: Different interaction patterns for different needs
+- <strong>Agent discovery</strong>: AgentCard enables clients to find and understand remote agents
+- <strong>Protocol abstraction</strong>: Declarative annotations hide complex protocol details</p>
+<p><strong>Why it matters:</strong> Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.</p>
 <hr>
 <h2 id="the-rationale-why-agentic-systems">The Rationale: Why Agentic Systems?<a class="headerlink" href="#the-rationale-why-agentic-systems" title="Permanent link"></a></h2>
 <h3 id="control-over-autonomy">Control Over Autonomy<a class="headerlink" href="#control-over-autonomy" title="Permanent link"></a></h3>
@@ -2202,7 +2202,7 @@ It also adds security features, monitoring, and scalability options that are ess
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../step-06/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 6 - Human-in-the-Loop pattern">
+          <a href="../step-06/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 6 - Using remote agents (A2A)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2212,7 +2212,7 @@ It also adds security features, monitoring, and scalability options that are ess
                 Previous
               </span>
               <div class="md-ellipsis">
-                Step 6 - Human-in-the-Loop pattern
+                Step 6 - Using remote agents (A2A)
               </div>
             </div>
           </a>
