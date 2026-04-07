@@ -263,7 +263,7 @@ This is the core of this step — a new agent that processes car images.
 
 Create `src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java`:
 
-```java title="CarImageAnalysisAgent.java"
+```java title="CarImageAnalysisAgent.java  hl_lines="28 30-32"
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java"
 ```
 
@@ -298,7 +298,7 @@ The system message instructs the LLM to:
 String analyzeCarImage(String rentalFeedback, @UserMessage ImageContent carImage);
 ```
 
-The `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.
+Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.
 
 #### The `outputKey = "rentalFeedback"`
 
