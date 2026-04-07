@@ -11,8 +11,7 @@ The Miles of Smiles management team wants to enhance the rental return process:
 This is a common real-world scenario where:
 
 1. **Text alone is insufficient**: An employee might write "car looks fine" but a photo reveals scratches or dents they missed
-2. **Consistency matters**: AI can consistently identify the same types of damage across all returns
-3. **Multimodal AI is powerful**: Modern LLMs can analyze images alongside text to provide richer assessments
+2. **Multimodal AI is powerful**: Modern LLMs can analyze images alongside text to provide richer assessments
 
 You'll learn how to integrate **multimodal capabilities** (text + image) into your existing agentic workflow using LangChain4j's `ImageContent`.
 
@@ -178,9 +177,9 @@ function returnFromRental(event, carId) {
 
 ### Accept Multipart Form Data
 
-Update `CarManagementResource.java` to accept the image as a `FileUpload` and convert it to `ImageContent`:
+Update `src/main/java/com/carmanagement/resource/CarManagementResource.java` to accept the image as a `FileUpload` and convert it to `ImageContent`:
 
-```java title="CarManagementResource.java"
+```java title="CarManagementResource.java hl_lines="37-61 114-127"
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
@@ -237,13 +236,12 @@ return carManagementService.processCarReturn(carNumber, "", cleaningFeedback, ""
 
 ## Part 3: Pass the Image Through the Service Layer
 
-### Update `CarManagementService`
+### Update `src/main/java/com/carmanagement/service/CarManagementService`
 
 Add `ImageContent` as a parameter and forward it to the workflow:
 
-```java title="CarManagementService.java (processCarReturn signature)"
-public Uni<String> processCarReturn(Integer carNumber, String rentalFeedback,
-        String cleaningFeedback, String maintenanceFeedback, ImageContent carImage) {
+```java title="CarManagementService.java  hl_lines="37-38"
+--8<-- "../../section-2/step-06/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
 The image is passed straight through to the workflow:
@@ -379,7 +377,7 @@ Click **Return**.
 
 ### Test With an Image
 
-1. Find or take a photo of a car (any car photo will work)
+1. Find or take a photo of a car (there is a sample image named `q4-tree.png` in the `resources` folder, but any car photo will work)
 2. On the Rental Return tab, click "Choose File" in the Car Image column
 3. Select the image
 4. Enter some feedback:

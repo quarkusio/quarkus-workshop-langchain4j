@@ -40,6 +40,7 @@ public class CarManagementResource {
      *
      * @param carNumber The car number
      * @param rentalFeedback Optional rental feedback
+     * @param carImage Optional image of the car being returned (multipart form data)
      * @return Uni that completes with the result
      */
     @POST
