@@ -752,6 +752,6 @@ The system now:
 - Provides fallback paths for rejected proposals
 - Balances automation with human oversight
 
-In **Step 06**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local DispositionAgent into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
+In **Step 06**, you'll learn about **multimodal image analysis** — allowing employees to upload car photos during rental returns, so the system can automatically enrich feedback with visual observations using a multimodal AI agent!
 
-[Continue to Step 06 - Using Remote Agents (A2A)](step-06.md)
+[Continue to Step 06 - Multimodal Image Analysis](step-06.md)
