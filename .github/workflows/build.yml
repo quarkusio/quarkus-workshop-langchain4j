@@ -63,6 +63,9 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     name: "Build Docs"
+    permissions:
+      contents: write
+      pages: write
     steps:
       - uses: actions/checkout@v6
 
