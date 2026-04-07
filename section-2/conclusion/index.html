@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://quarkus.io/quarkus-workshop-langchain4j/section-2/conclusion/">
       
       
-        <link rel="prev" href="../step-06/">
+        <link rel="prev" href="../step-07/">
       
       
         <link rel="next" href="../../conclusion/">
@@ -683,6 +683,8 @@ You are not viewing the latest version.
       
         
       
+        
+      
     
     
     
@@ -882,7 +884,35 @@ You are not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Step 6 - Using remote agents (A2A)
+    Step 6 - Multimodal agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-07/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 7 - Using remote agents (A2A)
   
 
     
@@ -1030,10 +1060,21 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-06-distributed-agents-with-a2a" class="md-nav__link">
+  <a href="#step-06-multimodal-agents" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 06: Distributed Agents with A2A
+        Step 06: Multimodal Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-07-distributed-agents-with-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 07: Distributed Agents with A2A
       
     </span>
   </a>
@@ -1163,10 +1204,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#pattern-6-distributed-agent-a2a" class="md-nav__link">
+  <a href="#pattern-6-multimodal-enrichment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern 6: Distributed Agent (A2A)
+        Pattern 6: Multimodal Enrichment
       
     </span>
   </a>
@@ -1174,10 +1215,21 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#pattern-7-human-in-the-loop-hitl" class="md-nav__link">
+  <a href="#pattern-7-distributed-agent-a2a" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern 7: Human-in-the-Loop (HITL)
+        Pattern 7: Distributed Agent (A2A)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-8-human-in-the-loop-hitl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 8: Human-in-the-Loop (HITL)
       
     </span>
   </a>
@@ -1492,10 +1544,21 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-06-distributed-agents-with-a2a" class="md-nav__link">
+  <a href="#step-06-multimodal-agents" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 06: Distributed Agents with A2A
+        Step 06: Multimodal Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-07-distributed-agents-with-a2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 07: Distributed Agents with A2A
       
     </span>
   </a>
@@ -1625,10 +1688,10 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#pattern-6-distributed-agent-a2a" class="md-nav__link">
+  <a href="#pattern-6-multimodal-enrichment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern 6: Distributed Agent (A2A)
+        Pattern 6: Multimodal Enrichment
       
     </span>
   </a>
@@ -1636,10 +1699,21 @@ You are not viewing the latest version.
 </li>
         
           <li class="md-nav__item">
-  <a href="#pattern-7-human-in-the-loop-hitl" class="md-nav__link">
+  <a href="#pattern-7-distributed-agent-a2a" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern 7: Human-in-the-Loop (HITL)
+        Pattern 7: Distributed Agent (A2A)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-8-human-in-the-loop-hitl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 8: Human-in-the-Loop (HITL)
       
     </span>
   </a>
@@ -1839,7 +1913,7 @@ You are not viewing the latest version.
 
 <div><h1 id="conclusion-mastering-agentic-systems">Conclusion: Mastering Agentic Systems<a class="headerlink" href="#conclusion-mastering-agentic-systems" title="Permanent link"></a></h1>
 <p>Congratulations! You’ve completed <strong>Section 2: Agentic Systems</strong> of the Quarkus LangChain4j workshop.</p>
-<p>Over the past six steps, you’ve journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight.
+<p>Over the past seven steps, you’ve journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight and multimodal capabilities.
 Let’s reflect on what you’ve built and why these patterns matter.</p>
 <hr>
 <h2 id="your-journey-through-agentic-systems">Your Journey Through Agentic Systems<a class="headerlink" href="#your-journey-through-agentic-systems" title="Permanent link"></a></h2>
@@ -1913,7 +1987,22 @@ Workflows let you compose specialized agents, each excellent at one task, into s
 - <strong>Audit trails</strong>: Complete tracking of approval decisions and reasoning</p>
 <p><strong>Why it matters:</strong> Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.</p>
 <hr>
-<h3 id="step-06-distributed-agents-with-a2a">Step 06: Distributed Agents with A2A<a class="headerlink" href="#step-06-distributed-agents-with-a2a" title="Permanent link"></a></h3>
+<h3 id="step-06-multimodal-agents">Step 06: Multimodal Agents<a class="headerlink" href="#step-06-multimodal-agents" title="Permanent link"></a></h3>
+<p>You added <strong>multimodal capabilities</strong> to the car return workflow, enabling the system to process both text and images.</p>
+<p><strong>What you built:</strong>
+- <code>CarImageAnalysisAgent</code>: Analyzes car images and enriches rental feedback with visual observations
+- Multipart form upload: Image upload in the Rental Return UI
+- <code>ImageContent</code> integration: Converting uploaded files to LangChain4j’s multimodal format
+- Enrichment pattern: New agent output replaces an existing scope variable for seamless downstream integration</p>
+<p><strong>Key concepts:</strong>
+- <strong>Multimodal agents</strong>: Processing text and images together in a single LLM call
+- <strong><code>ImageContent</code></strong>: LangChain4j’s representation of image data for multimodal models
+- <strong><code>@UserMessage</code> on <code>ImageContent</code></strong>: Automatically includes images in the message to the LLM
+- <strong>Enrichment pattern</strong>: Using <code>outputKey</code> to augment existing workflow data without changing downstream agents
+- <strong>Graceful degradation</strong>: Agent handles missing images by returning feedback unchanged</p>
+<p><strong>Why it matters:</strong> Real-world data is multimodal. Text descriptions are often incomplete or subjective. By combining visual analysis with textual feedback, AI systems can make more informed decisions. The enrichment pattern demonstrates how to add new capabilities to existing workflows with minimal disruption.</p>
+<hr>
+<h3 id="step-07-distributed-agents-with-a2a">Step 07: Distributed Agents with A2A<a class="headerlink" href="#step-07-distributed-agents-with-a2a" title="Permanent link"></a></h3>
 <p>You extended beyond single-application boundaries to build <strong>distributed multi-agent systems</strong> using the A2A protocol.</p>
 <p><strong>What you built:</strong>
 - <code>PricingAgent</code> (client): Connects to remote agents via <code>@A2AClientAgent</code>
@@ -2014,17 +2103,24 @@ The supervisor controls the flow of other agents, but the agents themselves rema
 <p><strong>When to use:</strong> Complex systems requiring multiple coordination strategies</p>
 <p><strong>Example:</strong> <code>CarProcessingWorkflow</code> orchestrating everything</p>
 <hr>
-<h3 id="pattern-6-distributed-agent-a2a">Pattern 6: Distributed Agent (A2A)<a class="headerlink" href="#pattern-6-distributed-agent-a2a" title="Permanent link"></a></h3>
+<h3 id="pattern-6-multimodal-enrichment">Pattern 6: Multimodal Enrichment<a class="headerlink" href="#pattern-6-multimodal-enrichment" title="Permanent link"></a></h3>
 <p><strong>Structure:</strong>
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Local Agent (client) → A2A Protocol → Remote Agent (server)
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Input (text + image) → Analysis Agent → Enriched text output
+</code></pre></div>
+<p><strong>When to use:</strong> Adding visual or other non-text data to improve decision quality</p>
+<p><strong>Example:</strong> <code>CarImageAnalysisAgent</code> analyzing car photos to enrich rental feedback</p>
+<hr>
+<h3 id="pattern-7-distributed-agent-a2a">Pattern 7: Distributed Agent (A2A)<a class="headerlink" href="#pattern-7-distributed-agent-a2a" title="Permanent link"></a></h3>
+<p><strong>Structure:</strong>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Local Agent (client) → A2A Protocol → Remote Agent (server)
 </code></pre></div>
 <p><strong>When to use:</strong> Cross-system integration, team independence, specialized services</p>
 <p><strong>Example:</strong> <code>DispositionAgent</code> calling remote disposition service</p>
 <hr>
-<h3 id="pattern-7-human-in-the-loop-hitl">Pattern 7: Human-in-the-Loop (HITL)<a class="headerlink" href="#pattern-7-human-in-the-loop-hitl" title="Permanent link"></a></h3>
+<h3 id="pattern-8-human-in-the-loop-hitl">Pattern 8: Human-in-the-Loop (HITL)<a class="headerlink" href="#pattern-8-human-in-the-loop-hitl" title="Permanent link"></a></h3>
 <p><strong>Structure:</strong>
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Agent Analysis → Proposal Creation → Human Review → Conditional Execution
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>                                                   └→ Fallback (if rejected)
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Agent Analysis → Proposal Creation → Human Review → Conditional Execution
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>                                                   └→ Fallback (if rejected)
 </code></pre></div>
 <p><strong>When to use:</strong> High-stakes decisions, compliance requirements, trust-building, edge cases</p>
 <p><strong>Example:</strong> <code>DispositionProposalAgent</code> → <code>HumanApprovalAgent</code> → Execute if approved</p>
@@ -2081,37 +2177,37 @@ The supervisor controls the flow of other agents, but the agents themselves rema
 <h2 id="real-world-applications">Real-World Applications<a class="headerlink" href="#real-world-applications" title="Permanent link"></a></h2>
 <p>The patterns you’ve learned apply to countless real-world scenarios:</p>
 <h3 id="customer-support-automation">Customer Support Automation<a class="headerlink" href="#customer-support-automation" title="Permanent link"></a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Ticket Analysis Agent →
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  ├─ FAQ Agent (if simple question)
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  ├─ Documentation Search Agent (if technical)
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  └─ Escalation Agent (if complex)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Ticket Analysis Agent →
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  ├─ FAQ Agent (if simple question)
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  ├─ Documentation Search Agent (if technical)
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  └─ Escalation Agent (if complex)
 </code></pre></div>
 <h3 id="data-processing-pipeline">Data Processing Pipeline<a class="headerlink" href="#data-processing-pipeline" title="Permanent link"></a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Parallel Analysis:
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  ├─ Data Quality Agent
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  ├─ Schema Validation Agent
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  └─ Anomaly Detection Agent
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>→ Conditional Action:
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  ├─ Auto-Fix Agent (if minor issues)
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>  ├─ Alert Agent (if major issues)
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  └─ Approve Agent (if clean)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Parallel Analysis:
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  ├─ Data Quality Agent
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  ├─ Schema Validation Agent
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  └─ Anomaly Detection Agent
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>→ Conditional Action:
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  ├─ Auto-Fix Agent (if minor issues)
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  ├─ Alert Agent (if major issues)
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>  └─ Approve Agent (if clean)
 </code></pre></div>
 <h3 id="e-commerce-order-processing">E-commerce Order Processing<a class="headerlink" href="#e-commerce-order-processing" title="Permanent link"></a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Order Receipt →
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  ├─ Inventory Check Agent
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  ├─ Payment Processing Agent (A2A to payment service)
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  ├─ Fraud Detection Agent
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>  └─ Shipping Coordination Agent
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Order Receipt →
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  ├─ Inventory Check Agent
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  ├─ Payment Processing Agent (A2A to payment service)
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>  ├─ Fraud Detection Agent
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>  └─ Shipping Coordination Agent
 </code></pre></div>
 <h3 id="devops-automation">DevOps Automation<a class="headerlink" href="#devops-automation" title="Permanent link"></a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Incident Detection →
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  ├─ Log Analysis Agent
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  ├─ Metric Analysis Agent
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>  └─ Root Cause Agent
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>→ Conditional Response:
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>  ├─ Auto-Remediation Agent (if known issue)
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>  ├─ Rollback Agent (if deployment related)
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>  └─ Alert Agent (if unknown)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Incident Detection →
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  ├─ Log Analysis Agent
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>  ├─ Metric Analysis Agent
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  └─ Root Cause Agent
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>→ Conditional Response:
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>  ├─ Auto-Remediation Agent (if known issue)
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>  ├─ Rollback Agent (if deployment related)
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>  └─ Alert Agent (if unknown)
 </code></pre></div>
 <hr>
 <h2 id="best-practices-youve-learned">Best Practices You’ve Learned<a class="headerlink" href="#best-practices-youve-learned" title="Permanent link"></a></h2>
@@ -2165,6 +2261,7 @@ The supervisor controls the flow of other agents, but the agents themselves rema
 - Workflow composition (sequence, parallel, conditional)
 - AgenticScope’s state for agent collaboration
 - Nested workflow architectures
+- Multimodal image analysis with the enrichment pattern
 - Distributed systems with A2A protocol
 - Human-in-the-Loop pattern for safe, controlled decision-making</p>
 <p>You’re now equipped to build production-ready agentic systems that solve real-world problems.</p>
@@ -2202,7 +2299,7 @@ It also adds security features, monitoring, and scalability options that are ess
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../step-06/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 6 - Using remote agents (A2A)">
+          <a href="../step-07/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 7 - Using remote agents (A2A)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2212,7 +2309,7 @@ It also adds security features, monitoring, and scalability options that are ess
                 Previous
               </span>
               <div class="md-ellipsis">
-                Step 6 - Using remote agents (A2A)
+                Step 7 - Using remote agents (A2A)
               </div>
             </div>
           </a>
