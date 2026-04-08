@@ -121,7 +121,7 @@ graph TB
     PA --> VCheck{Value > $15k?}
 
     VCheck -->|Yes - HIGH VALUE| Proposal[DispositionProposalAgent<br/>Create Proposal]
-    Proposal --> Approval[HumanApprovalAgent<br/>@HumanInTheLoop]
+    Proposal --> Approval["HumanApprovalAgent<br/>@HumanInTheLoop"]
     Approval --> ApprovalCheck{Approved?}
     ApprovalCheck -->|Yes| Execute[Execute Disposition]
     ApprovalCheck -->|No| Fallback[Route to Maintenance/Cleaning]
@@ -367,7 +367,7 @@ flowchart TD
     Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
     Proposal --> PropResult[Proposed: SCRAP<br/>Reasoning: Severe damage]
 
-    PropResult --> Human[HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow]
+    PropResult --> Human["HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow"]
     Human --> Decision{Decision}
     Decision -->|APPROVED| Execute[Execute SCRAP]
     Decision -->|REJECTED| Fallback[Route to Maintenance]
@@ -419,7 +419,7 @@ flowchart TD
     Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
     Proposal --> PropResult[Proposed: SELL or KEEP<br/>Minor damage]
 
-    PropResult --> Human[HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow]
+    PropResult --> Human["HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow"]
     Human --> Decision[Decision: REJECTED<br/>Too valuable for minor damage]
 
     Decision --> Fallback[Route to Maintenance<br/>Repair instead]

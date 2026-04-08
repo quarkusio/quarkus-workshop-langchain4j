@@ -505,6 +505,13 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java`:
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
+**Key Points:**
+
+- This agent demonstrates **pure LLM reasoning** without tool calling
+- Unlike CleaningAgent which uses CleaningTool, MaintenanceAgent relies entirely on the LLM's analysis
+- Returns structured recommendations that the system can act upon
+- Shows that not every agent needs tools - some can be pure reasoning agents
+
 #### Update CleaningAgent
 
 The CleaningAgent we created previously should now return analysisResult as well, so the results are aggregated.
@@ -542,14 +549,6 @@ Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent
 ```
 
 ### Create Supporting Infrastructure
-
-#### Create a Maintenance Tool for function calling
-
-Create `src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java` to add a function for creating a request to the maintenance team:
-
-```java title="MaintenanceTool.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java"
-```
 
 #### Create CarAssignment Model
 

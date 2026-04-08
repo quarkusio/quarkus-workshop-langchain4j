@@ -55,7 +55,7 @@ You mastered the art of **composing workflows within workflows**, unlocking trul
 - `FeedbackWorkflow`: Parallel analysis by three agents running concurrently
 - `CarAssignmentWorkflow`: Conditional routing based on what actions are needed
 - `CarProcessingWorkflow`: Three-level nested workflow orchestrating everything
-- Agents for maintenance, disposition, and comprehensive feedback analysis
+- Agents for maintenance, cleaning, and comprehensive feedback analysis
 
 **Key concepts:**
 - **Parallel workflows**: Concurrent agent execution for improved response time
