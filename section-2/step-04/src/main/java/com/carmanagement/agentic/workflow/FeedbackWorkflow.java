@@ -1,24 +1,31 @@
 package com.carmanagement.agentic.workflow;
 
-import com.carmanagement.agentic.agents.CleaningFeedbackAgent;
-import com.carmanagement.agentic.agents.MaintenanceFeedbackAgent;
-import com.carmanagement.agentic.agents.DispositionFeedbackAgent;
-import dev.langchain4j.agentic.declarative.ParallelAgent;
+import com.carmanagement.agentic.agents.FeedbackAnalysisAgent;
+import com.carmanagement.model.FeedbackTask;
+import dev.langchain4j.agentic.declarative.ParallelMapperAgent;
+
+import java.util.List;
 
 /**
  * Workflow for processing car feedback in parallel.
- * Analyzes feedback for cleaning, maintenance, and disposition needs.
+ * Analyzes feedback for cleaning, maintenance, and disposition needs using a unified agent.
  */
 public interface FeedbackWorkflow {
 
     /**
-     * Runs multiple feedback agents in parallel to analyze different aspects of car feedback.
+     * Runs the feedback analysis agent in parallel for multiple tasks.
+     * Uses @ParallelMapperAgent to execute the same agent with different task configurations.
+     * Returns a list of results that will be mapped to individual output keys.
      */
-    // --8<-- [start:parallel-agent]
-    @ParallelAgent(outputKey = "feedbackResult",
-            subAgents = { CleaningFeedbackAgent.class, MaintenanceFeedbackAgent.class, DispositionFeedbackAgent.class })
-    // --8<-- [end:parallel-agent]
-    String analyzeFeedback(
+    // --8<-- [start:parallel-mapper-agent]
+    @ParallelMapperAgent(
+            description = "Analyzes car feedback in parallel for cleaning, maintenance, and disposition needs",
+            outputKey = "feedbackResult",
+            subAgent = FeedbackAnalysisAgent.class,
+            itemsProvider = "tasks")
+    // --8<-- [end:parallel-mapper-agent]
+    List<String> analyzeFeedback(
+            List<FeedbackTask> tasks,
             String carMake,
             String carModel,
             Integer carYear,
@@ -28,4 +35,3 @@ public interface FeedbackWorkflow {
             String cleaningFeedback,
             String maintenanceFeedback);
 }
-

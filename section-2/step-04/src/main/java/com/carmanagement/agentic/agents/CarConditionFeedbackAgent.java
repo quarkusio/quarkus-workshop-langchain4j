@@ -5,6 +5,8 @@ import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
+import java.util.Map;
+
 /**
  * Agent that analyzes feedback to determine the final car condition and assignment.
  * This is the final decision-maker that interprets all previous agent outputs.
@@ -35,9 +37,9 @@ public interface CarConditionFeedbackAgent {
             Supervisor Decision: {supervisorDecision}
             
             Requests:
-            - Disposition: {dispositionRequest}
-            - Maintenance: {maintenanceRequest}
-            - Cleaning: {cleaningRequest}
+            - Disposition: {feedbackRequests.dispositionRequest}
+            - Maintenance: {feedbackRequests.maintenanceRequest}
+            - Cleaning: {feedbackRequests.cleaningRequest}
             """)
     @Agent(description = "Final car condition analyzer. Determines the car's condition and assignment based on all feedback.",
             outputKey = "carConditions")
@@ -47,10 +49,6 @@ public interface CarConditionFeedbackAgent {
             Integer carYear,
             Integer carNumber,
             String carCondition,
-            String dispositionRequest,
-            String cleaningRequest,
-            String maintenanceRequest,
+            Map<String, String> feedbackRequests,
             String supervisorDecision);
 }
-
-

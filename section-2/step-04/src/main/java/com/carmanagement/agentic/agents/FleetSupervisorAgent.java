@@ -3,6 +3,8 @@ package com.carmanagement.agentic.agents;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
 
+import java.util.Map;
+
 /**
  * Supervisor agent that orchestrates the entire car processing workflow.
  * Coordinates feedback analysis agents and action agents based on car condition.
@@ -27,9 +29,7 @@ public interface FleetSupervisorAgent {
             String rentalFeedback,
             String cleaningFeedback,
             String maintenanceFeedback,
-            String cleaningRequest,
-            String maintenanceRequest,
-            String dispositionRequest
+            Map<String, String> feedbackRequests
     );
 
     @SupervisorRequest
@@ -39,11 +39,12 @@ public interface FleetSupervisorAgent {
             Integer carYear,
             Integer carNumber,
             String carCondition,
-            String cleaningRequest,
-            String maintenanceRequest,
-            String dispositionRequest,
+            Map<String, String> feedbackRequests,
             String rentalFeedback
     ) {
+        String cleaningRequest = feedbackRequests.get("cleaningRequest");
+        String maintenanceRequest = feedbackRequests.get("maintenanceRequest");
+        String dispositionRequest = feedbackRequests.get("dispositionRequest");
 
         boolean dispositionRequired = dispositionRequest != null &&
                 dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
@@ -100,4 +101,3 @@ public interface FleetSupervisorAgent {
                 cleaningRequest, maintenanceRequest, dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
-
