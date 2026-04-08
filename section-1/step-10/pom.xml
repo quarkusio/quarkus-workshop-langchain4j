@@ -16,8 +16,8 @@
 
         <compiler-plugin.version>3.15.0</compiler-plugin.version>
 
-        <quarkus.platform.version>3.31.2</quarkus.platform.version>
-        <quarkus-langchain4j.version>1.7.0</quarkus-langchain4j.version>
+        <quarkus.platform.version>3.34.2</quarkus.platform.version>
+        <quarkus-langchain4j.version>1.8.4</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>io.quarkiverse.micrometer.registry</groupId>
             <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.4.1</version>
+            <version>3.5.0</version>
         </dependency>
 
         <!-- Fault Tolerance -->

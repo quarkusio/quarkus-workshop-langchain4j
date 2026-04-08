@@ -2,7 +2,7 @@
 
 Congratulations! You've completed **Section 2: Agentic Systems** of the Quarkus LangChain4j workshop.
 
-Over the past six steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight.
+Over the past seven steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight and multimodal capabilities.
 Let's reflect on what you've built and why these patterns matter.
 
 ---
@@ -87,29 +87,7 @@ You learned how to build **autonomous, context-aware orchestration** using super
 
 ---
 
-### Step 05: Distributed Agents with A2A
-
-You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
-
-**What you built:**
-- `DispositionAgent` (client): Connects to remote agents via `@A2AClientAgent`
-- Remote A2A server: Complete disposition service running independently
-- `AgentCard`: Describes remote agent capabilities
-- `AgentExecutor`: Handles A2A protocol communication
-- Two Quarkus applications communicating across HTTP
-
-**Key concepts:**
-- **A2A protocol**: Open standard for agent-to-agent communication
-- **Distributed architecture**: Agents running in separate systems
-- **Tasks vs. Messages**: Different interaction patterns for different needs
-- **Agent discovery**: AgentCard enables clients to find and understand remote agents
-- **Protocol abstraction**: Declarative annotations hide complex protocol details
-
-**Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
-
----
-
-### Step 06: Human-in-the-Loop Pattern
+### Step 05: Human-in-the-Loop Pattern
 
 You learned how to add **human oversight** to autonomous systems, ensuring critical decisions receive human approval before execution.
 
@@ -128,6 +106,49 @@ You learned how to add **human oversight** to autonomous systems, ensuring criti
 - **Audit trails**: Complete tracking of approval decisions and reasoning
 
 **Why it matters:** Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.
+
+---
+
+### Step 06: Multimodal Agents
+
+You added **multimodal capabilities** to the car return workflow, enabling the system to process both text and images.
+
+**What you built:**
+- `CarImageAnalysisAgent`: Analyzes car images and enriches rental feedback with visual observations
+- Multipart form upload: Image upload in the Rental Return UI
+- `ImageContent` integration: Converting uploaded files to LangChain4j's multimodal format
+- Enrichment pattern: New agent output replaces an existing scope variable for seamless downstream integration
+
+**Key concepts:**
+- **Multimodal agents**: Processing text and images together in a single LLM call
+- **`ImageContent`**: LangChain4j's representation of image data for multimodal models
+- **`@UserMessage` on `ImageContent`**: Automatically includes images in the message to the LLM
+- **Enrichment pattern**: Using `outputKey` to augment existing workflow data without changing downstream agents
+- **Graceful degradation**: Agent handles missing images by returning feedback unchanged
+
+**Why it matters:** Real-world data is multimodal. Text descriptions are often incomplete or subjective. By combining visual analysis with textual feedback, AI systems can make more informed decisions. The enrichment pattern demonstrates how to add new capabilities to existing workflows with minimal disruption.
+
+---
+
+### Step 07: Distributed Agents with A2A
+
+You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
+
+**What you built:**
+- `PricingAgent` (client): Connects to remote agents via `@A2AClientAgent`
+- Remote A2A server: Complete pricing service running independently
+- `AgentCard`: Describes remote agent capabilities
+- `AgentExecutor`: Handles A2A protocol communication
+- Two Quarkus applications communicating across HTTP
+
+**Key concepts:**
+- **A2A protocol**: Open standard for agent-to-agent communication
+- **Distributed architecture**: Agents running in separate systems
+- **Tasks vs. Messages**: Different interaction patterns for different needs
+- **Agent discovery**: AgentCard enables clients to find and understand remote agents
+- **Protocol abstraction**: Declarative annotations hide complex protocol details
+
+**Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
 
 ---
 
@@ -254,7 +275,20 @@ Main Workflow
 
 ---
 
-### Pattern 6: Distributed Agent (A2A)
+### Pattern 6: Multimodal Enrichment
+
+**Structure:**
+```
+Input (text + image) → Analysis Agent → Enriched text output
+```
+
+**When to use:** Adding visual or other non-text data to improve decision quality
+
+**Example:** `CarImageAnalysisAgent` analyzing car photos to enrich rental feedback
+
+---
+
+### Pattern 7: Distributed Agent (A2A)
 
 **Structure:**
 ```
@@ -267,7 +301,7 @@ Local Agent (client) → A2A Protocol → Remote Agent (server)
 
 ---
 
-### Pattern 7: Human-in-the-Loop (HITL)
+### Pattern 8: Human-in-the-Loop (HITL)
 
 **Structure:**
 ```
@@ -397,6 +431,7 @@ You've mastered:
 - Workflow composition (sequence, parallel, conditional)
 - AgenticScope's state for agent collaboration
 - Nested workflow architectures
+- Multimodal image analysis with the enrichment pattern
 - Distributed systems with A2A protocol
 - Human-in-the-Loop pattern for safe, controlled decision-making
 

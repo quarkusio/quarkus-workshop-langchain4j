@@ -36,7 +36,7 @@ public interface MaintenanceFeedbackAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String carCondition,
             String rentalFeedback,
             String cleaningFeedback,

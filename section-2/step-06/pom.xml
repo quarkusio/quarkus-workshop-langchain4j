@@ -13,11 +13,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.31.2</quarkus.platform.version>
+        <quarkus.platform.version>3.34.2</quarkus.platform.version>
         <skipITs>true</skipITs>
-        <surefire-plugin.version>3.5.4</surefire-plugin.version>
-        <quarkus-langchain4j.version>1.7.0</quarkus-langchain4j.version>
-        <a2a.version>0.3.2.Final</a2a.version>
+        <surefire-plugin.version>3.5.5</surefire-plugin.version>
+        <quarkus-langchain4j.version>1.8.4</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -60,10 +59,6 @@
         <dependency>
             <groupId>io.quarkiverse.langchain4j</groupId>
             <artifactId>quarkus-langchain4j-openai</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-agentic-a2a</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
