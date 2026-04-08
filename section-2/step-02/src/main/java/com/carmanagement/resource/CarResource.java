@@ -30,7 +30,7 @@ public class CarResource {
      */
     @GET
     @Path("/{id}")
-    public Response getCarById(Long id) {
+    public Response getCarById(Integer id) {
         CarInfo car = CarInfo.findById(id);
         if (car == null) {
             return Response.status(Response.Status.NOT_FOUND)

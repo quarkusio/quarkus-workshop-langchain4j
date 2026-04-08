@@ -45,7 +45,7 @@ public interface DispositionAgent {
             String carMake,
             String carModel,
             Integer carYear,
-            Long carNumber,
+            Integer carNumber,
             String carCondition,
             String carValue,
             String rentalFeedback);

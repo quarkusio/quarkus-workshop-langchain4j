@@ -1,29 +1,19 @@
-# Step 06 - Human-in-the-Loop Pattern
+# Step 06 - Multimodal Agents
 
-## Human-in-the-Loop Pattern
+## New Requirement: Visual Car Inspection
 
-In the previous step, you built a **distributed agent system** using Agent-to-Agent (A2A) communication, where the DispositionAgent ran as a remote service.
+In Step 5, you implemented the Human-in-the-Loop pattern for safe, controlled disposition decisions. The system relies entirely on textual feedback from employees returning cars. But what if the person returning the car could also **upload a photo**?
 
-However, that system made autonomous decisions about vehicle disposition without human oversight. What if you need **human approval** before executing high-stakes decisions, especially for valuable assets?
+The Miles of Smiles management team wants to enhance the rental return process:
 
-In this step, you'll learn about the **Human-in-the-Loop (HITL) pattern** - a critical approach where AI agents pause execution to request human approval before proceeding with significant actions.
+**Allow employees to optionally upload an image of the car when returning it, so the system can automatically enrich the rental feedback with visual observations.**
 
----
+This is a common real-world scenario where:
 
-## New Requirement from Miles of Smiles Management: Human Approval for High-Value Dispositions
+1. **Text alone is insufficient**: An employee might write "car looks fine" but a photo reveals scratches or dents they missed
+2. **Multimodal AI is powerful**: Modern LLMs can analyze images alongside text to provide richer assessments
 
-The Miles of Smiles management team has identified a risk: the system is making autonomous disposition decisions on high-value vehicles without human oversight.
-
-They want to implement a **human approval gate** with these requirements:
-
-1. **Value threshold**: Any vehicle worth more than **$15,000** requires human approval before disposition
-2. **Two-phase workflow**:
-       - Phase 1: AI creates a disposition **proposal**
-       - Phase 2: Human reviews and **approves or rejects** the proposal
-3. **Execution control**: Only execute approved dispositions
-4. **Audit trail**: Track approval status and reasoning for compliance
-
-This ensures that expensive vehicles aren't scrapped or sold without proper human review.
+You'll learn how to integrate **multimodal capabilities** (text + image) into your existing agentic workflow using LangChain4j's `ImageContent`.
 
 ---
 
@@ -31,327 +21,321 @@ This ensures that expensive vehicles aren't scrapped or sold without proper huma
 
 In this step, you will:
 
-- Understand the **Human-in-the-Loop (HITL) pattern** and when to use it
-- Implement a **two-phase approval workflow** (proposal → review → execution)
-- Create a **DispositionProposalAgent** that generates proposals
-- Build a **HumanApprovalAgent** that simulates human decision-making
-- Modify the **FleetSupervisorAgent** to route high-value vehicles through approval
-- Add **approval tracking** to the data model
-- See how HITL provides **safety and control** in autonomous systems
+- Add **image upload** to the Rental Return UI using multipart form data
+- Convert uploaded images to LangChain4j's **`ImageContent`** for multimodal processing
+- Create a **`CarImageAnalysisAgent`** that analyzes car images and enriches rental feedback
+- Integrate the new agent at the beginning of the existing **`CarProcessingWorkflow`** sequence
+- Understand how `ImageContent` flows through agent parameters using `@UserMessage`
+- See how the agent gracefully handles the **absence of an image**, returning the feedback unchanged
 
 ---
 
-## Understanding Human-in-the-Loop
+## Understanding Multimodal Agents
 
-### What is Human-in-the-Loop?
+### What is Multimodal Processing?
 
-**Human-in-the-Loop (HITL)** is a pattern where:
+**Multimodal processing** allows an AI agent to work with multiple types of content simultaneously — in this case, **text and images**. Instead of just reading feedback like "the car has some damage", the agent can also _see_ the car and identify specific issues.
 
-- AI agents perform analysis and create recommendations
-- Execution **pauses** to request human approval
-- Humans review proposals and make final decisions
-- System proceeds only after approval
+### How LangChain4j Handles Images
 
-### HITL vs. Fully Autonomous
+LangChain4j provides the `ImageContent` class to represent image data in messages sent to the LLM:
 
-| Aspect | Fully Autonomous | Human-in-the-Loop |
-|--------|------------------|-------------------|
-| **Speed** | Fast, immediate | Slower, waits for human |
-| **Scalability** | Unlimited | Limited by human capacity |
-| **Accuracy** | Consistent but may miss edge cases | Human judgment for complex cases |
-| **Accountability** | System responsibility | Human responsibility |
-| **Cost** | Lower operational cost | Higher due to human involvement |
+- **`ImageContent`**: Wraps an image (as base64-encoded data with a MIME type) as a content part
+- When passed as a method parameter annotated with `@UserMessage`, it is automatically included alongside text in the message sent to the LLM
+- The LLM receives both the text prompt and the image, enabling visual reasoning
 
-### The Two-Phase Workflow
+### The Enrichment Pattern
 
-```mermaid
-sequenceDiagram
-    participant System as Agentic System
-    participant Proposal as Proposal Agent
-    participant Human as Human Reviewer
-    participant Execution as Execution Agent
-    
-    System->>Proposal: Analyze situation
-    Proposal->>Proposal: Create recommendation
-    Proposal-->>System: Proposal ready
-    
-    System->>Human: Request approval
-    Note over Human: Human reviews<br/>proposal details
-    Human-->>System: APPROVED/REJECTED
-    
-    alt Approved
-        System->>Execution: Execute proposal
-        Execution-->>System: Action completed
-    else Rejected
-        System->>System: Fallback action
-        Note over System: Route to alternative<br/>processing path
-    end
-```
+Rather than creating a separate "image analysis" output, the `CarImageAnalysisAgent` uses an **enrichment pattern**:
+
+1. Receives the original rental feedback text and an optional car image
+2. If an image is present, analyzes it and **appends visual observations** to the feedback
+3. If no image is present, returns the feedback **unchanged**
+4. The enriched feedback then flows into the existing `FeedbackWorkflow` — no downstream changes needed
+
+This is elegant because it preserves the existing workflow structure while adding new capabilities.
 
 ---
 
-## What is Being Added?
+## What Are We Going to Build?
 
-We're enhancing our car management system with:
+We're enhancing the car management system with multimodal image analysis:
 
-- **DispositionProposalAgent**: Creates disposition proposals for review
-- **HumanApprovalAgent**: Simulates human approval decisions (in production, this would integrate with a real approval system)
-- **Updated FleetSupervisorAgent**: Routes high-value vehicles through the approval workflow
-- **Enhanced CarConditions**: Tracks approval status and reasoning
-- **Value-based routing**: Different paths for high-value vs. low-value vehicles
+1. **Update the UI**: Add an image upload field to the Rental Return tab
+2. **Update the REST endpoint**: Accept multipart form data with an optional image
+3. **Convert to `ImageContent`**: Transform the uploaded file into a LangChain4j `ImageContent`
+4. **Create `CarImageAnalysisAgent`**: A new agent that analyzes car images
+5. **Update the workflow**: Insert the new agent at the beginning of the sequence
 
-### The Complete HITL Architecture
+**The Updated Architecture:**
 
 ```mermaid
 graph TB
-    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential]
-    
-    A --> B[Step 1: FeedbackWorkflow<br/>Parallel Analysis]
+    Start([Car Return with optional image]) --> A[CarProcessingWorkflow<br/>Sequential]
+
+    A --> IMG[Step 1: CarImageAnalysisAgent<br/>Image Analysis]
+    IMG -->|enriched rentalFeedback| B[Step 2: FeedbackWorkflow<br/>Parallel Analysis]
     B --> B1[CleaningFeedbackAgent]
     B --> B2[MaintenanceFeedbackAgent]
     B --> B3[DispositionFeedbackAgent]
     B1 --> BEnd[All feedback complete]
     B2 --> BEnd
     B3 --> BEnd
-    
-    BEnd --> C[Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration]
-    C --> C1{Disposition<br/>Required?}
-    
-    C1 -->|Yes| PA[PricingAgent<br/>Estimate Value]
-    PA --> VCheck{Value > $15k?}
-    
-    VCheck -->|Yes - HIGH VALUE| Proposal[DispositionProposalAgent<br/>Create Proposal]
-    Proposal --> Approval[HumanApprovalAgent<br/>Review & Decide]
-    Approval --> ApprovalCheck{Approved?}
-    ApprovalCheck -->|Yes| Execute[Execute Disposition]
-    ApprovalCheck -->|No| Fallback[Route to Maintenance/Cleaning]
-    
-    VCheck -->|No - LOW VALUE| Direct[DispositionAgent<br/>Direct Decision]
-    Direct --> Execute
-    
-    C1 -->|No| Other[MaintenanceAgent or CleaningAgent]
-    
-    Execute --> CEnd[Supervisor Decision]
-    Fallback --> CEnd
-    Other --> CEnd
-    
-    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Final Summary]
-    D --> End([Updated Car with Approval Status])
-    
+
+    BEnd --> C[Step 3: FleetSupervisorAgent<br/>Autonomous Orchestration]
+    C --> CEnd[Supervisor Decision]
+
+    CEnd --> D[Step 4: CarConditionFeedbackAgent<br/>Final Summary]
+    D --> End([Updated Car])
+
     style A fill:#90EE90
+    style IMG fill:#E8B4F8
     style B fill:#87CEEB
     style C fill:#FFB6C1
     style D fill:#90EE90
-    style Proposal fill:#FFD700
-    style Approval fill:#FF6B6B
-    style VCheck fill:#FFA07A
-    style ApprovalCheck fill:#FFA07A
     style Start fill:#E8E8E8
     style End fill:#E8E8E8
 ```
 
 **The Key Innovation:**
 
-The **FleetSupervisorAgent** now implements value-based routing:
-
-- **High-value path** (>$15,000): PricingAgent → DispositionProposalAgent → HumanApprovalAgent → Execute if approved
-- **Low-value path** (≤$15,000): PricingAgent → DispositionAgent → Execute directly
-- **Fallback**: If approval rejected, route to maintenance or cleaning instead
+The **`CarImageAnalysisAgent`** sits at the beginning of the sequence, _before_ the `FeedbackWorkflow`. Its output key is `rentalFeedback`, which means it **replaces** the original rental feedback in the agentic scope with the enriched version. All downstream agents automatically receive the enriched feedback without any code changes.
 
 ---
 
-## Implementing the Human-in-the-Loop Pattern
+## Prerequisites
 
-Let's build the HITL system step by step.
+Before starting:
 
-### Create the DispositionProposalAgent
+- **Completed [Step 05](step-05.md){target="_blank"}** — This step builds on Step 5's architecture
+- Application from Step 05 is stopped (Ctrl+C)
+- Understanding of the existing `CarProcessingWorkflow` sequence
 
-This agent creates disposition proposals that will be reviewed by humans.
+---
 
-Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java`:
+## Part 1: Update the UI for Image Upload
 
-```java title="DispositionProposalAgent.java" hl_lines="14-29 38-48 51"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java"
+### Update the HTML
+
+Add a "Car Image" column to the Rental Return table in `index.html`:
+
+```html title="index.html (Rental Return table header)"
+<tr>
+    <th>Car Number</th>
+    <th>Make</th>
+    <th>Model</th>
+    <th>Year</th>
+    <th>Car Image</th>
+    <th>Action</th>
+</tr>
 ```
 
-!!! note "Why two disposition agents?"
-    You might wonder why we have both DispositionProposalAgent and DispositionAgent (from Step 5). They serve different purposes: DispositionProposalAgent creates recommendations for human review on high-value vehicles (>$15K), while DispositionAgent makes autonomous decisions on lower-value vehicles. Think of it like needing manager approval for expensive purchases but having autonomy for small ones.
+Each car row now includes a file input for optional image upload:
 
-**Key Points:**
-
-- Creates **proposals** rather than final decisions
-- Uses same decision criteria as DispositionAgent
-- Output format includes "Proposed Action" and "Reasoning"
-- Stored in AgenticScope with key `dispositionProposal`
-
-### Create the HumanApprovalAgent
-
-This agent implements Human-in-the-Loop by using a tool that **pauses workflow execution** until a human makes a decision through the UI.
-
-Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
-
-```java title="HumanApprovalAgent.java" hl_lines="14-35 38-58"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java"
+```html title="index.html (Rental Return table row — generated by JavaScript)"
+<td>
+    <input type="file" id="rental-image-${car.id}" accept="image/*">
+</td>
 ```
 
-**Key Points:**
+### Update the JavaScript
 
-- Uses the `requestHumanApproval` tool which **blocks execution** until human decides
-- The tool calls `HumanInputService.requestInput()` which returns a `CompletableFuture`
-- Workflow execution pauses by calling `.get()` on the future
-- Human sees pending approval in the UI and clicks Approve/Reject
-- The future completes, workflow resumes with the human's decision
-- Returns structured decision: APPROVED/REJECTED with reasoning
-- Stored in AgenticScope with key `approvalDecision`
+The `returnFromRental` function is updated to send a `FormData` object (multipart) instead of a simple query parameter:
 
-!!!note @HumanInTheLoop annotation
-    LangChain4j also has a @HumanInTheLoop annotation that can be used to mark methods that require human approval. This is a simpler approach than using a tool, but as of now doesn't provide the same level of control over the approval process.
+```javascript title="app.js"
+function returnFromRental(event, carId) {
+    event.preventDefault();
+    const feedback = document.getElementById(`rental-feedback-${carId}`).value;
+    const imageInput = document.getElementById(`rental-image-${carId}`);
+    const button = event.target.querySelector('button[type="submit"]');
 
-### Create the HumanApprovalTool
+    // ...loading state...
 
-This tool implements the actual blocking mechanism for TRUE HITL.
+    const formData = new FormData();
+    formData.append('rentalFeedback', feedback);
+    if (imageInput.files.length > 0) {
+        formData.append('carImage', imageInput.files[0]);
+    }
 
-Create `src/main/java/com/carmanagement/agentic/tools/HumanApprovalTool.java`:
-
-```java title="HumanApprovalTool.java"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/tools/HumanApprovalTool.java"
-```
-
-**Key Points:**
-
-- Creates an approval proposal in the database
-- Returns a `CompletableFuture<ApprovalProposal>` that completes when human decides
-- **Blocks by calling `.get(5, TimeUnit.MINUTES)`** - this is where the workflow pauses!
-- Workflow thread waits here until human clicks Approve/Reject in UI
-- Includes 5-minute timeout for safety
-- Returns human's decision to the agent
-
-### Create the ApprovalService
-
-This service manages the CompletableFutures that pause workflow execution.
-
-Create `src/main/java/com/carmanagement/service/ApprovalService.java`:
-
-```java title="ApprovalService.java"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/service/ApprovalService.java"
+    fetch(`/car-management/rental-return/${carId}`, {
+        method: 'POST',
+        body: formData
+    })
+    // ...response handling...
+}
 ```
 
 **Key Points:**
 
-- Stores `CompletableFuture<ApprovalProposal>` in a map keyed by car number
-- `createProposalAndWaitForDecision()` creates the future and returns it
-- Proposal is persisted in a separate transaction to ensure it's visible to UI queries
-- `processDecision()` completes the future when human makes a decision
-- This completion **resumes the workflow** that was blocked on `.get()`
+- Uses `FormData` for multipart encoding
+- The image is only appended if the user selected a file
+- No `Content-Type` header is set — the browser automatically adds `multipart/form-data` with the correct boundary
 
-### Create the ApprovalProposal Entity
+---
 
-This entity stores proposals in the database so the UI can display them.
+## Part 2: Update the REST Endpoint
 
-Create `src/main/java/com/carmanagement/model/ApprovalProposal.java`:
+### Accept Multipart Form Data
 
-```java title="ApprovalProposal.java"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/model/ApprovalProposal.java"
+Update `src/main/java/com/carmanagement/resource/CarManagementResource.java` to accept the image as a `FileUpload` and convert it to `ImageContent`:
+
+```java title="CarManagementResource.java hl_lines="37-61 114-127"
+--8<-- "../../section-2/step-06/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
-### Create the ApprovalResource
+**Let's break it down:**
 
-This REST resource allows the UI to fetch pending approvals and submit decisions.
+#### `@Consumes(MediaType.MULTIPART_FORM_DATA)`
 
-Create `src/main/java/com/carmanagement/resource/ApprovalResource.java`:
+The rental return endpoint now consumes multipart form data instead of query parameters:
 
-```java title="ApprovalResource.java"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/resource/ApprovalResource.java"
+```java
+@POST
+@Path("/rental-return/{carNumber}")
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+@Blocking
+public Uni<Response> processRentalReturn(Integer carNumber,
+        @RestForm String rentalFeedback, @RestForm FileUpload carImage) {
 ```
 
-**REST API Endpoints:**
+- **`@RestForm`**: Extracts form fields from the multipart request
+- **`FileUpload`**: RESTEasy Reactive's type for handling uploaded files
 
-- `GET /api/approvals/pending` - Returns all pending approval proposals
-- `POST /api/approvals/{id}/approve` - Approve a proposal
-- `POST /api/approvals/{id}/reject` - Reject a proposal
+#### The `toImageContent` Helper
 
-!!!success "TRUE Human-in-the-Loop Implementation"
-    - ✅ Workflow execution **actually pauses** when approval is needed
-    - ✅ The workflow thread **blocks** on `CompletableFuture.get()`
-    - ✅ Human sees pending approvals in the **real-time UI**
-    - ✅ Human clicks **Approve/Reject buttons** in the UI
-    - ✅ The future **completes** with the human's decision
-    - ✅ Workflow **resumes** and continues with the decision
-    - ✅ Includes **timeout handling** (5 minutes)
-    - ✅ Full **audit trail** in the database
+```java
+private ImageContent toImageContent(FileUpload fileUpload) {
+    if (fileUpload == null || fileUpload.filePath() == null) {
+        return EMPTY_IMAGE;
+    }
+    try {
+        byte[] bytes = Files.readAllBytes(fileUpload.filePath());
+        String base64 = Base64.getEncoder().encodeToString(bytes);
+        String mimeType = fileUpload.contentType();
+        return new ImageContent(base64, mimeType);
+    } catch (IOException e) {
+        Log.error("Failed to read uploaded car image", e);
+        return EMPTY_IMAGE;
+    }
+}
+```
 
-### Update the FleetSupervisorAgent
+- Reads the uploaded file and converts it to **base64-encoded** data
+- Creates an `ImageContent` with the base64 data and the file's MIME type (e.g., `image/jpeg`, `image/png`)
+- Falls back to `EMPTY_IMAGE` (a tiny white pixel) when no image is provided — this avoids null handling throughout the pipeline
 
-Modify the supervisor to implement value-based routing with the approval workflow.
+#### Non-Rental Endpoints
 
-Update `src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java`:
+The cleaning and maintenance return endpoints don't support image upload, so they pass `EMPTY_IMAGE`:
 
-```java title="FleetSupervisorAgent.java" hl_lines="10 24-35 40-46 49-51"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
+```java
+return carManagementService.processCarReturn(carNumber, "", cleaningFeedback, "", EMPTY_IMAGE)
+```
+
+---
+
+## Part 3: Pass the Image Through the Service Layer
+
+### Update `src/main/java/com/carmanagement/service/CarManagementService`
+
+Add `ImageContent` as a parameter and forward it to the workflow:
+
+```java title="CarManagementService.java  hl_lines="37-38"
+--8<-- "../../section-2/step-06/src/main/java/com/carmanagement/service/CarManagementService.java"
+```
+
+The image is passed straight through to the workflow:
+
+```java
+CarConditions carConditions = carProcessingWorkflow.processCarReturn(
+        carInfo.make, carInfo.model, carInfo.year, carNumber, carInfo.condition,
+        rentalFeedback != null ? rentalFeedback : "",
+        cleaningFeedback != null ? cleaningFeedback : "",
+        maintenanceFeedback != null ? maintenanceFeedback : "",
+        carImage);
+```
+
+---
+
+## Part 4: Create the CarImageAnalysisAgent
+
+This is the core of this step — a new agent that processes car images.
+
+Create `src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java`:
+
+```java title="CarImageAnalysisAgent.java  hl_lines="28 30-32"
+--8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java"
+```
+
+**Let's break it down:**
+
+#### The `@SystemMessage`
+
+```java
+@SystemMessage("""
+    You are a car image analyst for a car rental company.
+    You will receive the current rental feedback for a car being returned.
+    If an image of the car is provided, analyze it and enrich the rental feedback by appending
+    your visual observations about the car's condition (e.g., visible damage, scratches, dents,
+    cleanliness issues, tire condition, etc.).
+    If no image is provided, return the rental feedback exactly as it is, without any modification.
+    Your response must always include the original rental feedback text followed by your observations if any.
+    """)
+```
+
+The system message instructs the LLM to:
+
+- **Analyze the image** if one is provided, looking for visible damage, cleanliness issues, etc.
+- **Preserve the original feedback** — always include it in the response
+- **Be a no-op when there's no image** — return the feedback unchanged
+
+#### The `@UserMessage` and `ImageContent` Parameter
+
+```java
+@UserMessage("""
+    Rental Feedback: {rentalFeedback}
+    """)
+String analyzeCarImage(String rentalFeedback, @UserMessage ImageContent carImage);
+```
+
+Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.
+
+#### The `outputKey = "rentalFeedback"`
+
+```java
+@Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
+        outputKey = "rentalFeedback")
+```
+
+This is the key design decision: the agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.
+
+---
+
+## Part 5: Update the Workflow
+
+### Add the Agent to the Sequence
+
+Update `CarProcessingWorkflow.java` to include `CarImageAnalysisAgent` as the **first** sub-agent and add the `ImageContent` parameter:
+
+```java title="CarProcessingWorkflow.java"
+--8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
 **Key Changes:**
 
-- Added **DispositionProposalAgent** and **HumanApprovalAgent** to subAgents
-- Implemented **two-path routing** based on vehicle value
-- High-value path: Proposal → Approval → Execute if approved
-- Low-value path: Direct disposition decision
-- Stores approval status in AgenticScope for tracking
+- **`CarImageAnalysisAgent.class`** is added as the first sub-agent in the `@SequenceAgent`
+- The sequence is now: `CarImageAnalysisAgent` → `FeedbackWorkflow` → `FleetSupervisorAgent` → `CarConditionFeedbackAgent`
+- **`ImageContent carImage`** is added as a new parameter to `processCarReturn`
 
-### Update the CarConditions Model
+The flow is:
 
-Add approval tracking fields to the data model.
-
-Update `src/main/java/com/carmanagement/model/CarConditions.java`:
-
-```java title="CarConditions.java" hl_lines="8-9 11-15 20-22"
---8<-- "../../section-2/step-06/src/main/java/com/carmanagement/model/CarConditions.java"
-```
-
-**Key Points:**
-
-- Added `approvalStatus` field (APPROVED/REJECTED/NOT_REQUIRED)
-- Added `approvalReason` field for audit trail
-- Backward-compatible constructor for existing code
-
-### Update Application Configuration
-
-Add configuration for the approval threshold.
-
-Update `src/main/resources/application.properties`:
-
-```properties
-# Human-in-the-Loop configuration
-# Threshold for requiring human approval on high-value dispositions
-car-management.approval.threshold=15000
-```
-
-This makes the threshold configurable without code changes.
+1. `CarImageAnalysisAgent` analyzes the image and enriches `rentalFeedback` in the scope
+2. `FeedbackWorkflow` receives the enriched `rentalFeedback` and runs parallel analysis
+3. The rest of the workflow proceeds as before
 
 ---
 
-## Try the Complete Solution
-
-Now let's see the Human-in-the-Loop pattern in action!
-
-!!!warning "Keep the Remote A2A Service Running"
-    Before starting the step-06 application, make sure you have the **remote A2A service from step-05** running in a separate terminal.
-    
-    **Why?** The DispositionAgent used in this step is still running as a remote service (from step-05) and communicates via Agent-to-Agent (A2A) protocol.
-    
-    **Port Configuration:**
-    
-    - Remote A2A service (step-05): `http://localhost:8888`
-    - Main application (step-06): `http://localhost:8080`
-    
-    **To start the remote service:**
-    
-    ```bash
-    cd section-2/step-05/remote-a2a-agent
-    ./mvnw quarkus:dev
-    ```
-    
-    Keep this terminal running while you work with step-06. Both services need to be running for the Human-in-the-Loop workflow to work correctly.
+## Try It Out
 
 ### Start the Application
 
@@ -375,322 +359,168 @@ cd section-2/step-06
 
 3. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
-### Test HITL Scenarios
+### Test Without an Image
 
-Try these scenarios to see how the approval workflow handles different vehicle values:
-
-#### Scenario 1: High-Value Vehicle Requiring Approval
-
-Enter the following text in the feedback field for the **Honda Civic**:
+On the Rental Return tab, enter feedback for the Honda Civic **without** uploading an image:
 
 ```text
-The car was in a serious collision. Front end is completely destroyed and airbags deployed.
+The car has a small dent on the rear bumper
 ```
 
-**What happens:**
-
-```mermaid
-flowchart TD
-    Start([Input: Serious collision<br/>Front end destroyed])
-    
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
-    FW --> FSA[FleetSupervisorAgent<br/>Orchestration]
-    FSA --> PA[PricingAgent]
-    PA --> Value[Estimate: ~$18,000<br/>2020 Honda Civic]
-    
-    Value --> Check{Value > $15,000?}
-    Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
-    Proposal --> PropResult[Proposed: SCRAP<br/>Reasoning: Severe damage]
-    
-    PropResult --> Human[HumanApprovalAgent<br/>Reviews Proposal]
-    Human --> Decision{Decision}
-    Decision -->|APPROVED| Execute[Execute SCRAP]
-    Decision -->|REJECTED| Fallback[Route to Maintenance]
-    
-    Execute --> Result([Status: PENDING_DISPOSITION<br/>Approval: APPROVED])
-    Fallback --> Result2([Status: IN_MAINTENANCE<br/>Approval: REJECTED])
-    
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style PA fill:#F9E79F
-    style Proposal fill:#FFD700
-    style Human fill:#FF6B6B
-    style Check fill:#FFA07A
-    style Decision fill:#FFA07A
-    style Result fill:#D2B4DE
-    style Result2 fill:#D2B4DE
-```
+Click **Return**.
 
 **Expected Result:**
 
-- PricingAgent estimates value at ~$18,000 (above threshold)
-- DispositionProposalAgent creates SCRAP proposal
-- HumanApprovalAgent reviews and likely APPROVES (severe damage justifies scrapping)
-- Status: `PENDING_DISPOSITION`
-- Condition includes approval status and reasoning
+- The `CarImageAnalysisAgent` receives the feedback with an empty image
+- Since there's no meaningful image, it returns the feedback unchanged
+- The rest of the workflow processes the original feedback as before
 
-#### Scenario 2: High-Value Vehicle - Approval Rejected
+### Test With an Image
 
-Enter the following text in the **Mercedes Benz** feedback field:
+1. Find or take a photo of a car (there is a sample image named `q4-tree.png` in the `resources` folder, but any car photo will work)
+2. On the Rental Return tab, click "Choose File" in the Car Image column
+3. Select the image
+4. Enter some feedback:
 
 ```text
-Minor fender bender, small dent in rear bumper
+Customer mentioned a minor scratch
 ```
 
-**What happens:**
-
-```mermaid
-flowchart TD
-    Start([Input: Minor fender bender<br/>small dent])
-    
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
-    FW --> FSA[FleetSupervisorAgent]
-    FSA --> PA[PricingAgent]
-    PA --> Value[Estimate: ~$25,000<br/>2021 Mercedes Benz]
-    
-    Value --> Check{Value > $15,000?}
-    Check -->|Yes| Proposal[DispositionProposalAgent<br/>Creates Proposal]
-    Proposal --> PropResult[Proposed: SELL or KEEP<br/>Minor damage]
-    
-    PropResult --> Human[HumanApprovalAgent<br/>Reviews Proposal]
-    Human --> Decision[Decision: REJECTED<br/>Too valuable for minor damage]
-    
-    Decision --> Fallback[Route to Maintenance<br/>Repair instead]
-    Fallback --> Result([Status: IN_MAINTENANCE<br/>Approval: REJECTED])
-    
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style PA fill:#F9E79F
-    style Proposal fill:#FFD700
-    style Human fill:#FF6B6B
-    style Check fill:#FFA07A
-    style Result fill:#D2B4DE
-```
+5. Click **Return**
 
 **Expected Result:**
 
-- PricingAgent estimates value at ~$25,000 (high value)
-- DispositionProposalAgent suggests SELL or KEEP
-- HumanApprovalAgent REJECTS (too valuable for disposition with minor damage)
-- Fallback: Routes to MaintenanceAgent instead
-- Status: `IN_MAINTENANCE`
-- Approval status: `REJECTED` with reasoning
+- The `CarImageAnalysisAgent` analyzes the image alongside the feedback
+- It enriches the feedback with visual observations, e.g.: _"Customer mentioned a minor scratch. Visual analysis: The image shows a visible scratch on the front left fender, approximately 15cm long. The paint is chipped in the affected area. Additionally, the front bumper shows minor scuff marks on the lower right corner."_
+- The enriched feedback flows into `FeedbackWorkflow`, which may now detect cleaning or maintenance needs that the original text alone wouldn't have triggered
 
-#### Scenario 3: Low-Value Vehicle - No Approval Needed
+### Check the Agent Report
 
-Enter the following text in the **Ford F-150** feedback field (Maintenance Returns tab):
-
-```text
-The truck is totaled, completely inoperable, very old
-```
-
-**What happens:**
-
-```mermaid
-flowchart TD
-    Start([Input: Totaled truck<br/>very old])
-    
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
-    
-    FW --> FSA[FleetSupervisorAgent]
-    FSA --> PA[PricingAgent]
-    PA --> Value[Estimate: ~$8,000<br/>2019 Ford F-150, totaled]
-    
-    Value --> Check{Value > $15,000?}
-    Check -->|No| Direct[DispositionAgent<br/>Direct Decision]
-    Direct --> Decision[Decision: SCRAP<br/>Beyond economical repair]
-    
-    Decision --> Result([Status: PENDING_DISPOSITION<br/>Approval: NOT_REQUIRED])
-    
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style PA fill:#F9E79F
-    style Direct fill:#87CEEB
-    style Check fill:#FFA07A
-    style Result fill:#D2B4DE
-```
-
-**Expected Result:**
-
-- PricingAgent estimates value at ~$8,000 (below threshold)
-- Skips approval workflow (low value)
-- DispositionAgent makes direct SCRAP decision
-- Status: `PENDING_DISPOSITION`
-- Approval status: `NOT_REQUIRED`
-
-### Check the Logs
-
-Watch the console output to see the approval workflow execution:
-
-```bash
-FeedbackWorkflow executing...
-  ├─ DispositionFeedbackAgent: DISPOSITION_REQUIRED
-FleetSupervisorAgent orchestrating...
-  ├─ PricingAgent: Estimated value $18,000
-  ├─ Value check: $18,000 > $15,000 → Approval required
-  ├─ DispositionProposalAgent: Proposed SCRAP
-  ├─ HumanApprovalAgent: Reviewing proposal...
-  └─ Decision: APPROVED - Severe damage justifies scrapping
-CarConditionFeedbackAgent updating...
-  └─ Approval status: APPROVED
-```
-
-Notice how high-value vehicles go through the proposal → approval → execution flow!
+Click **Generate Report** to see the execution trace. You'll see the `CarImageAnalysisAgent` as the first step in the sequence, with its input (original feedback) and output (enriched feedback).
 
 ---
 
-## Why Human-in-the-Loop Matters
-
-### Safety and Control
-
-HITL provides a **safety net** for autonomous systems:
-
-- **Prevents costly mistakes**: Human review catches edge cases
-- **Builds trust**: Gradual transition from manual to autonomous
-- **Maintains accountability**: Clear human responsibility for critical decisions
-
-### Compliance and Audit
-
-Many industries require human oversight:
-
-- **Financial services**: Large transactions need approval
-- **Healthcare**: Treatment decisions require physician review
-- **Legal**: Contract terms need lawyer approval
-- **Audit trails**: Track who approved what and when
-
-### Balancing Automation and Control
-
-HITL lets you **tune the automation level**:
+## How It All Works Together
 
 ```mermaid
-graph LR
-    A[Fully Manual] --> B[HITL - High Threshold]
-    B --> C[HITL - Low Threshold]
-    C --> D[Fully Autonomous]
-    
-    style A fill:#FF6B6B
-    style B fill:#FFD700
-    style C fill:#87CEEB
-    style D fill:#90EE90
-```
+sequenceDiagram
+    participant User
+    participant UI as Web UI
+    participant REST as CarManagementResource
+    participant Service as CarManagementService
+    participant Workflow as CarProcessingWorkflow
+    participant ImageAgent as CarImageAnalysisAgent
+    participant FeedbackWF as FeedbackWorkflow
 
-- Start with **low threshold** (approve everything)
-- Gradually **increase threshold** as confidence grows
-- Eventually move to **fully autonomous** for routine cases
-- Keep HITL for **high-stakes decisions**
+    User->>UI: Enter feedback + upload image
+    UI->>REST: POST multipart (feedback + image)
+    REST->>REST: toImageContent(fileUpload)
+    REST->>Service: processCarReturn(..., imageContent)
+    Service->>Workflow: processCarReturn(..., carImage)
+
+    rect rgb(232, 180, 248)
+    Note over Workflow,ImageAgent: Image Analysis (Step 1)
+    Workflow->>ImageAgent: analyzeCarImage(rentalFeedback, carImage)
+    ImageAgent->>ImageAgent: LLM analyzes text + image
+    ImageAgent->>Workflow: enriched rentalFeedback
+    end
+
+    rect rgb(255, 243, 205)
+    Note over Workflow,FeedbackWF: Parallel Analysis (Step 2)
+    Workflow->>FeedbackWF: Uses enriched rentalFeedback
+    par Concurrent Execution
+        FeedbackWF->>FeedbackWF: CleaningFeedbackAgent
+    and
+        FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
+    and
+        FeedbackWF->>FeedbackWF: DispositionFeedbackAgent
+    end
+    end
+
+    Note over Workflow: Steps 3-4: Supervisor + Condition (unchanged)
+```
 
 ---
 
-## Optional: Implement It Yourself
+## Key Takeaways
 
-If you want hands-on practice implementing the HITL pattern, you can build it step-by-step.
-
-!!!warning "Short on time?"
-    The complete solution is available in `section-2/step-06`.
-    You can explore the code there if you prefer to move forward quickly.
-
-### Prerequisites
-
-Before starting:
-
-- Completed [Step 05](step-05.md){target="_blank"} (or have the `section-2/step-05/multi-agent-system` code available)
-- Application from Step 05 is stopped (Ctrl+C)
-
-### Implementation Steps
-
-1. **Copy the step-05 code** to create step-06 base
-2. **Create DispositionProposalAgent.java** with proposal generation logic
-3. **Create HumanApprovalAgent.java** with approval simulation
-4. **Update FleetSupervisorAgent.java** to add value-based routing
-5. **Update CarConditions.java** to add approval fields
-6. **Update application.properties** with approval threshold
-7. **Test** with different vehicle values
-
-Follow the code examples shown earlier in this guide.
+- **Multimodal agents** can process both text and images in a single interaction
+- **`ImageContent`** is LangChain4j's way to represent images for LLM consumption
+- **`@UserMessage` on `ImageContent`** parameters automatically includes the image in the message to the LLM
+- **The enrichment pattern** (outputKey matching an existing scope variable) allows new agents to augment data without changing downstream code
+- **Graceful degradation**: The agent handles missing images by returning feedback unchanged
+- **Multipart form data** with `@RestForm FileUpload` makes image upload straightforward in Quarkus
+- **Base64 encoding** is used to convert uploaded files into `ImageContent`
 
 ---
 
 ## Experiment Further
 
-### 1. Implement Real Human Approval
+### 1. Try Different Image Types
 
-Replace the simulated HumanApprovalAgent with a real approval system:
+Upload various car images to see how the agent describes different conditions:
 
-- Store proposals in a database with PENDING status
-- Send email/Slack notifications to approvers
-- Create a web UI for reviewing proposals
-- Use async processing to wait for human response
+- A clean, well-maintained car
+- A car with visible damage (dents, scratches)
+- A dirty car (mud, stains)
+- An interior shot showing wear
 
-### 2. Add Approval Workflows
+### 2. Compare With and Without Images
 
-Implement multi-level approval:
+Return the same car with identical text feedback but with and without an image. Compare how the downstream agents (cleaning, maintenance, disposition) react differently based on the enriched feedback.
 
-- $15,000-$25,000: Single approver
-- $25,000-$50,000: Two approvers
-- >$50,000: Manager approval required
+### 3. Adjust the System Message
 
-### 3. Track Approval Metrics
+Modify the `CarImageAnalysisAgent`'s system message to focus on specific aspects:
 
-Add monitoring:
-
-- Approval rate by value range
-- Average approval time
-- Rejection reasons analysis
-- Approver performance metrics
-
-### 4. Implement Approval Timeouts
-
-Add time limits:
-
-- Auto-reject after 24 hours
-- Escalate to manager after 48 hours
-- Send reminder notifications
-
-### 5. Add Approval History
-
-Track all approvals:
-
-- Who approved/rejected
-- When the decision was made
-- Reasoning provided
-- Outcome of the decision
+- Only report safety-critical damage
+- Include estimated repair costs
+- Rate the car's cleanliness on a scale of 1-10
 
 ---
 
 ## Troubleshooting
 
-??? warning "All vehicles going through approval workflow"
-    Check that the value threshold is correctly configured in `application.properties` and that the PricingAgent is returning numeric values that can be compared.
-
-??? warning "Approval agent always approving/rejecting"
-    Review the approval criteria in HumanApprovalAgent's system message. The simulated logic may need adjustment based on your test scenarios.
-
-??? warning "Approval status not being tracked"
+??? warning "Image not being processed"
     Verify that:
-    
-    - FleetSupervisorAgent stores `approvalStatus` and `approvalReason` in AgenticScope
-    - CarConditions model has the new fields
-    - CarProcessingWorkflow retrieves these values from the scope
 
-??? warning "Low-value vehicles still requiring approval"
-    Check the value comparison logic in FleetSupervisorAgent. Ensure the PricingAgent output is being parsed correctly as a number.
+    - The file input has `accept="image/*"` to filter non-image files
+    - The JavaScript correctly appends the file to `FormData`
+    - The `toImageContent` method is reading the file and encoding it as base64
+    - Check the server logs for any `IOException` messages
+
+??? warning "Agent returns feedback unchanged even with an image"
+    This can happen if:
+
+    - The image is too small or blank (the LLM sees nothing to analyze)
+    - The MIME type is incorrect — verify `fileUpload.contentType()` returns a valid image type
+    - The LLM model doesn't support vision — ensure your configured model supports multimodal input
+
+??? warning "Request too large"
+    Large images (>10MB) may exceed request size limits. Consider:
+
+    - Adding `accept="image/*"` to the file input (already done)
+    - Configuring `quarkus.http.body.max-body-size` in `application.properties` if needed
+    - Compressing images client-side before upload
 
 ---
 
 ## What's Next?
 
-Congratulations! You've completed the final step of Section 2 and implemented the **Human-in-the-Loop pattern** for safe, controlled autonomous decision-making!
+You've successfully added multimodal image analysis to the car management system!
 
 The system now:
 
-- Routes high-value vehicles through human approval
-- Creates proposals for human review
-- Tracks approval decisions for audit trails
-- Provides fallback paths for rejected proposals
-- Balances automation with human oversight
+- Accepts optional car images during rental returns
+- Analyzes images using a multimodal LLM agent
+- Enriches rental feedback with visual observations
+- Seamlessly integrates with the existing workflow — no downstream changes needed
 
-Ready to wrap up? Head to the conclusion to review everything you've learned and see how these patterns apply to real-world scenarios!
+**Key Progression:**
+- **Step 4**: Sophisticated local orchestration with Supervisor Pattern
+- **Step 5**: Human-in-the-Loop for safe, controlled autonomous decisions
+- **Step 6**: Multimodal image analysis for enriched feedback
 
-[Continue to Conclusion - Mastering Agentic Systems](conclusion.md)
+In **Step 07**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local PricingAgent into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
+
+[Continue to Step 07 - Using Remote Agents (A2A)](step-07.md)
