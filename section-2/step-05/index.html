@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2311,7 +2311,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     PA --&gt; VCheck{Value &gt; $15k?}
 
     VCheck --&gt;|Yes - HIGH VALUE| Proposal[DispositionProposalAgent&lt;br/&gt;Create Proposal]
-    Proposal --&gt; Approval[HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop]
+    Proposal --&gt; Approval["HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop"]
     Approval --&gt; ApprovalCheck{Approved?}
     ApprovalCheck --&gt;|Yes| Execute[Execute Disposition]
     ApprovalCheck --&gt;|No| Fallback[Route to Maintenance/Cleaning]
@@ -3284,7 +3284,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     Check --&gt;|Yes| Proposal[DispositionProposalAgent&lt;br/&gt;Creates Proposal]
     Proposal --&gt; PropResult[Proposed: SCRAP&lt;br/&gt;Reasoning: Severe damage]
 
-    PropResult --&gt; Human[HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop pauses workflow]
+    PropResult --&gt; Human["HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop pauses workflow"]
     Human --&gt; Decision{Decision}
     Decision --&gt;|APPROVED| Execute[Execute SCRAP]
     Decision --&gt;|REJECTED| Fallback[Route to Maintenance]
@@ -3353,7 +3353,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     Check --&gt;|Yes| Proposal[DispositionProposalAgent&lt;br/&gt;Creates Proposal]
     Proposal --&gt; PropResult[Proposed: SELL or KEEP&lt;br/&gt;Minor damage]
 
-    PropResult --&gt; Human[HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop pauses workflow]
+    PropResult --&gt; Human["HumanApprovalAgent&lt;br/&gt;@HumanInTheLoop pauses workflow"]
     Human --&gt; Decision[Decision: REJECTED&lt;br/&gt;Too valuable for minor damage]
 
     Decision --&gt; Fallback[Route to Maintenance&lt;br/&gt;Repair instead]
