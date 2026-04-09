@@ -51,7 +51,7 @@ Rather than creating a separate "image analysis" output, the `CarImageAnalysisAg
 1. Receives the original rental feedback text and an optional car image
 2. If an image is present, analyzes it and **appends visual observations** to the feedback
 3. If no image is present, returns the feedback **unchanged**
-4. The enriched feedback then flows into the existing `FeedbackWorkflow` — no downstream changes needed
+4. The enriched feedback then flows into the existing `FeedbackAnalysisWorkflow` — no downstream changes needed
 
 This is elegant because it preserves the existing workflow structure while adding new capabilities.
 
@@ -74,13 +74,14 @@ graph TB
     Start([Car Return with optional image]) --> A[CarProcessingWorkflow<br/>Sequential]
 
     A --> IMG[Step 1: CarImageAnalysisAgent<br/>Image Analysis]
-    IMG -->|enriched rentalFeedback| B[Step 2: FeedbackWorkflow<br/>Parallel Analysis]
-    B --> B1[CleaningFeedbackAgent]
-    B --> B2[MaintenanceFeedbackAgent]
-    B --> B3[DispositionFeedbackAgent]
-    B1 --> BEnd[All feedback complete]
-    B2 --> BEnd
-    B3 --> BEnd
+    IMG -->|enriched rentalFeedback| B[Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper]
+    B --> B1[FeedbackTask.cleaning()]
+    B --> B2[FeedbackTask.maintenance()]
+    B --> B3[FeedbackTask.disposition()]
+    B1 --> BA[FeedbackAnalysisAgent]
+    B2 --> BA
+    B3 --> BA
+    BA --> BEnd[FeedbackAnalysisResults]
 
     BEnd --> C[Step 3: FleetSupervisorAgent<br/>Autonomous Orchestration]
     C --> CEnd[Supervisor Decision]
@@ -99,7 +100,7 @@ graph TB
 
 **The Key Innovation:**
 
-The **`CarImageAnalysisAgent`** sits at the beginning of the sequence, _before_ the `FeedbackWorkflow`. Its output key is `rentalFeedback`, which means it **replaces** the original rental feedback in the agentic scope with the enriched version. All downstream agents automatically receive the enriched feedback without any code changes.
+The **`CarImageAnalysisAgent`** sits at the beginning of the sequence, _before_ the `FeedbackAnalysisWorkflow`. Its output key is `rentalFeedback`, which means it **replaces** the original rental feedback in the agentic scope with the enriched version. All downstream agents automatically receive the enriched feedback without any code changes.
 
 ---
 
@@ -307,7 +308,7 @@ Note that the `@UserMessage` annotation on the `ImageContent` parameter tells La
         outputKey = "rentalFeedback")
 ```
 
-This is the key design decision: the agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.
+This is the key design decision: the agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (`FeedbackAnalysisWorkflow`, `FleetSupervisorAgent`, and the rest of the sequence) will automatically receive the enriched feedback.
 
 ---
 
@@ -324,13 +325,13 @@ Update `CarProcessingWorkflow.java` to include `CarImageAnalysisAgent` as the **
 **Key Changes:**
 
 - **`CarImageAnalysisAgent.class`** is added as the first sub-agent in the `@SequenceAgent`
-- The sequence is now: `CarImageAnalysisAgent` → `FeedbackWorkflow` → `FleetSupervisorAgent` → `CarConditionFeedbackAgent`
+- The sequence is now: `CarImageAnalysisAgent` → `FeedbackAnalysisWorkflow` → `FleetSupervisorAgent` → `CarConditionFeedbackAgent`
 - **`ImageContent carImage`** is added as a new parameter to `processCarReturn`
 
 The flow is:
 
 1. `CarImageAnalysisAgent` analyzes the image and enriches `rentalFeedback` in the scope
-2. `FeedbackWorkflow` receives the enriched `rentalFeedback` and runs parallel analysis
+2. `FeedbackAnalysisWorkflow` receives the enriched `rentalFeedback` and runs parallel analysis
 3. The rest of the workflow proceeds as before
 
 ---
@@ -392,7 +393,7 @@ Customer mentioned a minor scratch
 
 - The `CarImageAnalysisAgent` analyzes the image alongside the feedback
 - It enriches the feedback with visual observations, e.g.: _"Customer mentioned a minor scratch. Visual analysis: The image shows a visible scratch on the front left fender, approximately 15cm long. The paint is chipped in the affected area. Additionally, the front bumper shows minor scuff marks on the lower right corner."_
-- The enriched feedback flows into `FeedbackWorkflow`, which may now detect cleaning or maintenance needs that the original text alone wouldn't have triggered
+- The enriched feedback flows into `FeedbackAnalysisWorkflow`, which may now detect cleaning, maintenance, or disposition needs that the original text alone wouldn't have triggered
 
 ### Check the Agent Report
 
@@ -410,7 +411,7 @@ sequenceDiagram
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
     participant ImageAgent as CarImageAnalysisAgent
-    participant FeedbackWF as FeedbackWorkflow
+    participant FeedbackWF as FeedbackAnalysisWorkflow
 
     User->>UI: Enter feedback + upload image
     UI->>REST: POST multipart (feedback + image)
@@ -429,11 +430,11 @@ sequenceDiagram
     Note over Workflow,FeedbackWF: Parallel Analysis (Step 2)
     Workflow->>FeedbackWF: Uses enriched rentalFeedback
     par Concurrent Execution
-        FeedbackWF->>FeedbackWF: CleaningFeedbackAgent
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.cleaning()
     and
-        FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.maintenance()
     and
-        FeedbackWF->>FeedbackWF: DispositionFeedbackAgent
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.disposition()
     end
     end
 

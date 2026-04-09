@@ -1,11 +1,10 @@
 package com.carmanagement.agentic.agents;
 
 import com.carmanagement.model.CarConditions;
+import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-
-import java.util.Map;
 
 /**
  * Agent that analyzes feedback to determine the final car condition and assignment.
@@ -23,10 +22,10 @@ public interface CarConditionFeedbackAgent {
         }
         
         Rules:
-        - carAssignment: Check the ACTUAL DispositionAgent decision in supervisorDecision, not just the request
+        - carAssignment: Check the ACTUAL DispositionAgent decision in supervisorDecision, not just the analysis
         - If supervisorDecision mentions SCRAP/SELL/DONATE (but NOT KEEP) → DISPOSITION
-        - Else if maintenanceRequest ≠ "MAINTENANCE_NOT_REQUIRED" → MAINTENANCE
-        - Else if cleaningRequest ≠ "CLEANING_NOT_REQUIRED" → CLEANING
+        - Else if maintenanceAnalysis ≠ "MAINTENANCE_NOT_REQUIRED" → MAINTENANCE
+        - Else if cleaningAnalysis ≠ "CLEANING_NOT_REQUIRED" → CLEANING
         - Else → NONE
         - IMPORTANT: If DispositionAgent decided KEEP, do NOT assign DISPOSITION - check maintenance/cleaning instead
         - generalCondition: Summarize the action and reason
@@ -36,10 +35,10 @@ public interface CarConditionFeedbackAgent {
             
             Supervisor Decision: {supervisorDecision}
             
-            Requests:
-            - Disposition: {feedbackRequests.dispositionRequest}
-            - Maintenance: {feedbackRequests.maintenanceRequest}
-            - Cleaning: {feedbackRequests.cleaningRequest}
+            Feedback Analysis Results:
+            - Disposition: {feedbackAnalysisResults.dispositionAnalysis}
+            - Maintenance: {feedbackAnalysisResults.maintenanceAnalysis}
+            - Cleaning: {feedbackAnalysisResults.cleaningAnalysis}
             """)
     @Agent(description = "Final car condition analyzer. Determines the car's condition and assignment based on all feedback.",
             outputKey = "carConditions")
@@ -49,6 +48,6 @@ public interface CarConditionFeedbackAgent {
             Integer carYear,
             Integer carNumber,
             String carCondition,
-            Map<String, String> feedbackRequests,
+            FeedbackAnalysisResults feedbackAnalysisResults,
             String supervisorDecision);
 }

@@ -1,16 +1,19 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
 
-import java.util.Map;
-
 /**
  * Supervisor agent that orchestrates the entire car processing workflow.
- * Coordinates feedback analysis agents and action agents based on car condition.
+ * Coordinates action agents based on analysis results of the car condition.
  */
 public interface FleetSupervisorAgent {
 
+    /**
+     * Main method to coordinate car processing based on feedback.
+     * This is the entry point for the supervisor agent.
+     */
     @SupervisorAgent(
             outputKey = "supervisorDecision",
             subAgents = {
@@ -29,9 +32,24 @@ public interface FleetSupervisorAgent {
             String rentalFeedback,
             String cleaningFeedback,
             String maintenanceFeedback,
-            Map<String, String> feedbackRequests
+            FeedbackAnalysisResults feedbackAnalysisResults
     );
 
+    /**
+     * Generates the supervisor request prompt based on feedback analysis results.
+     * This method examines the disposition analysis to determine if the car requires
+     * disposition (removal from fleet) and constructs appropriate instructions for
+     * the supervisor agent to coordinate the necessary action agents.
+     *
+     * @param carMake The make of the car
+     * @param carModel The model of the car
+     * @param carYear The year of the car
+     * @param carNumber The car's identification number
+     * @param carCondition The current condition description
+     * @param feedbackAnalysisResults The results from parallel feedback analysis
+     * @param rentalFeedback The original rental feedback
+     * @return A formatted prompt instructing the supervisor which agents to invoke
+     */
     @SupervisorRequest
     static String request(
             String carMake,
@@ -39,15 +57,11 @@ public interface FleetSupervisorAgent {
             Integer carYear,
             Integer carNumber,
             String carCondition,
-            Map<String, String> feedbackRequests,
+            FeedbackAnalysisResults feedbackAnalysisResults,
             String rentalFeedback
     ) {
-        String cleaningRequest = feedbackRequests.get("cleaningRequest");
-        String maintenanceRequest = feedbackRequests.get("maintenanceRequest");
-        String dispositionRequest = feedbackRequests.get("dispositionRequest");
-
-        boolean dispositionRequired = dispositionRequest != null &&
-                dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
+        boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
+                feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
 
         String noDispositionMessage = """
                No disposition has been requested.
@@ -80,9 +94,9 @@ public interface FleetSupervisorAgent {
             You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.
             
             The feedback has already been analyzed and you have these inputs:
-            - cleaningRequest: What cleaning is needed (or "CLEANING_NOT_REQUIRED")
-            - maintenanceRequest: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
-            - dispositionRequest: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
+            - cleaningAnalysis: What cleaning is needed (or "CLEANING_NOT_REQUIRED")
+            - maintenanceAnalysis: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
+            - dispositionAnalysis: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
             
             Your job is to invoke the appropriate ACTION agents for this car
             
@@ -90,14 +104,16 @@ public interface FleetSupervisorAgent {
             Current Condition: %s
             Rental Feedback: %s
             
-            Cleaning Request: %s
-            Maintenance Request: %s
+            Cleaning Analysis: %s
+            Maintenance Analysis: %s
             
             In particular, your have to follow these steps
             
             %s
             """,
                 carYear, carMake, carModel, carNumber, carCondition, rentalFeedback,
-                cleaningRequest, maintenanceRequest, dispositionRequired ? dispositionMessage : noDispositionMessage);
+                feedbackAnalysisResults.cleaningAnalysis(),
+                feedbackAnalysisResults.maintenanceAnalysis(),
+                dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }

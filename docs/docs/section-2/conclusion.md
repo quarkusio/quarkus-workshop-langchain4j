@@ -74,12 +74,17 @@ You learned how to build **autonomous, context-aware orchestration** using super
 
 **What you built:**
 - `FleetSupervisorAgent`: AI-driven supervisor using `@SupervisorAgent` annotation
+- `FeedbackAnalysisAgent`: A unified feedback analyzer driven by `FeedbackTask` configurations
+- `FeedbackAnalysisWorkflow`: A parallel mapper workflow that runs the same agent for cleaning, maintenance, and disposition analysis
 - `PricingAgent`: Vehicle valuation specialist
 - Adaptive workflow that adjusts based on business conditions
 
 **Key concepts:**
 - **Supervisor pattern**: AI agents that orchestrate other agents
 - **Autonomous orchestration**: Supervisor decides which agents to invoke
+- **Parameterized parallel analysis**: One feedback agent runs multiple times with different task definitions
+- **`@ParallelMapperAgent`**: A workflow pattern for invoking the same agent in parallel across a list of items
+- **`@Output` transformation**: Parallel workflow results are reshaped into a structured record for downstream agents
 - **Context-aware routing**: Decisions based on multiple factors (demand, condition, value)
 - **Flexible business logic**: Adjust behavior via prompts, not code changes
 
@@ -236,7 +241,7 @@ Input ├─ Agent B ─┤ → Combined Output
 
 **When to use:** Independent analyses that can run concurrently
 
-**Example:** `FeedbackWorkflow` running wash, maintenance, and disposition analysis
+**Example:** `FeedbackAnalysisWorkflow` running `FeedbackAnalysisAgent` in parallel with cleaning, maintenance, and disposition task configurations
 
 ---
 
@@ -297,7 +302,7 @@ Local Agent (client) → A2A Protocol → Remote Agent (server)
 
 **When to use:** Cross-system integration, team independence, specialized services
 
-**Example:** `DispositionAgent` calling remote disposition service
+**Example:** `PricingAgent` calling a remote pricing service
 
 ---
 

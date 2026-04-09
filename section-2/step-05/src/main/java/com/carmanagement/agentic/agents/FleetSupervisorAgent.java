@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
 
@@ -30,9 +31,7 @@ public interface FleetSupervisorAgent {
         String rentalFeedback,
         String cleaningFeedback,
         String maintenanceFeedback,
-        String cleaningRequest,
-        String maintenanceRequest,
-        String dispositionRequest
+        FeedbackAnalysisResults feedbackAnalysisResults
     );
 
     @SupervisorRequest()
@@ -42,13 +41,11 @@ public interface FleetSupervisorAgent {
         Integer carYear,
         Integer carNumber,
         String carCondition,
-        String cleaningRequest,
-        String maintenanceRequest,
-        String dispositionRequest,
+        FeedbackAnalysisResults feedbackAnalysisResults,
         String rentalFeedback
     ) {
-        boolean dispositionRequired = dispositionRequest != null &&
-                                     dispositionRequest.toUpperCase().contains("DISPOSITION_REQUIRED");
+        boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
+                                     feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
         
         String noDispositionMessage = """
             Disposition is not required. 
@@ -78,9 +75,9 @@ public interface FleetSupervisorAgent {
             You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.
             
             The feedback has already been analyzed and you have these inputs:
-            - cleaningRequest: What cleaning is needed (or "CLEANING_NOT_REQUIRED")
-            - maintenanceRequest: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
-            - dispositionRequest: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
+            - cleaningAnalysis: What cleaning is needed (or "CLEANING_NOT_REQUIRED")
+            - maintenanceAnalysis: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")
+            - dispositionAnalysis: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")
             
             Your job is to invoke the appropriate ACTION agents for this car
             
@@ -90,11 +87,11 @@ public interface FleetSupervisorAgent {
             
             Rental Feedback: """ + rentalFeedback + """
             
-            Cleaning Request: """ + cleaningRequest + """
+            Cleaning Analysis: """ + feedbackAnalysisResults.cleaningAnalysis() + """
             
-            Maintenance Request: """ + maintenanceRequest + """
+            Maintenance Analysis: """ + feedbackAnalysisResults.maintenanceAnalysis() + """
             
-            Disposition Request: """ + (dispositionRequired ? dispositionMessage : noDispositionMessage);
+            Disposition Analysis: """ + (dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
 
