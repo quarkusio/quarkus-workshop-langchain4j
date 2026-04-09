@@ -198,12 +198,10 @@ Create [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/ste
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"
 ```
 
-Each factory method returns a configured [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) with four important pieces of data:
+Each factory method returns a configured [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) with two important pieces of data:
 
-- the feedback type
+- the feedback type (for identification and debugging)
 - the system instructions to use for that analysis
-- the output key that identifies the result in the workflow
-- the sentinel value used when no action is required
 
 This design keeps the agent generic and moves the task-specific behavior into data. If you ever want to add another feedback dimension later, you can usually start by adding another task factory rather than introducing another near-identical agent.
 
@@ -217,11 +215,7 @@ In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java"
 ```
 
-There are two details worth paying attention to here.
-
-The first is the system message. Instead of hardcoding the instructions in the agent itself, the agent uses `{task.systemInstructions}`. That means the same agent can behave like a cleaning analyzer, a maintenance analyzer, or a disposition analyzer depending on the [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) that was passed in.
-
-The second is the agent output key. The annotation uses `{task.outputKey}`, so each invocation writes its result under the correct logical name for that task.
+The key detail here is the system message. Instead of hardcoding the instructions in the agent itself, the agent uses `{task.systemInstructions}`. That means the same agent can behave like a cleaning analyzer, a maintenance analyzer, or a disposition analyzer depending on the [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) that was passed in.
 
 This is the core of the refactoring: one agent, multiple task configurations.
 

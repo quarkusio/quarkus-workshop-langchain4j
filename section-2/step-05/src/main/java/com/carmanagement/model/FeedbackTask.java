@@ -2,13 +2,11 @@ package com.carmanagement.model;
 
 /**
  * Record representing a feedback analysis task with its configuration.
- * Contains the type of feedback, system instructions, output key, and sentinel value.
+ * Contains the type of feedback and system instructions for the analysis.
  */
 public record FeedbackTask(
         FeedbackType feedbackType,
-        String systemInstructions,
-        String outputKey,
-        String notRequiredValue) {
+        String systemInstructions) {
 
     /**
      * Factory method for creating a cleaning feedback task.
@@ -23,9 +21,7 @@ public record FeedbackTask(
                 Be specific about what type of cleaning is needed (exterior, interior, detailing, waxing).
                 If no interior or exterior car cleaning services are needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".
                 Include the reason for your choice but keep your response short.
-                """,
-                "cleaningRequest",
-                "CLEANING_NOT_REQUIRED"
+                """
         );
     }
 
@@ -43,9 +39,7 @@ public record FeedbackTask(
                 Be specific about what type of maintenance is needed (oil change, tire rotation, brake service, engine service, transmission service, body work).
                 If no service of any kind, repairs or maintenance are needed, respond with "MAINTENANCE_NOT_REQUIRED".
                 Include the reason for your choice but keep your response short.
-                """,
-                "maintenanceRequest",
-                "MAINTENANCE_NOT_REQUIRED"
+                """
         );
     }
 
@@ -71,9 +65,7 @@ public record FeedbackTask(
                 "DISPOSITION_NOT_REQUIRED"
                 
                 Keep your response concise.
-                """,
-                "dispositionRequest",
-                "DISPOSITION_NOT_REQUIRED"
+                """
         );
     }
 }

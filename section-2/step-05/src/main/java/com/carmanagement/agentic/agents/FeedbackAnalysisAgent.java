@@ -25,7 +25,7 @@ public interface FeedbackAnalysisAgent {
         Maintenance Feedback: {maintenanceFeedback}
         """)
     @Agent(description = "Feedback analyzer. Using feedback, determines if action is needed based on task type.",
-            outputKey = "{task.outputKey}")
+            outputKey = "feedbackAnalysis")
     String analyzeFeedback(
             FeedbackTask task,
             String carMake,
