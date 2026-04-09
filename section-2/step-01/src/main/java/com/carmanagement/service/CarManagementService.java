@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackContext;
 
 /**
  * Service for managing car returns from various operations.
@@ -33,14 +34,11 @@ public class CarManagementService {
             return "Car not found with number: " + carNumber;
         }
 
+        // Create feedback context
+        FeedbackContext feedback = new FeedbackContext(rentalFeedback, cleaningFeedback);
+
         // Process the car result
-        String result = cleaningAgent.processCleaning(
-                carInfo.make,
-                carInfo.model,
-                carInfo.year,
-                carNumber,
-                rentalFeedback != null ? rentalFeedback : "",
-                cleaningFeedback != null ? cleaningFeedback : "");
+        String result = cleaningAgent.processCleaning(carInfo, carNumber, feedback);
 
         if (result.toUpperCase().contains("CLEANING_NOT_REQUIRED")) {
             carInfo.status = CarStatus.AVAILABLE;

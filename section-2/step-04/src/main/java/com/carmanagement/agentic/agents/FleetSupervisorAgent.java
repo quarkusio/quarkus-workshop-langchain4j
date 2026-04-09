@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
@@ -24,14 +25,8 @@ public interface FleetSupervisorAgent {
             }
     )
     String superviseCarProcessing(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback,
-            String maintenanceFeedback,
             FeedbackAnalysisResults feedbackAnalysisResults
     );
 
@@ -52,13 +47,9 @@ public interface FleetSupervisorAgent {
      */
     @SupervisorRequest
     static String request(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            FeedbackAnalysisResults feedbackAnalysisResults,
-            String rentalFeedback
+            FeedbackAnalysisResults feedbackAnalysisResults
     ) {
         boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
                 feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
@@ -102,7 +93,6 @@ public interface FleetSupervisorAgent {
             
             Car: %d %s %s (#%d)
             Current Condition: %s
-            Rental Feedback: %s
             
             Cleaning Analysis: %s
             Maintenance Analysis: %s
@@ -111,7 +101,7 @@ public interface FleetSupervisorAgent {
             
             %s
             """,
-                carYear, carMake, carModel, carNumber, carCondition, rentalFeedback,
+                carInfo.year, carInfo.make, carInfo.model, carNumber, carInfo.condition,
                 feedbackAnalysisResults.cleaningAnalysis(),
                 feedbackAnalysisResults.maintenanceAnalysis(),
                 dispositionRequired ? dispositionMessage : noDispositionMessage);

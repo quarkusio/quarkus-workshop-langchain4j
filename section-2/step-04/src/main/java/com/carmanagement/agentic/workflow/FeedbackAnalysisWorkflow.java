@@ -1,7 +1,9 @@
 package com.carmanagement.agentic.workflow;
 
 import com.carmanagement.agentic.agents.FeedbackAnalysisAgent;
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
+import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.ParallelMapperAgent;
@@ -28,14 +30,9 @@ public interface FeedbackAnalysisWorkflow {
     // --8<-- [end:parallel-mapper-agent]
     List<String> analyzeFeedback(
             List<FeedbackTask> tasks,
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback,
-            String maintenanceFeedback);
+            FeedbackContext feedback);
 
     /**
      * Output method that transforms the parallel feedback results into a structured object.

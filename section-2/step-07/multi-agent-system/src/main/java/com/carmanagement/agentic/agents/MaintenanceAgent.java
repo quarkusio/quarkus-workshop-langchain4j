@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.agentic.Agent;
@@ -28,9 +29,9 @@ public interface MaintenanceAgent {
         """)
     @UserMessage("""
         Car Information:
-        Make: {carMake}
-        Model: {carModel}
-        Year: {carYear}
+        Make: {carInfo.make}
+        Model: {carInfo.model}
+        Year: {carInfo.year}
         Car Number: {carNumber}
         
         Maintenance Request:
@@ -39,9 +40,7 @@ public interface MaintenanceAgent {
     @Agent(description = "Car maintenance specialist. Using car information and request, determines what maintenance services are needed.",
             outputKey = "analysisResult")
     String processMaintenance(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
             String maintenanceRequest);
 }

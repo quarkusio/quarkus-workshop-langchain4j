@@ -3,6 +3,8 @@ package com.carmanagement.agentic.workflow;
 import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
 import com.carmanagement.agentic.agents.FleetSupervisorAgent;
 import com.carmanagement.model.CarConditions;
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
@@ -29,14 +31,9 @@ public interface CarProcessingWorkflow extends MonitoredAgent {
     // --8<-- [end:sequence-agent]
     CarConditions processCarReturn(
             List<FeedbackTask> tasks,
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback,
-            String maintenanceFeedback);
+            FeedbackContext feedbackContext);
 
     @Output
     static CarConditions output(CarConditions carConditions) {

@@ -8,6 +8,7 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackContext;
 import io.quarkus.logging.Log;
 
 /**
@@ -40,16 +41,11 @@ public class CarManagementService {
         Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
         Log.info("CarAssignmentWorkflow evaluating conditions...");
         
-        // Process the car return using the workflow and get the AgenticScope
-        CarConditions carConditions = carProcessingWorkflow.processCarReturn(
-                carInfo.make,
-                carInfo.model,
-                carInfo.year,
-                carNumber,
-                carInfo.condition,
-                rentalFeedback != null ? rentalFeedback : "",
-                cleaningFeedback != null ? cleaningFeedback : "",
-                maintenanceFeedback != null ? maintenanceFeedback : "");
+        // Create feedback context
+        FeedbackContext feedback = new FeedbackContext(rentalFeedback, cleaningFeedback, maintenanceFeedback);
+        
+        // Process the car return using the workflow
+        CarConditions carConditions = carProcessingWorkflow.processCarReturn(carInfo, carNumber, feedback);
 
         Log.info("CarConditionFeedbackAgent updating...");
         

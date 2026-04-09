@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -9,7 +10,7 @@ import dev.langchain4j.service.UserMessage;
  */
 public interface CarConditionFeedbackAgent {
 
-    @SystemMessage("""       
+    @SystemMessage("""
         You are a car condition analyzer for a car rental company. Your job is to determine the current condition of a car based on feedback.
         Analyze all feedback and the previous car condition to provide an updated condition description.
         Always provide a very short (no more than 200 characters) condition description, even if there's minimal feedback.
@@ -17,10 +18,10 @@ public interface CarConditionFeedbackAgent {
         """)
     @UserMessage("""
             Car Information:
-            Make: {carMake}
-            Model: {carModel}
-            Year: {carYear}
-            Previous Condition: {carCondition}
+            Make: {carInfo.make}
+            Model: {carInfo.model}
+            Year: {carInfo.year}
+            Previous Condition: {carInfo.condition}
             
             Feedback from other agents:
             Cleaning Recommendation: {cleaningRequest}
@@ -29,11 +30,8 @@ public interface CarConditionFeedbackAgent {
     @Agent(description = "Car condition analyzer. Determines the current condition of a car based on feedback.",
             outputKey = "carCondition")
     String analyzeForCondition(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
             String cleaningRequest,
             String maintenanceRequest);
 }

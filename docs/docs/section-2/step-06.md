@@ -55,6 +55,14 @@ Rather than creating a separate "image analysis" output, the `CarImageAnalysisAg
 
 This is elegant because it preserves the existing workflow structure while adding new capabilities.
 
+**Why ImageContent Stays Separate:**
+
+You might notice that `ImageContent` is passed as a separate parameter rather than being added to `FeedbackContext`. This is intentional:
+
+- `ImageContent` is a special LangChain4j type for multimodal AI, not simple data
+- It's only used by the image analysis agent, not by other agents in the workflow
+- Keeping it separate maintains the clean separation between feedback data (in `FeedbackContext`) and multimodal content (as `ImageContent`)
+
 ---
 
 ## What Are We Going to Build?

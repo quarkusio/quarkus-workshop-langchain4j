@@ -375,17 +375,22 @@ The workflow method signature defines **all the inputs** needed by any agent in 
 
 ```java
 CarConditions processCarReturn(
-    String carMake,
-    String carModel,
-    Integer carYear,
+    CarInfo carInfo,
     Integer carNumber,
-    String carCondition,
-    String rentalFeedback,
-    String cleaningFeedback
+    FeedbackContext feedbackContext
 )
 ```
 
-These parameters are automatically populated into the `AgenticScope` when the workflow is invoked.
+These parameters are automatically populated into the `AgenticScope` when the workflow is invoked. By using context objects (`CarInfo` and `FeedbackContext`), we keep the workflow signature clean and maintainable even as the system grows more complex.
+
+**Context Objects in AgenticScope:**
+
+When you pass context objects to a workflow, the `AgenticScope` stores them as-is. Agents can then access fields within these objects using dot notation in their `@UserMessage` templates:
+
+- `{carInfo.make}` accesses the `make` field of the `CarInfo` object
+- `{feedbackContext.rentalFeedback}` accesses the `rentalFeedback` field of the `FeedbackContext` record
+
+This pattern reduces the number of parameters flowing through the system from 7+ individual values to just 3 meaningful objects.
 
 ### `@Output`
 

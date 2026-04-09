@@ -3,6 +3,8 @@ package com.carmanagement.agentic.workflow;
 import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
 import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.model.CarConditions;
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
 
@@ -18,13 +20,9 @@ public interface CarProcessingWorkflow {
             outputKey = "carConditions",
             subAgents = { CleaningAgent.class, CarConditionFeedbackAgent.class })
     CarConditions processCarReturn(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback);
+            FeedbackContext feedback);
 
     @Output
     static CarConditions output(String carCondition, String cleaningAgentResult) {

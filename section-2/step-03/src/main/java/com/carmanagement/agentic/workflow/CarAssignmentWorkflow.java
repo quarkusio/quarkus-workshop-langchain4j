@@ -2,6 +2,7 @@ package com.carmanagement.agentic.workflow;
 
 import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.agentic.agents.MaintenanceAgent;
+import com.carmanagement.model.CarInfo;
 import dev.langchain4j.agentic.declarative.ActivationCondition;
 import dev.langchain4j.agentic.declarative.ConditionalAgent;
 
@@ -17,11 +18,8 @@ public interface CarAssignmentWorkflow {
     @ConditionalAgent(outputKey = "analysisResult",
             subAgents = { MaintenanceAgent.class,  CleaningAgent.class })
     String processAction(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
             String cleaningRequest,
             String maintenanceRequest);
 

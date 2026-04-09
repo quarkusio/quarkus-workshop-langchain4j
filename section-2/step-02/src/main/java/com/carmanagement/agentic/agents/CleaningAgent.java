@@ -3,6 +3,8 @@ package com.carmanagement.agentic.agents;
 import io.quarkiverse.langchain4j.ToolBox;
 
 import com.carmanagement.agentic.tools.CleaningTool;
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -23,25 +25,22 @@ public interface CleaningAgent {
         If no cleaning is needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".
         
         Car Information:
-        Make: {carMake}
-        Model: {carModel}
-        Year: {carYear}
+        Make: {carInfo.make}
+        Model: {carInfo.model}
+        Year: {carInfo.year}
         Car Number: {carNumber}
         
         Feedback:
-        Rental Feedback: {rentalFeedback}
-        Cleaning Feedback: {cleaningFeedback}
+        Rental Feedback: {feedback.rentalFeedback}
+        Cleaning Feedback: {feedback.cleaningFeedback}
         """)
     @Agent(outputKey = "cleaningAgentResult",
             description = "Cleaning specialist. Determines what cleaning services are needed.")
     @ToolBox(CleaningTool.class)
     String processCleaning(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String rentalFeedback,
-            String cleaningFeedback);
+            FeedbackContext feedback);
 }
 
 
