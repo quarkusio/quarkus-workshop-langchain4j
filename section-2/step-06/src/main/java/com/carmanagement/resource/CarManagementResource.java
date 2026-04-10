@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 import org.jboss.resteasy.reactive.RestForm;
-import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import dev.langchain4j.data.message.ImageContent;
@@ -22,6 +21,7 @@ import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.service.CarManagementService;
 
 /**
@@ -35,69 +35,45 @@ public class CarManagementResource {
     CarManagementService carManagementService;
     
     /**
-     * Process a car return from rental.
+     * Process a car return from any status (rental, cleaning, or maintenance).
+     * Routes feedback to the appropriate parameter based on the car's current status.
      * This is a blocking operation due to AI agent processing.
      *
      * @param carNumber The car number
-     * @param rentalFeedback Optional rental feedback
+     * @param feedback Optional feedback about the return
      * @param carImage Optional image of the car being returned (multipart form data)
      * @return Uni that completes with the result
      */
     @POST
-    @Path("/rental-return/{carNumber}")
+    @Path("/return/{carNumber}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Blocking
-    public Uni<Response> processRentalReturn(Integer carNumber, @RestForm String rentalFeedback, @RestForm FileUpload carImage) {
+    public Uni<Response> processReturn(Integer carNumber, @RestForm String feedback, @RestForm FileUpload carImage) {
         ImageContent imageContent = toImageContent(carImage);
 
-        return carManagementService.processCarReturn(carNumber, rentalFeedback, "", "", imageContent)
+        // Route feedback based on the car's current status
+        CarInfo car = CarInfo.findById(carNumber);
+        String rentalFeedback = "", cleaningFeedback = "", maintenanceFeedback = "";
+        if (car != null) {
+            switch (car.status) {
+                case RENTED:
+                    rentalFeedback = feedback != null ? feedback : "";
+                    break;
+                case AT_CLEANING:
+                    cleaningFeedback = feedback != null ? feedback : "";
+                    break;
+                case IN_MAINTENANCE:
+                    maintenanceFeedback = feedback != null ? feedback : "";
+                    break;
+            }
+        }
+
+        return carManagementService.processCarReturn(carNumber, rentalFeedback, cleaningFeedback, maintenanceFeedback, imageContent)
             .onItem().transform(result -> Response.ok(result).build())
             .onFailure().recoverWithItem(e -> {
                 Log.error(e.getMessage(), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Error processing rental return: " + e.getMessage())
-                        .build();
-            });
-    }
-    
-    /**
-     * Process a car return from cleaning.
-     *
-     * @param carNumber The car number
-     * @param cleaningFeedback Optional cleaning feedback
-     * @return Uni that completes with the result
-     */
-    @POST
-    @Path("/cleaningReturn/{carNumber}")
-    public Uni<Response> processCleaningReturn(Integer carNumber, @RestQuery String cleaningFeedback) {
-        
-        return carManagementService.processCarReturn(carNumber, "", cleaningFeedback, "", EMPTY_IMAGE)
-            .onItem().transform(result -> Response.ok(result).build())
-            .onFailure().recoverWithItem(e -> {
-                Log.error(e.getMessage(), e);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Error processing cleaning return: " + e.getMessage())
-                        .build();
-            });
-    }
-    
-    /**
-     * Process a car return from maintenance.
-     *
-     * @param carNumber The car number
-     * @param maintenanceFeedback Optional maintenance feedback
-     * @return Uni that completes with the result
-     */
-    @POST
-    @Path("/maintenance-return/{carNumber}")
-    public Uni<Response> processMaintenanceReturn(Integer carNumber, @RestQuery String maintenanceFeedback) {
-        
-        return carManagementService.processCarReturn(carNumber, "", "", maintenanceFeedback, EMPTY_IMAGE)
-            .onItem().transform(result -> Response.ok(result).build())
-            .onFailure().recoverWithItem(e -> {
-                Log.error(e.getMessage(), e);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Error processing maintenance return: " + e.getMessage())
+                        .entity("Error processing car return: " + e.getMessage())
                         .build();
             });
     }

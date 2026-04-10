@@ -82,7 +82,7 @@ Once started, open your browser to [http://localhost:8080](http://localhost:8080
 The application has two main sections:
 
 1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status.
-2. **Returns** (bottom): Displays cars that are currently rented or being cleaned.
+2. **Action** column: For rented or cleaning cars, provides an inline feedback form to process returns.
 
 ![Agentic App UI](../images/agentic-UI-1.png){: .center}
 
@@ -94,7 +94,7 @@ Let's see the agent in action!
 
 ### Test 1: Car Needs Cleaning
 
-Act as a rental team member processing a car return. In the **Returns > Rental Return** section, select a car and enter this feedback:
+Act as a rental team member processing a car return. In the **Fleet Status** grid, find a rented car and enter this feedback in its **Action** column:
 
 ```
 Car has dog hair all over the back seat
@@ -198,9 +198,9 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 **Key Points:**
 
-- The `processRentalReturn` method (endpoint `/car-management/rental-return/{carNumber}`):  Accepts feedback from the rental team
-- The `processCleaningReturn` method (endpoint `/car-management/cleaningReturn/{carNumber}`): Accepts feedback from the cleaning team
-- Both endpoints delegate to `CarManagementService.processCarReturn`
+- The `processReturn` method (endpoint `/car-management/return/{carNumber}`): Accepts feedback and routes it based on the car's current status
+- Looks up the car via `CarInfo.findById` to determine which type of feedback to pass
+- Delegates to `CarManagementService.processCarReturn`
 
 ---
 
@@ -357,7 +357,7 @@ sequenceDiagram
     participant LLM as OpenAI LLM
     participant Tool as CleaningTool
 
-    User->>REST: POST /rental-return/6<br/>feedback: "Dog hair in back seat"
+    User->>REST: POST /return/6<br/>feedback: "Dog hair in back seat"
     REST->>Service: processCarReturn(6, "Dog hair...", "")
     Service->>Agent: processCleaning(...)
     Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #6, feedback: "Dog hair..."
@@ -382,7 +382,7 @@ sequenceDiagram
     participant Agent as CleaningAgent
     participant LLM as OpenAI LLM
 
-    User->>REST: POST /rental-return/3<br/>feedback: "Car looks good"
+    User->>REST: POST /return/3<br/>feedback: "Car looks good"
     REST->>Service: processCarReturn(3, "Car looks good", "")
     Service->>Agent: processCleaning(...)
     Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #3, feedback: "Car looks good"

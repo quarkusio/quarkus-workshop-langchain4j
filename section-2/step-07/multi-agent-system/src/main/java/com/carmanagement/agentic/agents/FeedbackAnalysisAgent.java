@@ -22,9 +22,9 @@ public interface FeedbackAnalysisAgent {
         Previous Condition: {carInfo.condition}
         
         Feedback:
-        Rental Feedback: {feedbackContext.rentalFeedback}
-        Cleaning Feedback: {feedbackContext.cleaningFeedback}
-        Maintenance Feedback: {feedbackContext.maintenanceFeedback}
+        Rental Feedback: {feedback.rentalFeedback}
+        Cleaning Feedback: {feedback.cleaningFeedback}
+        Maintenance Feedback: {feedback.maintenanceFeedback}
         """)
     @Agent(description = "Feedback analyzer. Using feedback, determines if action is needed based on task type.",
             outputKey = "feedbackAnalysis")
@@ -32,5 +32,5 @@ public interface FeedbackAnalysisAgent {
             FeedbackTask task,
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedbackContext);
+            FeedbackContext feedback);
 }

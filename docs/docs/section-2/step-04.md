@@ -500,7 +500,7 @@ flowchart TD
 
 #### Scenario 2: Total Loss
 
-Enter the following text in the **Ford F-150** feedback field from the Maintenance Returns tab:
+Enter the following text in the **Ford F-150** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 The car is totaled after a major accident, completely inoperable
@@ -573,7 +573,7 @@ flowchart TD
 
 #### Scenario 4: Minor Issues
 
-Enter the following text in the **BMW X5** feedback field (in the Maintenance Return tab):
+Enter the following text in the **BMW X5** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 Car is dirty, needs cleaning

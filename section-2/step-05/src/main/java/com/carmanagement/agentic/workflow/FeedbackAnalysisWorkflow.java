@@ -32,7 +32,7 @@ public interface FeedbackAnalysisWorkflow {
             List<FeedbackTask> tasks,
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedbackContext);
+            FeedbackContext feedback);
 
     /**
      * Output method that transforms the parallel feedback results into a structured object.

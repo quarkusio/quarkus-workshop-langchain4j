@@ -289,7 +289,7 @@ flowchart TD
 
 #### Scenario 3: Maintenance Return
 
-Now use the "Maintenance Return" tab and enter in the For F-150 field:
+Find the Ford F-150 (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
 
 ```text
 Fixed the brakes, car could use a wash now

@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.service.SystemMessage;
@@ -25,9 +26,9 @@ public interface CarImageAnalysisAgent {
         In any cases the returned response MUST be a single sentence.
         """)
     @UserMessage("""
-        Rental Feedback: {rentalFeedback}
+        Rental Feedback: {feedback.rentalFeedback}
         """)
     @Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
             outputKey = "rentalFeedback")
-    String analyzeCarImage(String rentalFeedback, @UserMessage ImageContent carImage);
+    String analyzeCarImage(FeedbackContext feedback, @UserMessage ImageContent carImage);
 }

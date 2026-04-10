@@ -16,39 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for form submissions and tabs
     setupEventListeners();
     
-    // Set up tab functionality
-    setupTabs();
-    
     // Set up sorting functionality
     setupSorting();
 });
-
-// Function to set up tab functionality
-function setupTabs() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and content
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Add active class to clicked button
-            button.classList.add('active');
-            
-            // Show corresponding content
-            const tabId = button.getAttribute('data-tab');
-            const tabContent = document.getElementById(tabId + '-section');
-            if (tabContent) {
-                tabContent.classList.add('active');
-            }
-        });
-    });
-}
 
 // Function to load all cars from the API
 function loadAllCars() {
@@ -68,8 +38,6 @@ function loadAllCars() {
             
             // Process the cars data
             populateFleetStatusTable(carsData);
-            populateRentalReturnTable(carsData.filter(car => car.status === 'RENTED'));
-            populateCleaningTable(carsData.filter(car => car.status === 'AT_CLEANING'));
         })
         .catch(error => {
             console.error('Error fetching cars:', error);
@@ -195,10 +163,10 @@ function populateFleetStatusTable(cars) {
         tableBody.innerHTML = '<tr><td colspan="6">No cars match your filter criteria</td></tr>';
         return;
     }
-    
+
     filteredCars.forEach(car => {
         const row = document.createElement('tr');
-        
+
         // Highlight the row if it was just updated
         if (car.id === lastUpdatedCarId) {
             row.classList.add('highlight-row');
@@ -207,147 +175,65 @@ function populateFleetStatusTable(cars) {
                 lastUpdatedCarId = null;
             }, 3000);
         }
-        
+
         // Get status pill class based on car status
         const statusPillClass = getStatusPillClass(car.status);
-        
+
+        // Build action column based on status
+        let actionCell = '<td></td>';
+        if (car.status === 'RENTED' || car.status === 'AT_CLEANING') {
+            actionCell = `
+                <td>
+                    <form onsubmit="processFeedback(event, ${car.id}, '${car.status}')">
+                        <input type="text" class="feedback-input" id="feedback-${car.id}" placeholder="Enter feedback">
+                        <button type="submit" class="return-button">Return</button>
+                    </form>
+                </td>
+            `;
+        }
+
         row.innerHTML = `
             <td>${car.id}</td>
             <td>${car.make}</td>
             <td>${car.model}</td>
             <td>${car.year}</td>
             <td><span class="status-pill ${statusPillClass}">${getStatusDisplay(car.status)}</span></td>
+            ${actionCell}
         `;
-        
+
         tableBody.appendChild(row);
     });
 }
 
-// Function to populate the Rental Return table
-function populateRentalReturnTable(cars) {
-    const tableBody = document.getElementById('rental-return-table-body');
-    tableBody.innerHTML = ''; // Clear existing rows
-    
-    if (cars.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6">No cars currently rented</td></tr>';
-        return;
-    }
-    
-    cars.forEach(car => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${car.id}</td>
-            <td>${car.make}</td>
-            <td>${car.model}</td>
-            <td>${car.year}</td>
-            <td>
-                <form id="rentalReturnForm" onsubmit="returnFromRental(event, ${car.id})">
-                    <input type="text" class="feedback-input" id="rental-feedback-${car.id}" placeholder="Enter feedback">
-                    <button type="submit" class="return-button">Return</button>
-                </form>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-}
-
-// Function to populate the Cleaning table
-function populateCleaningTable(cars) {
-    const tableBody = document.getElementById('cleaning-table-body');
-    tableBody.innerHTML = ''; // Clear existing rows
-    
-    if (cars.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6">No cars currently being cleaned</td></tr>';
-        return;
-    }
-    
-    cars.forEach(car => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${car.id}</td>
-            <td>${car.make}</td>
-            <td>${car.model}</td>
-            <td>${car.year}</td>
-            <td>
-                <form id="rentalReturnForm" onsubmit="returnFromCleaning(event, ${car.id})">
-                    <input type="text" class="feedback-input" id="cleaning-feedback-${car.id}" placeholder="Enter feedback">
-                    <button class="return-button">Return</button>
-                </form>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-}
-
-
-// Function to return a car from rental
-function returnFromRental(event, carId) {
+// Function to process feedback and return a car
+function processFeedback(event, carId, status) {
     event.preventDefault();
-    const feedback = document.getElementById(`rental-feedback-${carId}`).value;
-    const button = event.target.querySelector('button[type="submit"]');
-    
-    // Add loading state
-    button.disabled = true;
-    button.classList.add('loading');
-    const originalText = button.textContent;
-    button.textContent = 'Processing...';
-    
-    fetch(`/car-management/rental-return/${carId}?rentalFeedback=${encodeURIComponent(feedback)}`, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();
-    })
-    .then(data => {
-        lastUpdatedCarId = carId; // Mark this car for highlighting
-        showNotification('Car successfully returned from rental');
-        loadAllCars(); // Refresh all tables
-    })
-    .catch(error => {
-        console.error('Error returning car from rental:', error);
-        displayError('Failed to process rental return. Please try again.');
-        // Re-enable button on error
-        button.disabled = false;
-        button.classList.remove('loading');
-        button.textContent = originalText;
-    });
-}
-
-// Function to return a car from cleaning
-function returnFromCleaning(event, carId) {
-    event.preventDefault();
-    const feedback = document.getElementById(`cleaning-feedback-${carId}`).value;
+    const feedback = document.getElementById(`feedback-${carId}`).value;
     const button = event.target.querySelector('button');
-    
-    // Add loading state
+
     button.disabled = true;
     button.classList.add('loading');
     const originalText = button.textContent;
     button.textContent = 'Processing...';
-    
-    fetch(`/car-management/cleaningReturn/${carId}?cleaningFeedback=${encodeURIComponent(feedback)}`, {
-        method: 'POST'
-    })
+
+    const statusLabels = {
+        'RENTED': 'rental',
+        'AT_CLEANING': 'cleaning'
+    };
+
+    fetch(`/car-management/return/${carId}?feedback=${encodeURIComponent(feedback)}`, { method: 'POST' })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         return response.text();
     })
     .then(data => {
-        lastUpdatedCarId = carId; // Mark this car for highlighting
-        showNotification('Car successfully returned from cleaning');
-        loadAllCars(); // Refresh all tables
+        lastUpdatedCarId = carId;
+        showNotification(`Car successfully returned from ${statusLabels[status]}`);
+        loadAllCars();
     })
     .catch(error => {
-        console.error('Error returning car from cleaning:', error);
-        displayError('Failed to process cleaning return. Please try again.');
-        // Re-enable button on error
+        console.error(`Error returning car from ${statusLabels[status]}:`, error);
+        displayError(`Failed to process ${statusLabels[status]} return. Please try again.`);
         button.disabled = false;
         button.classList.remove('loading');
         button.textContent = originalText;

@@ -9,6 +9,7 @@ import org.jboss.resteasy.reactive.RestQuery;
 
 import io.quarkus.logging.Log;
 
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.service.CarManagementService;
 
 /**
@@ -16,50 +17,43 @@ import com.carmanagement.service.CarManagementService;
  */
 @Path("/car-management")
 public class CarManagementResource {
-    
+
     @Inject
     CarManagementService carManagementService;
-    
+
     /**
-     * Process a car return from rental.
-     * 
+     * Process a car return.
+     *
      * @param carNumber The car number
-     * @param rentalFeedback Optional rental feedback
+     * @param feedback Optional feedback
      * @return Result of the processing
      */
     @POST
-    @Path("/rental-return/{carNumber}")
-    public Response processRentalReturn(Integer carNumber, @RestQuery String rentalFeedback) {
-        
+    @Path("/return/{carNumber}")
+    public Response processReturn(Integer carNumber, @RestQuery String feedback) {
+
         try {
-            String result = carManagementService.processCarReturn(carNumber, rentalFeedback, "");
-            return Response.ok(result).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error processing rental return: " + e.getMessage())
-                    .build();
-        }
-    }
-    
-    /**
-     * Process a car return from cleaning.
-     * 
-     * @param carNumber The car number
-     * @param cleaningFeedback Optional cleaning feedback
-     * @return Result of the processing
-     */
-    @POST
-    @Path("/cleaningReturn/{carNumber}")
-    public Response processCleaningReturn(Integer carNumber, @RestQuery String cleaningFeedback) {
-        
-        try {
-            String result = carManagementService.processCarReturn(carNumber, "", cleaningFeedback);
+            CarInfo car = CarInfo.findById(carNumber);
+            String rentalFeedback = "";
+            String cleaningFeedback = "";
+
+            if (car != null) {
+                switch (car.status) {
+                    case RENTED:
+                        rentalFeedback = feedback != null ? feedback : "";
+                        break;
+                    case AT_CLEANING:
+                        cleaningFeedback = feedback != null ? feedback : "";
+                        break;
+                }
+            }
+
+            String result = carManagementService.processCarReturn(carNumber, rentalFeedback, cleaningFeedback);
             return Response.ok(result).build();
         } catch (Exception e) {
             Log.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error processing cleaning return: " + e.getMessage())
+                    .entity("Error processing return: " + e.getMessage())
                     .build();
         }
     }

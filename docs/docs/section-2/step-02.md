@@ -487,7 +487,7 @@ The **Fleet Status** section now has a **"Condition"** column showing each car's
 
 ### Test the Workflow
 
-In the `Returns > Rental Return` section, enter feedback that indicates a problem with a car:
+In the **Fleet Status** grid, find a rented car and enter feedback that indicates a problem:
 
 ```text
 there has clearly been a fire in the trunk of this car
