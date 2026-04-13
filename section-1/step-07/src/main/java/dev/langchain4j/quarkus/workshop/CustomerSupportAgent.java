@@ -15,6 +15,9 @@ public interface CustomerSupportAgent {
             You are friendly, polite and concise.
             If the question is unrelated to car rental, you should politely redirect the customer to the right department.
             
+            When calling tools or functions, strictly use JSON objects,
+            do not wrap in quotes or use plain strings.
+            
             Today is {current_date}.
             """)
     @ToolBox(BookingRepository.class)
