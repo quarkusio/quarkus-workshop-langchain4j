@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2467,33 +2467,34 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.data.message.ImageContent</span><span class="p">;</span>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="cm">/**</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="cm"> * Agent that analyzes a car image and enriches the rental feedback with visual observations.</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="cm"> * If no image is provided, the rental feedback is returned unchanged.</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="cm"> */</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarImageAnalysisAgent</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="s">        You are a car image analyst for a car rental company.</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s">        You will receive the current rental feedback for a car being returned.</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="s">        If an image of the car is provided, analyze it and rewrite the rental feedback taking count of</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="s">        your visual observations about the car's condition (e.g., visible damage, scratches, dents,</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">        cleanliness issues, tire condition, etc.).</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">        Avoid appending your visual observations in a separated section of the response, but combine</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="s">        the existing rental feedback, if present, with what you can see from the image in a single response.</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="s">        If no image is provided, or the image is empty or it doesn't seem related to a car,</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="s">        simply return the rental feedback exactly as it is, without any modification.</span>
-<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="s">        Your response must always include the original rental feedback text followed by your observations if any.</span>
-<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="s">        In any cases the returned response MUST be a single sentence.</span>
-<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="s">        Rental Feedback: {rentalFeedback}</span>
-<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car image analyzer. Enriches rental feedback with visual observations from a car image."</span><span class="p">,</span>
-<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"rentalFeedback"</span><span class="p">)</span>
-<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeCarImage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="nd">@UserMessage</span><span class="w"> </span><span class="n">ImageContent</span><span class="w"> </span><span class="n">carImage</span><span class="p">);</span>
-<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="p">}</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.V</span><span class="p">;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="cm">/**</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="cm"> * Agent that analyzes a car image and enriches the rental feedback with visual observations.</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="cm"> * If no image is provided, the rental feedback is returned unchanged.</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="cm"> */</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarImageAnalysisAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s">        You are a car image analyst for a car rental company.</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="s">        You will receive the current rental feedback for a car being returned.</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="s">        If an image of the car is provided, analyze it and rewrite the rental feedback taking count of</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">        your visual observations about the car's condition (e.g., visible damage, scratches, dents,</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">        cleanliness issues, tire condition, etc.).</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="s">        Avoid appending your visual observations in a separated section of the response, but combine</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="s">        the existing rental feedback, if present, with what you can see from the image in a single response.</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="s">        If no image is provided, or the image is empty or it doesn't seem related to a car,</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="s">        simply return the rental feedback exactly as it is, without any modification.</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="s">        Your response must always include the original rental feedback text followed by your observations if any.</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="s">        In any cases the returned response MUST be a single sentence.</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="s">        Rental Feedback: {rentalFeedback}</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car image analyzer. Enriches rental feedback with visual observations from a car image."</span><span class="p">,</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"rentalFeedback"</span><span class="p">)</span>
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeCarImage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="nd">@UserMessage</span><span class="w"> </span><span class="nd">@V</span><span class="p">(</span><span class="s">"carImage"</span><span class="p">)</span><span class="w"> </span><span class="n">ImageContent</span><span class="w"> </span><span class="n">carImage</span><span class="p">);</span>
+<a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Let’s break it down:</strong></p>
 <h4 id="the-systemmessage">The <code>@SystemMessage</code><a class="headerlink" href="#the-systemmessage" title="Permanent link"></a></h4>
@@ -2517,14 +2518,14 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="s">    Rental Feedback: {rentalFeedback}</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="s">    """</span><span class="p">)</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">String</span><span class="w"> </span><span class="nf">analyzeCarImage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="nd">@UserMessage</span><span class="w"> </span><span class="n">ImageContent</span><span class="w"> </span><span class="n">carImage</span><span class="p">);</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">String</span><span class="w"> </span><span class="nf">analyzeCarImage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="nd">@UserMessage</span><span class="w"> </span><span class="nd">@V</span><span class="p">(</span><span class="s">"carImage"</span><span class="p">)</span><span class="w"> </span><span class="n">ImageContent</span><span class="w"> </span><span class="n">carImage</span><span class="p">);</span>
 </code></pre></div>
-<p>Note that the <code>@UserMessage</code> annotation on the <code>ImageContent</code> parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the <code>@UserMessage</code> annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.</p>
+<p>Note that the <code>@UserMessage</code> annotation on the <code>ImageContent</code> parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the <code>@UserMessage</code> annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning. In this case we also need to add the @V annotation to specify the variable name in the template of the UserMessage.</p>
 <h4 id="the-outputkey-rentalfeedback">The <code>outputKey = "rentalFeedback"</code><a class="headerlink" href="#the-outputkey-rentalfeedback" title="Permanent link"></a></h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car image analyzer. Enriches rental feedback with visual observations from a car image."</span><span class="p">,</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">        </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"rentalFeedback"</span><span class="p">)</span>
 </code></pre></div>
-<p>This is the key design decision: the agent’s output key is <code>rentalFeedback</code>, which means its result <strong>replaces</strong> the <code>rentalFeedback</code> value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.</p>
+<p>The agent’s output key is <code>rentalFeedback</code>, which means its result <strong>replaces</strong> the <code>rentalFeedback</code> value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.</p>
 <hr>
 <h2 id="part-5-update-the-workflow">Part 5: Update the Workflow<a class="headerlink" href="#part-5-update-the-workflow" title="Permanent link"></a></h2>
 <h3 id="add-the-agent-to-the-sequence">Add the Agent to the Sequence<a class="headerlink" href="#add-the-agent-to-the-sequence" title="Permanent link"></a></h3>
