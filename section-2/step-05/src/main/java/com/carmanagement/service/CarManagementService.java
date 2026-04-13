@@ -8,7 +8,6 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
@@ -32,34 +31,24 @@ public class CarManagementService {
      * This method runs asynchronously to handle workflow pauses for human approval.
      * 
      * @param carNumber The car number
-     * @param rentalFeedback Optional rental feedback
-     * @param cleaningFeedback Optional cleaning feedback
-     * @param maintenanceFeedback Optional maintenance feedback
+     * @param feedback Optional feedback
      * @return Uni that completes with the result of the processing
      */
-    public Uni<String> processCarReturn(Integer carNumber, String rentalFeedback, String cleaningFeedback,
-                                   String maintenanceFeedback) {
-        
+    public Uni<String> processCarReturn(Integer carNumber, String feedback) {
+
         return Uni.createFrom().item(() -> {
             CarInfo carInfo = findCarInfo(carNumber);
             if (carInfo == null) {
                 return "Car not found with number: " + carNumber;
             }
-            
+
             // Create the list of feedback tasks for parallel analysis
             List<FeedbackTask> tasks = List.of(
                     FeedbackTask.cleaning(),
                     FeedbackTask.maintenance(),
                     FeedbackTask.disposition()
             );
-            
-            // Create feedback context
-            FeedbackContext feedback = new FeedbackContext(
-                    rentalFeedback != null ? rentalFeedback : "",
-                    cleaningFeedback != null ? cleaningFeedback : "",
-                    maintenanceFeedback != null ? maintenanceFeedback : ""
-            );
-                                
+
             // Process the car return using the workflow with supervisor
             // This may PAUSE if human approval is needed
             CarConditions carConditions = carProcessingWorkflow.processCarReturn(

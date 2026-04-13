@@ -14,7 +14,6 @@ import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
-import com.carmanagement.model.CarInfo;
 import com.carmanagement.service.CarManagementService;
 
 /**
@@ -39,26 +38,7 @@ public class CarManagementResource {
     @Blocking
     public Uni<Response> processReturn(Integer carNumber, @RestQuery String feedback) {
 
-        CarInfo car = CarInfo.findById(carNumber);
-        String rentalFeedback = "";
-        String cleaningFeedback = "";
-        String maintenanceFeedback = "";
-
-        if (car != null) {
-            switch (car.status) {
-                case RENTED:
-                    rentalFeedback = feedback != null ? feedback : "";
-                    break;
-                case AT_CLEANING:
-                    cleaningFeedback = feedback != null ? feedback : "";
-                    break;
-                case IN_MAINTENANCE:
-                    maintenanceFeedback = feedback != null ? feedback : "";
-                    break;
-            }
-        }
-
-        return carManagementService.processCarReturn(carNumber, rentalFeedback, cleaningFeedback, maintenanceFeedback)
+        return carManagementService.processCarReturn(carNumber, feedback != null ? feedback : "")
             .onItem().transform(result -> Response.ok(result).build())
             .onFailure().recoverWithItem(e -> {
                 Log.error(e.getMessage(), e);

@@ -21,7 +21,6 @@ import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
-import com.carmanagement.model.CarInfo;
 import com.carmanagement.service.CarManagementService;
 
 /**
@@ -36,7 +35,6 @@ public class CarManagementResource {
     
     /**
      * Process a car return from any status (rental, cleaning, or maintenance).
-     * Routes feedback to the appropriate parameter based on the car's current status.
      * This is a blocking operation due to AI agent processing.
      *
      * @param carNumber The car number
@@ -51,24 +49,7 @@ public class CarManagementResource {
     public Uni<Response> processReturn(Integer carNumber, @RestForm String feedback, @RestForm FileUpload carImage) {
         ImageContent imageContent = toImageContent(carImage);
 
-        // Route feedback based on the car's current status
-        CarInfo car = CarInfo.findById(carNumber);
-        String rentalFeedback = "", cleaningFeedback = "", maintenanceFeedback = "";
-        if (car != null) {
-            switch (car.status) {
-                case RENTED:
-                    rentalFeedback = feedback != null ? feedback : "";
-                    break;
-                case AT_CLEANING:
-                    cleaningFeedback = feedback != null ? feedback : "";
-                    break;
-                case IN_MAINTENANCE:
-                    maintenanceFeedback = feedback != null ? feedback : "";
-                    break;
-            }
-        }
-
-        return carManagementService.processCarReturn(carNumber, rentalFeedback, cleaningFeedback, maintenanceFeedback, imageContent)
+        return carManagementService.processCarReturn(carNumber, feedback != null ? feedback : "", imageContent)
             .onItem().transform(result -> Response.ok(result).build())
             .onFailure().recoverWithItem(e -> {
                 Log.error(e.getMessage(), e);

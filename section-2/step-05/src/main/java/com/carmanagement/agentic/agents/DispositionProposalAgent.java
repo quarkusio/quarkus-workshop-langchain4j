@@ -1,6 +1,5 @@
 package com.carmanagement.agentic.agents;
 
-import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -47,7 +46,7 @@ public interface DispositionProposalAgent {
         - Car Number: {carNumber}
         - Current Condition: {carCondition}
         - Estimated Value: {carValue}
-        - Damage/Feedback: {feedback.rentalFeedback}
+        - Damage/Feedback: {feedback}
 
         Provide your disposition proposal with clear reasoning.
         """)
@@ -59,7 +58,7 @@ public interface DispositionProposalAgent {
             Integer carNumber,
             String carCondition,
             String carValue,
-            FeedbackContext feedback);
+            String feedback);
 }
 
 

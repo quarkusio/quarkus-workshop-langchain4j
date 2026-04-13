@@ -9,7 +9,6 @@ import org.jboss.resteasy.reactive.RestQuery;
 
 import io.quarkus.logging.Log;
 
-import com.carmanagement.model.CarInfo;
 import com.carmanagement.service.CarManagementService;
 
 /**
@@ -33,22 +32,7 @@ public class CarManagementResource {
     public Response processReturn(Integer carNumber, @RestQuery String feedback) {
 
         try {
-            CarInfo car = CarInfo.findById(carNumber);
-            String rentalFeedback = "";
-            String cleaningFeedback = "";
-
-            if (car != null) {
-                switch (car.status) {
-                    case RENTED:
-                        rentalFeedback = feedback != null ? feedback : "";
-                        break;
-                    case AT_CLEANING:
-                        cleaningFeedback = feedback != null ? feedback : "";
-                        break;
-                }
-            }
-
-            String result = carManagementService.processCarReturn(carNumber, rentalFeedback, cleaningFeedback);
+            String result = carManagementService.processCarReturn(carNumber, feedback != null ? feedback : "");
             return Response.ok(result).build();
         } catch (Exception e) {
             Log.error(e.getMessage(), e);

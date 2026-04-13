@@ -8,7 +8,6 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.model.FeedbackContext;
 import io.quarkus.logging.Log;
 
 /**
@@ -24,13 +23,11 @@ public class CarManagementService {
      * Process a car return from any operation.
      *
      * @param carNumber The car number
-     * @param rentalFeedback Optional rental feedback
-     * @param cleaningFeedback Optional cleaning feedback
-     * @param maintenanceFeedback Optional maintenance feedback
+     * @param feedback Optional feedback
      * @return Result of the processing
      */
     @Transactional
-    public String processCarReturn(Integer carNumber, String rentalFeedback, String cleaningFeedback, String maintenanceFeedback) {
+    public String processCarReturn(Integer carNumber, String feedback) {
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
@@ -40,10 +37,7 @@ public class CarManagementService {
         Log.info("  ├─ CleaningFeedbackAgent analyzing...");
         Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
         Log.info("CarAssignmentWorkflow evaluating conditions...");
-        
-        // Create feedback context
-        FeedbackContext feedback = new FeedbackContext(rentalFeedback, cleaningFeedback, maintenanceFeedback);
-        
+
         // Process the car return using the workflow
         CarConditions carConditions = carProcessingWorkflow.processCarReturn(carInfo, carNumber, feedback);
 

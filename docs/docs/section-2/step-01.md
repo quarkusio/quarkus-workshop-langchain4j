@@ -225,7 +225,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 
 ## Component 3: The CleaningAgent
 
-Here's where the *magic* happens — the AI agent definition:
+Here's where the magic happens — the AI agent definition:
 
 ```java hl_lines="6-11 23-24" title="CleaningAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java:cleaningAgent"
@@ -235,25 +235,19 @@ Here's where the *magic* happens — the AI agent definition:
 
 ### Using Context Objects for Cleaner Parameters
 
-Notice how the agent method signature uses `CarInfo` and `FeedbackContext` instead of passing individual fields:
+Notice how the agent method signature uses `CarInfo` for car details and a simple `String feedback` for the user's feedback:
 
 ```java
-String processCleaning(CarInfo carInfo, Integer carNumber, FeedbackContext feedbackContext)
+String processCleaning(CarInfo carInfo, Integer carNumber, String feedback)
 ```
 
-This approach groups related parameters into cohesive objects, making the code more maintainable. The `FeedbackContext` is a simple record that encapsulates feedback from different sources:
-
-```java
-public record FeedbackContext(String rentalFeedback, String cleaningFeedback) {
-    // Null-safe constructor ensures empty strings instead of nulls
-}
-```
+This approach groups related car parameters into a cohesive `CarInfo` object, keeping the method signature clean and maintainable. The feedback is passed as a simple string — specialized agents will evaluate this string differently based on their role (e.g. a cleaning agent will look for clues that the car needs to be cleaned, while a maintenance agent will look for any signs that point to the car needing repairs).
 
 **Benefits of this pattern:**
 
-- **Reduced parameter count**: Instead of passing 6-8 individual parameters, we pass 3 meaningful objects
-- **Better organization**: Related data stays together (car details in `CarInfo`, feedback in `FeedbackContext`)
-- **Easier maintenance**: Adding new feedback sources only requires updating `FeedbackContext`, not every method signature
+- **Reduced parameter count**: Instead of passing 6-8 individual parameters, we pass a few meaningful objects
+- **Better organization**: Related car data stays together in `CarInfo`
+- **Simplicity**: Feedback flows through the system as a plain string
 - **Type safety**: The compiler ensures you pass the right context objects
 
 This pattern becomes even more valuable as workflows grow more complex in later steps.

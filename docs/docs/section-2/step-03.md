@@ -448,17 +448,9 @@ Before starting:
 
 ### Create Feedback Analysis Agents
 
-Before creating the agents, note that `FeedbackContext` has been expanded in this step to include a third field: `maintenanceFeedback`. This evolution demonstrates how context objects make it easy to add new data sources without changing every method signature throughout the system.
-
-```java
-public record FeedbackContext(
-    String rentalFeedback,
-    String cleaningFeedback,
-    String maintenanceFeedback  // New in Step 03
-) {
-    // Null-safe constructor
-}
-```
+Let's create the agents that will analyze the feedback from the UI form. 
+The feedback string is evaluated differently by each agent: The `MaintenanceFeedbackAgent` will look for anything that might point to the car needing repairs, 
+while the `CleaningFeedbackAgent` is specialized in looking for clues in the string that car might be dirty and in need of cleaning.
 
 #### MaintenanceFeedbackAgent
 

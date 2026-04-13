@@ -3,7 +3,6 @@ package com.carmanagement.agentic.workflow;
 import com.carmanagement.agentic.agents.CleaningFeedbackAgent;
 import com.carmanagement.agentic.agents.MaintenanceFeedbackAgent;
 import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.declarative.ParallelAgent;
 
 /**
@@ -21,6 +20,6 @@ public interface FeedbackWorkflow {
     String analyzeFeedback(
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedback);
+            String feedback);
 }
 

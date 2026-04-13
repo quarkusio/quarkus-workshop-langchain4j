@@ -42,7 +42,6 @@ public interface FleetSupervisorAgent {
      * @param carNumber The car's identification number
      * @param carCondition The current condition description
      * @param feedbackAnalysisResults The results from parallel feedback analysis
-     * @param rentalFeedback The original rental feedback
      * @return A formatted prompt instructing the supervisor which agents to invoke
      */
     @SupervisorRequest

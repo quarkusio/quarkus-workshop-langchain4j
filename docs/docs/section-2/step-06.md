@@ -57,11 +57,11 @@ This is elegant because it preserves the existing workflow structure while addin
 
 **Why ImageContent Stays Separate:**
 
-You might notice that `ImageContent` is passed as a separate parameter rather than being added to `FeedbackContext`. This is intentional:
+`ImageContent` is passed as a separate parameter alongside the `String feedback`:
 
-- `ImageContent` is a special LangChain4j type for multimodal AI, not simple data
+- `ImageContent` is a special LangChain4j type for multimodal AI, not simple text data
 - It's only used by the image analysis agent, not by other agents in the workflow
-- Keeping it separate maintains the clean separation between feedback data (in `FeedbackContext`) and multimodal content (as `ImageContent`)
+- Keeping it separate maintains the clean separation between feedback text and multimodal content
 
 ---
 
@@ -229,14 +229,14 @@ Add `ImageContent` as a parameter and forward it to the workflow:
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
-The image is passed straight through to the workflow via `FeedbackContext` and the `carImage` parameter:
+The image is passed straight through to the workflow alongside the feedback string and the `carImage` parameter:
 
 ```java
 CarConditions carConditions = carProcessingWorkflow.processCarReturn(
         tasks,
         carInfo,
         carNumber,
-        feedbackContext,
+        feedback,
         carImage);
 ```
 

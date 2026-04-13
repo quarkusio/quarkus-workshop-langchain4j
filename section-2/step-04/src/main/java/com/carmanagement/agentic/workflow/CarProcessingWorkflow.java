@@ -4,7 +4,6 @@ import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
 import com.carmanagement.agentic.agents.FleetSupervisorAgent;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
@@ -32,7 +31,7 @@ public interface CarProcessingWorkflow {
             List<FeedbackTask> tasks,
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedback);
+            String feedback);
 
     @Output
     static CarConditions output(CarConditions carConditions) {
