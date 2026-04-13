@@ -5,6 +5,7 @@ import com.carmanagement.model.FeedbackAnalysisResults;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.ParallelMapperAgent;
+import dev.langchain4j.agentic.scope.AgenticScope;
 
 import java.util.List;
 
@@ -43,11 +44,13 @@ public interface FeedbackAnalysisWorkflow {
      * [0] = cleaning analysis, [1] = maintenance analysis, [2] = disposition analysis
      */
     @Output
-    static FeedbackAnalysisResults output(List<String> feedbackResult) {
-        return new FeedbackAnalysisResults(
+    static List<String> output(AgenticScope scope, List<String> feedbackResult) {
+        // temp workaround to write directly to agenticSope
+        scope.writeState("feedbackAnalysisResults", new FeedbackAnalysisResults(
                 feedbackResult.get(0),  // cleaningAnalysis
                 feedbackResult.get(1),  // maintenanceAnalysis
                 feedbackResult.get(2)   // dispositionAnalysis
-        );
+        ));
+        return feedbackResult;
     }
 }
