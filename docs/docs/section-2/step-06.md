@@ -280,7 +280,7 @@ The system message instructs the LLM to:
 @UserMessage("""
     Rental Feedback: {rentalFeedback}
     """)
-String analyzeCarImage(String rentalFeedback, @UserMessage ImageContent carImage);
+String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") ImageContent carImage);
 ```
 
 Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.
@@ -292,7 +292,7 @@ Note that the `@UserMessage` annotation on the `ImageContent` parameter tells La
         outputKey = "rentalFeedback")
 ```
 
-This is the key design decision: the agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (`FeedbackAnalysisWorkflow`, `FleetSupervisorAgent`, and the rest of the sequence) will automatically receive the enriched feedback.
+The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (`FeedbackAnalysisWorkflow`, `FleetSupervisorAgent`, and the rest of the sequence) will automatically receive the enriched feedback.
 
 ---
 

@@ -4,6 +4,7 @@ import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 
 /**
  * Agent that analyzes a car image and enriches the rental feedback with visual observations.
@@ -29,5 +30,5 @@ public interface CarImageAnalysisAgent {
         """)
     @Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
             outputKey = "rentalFeedback")
-    String analyzeCarImage(String feedback, @UserMessage ImageContent carImage);
+    String analyzeCarImage(String feedback, @UserMessage @V("carImage") ImageContent carImage);
 }
