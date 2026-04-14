@@ -23,11 +23,11 @@ public interface FeedbackAnalysisWorkflow {
     // --8<-- [start:parallel-mapper-agent]
     @ParallelMapperAgent(
             description = "Analyzes car feedback in parallel for cleaning, maintenance, and disposition needs",
-            outputKey = "feedbackResult",
+            outputKey = "feedbackAnalysisResults",
             subAgent = FeedbackAnalysisAgent.class,
             itemsProvider = "tasks")
     // --8<-- [end:parallel-mapper-agent]
-    List<String> analyzeFeedback(
+    FeedbackAnalysisResults analyzeFeedback(
             List<FeedbackTask> tasks,
             String carMake,
             String carModel,
@@ -40,17 +40,16 @@ public interface FeedbackAnalysisWorkflow {
 
     /**
      * Output method that transforms the parallel feedback results into a structured object.
-     * The feedbackResult list contains results in the same order as the input tasks:
+     * The feedbackAnalysisResults list contains results in the same order as the input tasks:
      * [0] = cleaning analysis, [1] = maintenance analysis, [2] = disposition analysis
      */
     @Output
-    static List<String> output(AgenticScope scope, List<String> feedbackResult) {
-        // temp workaround to write directly to agenticSope
-        scope.writeState("feedbackAnalysisResults", new FeedbackAnalysisResults(
-                feedbackResult.get(0),  // cleaningAnalysis
-                feedbackResult.get(1),  // maintenanceAnalysis
-                feedbackResult.get(2)   // dispositionAnalysis
-        ));
-        return feedbackResult;
+    static FeedbackAnalysisResults output(AgenticScope scope, List<String> feedbackAnalysisResults) {
+        // temp workaround to write directly to agenticScope
+        return new FeedbackAnalysisResults(
+                feedbackAnalysisResults.get(0),  // cleaningAnalysis
+                feedbackAnalysisResults.get(1),  // maintenanceAnalysis
+                feedbackAnalysisResults.get(2)   // dispositionAnalysis
+        );
     }
 }
