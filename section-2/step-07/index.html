@@ -2291,15 +2291,15 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     <pre class="mermaid"><code>graph TD
     subgraph "Main Application (localhost:8080)"
         R[Rental/Cleaning/Maintenance Returns]
-        FW[FeedbackWorkflow&lt;br/&gt;Parallel]
-        DFA[DispositionFeedbackAgent]
+        FW[FeedbackAnalysisWorkflow&lt;br/&gt;Parallel Mapper]
+        FA[FeedbackAnalysisAgent]
         FSA[FleetSupervisorAgent&lt;br/&gt;Supervisor]
         PAC["PricingAgent&lt;br/&gt;@A2AClientAgent"]
         DA[DispositionAgent&lt;br/&gt;Local]
 
         R --&gt; FW
-        FW --&gt; DFA
-        DFA --&gt; FSA
+        FW --&gt; FA
+        FA --&gt; FSA
         FSA --&gt; PAC
         FSA --&gt; DA
     end
@@ -2339,9 +2339,9 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   │   │   ├── DispositionAgent.java          # Local agent
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   │   │   ├── DispositionProposalAgent.java  # Creates proposals
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   │   │   ├── HumanApprovalAgent.java        # @HumanInTheLoop
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   │   │   └── FeedbackAnalysisAgent.java     # Parameterized feedback analyzer
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │   │   └── workflow/
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   │       ├── FeedbackAnalysisWorkflow.java  # Parallel mapper analysis
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   │   ├── model/
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   │   │   └── ApprovalProposal.java              # Approval entity
@@ -2771,11 +2771,11 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <p><strong>What happens?</strong></p>
 <ol>
 <li>
-<p><strong>Parallel Analysis</strong> (FeedbackWorkflow):</p>
+<p><strong>Parallel Analysis</strong> (<code>FeedbackAnalysisWorkflow</code>):</p>
 <ol>
-<li><code>DispositionFeedbackAgent</code>: “Disposition required — severe damage”</li>
-<li><code>MaintenanceFeedbackAgent</code>: “Major repairs needed”</li>
-<li><code>CleaningFeedbackAgent</code>: “Not applicable”</li>
+<li><code>FeedbackTask.disposition()</code> executed by <code>FeedbackAnalysisAgent</code>: “Disposition required — severe damage”</li>
+<li><code>FeedbackTask.maintenance()</code> executed by <code>FeedbackAnalysisAgent</code>: “Major repairs needed”</li>
+<li><code>FeedbackTask.cleaning()</code> executed by <code>FeedbackAnalysisAgent</code>: “Not applicable”</li>
 </ol>
 </li>
 <li>
@@ -2814,7 +2814,7 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>Remote A2A PricingAgent called
 </code></pre></div>
 <p><strong>Terminal 2 (Main Application):</strong>
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>[DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>[FeedbackAnalysisAgent/disposition] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>[FleetSupervisorAgent] Invoking PricingAgent for value estimation
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>[PricingAgent @A2AClientAgent] Sending task to http://localhost:8888
 <a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>[PricingAgent @A2AClientAgent] Received result: Estimated Value: $12,500
@@ -2850,7 +2850,7 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
     participant User
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
-    participant FeedbackWF as FeedbackWorkflow
+    participant FeedbackWF as FeedbackAnalysisWorkflow
     participant Supervisor as FleetSupervisorAgent
     participant PricingClient as PricingAgent&lt;br/&gt;@A2AClientAgent
     participant A2A as A2A Protocol&lt;br/&gt;(JSON-RPC)
@@ -2865,11 +2865,11 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
     Note over Workflow,FeedbackWF: Parallel Analysis
     Workflow-&gt;&gt;FeedbackWF: Execute
     par Concurrent Execution
-        FeedbackWF-&gt;&gt;FeedbackWF: CleaningFeedbackAgent
+        FeedbackWF-&gt;&gt;FeedbackWF: FeedbackAnalysisAgent&lt;br/&gt;with FeedbackTask.cleaning()
     and
-        FeedbackWF-&gt;&gt;FeedbackWF: MaintenanceFeedbackAgent
+        FeedbackWF-&gt;&gt;FeedbackWF: FeedbackAnalysisAgent&lt;br/&gt;with FeedbackTask.maintenance()
     and
-        FeedbackWF-&gt;&gt;FeedbackWF: DispositionFeedbackAgent&lt;br/&gt;Result: "DISPOSITION_REQUIRED"
+        FeedbackWF-&gt;&gt;FeedbackWF: FeedbackAnalysisAgent&lt;br/&gt;with FeedbackTask.disposition()&lt;br/&gt;Result: "DISPOSITION_REQUIRED"
     end
     end
 

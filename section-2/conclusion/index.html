@@ -1962,11 +1962,16 @@ Workflows let you compose specialized agents, each excellent at one task, into s
 <p>You learned how to build <strong>autonomous, context-aware orchestration</strong> using supervisor agents.</p>
 <p><strong>What you built:</strong>
 - <code>FleetSupervisorAgent</code>: AI-driven supervisor using <code>@SupervisorAgent</code> annotation
+- <code>FeedbackAnalysisAgent</code>: A unified feedback analyzer driven by <code>FeedbackTask</code> configurations
+- <code>FeedbackAnalysisWorkflow</code>: A parallel mapper workflow that runs the same agent for cleaning, maintenance, and disposition analysis
 - <code>PricingAgent</code>: Vehicle valuation specialist
 - Adaptive workflow that adjusts based on business conditions</p>
 <p><strong>Key concepts:</strong>
 - <strong>Supervisor pattern</strong>: AI agents that orchestrate other agents
 - <strong>Autonomous orchestration</strong>: Supervisor decides which agents to invoke
+- <strong>Parameterized parallel analysis</strong>: One feedback agent runs multiple times with different task definitions
+- <strong><code>@ParallelMapperAgent</code></strong>: A workflow pattern for invoking the same agent in parallel across a list of items
+- <strong><code>@Output</code> transformation</strong>: Parallel workflow results are reshaped into a structured record for downstream agents
 - <strong>Context-aware routing</strong>: Decisions based on multiple factors (demand, condition, value)
 - <strong>Flexible business logic</strong>: Adjust behavior via prompts, not code changes</p>
 <p><strong>Why it matters:</strong> Real-world systems need to adapt to changing conditions. Supervisor agents provide intelligent, context-aware orchestration that can handle complex scenarios without hardcoded logic. This makes systems more flexible and easier to maintain.</p>
@@ -2078,7 +2083,7 @@ The supervisor controls the flow of other agents, but the agents themselves rema
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>      └─ Agent C ─┘
 </code></pre></div>
 <p><strong>When to use:</strong> Independent analyses that can run concurrently</p>
-<p><strong>Example:</strong> <code>FeedbackWorkflow</code> running wash, maintenance, and disposition analysis</p>
+<p><strong>Example:</strong> <code>FeedbackAnalysisWorkflow</code> running <code>FeedbackAnalysisAgent</code> in parallel with cleaning, maintenance, and disposition task configurations</p>
 <hr>
 <h3 id="pattern-4-conditional-workflow">Pattern 4: Conditional Workflow<a class="headerlink" href="#pattern-4-conditional-workflow" title="Permanent link"></a></h3>
 <p><strong>Structure:</strong>
@@ -2115,7 +2120,7 @@ The supervisor controls the flow of other agents, but the agents themselves rema
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Local Agent (client) → A2A Protocol → Remote Agent (server)
 </code></pre></div>
 <p><strong>When to use:</strong> Cross-system integration, team independence, specialized services</p>
-<p><strong>Example:</strong> <code>DispositionAgent</code> calling remote disposition service</p>
+<p><strong>Example:</strong> <code>PricingAgent</code> calling a remote pricing service</p>
 <hr>
 <h3 id="pattern-8-human-in-the-loop-hitl">Pattern 8: Human-in-the-Loop (HITL)<a class="headerlink" href="#pattern-8-human-in-the-loop-hitl" title="Permanent link"></a></h3>
 <p><strong>Structure:</strong>
