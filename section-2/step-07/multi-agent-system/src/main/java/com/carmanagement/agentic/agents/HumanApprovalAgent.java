@@ -24,7 +24,7 @@ public interface HumanApprovalAgent {
             String dispositionProposal,
             String dispositionReason,
             String carCondition,
-            String rentalFeedback
+            String feedback
     ) {
 
         Log.infof("🛑 HITL Tool: Creating approval proposal for car %d - %s %s %s",
@@ -38,7 +38,7 @@ public interface HumanApprovalAgent {
             CompletableFuture<ApprovalProposal> approvalFuture =
                     approvalService.createProposalAndWaitForDecision(
                             carNumber, carMake, carModel, carYear, carValue,
-                            dispositionProposal, dispositionReason, carCondition, rentalFeedback
+                            dispositionProposal, dispositionReason, carCondition, feedback
                     );
 
             // BLOCK HERE until human makes decision (with 5 minute timeout)

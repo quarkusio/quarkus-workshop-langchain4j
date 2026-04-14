@@ -46,8 +46,8 @@ public interface DispositionProposalAgent {
         - Car Number: {carNumber}
         - Current Condition: {carCondition}
         - Estimated Value: {carValue}
-        - Damage/Feedback: {rentalFeedback}
-        
+        - Damage/Feedback: {feedback}
+
         Provide your disposition proposal with clear reasoning.
         """)
     @Agent(outputKey = "dispositionProposal", description = "Creates disposition proposals for vehicles requiring disposition")
@@ -58,7 +58,7 @@ public interface DispositionProposalAgent {
             Integer carNumber,
             String carCondition,
             String carValue,
-            String rentalFeedback);
+            String feedback);
 }
 
 

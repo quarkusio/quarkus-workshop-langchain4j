@@ -465,7 +465,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 - Focuses on mechanical issues, body damage, and maintenance needs
 - Returns "MAINTENANCE_NOT_REQUIRED" for easy conditional checking
 - Uses `outputKey` to store result in AgenticScope
-- Accesses maintenance feedback via `{feedbackContext.maintenanceFeedback}` in the `@UserMessage` template
+- Accesses the feedback string via `{feedback}` in the `@UserMessage` template
 
 #### CleaningFeedbackAgent
 
