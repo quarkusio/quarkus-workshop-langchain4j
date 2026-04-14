@@ -293,7 +293,7 @@ Note that the `@UserMessage` annotation on the `ImageContent` parameter tells La
         outputKey = "rentalFeedback", optional = true)
 ```
 
-The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of this agent if no image is provided.
+The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of an agent if not all of its required parameters are provided; in this case it will be skipped if the image is missing.
 
 ---
 
