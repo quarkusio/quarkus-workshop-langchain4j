@@ -2,7 +2,6 @@ package com.carmanagement.agentic.agents;
 
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
-import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
 
@@ -27,7 +26,7 @@ public interface FleetSupervisorAgent {
     String superviseCarProcessing(
         CarInfo carInfo,
         Integer carNumber,
-        FeedbackContext feedback,
+        String feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     );
 
@@ -35,7 +34,7 @@ public interface FleetSupervisorAgent {
     static String request(
         CarInfo carInfo,
         Integer carNumber,
-        FeedbackContext feedback,
+        String feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     ) {
         boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
@@ -79,7 +78,7 @@ public interface FleetSupervisorAgent {
             
             Current Condition: """ + carInfo.condition + """
             
-            Rental Feedback: """ + feedback.rentalFeedback() + """
+            Feedback: """ + feedback + """
             
             Cleaning Analysis: """ + feedbackAnalysisResults.cleaningAnalysis() + """
             

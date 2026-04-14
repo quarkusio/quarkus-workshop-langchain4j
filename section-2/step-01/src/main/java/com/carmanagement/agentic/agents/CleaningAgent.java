@@ -4,7 +4,6 @@ import io.quarkiverse.langchain4j.ToolBox;
 
 import com.carmanagement.agentic.tools.CleaningTool;
 import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -28,16 +27,14 @@ public interface CleaningAgent {
         Year: {carInfo.year}
         Car Number: {carNumber}
         
-        Feedback:
-        Rental Feedback: {feedback.rentalFeedback}
-        Cleaning Feedback: {feedback.cleaningFeedback}
+        Feedback: {feedback}
         """)
     @Agent("Cleaning specialist. Determines what cleaning services are needed.")
     @ToolBox(CleaningTool.class)
     String processCleaning(
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedback);
+            String feedback);
 }
 // --8<-- [end:cleaningAgent]
 

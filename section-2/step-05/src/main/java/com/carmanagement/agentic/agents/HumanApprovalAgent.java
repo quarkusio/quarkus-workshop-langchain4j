@@ -1,7 +1,6 @@
 package com.carmanagement.agentic.agents;
 
 import com.carmanagement.model.ApprovalProposal;
-import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.service.ApprovalService;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.declarative.HumanInTheLoop;
@@ -25,7 +24,7 @@ public interface HumanApprovalAgent {
             String dispositionProposal,
             String dispositionReason,
             String carCondition,
-            FeedbackContext feedback
+            String feedback
     ) {
 
         Log.infof("🛑 HITL Tool: Creating approval proposal for car %d - %s %s %s",
@@ -39,7 +38,7 @@ public interface HumanApprovalAgent {
             CompletableFuture<ApprovalProposal> approvalFuture =
                     approvalService.createProposalAndWaitForDecision(
                             carNumber, carMake, carModel, carYear, carValue,
-                            dispositionProposal, dispositionReason, carCondition, feedback.rentalFeedback()
+                            dispositionProposal, dispositionReason, carCondition, feedback
                     );
 
             // BLOCK HERE until human makes decision (with 5 minute timeout)

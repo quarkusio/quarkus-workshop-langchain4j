@@ -3,7 +3,6 @@ package com.carmanagement.agentic.workflow;
 import com.carmanagement.agentic.agents.FeedbackAnalysisAgent;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
-import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.ParallelMapperAgent;
@@ -33,7 +32,7 @@ public interface FeedbackAnalysisWorkflow {
             List<FeedbackTask> tasks,
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedback);
+            String feedback);
 
     /**
      * Output method that transforms the parallel feedback results into a structured object.
@@ -42,6 +41,7 @@ public interface FeedbackAnalysisWorkflow {
      */
     @Output
     static FeedbackAnalysisResults output(AgenticScope scope, List<String> feedbackAnalysisResults) {
+        // temp workaround to write directly to agenticScope
         return new FeedbackAnalysisResults(
                 feedbackAnalysisResults.get(0),  // cleaningAnalysis
                 feedbackAnalysisResults.get(1),  // maintenanceAnalysis

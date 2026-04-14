@@ -377,20 +377,18 @@ The workflow method signature defines **all the inputs** needed by any agent in 
 CarConditions processCarReturn(
     CarInfo carInfo,
     Integer carNumber,
-    FeedbackContext feedbackContext
+    String feedback
 )
 ```
 
-These parameters are automatically populated into the `AgenticScope` when the workflow is invoked. By using context objects (`CarInfo` and `FeedbackContext`), we keep the workflow signature clean and maintainable even as the system grows more complex.
+These parameters are automatically populated into the `AgenticScope` when the workflow is invoked. By using context objects like `CarInfo`, we keep the workflow signature clean and maintainable even as the system grows more complex.
 
-**Context Objects in AgenticScope:**
+**Parameters in AgenticScope:**
 
-When you pass context objects to a workflow, the `AgenticScope` stores them as-is. Agents can then access fields within these objects using dot notation in their `@UserMessage` templates:
+When you pass parameters to a workflow, the `AgenticScope` stores them. Agents can then access fields within objects using dot notation in their `@UserMessage` templates:
 
 - `{carInfo.make}` accesses the `make` field of the `CarInfo` object
-- `{feedbackContext.rentalFeedback}` accesses the `rentalFeedback` field of the `FeedbackContext` record
-
-This pattern reduces the number of parameters flowing through the system from 7+ individual values to just 3 meaningful objects.
+- `{feedback}` accesses the feedback string directly
 
 ### `@Output`
 
@@ -487,7 +485,7 @@ The **Fleet Status** section now has a **"Condition"** column showing each car's
 
 ### Test the Workflow
 
-In the `Returns > Rental Return` section, enter feedback that indicates a problem with a car:
+In the **Fleet Status** grid, find a rented car and enter feedback that indicates a problem:
 
 ```text
 there has clearly been a fire in the trunk of this car

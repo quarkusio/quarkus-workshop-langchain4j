@@ -498,11 +498,11 @@ Listening on: http://localhost:8080
 
 Open your browser to [http://localhost:8080](http://localhost:8080){target=_blank}.
 
-You'll see the same UI as Step 5 with the **Returns and Dispositions** section and the **Dispositions** tab.
+You'll see the Fleet Status grid with inline feedback forms in the Action column and the approval notification button.
 
-![Maintenance Returns Tab](../images/agentic-UI-maintenance-returns-2.png){: .center}
+![Fleet Status Grid](../images/agentic-UI-maintenance-returns-2.png){: .center}
 
-On the Rental Return tab, enter feedback indicating severe damage for the Honda Civic:
+iFind the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:
 
 ```
 looks like this car hit a tree and is damaged beyond repair
@@ -533,7 +533,7 @@ Click **Return**.
 
 5. **UI Update**:
     1. Car status → `DISPOSED`
-    2. Car appears in the Dispositions tab
+    2. Car status updates to `PENDING_DISPOSITION` in the Fleet Status grid
 
 ### Check the Logs
 

@@ -446,7 +446,7 @@ flowchart TD
 
 #### Scenario 3: Low-Value Vehicle - No Approval Needed
 
-Enter the following text in the **Ford F-150** feedback field (Maintenance Returns tab):
+Enter the following text in the **Ford F-150** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 The truck is totaled, completely inoperable, very old

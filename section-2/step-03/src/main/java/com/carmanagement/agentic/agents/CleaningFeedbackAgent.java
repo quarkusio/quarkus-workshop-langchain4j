@@ -1,7 +1,6 @@
 package com.carmanagement.agentic.agents;
 
 import com.carmanagement.model.CarInfo;
-import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -26,17 +25,14 @@ public interface CleaningFeedbackAgent {
         Year: {carInfo.year}
         Previous Condition: {carInfo.condition}
         
-        Feedback:
-        Rental Feedback: {feedback.rentalFeedback}
-        Cleaning Feedback: {feedback.cleaningFeedback}
-        Maintenance Feedback: {feedback.maintenanceFeedback}
+        Feedback: {feedback}
         """)
     @Agent(description = "Cleaning analyzer. Using feedback, determines if a cleaning is needed.",
             outputKey = "cleaningRequest")
     String analyzeForCleaning(
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedback);
+            String feedback);
 }
 
 

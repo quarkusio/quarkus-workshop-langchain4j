@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
-import com.carmanagement.model.FeedbackContext;
 
 /**
  * Service for managing car returns from various operations.
@@ -23,19 +22,15 @@ public class CarManagementService {
      * Process a car return from any operation.
      *
      * @param carNumber The car number
-     * @param rentalFeedback Optional rental feedback
-     * @param cleaningFeedback Optional cleaning feedback
+     * @param feedback Optional feedback
      * @return Result of the processing
      */
     @Transactional
-    public String processCarReturn(Integer carNumber, String rentalFeedback, String cleaningFeedback) {
+    public String processCarReturn(Integer carNumber, String feedback) {
         CarInfo carInfo = CarInfo.findById(carNumber);
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
         }
-
-        // Create feedback context
-        FeedbackContext feedback = new FeedbackContext(rentalFeedback, cleaningFeedback);
 
         // Process the car result
         String result = cleaningAgent.processCleaning(carInfo, carNumber, feedback);

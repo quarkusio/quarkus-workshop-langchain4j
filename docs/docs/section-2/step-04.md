@@ -85,10 +85,6 @@ Instead of creating one more near-duplicate agent, this step refactors the desig
 
 This is a useful architectural progression to understand. You start with concrete, easy-to-read building blocks when learning the model. Once the pattern is familiar, you can refactor toward something more reusable and maintainable.
 
-**Context Objects Continue to Simplify:**
-
-Throughout this refactoring, the `CarInfo` and `FeedbackContext` pattern introduced in earlier steps continues to provide value. Even as we move to a more sophisticated architecture with parameterized agents, we still pass just 3-4 meaningful objects rather than 8-10 individual parameters. This keeps method signatures clean and maintainable.
-
 ---
 
 ## What is Being Added?
@@ -500,7 +496,7 @@ flowchart TD
 
 #### Scenario 2: Total Loss
 
-Enter the following text in the **Ford F-150** feedback field from the Maintenance Returns tab:
+Enter the following text in the **Ford F-150** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 The car is totaled after a major accident, completely inoperable
@@ -573,7 +569,7 @@ flowchart TD
 
 #### Scenario 4: Minor Issues
 
-Enter the following text in the **BMW X5** feedback field (in the Maintenance Return tab):
+Enter the following text in the **BMW X5** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 Car is dirty, needs cleaning

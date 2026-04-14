@@ -53,8 +53,15 @@ tr.highlight-row {
     }
 }
 
+td form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .feedback-input {
-    width: 200px;
+    flex: 1;
+    min-width: 120px;
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -69,6 +76,8 @@ tr.highlight-row {
     cursor: pointer;
     position: relative;
     transition: background-color 0.3s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .return-button:hover:not(:disabled) {

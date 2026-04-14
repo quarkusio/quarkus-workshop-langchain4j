@@ -120,7 +120,7 @@ You added **multimodal capabilities** to the car return workflow, enabling the s
 
 **What you built:**
 - `CarImageAnalysisAgent`: Analyzes car images and enriches rental feedback with visual observations
-- Multipart form upload: Image upload in the Rental Return UI
+- Multipart form upload: Image upload in the rental return form
 - `ImageContent` integration: Converting uploaded files to LangChain4j's multimodal format
 - Enrichment pattern: New agent output replaces an existing scope variable for seamless downstream integration
 

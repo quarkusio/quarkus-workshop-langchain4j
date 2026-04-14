@@ -82,7 +82,7 @@ Once started, open your browser to [http://localhost:8080](http://localhost:8080
 The application has two main sections:
 
 1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status.
-2. **Returns** (bottom): Displays cars that are currently rented or being cleaned.
+2. **Action** column: For rented or cleaning cars, provides an inline feedback form to process returns.
 
 ![Agentic App UI](../images/agentic-UI-1.png){: .center}
 
@@ -94,7 +94,7 @@ Let's see the agent in action!
 
 ### Test 1: Car Needs Cleaning
 
-Act as a rental team member processing a car return. In the **Returns > Rental Return** section, select a car and enter this feedback:
+Act as a rental team member processing a car return. In the **Fleet Status** grid, find a rented car and enter this feedback in its **Action** column:
 
 ```
 Car has dog hair all over the back seat
@@ -198,9 +198,9 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 **Key Points:**
 
-- The `processRentalReturn` method (endpoint `/car-management/rental-return/{carNumber}`):  Accepts feedback from the rental team
-- The `processCleaningReturn` method (endpoint `/car-management/cleaningReturn/{carNumber}`): Accepts feedback from the cleaning team
-- Both endpoints delegate to `CarManagementService.processCarReturn`
+- The `processReturn` method (endpoint `/car-management/return/{carNumber}`): Accepts feedback and routes it based on the car's current status
+- Looks up the car via `CarInfo.findById` to determine which type of feedback to pass
+- Delegates to `CarManagementService.processCarReturn`
 
 ---
 
@@ -225,7 +225,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 
 ## Component 3: The CleaningAgent
 
-Here's where the *magic* happens — the AI agent definition:
+Here's where the magic happens — the AI agent definition:
 
 ```java hl_lines="6-11 23-24" title="CleaningAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java:cleaningAgent"
@@ -235,25 +235,19 @@ Here's where the *magic* happens — the AI agent definition:
 
 ### Using Context Objects for Cleaner Parameters
 
-Notice how the agent method signature uses `CarInfo` and `FeedbackContext` instead of passing individual fields:
+Notice how the agent method signature uses `CarInfo` for car details and a simple `String feedback` for the user's feedback:
 
 ```java
-String processCleaning(CarInfo carInfo, Integer carNumber, FeedbackContext feedbackContext)
+String processCleaning(CarInfo carInfo, Integer carNumber, String feedback)
 ```
 
-This approach groups related parameters into cohesive objects, making the code more maintainable. The `FeedbackContext` is a simple record that encapsulates feedback from different sources:
-
-```java
-public record FeedbackContext(String rentalFeedback, String cleaningFeedback) {
-    // Null-safe constructor ensures empty strings instead of nulls
-}
-```
+This approach groups related car parameters into a cohesive `CarInfo` object, keeping the method signature clean and maintainable. The feedback is passed as a simple string — specialized agents will evaluate this string differently based on their role (e.g. a cleaning agent will look for clues that the car needs to be cleaned, while a maintenance agent will look for any signs that point to the car needing repairs).
 
 **Benefits of this pattern:**
 
-- **Reduced parameter count**: Instead of passing 6-8 individual parameters, we pass 3 meaningful objects
-- **Better organization**: Related data stays together (car details in `CarInfo`, feedback in `FeedbackContext`)
-- **Easier maintenance**: Adding new feedback sources only requires updating `FeedbackContext`, not every method signature
+- **Reduced parameter count**: Instead of passing 6-8 individual parameters, we pass a few meaningful objects
+- **Better organization**: Related car data stays together in `CarInfo`
+- **Simplicity**: Feedback flows through the system as a plain string
 - **Type safety**: The compiler ensures you pass the right context objects
 
 This pattern becomes even more valuable as workflows grow more complex in later steps.
@@ -357,7 +351,7 @@ sequenceDiagram
     participant LLM as OpenAI LLM
     participant Tool as CleaningTool
 
-    User->>REST: POST /rental-return/6<br/>feedback: "Dog hair in back seat"
+    User->>REST: POST /return/6<br/>feedback: "Dog hair in back seat"
     REST->>Service: processCarReturn(6, "Dog hair...", "")
     Service->>Agent: processCleaning(...)
     Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #6, feedback: "Dog hair..."
@@ -382,7 +376,7 @@ sequenceDiagram
     participant Agent as CleaningAgent
     participant LLM as OpenAI LLM
 
-    User->>REST: POST /rental-return/3<br/>feedback: "Car looks good"
+    User->>REST: POST /return/3<br/>feedback: "Car looks good"
     REST->>Service: processCarReturn(3, "Car looks good", "")
     Service->>Agent: processCleaning(...)
     Agent->>LLM: System: You handle cleaning intake...<br/>User: Car #3, feedback: "Car looks good"
