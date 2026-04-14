@@ -1,5 +1,7 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -17,22 +19,18 @@ public interface CarConditionFeedbackAgent {
         """)
     @UserMessage("""
             Car Information:
-            Make: {carMake}
-            Model: {carModel}
-            Year: {carYear}
-            Previous Condition: {carCondition}
+            Make: {carInfo.make}
+            Model: {carInfo.model}
+            Year: {carInfo.year}
+            Previous Condition: {carInfo.condition}
             
-            Rental Feedback: {rentalFeedback}
-            Cleaning Feedback: {cleaningFeedback}
+            Rental Feedback: {feedback.rentalFeedback}
+            Cleaning Feedback: {feedback.cleaningFeedback}
             """)
     @Agent(outputKey = "carCondition",
             description = "Car condition analyzer. Determines the current condition of a car based on feedback.")
     String analyzeForCondition(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback);
+            FeedbackContext feedback);
 }

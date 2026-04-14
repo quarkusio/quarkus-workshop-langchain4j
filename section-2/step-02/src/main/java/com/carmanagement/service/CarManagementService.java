@@ -8,6 +8,7 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackContext;
 
 /**
  * Service for managing car returns from various operations.
@@ -31,22 +32,18 @@ public class CarManagementService {
             return "Car not found with number: " + carNumber;
         }
 
-        // Process the car return using the workflow and get the AgenticScope
-        CarConditions carConditions = carProcessingWorkflow.processCarReturn(
-                carInfo.make,
-                carInfo.model,
-                carInfo.year,
-                carNumber,
-                carInfo.condition,
-                rentalFeedback != null ? rentalFeedback : "",
-                cleaningFeedback != null ? cleaningFeedback : "");
+        // Create feedback context
+        FeedbackContext feedback = new FeedbackContext(rentalFeedback, cleaningFeedback);
+
+        // Process the car return using the workflow
+        CarConditions carConditions = carProcessingWorkflow.processCarReturn(carInfo, carNumber, feedback);
 
         // Update the car's condition with the result from CarConditionFeedbackAgent
         carInfo.condition = carConditions.generalCondition();
 
         // If cleaning was not required, make the car available to rent
         if (!carConditions.cleaningRequired()) {
-            carInfo.status = CarStatus.AVAILABLE;            
+            carInfo.status = CarStatus.AVAILABLE;
         }
         
         carInfo.persist();

@@ -8,6 +8,7 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import io.quarkus.logging.Log;
 
@@ -38,25 +39,27 @@ public class CarManagementService {
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
         }
-                
+
         // Create the list of feedback tasks
         List<FeedbackTask> tasks = List.of(
                 FeedbackTask.cleaning(),
                 FeedbackTask.maintenance(),
                 FeedbackTask.disposition()
         );
+
+        // Create feedback context
+        FeedbackContext feedback = new FeedbackContext(
+                rentalFeedback != null ? rentalFeedback : "",
+                cleaningFeedback != null ? cleaningFeedback : "",
+                maintenanceFeedback != null ? maintenanceFeedback : ""
+        );
         
         // Process the car return using the workflow with supervisor
         CarConditions carConditions = carProcessingWorkflow.processCarReturn(
                 tasks,
-                carInfo.make,
-                carInfo.model,
-                carInfo.year,
+                carInfo,
                 carNumber,
-                carInfo.condition,
-                rentalFeedback != null ? rentalFeedback : "",
-                cleaningFeedback != null ? cleaningFeedback : "",
-                maintenanceFeedback != null ? maintenanceFeedback : "");
+                feedback);
 
         Log.info("CarConditionFeedbackAgent updating...");
         

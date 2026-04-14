@@ -233,6 +233,31 @@ Here's where the *magic* happens — the AI agent definition:
 
 **Let's break it down:**
 
+### Using Context Objects for Cleaner Parameters
+
+Notice how the agent method signature uses `CarInfo` and `FeedbackContext` instead of passing individual fields:
+
+```java
+String processCleaning(CarInfo carInfo, Integer carNumber, FeedbackContext feedbackContext)
+```
+
+This approach groups related parameters into cohesive objects, making the code more maintainable. The `FeedbackContext` is a simple record that encapsulates feedback from different sources:
+
+```java
+public record FeedbackContext(String rentalFeedback, String cleaningFeedback) {
+    // Null-safe constructor ensures empty strings instead of nulls
+}
+```
+
+**Benefits of this pattern:**
+
+- **Reduced parameter count**: Instead of passing 6-8 individual parameters, we pass 3 meaningful objects
+- **Better organization**: Related data stays together (car details in `CarInfo`, feedback in `FeedbackContext`)
+- **Easier maintenance**: Adding new feedback sources only requires updating `FeedbackContext`, not every method signature
+- **Type safety**: The compiler ensures you pass the right context objects
+
+This pattern becomes even more valuable as workflows grow more complex in later steps.
+
 ### `@SystemMessage`
 Defines the agent's **role** and **decision-making logic**:
 

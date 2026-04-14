@@ -1,5 +1,7 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
+import com.carmanagement.model.FeedbackContext;
 import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
@@ -14,26 +16,21 @@ public interface FeedbackAnalysisAgent {
     @SystemMessage("{task.systemInstructions}")
     @UserMessage("""
         Car Information:
-        Make: {carMake}
-        Model: {carModel}
-        Year: {carYear}
-        Previous Condition: {carCondition}
+        Make: {carInfo.make}
+        Model: {carInfo.model}
+        Year: {carInfo.year}
+        Previous Condition: {carInfo.condition}
         
         Feedback:
-        Rental Feedback: {rentalFeedback}
-        Cleaning Feedback: {cleaningFeedback}
-        Maintenance Feedback: {maintenanceFeedback}
+        Rental Feedback: {feedback.rentalFeedback}
+        Cleaning Feedback: {feedback.cleaningFeedback}
+        Maintenance Feedback: {feedback.maintenanceFeedback}
         """)
     @Agent(description = "Feedback analyzer. Using feedback, determines if action is needed based on task type.",
             outputKey = "feedbackAnalysis")
     String analyzeFeedback(
             FeedbackTask task,
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
-            String rentalFeedback,
-            String cleaningFeedback,
-            String maintenanceFeedback);
+            FeedbackContext feedback);
 }

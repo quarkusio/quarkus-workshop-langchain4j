@@ -1,6 +1,7 @@
 package com.carmanagement.agentic.agents;
 
 import com.carmanagement.model.CarConditions;
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
@@ -29,7 +30,7 @@ public interface CarConditionFeedbackAgent {
         - generalCondition: Summarize the action and reason
         """)
     @UserMessage("""
-            Car: {carYear} {carMake} {carModel} (#{carNumber})
+            Car: {carInfo.year} {carInfo.make} {carInfo.model} (#{carNumber})
             
             Supervisor Decision: {supervisorDecision}
             
@@ -41,11 +42,8 @@ public interface CarConditionFeedbackAgent {
     @Agent(description = "Final car condition analyzer. Determines the car's condition, assignment, and approval status based on all feedback.",
             outputKey = "carConditions")
     CarConditions analyzeForCondition(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
-            String carCondition,
             FeedbackAnalysisResults feedbackAnalysisResults,
             String supervisorDecision);
 }

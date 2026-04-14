@@ -55,6 +55,14 @@ Rather than creating a separate "image analysis" output, the `CarImageAnalysisAg
 
 This is elegant because it preserves the existing workflow structure while adding new capabilities.
 
+**Why ImageContent Stays Separate:**
+
+You might notice that `ImageContent` is passed as a separate parameter rather than being added to `FeedbackContext`. This is intentional:
+
+- `ImageContent` is a special LangChain4j type for multimodal AI, not simple data
+- It's only used by the image analysis agent, not by other agents in the workflow
+- Keeping it separate maintains the clean separation between feedback data (in `FeedbackContext`) and multimodal content (as `ImageContent`)
+
 ---
 
 ## What Are We Going to Build?
@@ -296,10 +304,10 @@ The system message instructs the LLM to:
 @UserMessage("""
     Rental Feedback: {rentalFeedback}
     """)
-String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") @V("carImage") ImageContent carImage);
+String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") ImageContent carImage);
 ```
 
-Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning. In this case we also need to add the @V annotation to specify the variable name in the template of the UserMessage.
+Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning.
 
 #### The `outputKey = "rentalFeedback"`
 
@@ -308,7 +316,7 @@ Note that the `@UserMessage` annotation on the `ImageContent` parameter tells La
         outputKey = "rentalFeedback")
 ```
 
-The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.
+The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (`FeedbackAnalysisWorkflow`, `FleetSupervisorAgent`, and the rest of the sequence) will automatically receive the enriched feedback.
 
 ---
 

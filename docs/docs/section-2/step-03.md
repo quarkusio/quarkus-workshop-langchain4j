@@ -448,6 +448,18 @@ Before starting:
 
 ### Create Feedback Analysis Agents
 
+Before creating the agents, note that `FeedbackContext` has been expanded in this step to include a third field: `maintenanceFeedback`. This evolution demonstrates how context objects make it easy to add new data sources without changing every method signature throughout the system.
+
+```java
+public record FeedbackContext(
+    String rentalFeedback,
+    String cleaningFeedback,
+    String maintenanceFeedback  // New in Step 03
+) {
+    // Null-safe constructor
+}
+```
+
 #### MaintenanceFeedbackAgent
 
 Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java`:
@@ -461,6 +473,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 - Focuses on mechanical issues, body damage, and maintenance needs
 - Returns "MAINTENANCE_NOT_REQUIRED" for easy conditional checking
 - Uses `outputKey` to store result in AgenticScope
+- Accesses maintenance feedback via `{feedbackContext.maintenanceFeedback}` in the `@UserMessage` template
 
 #### CleaningFeedbackAgent
 

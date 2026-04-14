@@ -1,6 +1,8 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
 
@@ -23,26 +25,18 @@ public interface FleetSupervisorAgent {
         }
     )
     String superviseCarProcessing(
-        String carMake,
-        String carModel,
-        Integer carYear,
+        CarInfo carInfo,
         Integer carNumber,
-        String carCondition,
-        String rentalFeedback,
-        String cleaningFeedback,
-        String maintenanceFeedback,
+        FeedbackContext feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     );
 
     @SupervisorRequest()
     static String request(
-        String carMake,
-        String carModel,
-        Integer carYear,
+        CarInfo carInfo,
         Integer carNumber,
-        String carCondition,
-        FeedbackAnalysisResults feedbackAnalysisResults,
-        String rentalFeedback
+        FeedbackContext feedback,
+        FeedbackAnalysisResults feedbackAnalysisResults
     ) {
         boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
                                      feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
@@ -81,11 +75,11 @@ public interface FleetSupervisorAgent {
             
             Your job is to invoke the appropriate ACTION agents for this car
             
-            Car: """ + carYear + " " + carMake + " " + carModel + " (#" + carNumber + ")" + """
+            Car: """ + carInfo.year + " " + carInfo.make + " " + carInfo.model + " (#" + carNumber + ")" + """
             
-            Current Condition: """ + carCondition + """
+            Current Condition: """ + carInfo.condition + """
             
-            Rental Feedback: """ + rentalFeedback + """
+            Rental Feedback: """ + feedback.rentalFeedback() + """
             
             Cleaning Analysis: """ + feedbackAnalysisResults.cleaningAnalysis() + """
             

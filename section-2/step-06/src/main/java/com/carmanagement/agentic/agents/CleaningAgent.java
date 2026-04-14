@@ -3,6 +3,7 @@ package com.carmanagement.agentic.agents;
 import io.quarkiverse.langchain4j.ToolBox;
 
 import com.carmanagement.agentic.tools.CleaningTool;
+import com.carmanagement.model.CarInfo;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -23,9 +24,9 @@ public interface CleaningAgent {
         If no specific cleaning request is provided, request a standard exterior wash.
         
         Car Information:
-        Make: {carMake}
-        Model: {carModel}
-        Year: {carYear}
+        Make: {carInfo.make}
+        Model: {carInfo.model}
+        Year: {carInfo.year}
         Car Number: {carNumber}
         
         Cleaning Request:
@@ -35,9 +36,7 @@ public interface CleaningAgent {
             outputKey = "analysisResult")
     @ToolBox(CleaningTool.class)
     String processCleaning(
-            String carMake,
-            String carModel,
-            Integer carYear,
+            CarInfo carInfo,
             Integer carNumber,
             String cleaningRequest);
 }
