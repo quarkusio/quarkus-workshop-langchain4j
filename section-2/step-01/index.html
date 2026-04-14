@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1009,6 +1009,17 @@ You are not viewing the latest version.
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-context-objects-for-cleaner-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Context Objects for Cleaner Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#systemmessage" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1696,6 +1707,17 @@ You are not viewing the latest version.
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-context-objects-for-cleaner-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Context Objects for Cleaner Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#systemmessage" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2179,23 +2201,20 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Car not found with number: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carNumber</span><span class="p">;</span>
 <a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="hll"><span class="w">    </span><span class="c1">// Process the car result</span>
-</span><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cleaningAgent</span><span class="p">.</span><span class="na">processCleaning</span><span class="p">(</span>
-</span><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="hll"><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">make</span><span class="p">,</span>
-</span><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll"><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">model</span><span class="p">,</span>
-</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="hll"><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">year</span><span class="p">,</span>
-</span><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="hll"><span class="w">            </span><span class="n">carNumber</span><span class="p">,</span>
-</span><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="hll"><span class="w">            </span><span class="n">rentalFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="p">,</span>
-</span><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="hll"><span class="w">            </span><span class="n">cleaningFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
-</span><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="hll">
-</span><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="hll"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"CLEANING_NOT_REQUIRED"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
-</span><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
-</span><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
-</span><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
-<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
-<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="p">}</span>
-</code></pre></div>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="hll"><span class="w">    </span><span class="c1">// Create feedback context</span>
+</span><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="hll"><span class="w">    </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FeedbackContext</span><span class="p">(</span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="p">);</span>
+</span><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="hll">
+</span><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll"><span class="w">    </span><span class="c1">// Process the car result</span>
+</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cleaningAgent</span><span class="p">.</span><span class="na">processCleaning</span><span class="p">(</span><span class="n">carInfo</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+</span><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="hll">
+</span><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="hll"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"CLEANING_NOT_REQUIRED"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
+</span><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
+</span><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="hll">
+</span><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="hll"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+</span><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="hll"><span class="p">}</span>
+</span></code></pre></div>
 <p><strong>Key Points:</strong></p>
 <ul>
 <li>The <code>CleaningAgent</code> field is injected as a CDI bean</li>
@@ -2222,27 +2241,41 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 </span><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="hll"><span class="s">        """</span><span class="p">)</span>
 </span><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="s">        Car Information:</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="s">        Make: {carMake}</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="s">        Model: {carModel}</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s">        Year: {carYear}</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="s">        Make: {carInfo.make}</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="s">        Model: {carInfo.model}</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s">        Year: {carInfo.year}</span>
 <a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="s">        Car Number: {carNumber}</span>
 <a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
 <a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">        Feedback:</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">        Rental Feedback: {rentalFeedback}</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="s">        Cleaning Feedback: {cleaningFeedback}</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">        Rental Feedback: {feedback.rentalFeedback}</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="s">        Cleaning Feedback: {feedback.cleaningFeedback}</span>
 <a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="s">        """</span><span class="p">)</span>
 <a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="hll"><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="s">"Cleaning specialist. Determines what cleaning services are needed."</span><span class="p">)</span>
 </span><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="hll"><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">CleaningTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 </span><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processCleaning</span><span class="p">(</span>
-<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span>
-<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="p">);</span>
-<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="p">}</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">            </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Let’s break it down:</strong></p>
+<h3 id="using-context-objects-for-cleaner-parameters">Using Context Objects for Cleaner Parameters<a class="headerlink" href="#using-context-objects-for-cleaner-parameters" title="Permanent link"></a></h3>
+<p>Notice how the agent method signature uses <code>CarInfo</code> and <code>FeedbackContext</code> instead of passing individual fields:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">String</span><span class="w"> </span><span class="nf">processCleaning</span><span class="p">(</span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedbackContext</span><span class="p">)</span>
+</code></pre></div>
+<p>This approach groups related parameters into cohesive objects, making the code more maintainable. The <code>FeedbackContext</code> is a simple record that encapsulates feedback from different sources:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">FeedbackContext</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="c1">// Null-safe constructor ensures empty strings instead of nulls</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Benefits of this pattern:</strong></p>
+<ul>
+<li><strong>Reduced parameter count</strong>: Instead of passing 6-8 individual parameters, we pass 3 meaningful objects</li>
+<li><strong>Better organization</strong>: Related data stays together (car details in <code>CarInfo</code>, feedback in <code>FeedbackContext</code>)</li>
+<li><strong>Easier maintenance</strong>: Adding new feedback sources only requires updating <code>FeedbackContext</code>, not every method signature</li>
+<li><strong>Type safety</strong>: The compiler ensures you pass the right context objects</li>
+</ul>
+<p>This pattern becomes even more valuable as workflows grow more complex in later steps.</p>
 <h3 id="systemmessage"><code>@SystemMessage</code><a class="headerlink" href="#systemmessage" title="Permanent link"></a></h3>
 <p>Defines the agent’s <strong>role</strong> and <strong>decision-making logic</strong>:</p>
 <ul>
@@ -2301,55 +2334,55 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <p>If you went through Section 1, you’ll remember that we already covered <a href="../../section-1/step-07/" target="_blank">tool and function calling</a> for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
 These tools can be local, like in the following <code>CleaningTool</code> example, or remote, using the <a href="../../section-1/step-08/" target="_blank">MCP protocol we visited in Section 1, Step 8</a>..</p>
-<div class="highlight"><span class="filename">CleaningTool.java</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="cm">/**</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="cm"> * Tool for requesting cleaning operations.</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="cm"> */</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="hll"><span class="nd">@ApplicationScoped</span>
-</span><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CleaningTool</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="cm">/**</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="cm">     * Requests a cleaning based on the provided parameters.</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="cm">     *</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="cm">     * @param carNumber The car number</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="cm">     * @param carMake The car make</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="cm">     * @param carModel The car model</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="cm">     * @param carYear The car year</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="cm">     * @param exteriorWash Whether to request exterior wash</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="cm">     * @param interiorCleaning Whether to request interior cleaning</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="cm">     * @param detailing Whether to request detailing</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="cm">     * @param waxing Whether to request waxing</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="cm">     * @param requestText The cleaning request text</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="cm">     * @return A summary of the cleaning request</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="cm">     */</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="hll"><span class="w">    </span><span class="nd">@Tool</span><span class="p">(</span><span class="s">"Requests a cleaning with the specified options"</span><span class="p">)</span>
-</span><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">    </span><span class="nd">@Transactional</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">requestCleaning</span><span class="p">(</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">exteriorWash</span><span class="p">,</span>
-<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">interiorCleaning</span><span class="p">,</span>
-<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">detailing</span><span class="p">,</span>
-<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">waxing</span><span class="p">,</span>
-<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">requestText</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>
-<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="w">        </span><span class="c1">// In a real implementation, this would make an API call to a cleaning service</span>
-<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="w">        </span><span class="c1">// or update a database with the cleaning request</span>
-<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>
-<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="w">        </span><span class="c1">// Update car status to AT_CLEANING</span>
-<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="w">        </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
-<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a><span class="hll"><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AT_CLEANING</span><span class="p">;</span>
-</span><a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
-<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a>
-<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generateCleaningSummary</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="w">                                              </span><span class="n">exteriorWash</span><span class="p">,</span><span class="w"> </span><span class="n">interiorCleaning</span><span class="p">,</span><span class="w"> </span><span class="n">detailing</span><span class="p">,</span>
-<a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a><span class="w">                                              </span><span class="n">waxing</span><span class="p">,</span><span class="w"> </span><span class="n">requestText</span><span class="p">);</span>
-<a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="hll"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\uD83D\uDE97 CleaningTool result: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
-</span><a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a><span class="hll"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
-</span><a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a><span class="w">    </span><span class="p">}</span>
+<div class="highlight"><span class="filename">CleaningTool.java</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cm">/**</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="cm"> * Tool for requesting cleaning operations.</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="cm"> */</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="hll"><span class="nd">@ApplicationScoped</span>
+</span><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CleaningTool</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="cm">     * Requests a cleaning based on the provided parameters.</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="cm">     *</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="cm">     * @param carNumber The car number</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="cm">     * @param carMake The car make</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="cm">     * @param carModel The car model</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="cm">     * @param carYear The car year</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="cm">     * @param exteriorWash Whether to request exterior wash</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="cm">     * @param interiorCleaning Whether to request interior cleaning</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="cm">     * @param detailing Whether to request detailing</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="cm">     * @param waxing Whether to request waxing</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="cm">     * @param requestText The cleaning request text</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="cm">     * @return A summary of the cleaning request</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="cm">     */</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="hll"><span class="w">    </span><span class="nd">@Tool</span><span class="p">(</span><span class="s">"Requests a cleaning with the specified options"</span><span class="p">)</span>
+</span><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">    </span><span class="nd">@Transactional</span>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">requestCleaning</span><span class="p">(</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">exteriorWash</span><span class="p">,</span>
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">interiorCleaning</span><span class="p">,</span>
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">detailing</span><span class="p">,</span>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">waxing</span><span class="p">,</span>
+<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">requestText</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a>
+<a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a><span class="w">        </span><span class="c1">// In a real implementation, this would make an API call to a cleaning service</span>
+<a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a><span class="w">        </span><span class="c1">// or update a database with the cleaning request</span>
+<a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a>
+<a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a><span class="w">        </span><span class="c1">// Update car status to AT_CLEANING</span>
+<a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a><span class="w">        </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
+<a id="__codelineno-12-39" name="__codelineno-12-39" href="#__codelineno-12-39"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-40" name="__codelineno-12-40" href="#__codelineno-12-40"></a><span class="hll"><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AT_CLEANING</span><span class="p">;</span>
+</span><a id="__codelineno-12-41" name="__codelineno-12-41" href="#__codelineno-12-41"></a><span class="w">            </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
+<a id="__codelineno-12-42" name="__codelineno-12-42" href="#__codelineno-12-42"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-12-43" name="__codelineno-12-43" href="#__codelineno-12-43"></a>
+<a id="__codelineno-12-44" name="__codelineno-12-44" href="#__codelineno-12-44"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generateCleaningSummary</span><span class="p">(</span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
+<a id="__codelineno-12-45" name="__codelineno-12-45" href="#__codelineno-12-45"></a><span class="w">                                              </span><span class="n">exteriorWash</span><span class="p">,</span><span class="w"> </span><span class="n">interiorCleaning</span><span class="p">,</span><span class="w"> </span><span class="n">detailing</span><span class="p">,</span>
+<a id="__codelineno-12-46" name="__codelineno-12-46" href="#__codelineno-12-46"></a><span class="w">                                              </span><span class="n">waxing</span><span class="p">,</span><span class="w"> </span><span class="n">requestText</span><span class="p">);</span>
+<a id="__codelineno-12-47" name="__codelineno-12-47" href="#__codelineno-12-47"></a><span class="hll"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\uD83D\uDE97 CleaningTool result: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+</span><a id="__codelineno-12-48" name="__codelineno-12-48" href="#__codelineno-12-48"></a><span class="hll"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+</span><a id="__codelineno-12-49" name="__codelineno-12-49" href="#__codelineno-12-49"></a><span class="w">    </span><span class="p">}</span>
 </code></pre></div>
 <p><strong>Key Points:</strong></p>
 <ul>
@@ -2482,21 +2515,21 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>Try these experiments to deepen your understanding:</p>
 <h3 id="1-test-edge-cases">1. Test Edge Cases<a class="headerlink" href="#1-test-edge-cases" title="Permanent link"></a></h3>
 <p>Try different feedback scenarios:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>The trunk smells like fish
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>The trunk smells like fish
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Minor scratch on the bumper
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Minor scratch on the bumper
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Spotless condition
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Spotless condition
 </code></pre></div>
 <p>What does the agent decide for each? Does it call the cleaning tool?</p>
 <h3 id="2-modify-the-system-message">2. Modify the System Message<a class="headerlink" href="#2-modify-the-system-message" title="Permanent link"></a></h3>
 <p>Edit <code>CleaningAgent.java</code> and change the system message. For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="s">    You are a very picky cleaning intake specialist.</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s">    Request a full detail (exterior, interior, waxing, detailing)</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s">    unless the car is absolutely perfect.</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s">    If perfect, respond with "CLEANING_NOT_REQUIRED".</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="s">    """</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="s">    You are a very picky cleaning intake specialist.</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="s">    Request a full detail (exterior, interior, waxing, detailing)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="s">    unless the car is absolutely perfect.</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="s">    If perfect, respond with "CLEANING_NOT_REQUIRED".</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="s">    """</span><span class="p">)</span>
 </code></pre></div>
 <p>How does this change the agent’s behavior?</p>
 <h3 id="3-add-more-tool-parameters">3. Add More Tool Parameters<a class="headerlink" href="#3-add-more-tool-parameters" title="Permanent link"></a></h3>
@@ -2507,7 +2540,7 @@ Does the agent automatically learn to use it?</p>
 <details class="warning">
 <summary>Error: OPENAI_API_KEY not set</summary>
 <p>Make sure you’ve exported the environment variable:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-your-key-here
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-your-key-here
 </code></pre></div>
 <p>Then restart the application.</p>
 </details>
