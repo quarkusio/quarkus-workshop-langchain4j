@@ -26,6 +26,7 @@ In this step, you will:
 - Create a **`CarImageAnalysisAgent`** that analyzes car images and enriches rental feedback
 - Integrate the new agent at the beginning of the existing **`CarProcessingWorkflow`** sequence
 - Understand how `ImageContent` flows through agent parameters using `@UserMessage`
+- Understand how optional agents can be used to handle the absence of an input and skip the work of the agent
 - See how the agent gracefully handles the **absence of an image**, returning the feedback unchanged
 
 ---
@@ -199,7 +200,7 @@ public Uni<Response> processReturn(Integer carNumber,
 ```java
 private ImageContent toImageContent(FileUpload fileUpload) {
     if (fileUpload == null || fileUpload.filePath() == null) {
-        return EMPTY_IMAGE;
+        return null;
     }
     try {
         byte[] bytes = Files.readAllBytes(fileUpload.filePath());
@@ -208,14 +209,14 @@ private ImageContent toImageContent(FileUpload fileUpload) {
         return new ImageContent(base64, mimeType);
     } catch (IOException e) {
         Log.error("Failed to read uploaded car image", e);
-        return EMPTY_IMAGE;
+        return null;
     }
 }
 ```
 
 - Reads the uploaded file and converts it to **base64-encoded** data
 - Creates an `ImageContent` with the base64 data and the file's MIME type (e.g., `image/jpeg`, `image/png`)
-- Falls back to `EMPTY_IMAGE` (a tiny white pixel) when no image is provided — this avoids null handling throughout the pipeline
+- Falls back to `null` when no image is provided
 
 ---
 
@@ -280,19 +281,19 @@ The system message instructs the LLM to:
 @UserMessage("""
     Rental Feedback: {rentalFeedback}
     """)
-String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") @V("carImage") ImageContent carImage);
+String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") ImageContent carImage);
 ```
 
 Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning. In this case we also need to add the @V annotation to specify the variable name in the template of the UserMessage.
 
-#### The `outputKey = "rentalFeedback"`
+#### The `outputKey` and the `optional` flag
 
 ```java
 @Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
-        outputKey = "rentalFeedback")
+        outputKey = "rentalFeedback", optional = true)
 ```
 
-The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback.
+The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of this agent if no image is provided.
 
 ---
 
@@ -433,7 +434,7 @@ sequenceDiagram
 - **`ImageContent`** is LangChain4j's way to represent images for LLM consumption
 - **`@UserMessage` on `ImageContent`** parameters automatically includes the image in the message to the LLM
 - **The enrichment pattern** (outputKey matching an existing scope variable) allows new agents to augment data without changing downstream code
-- **Graceful degradation**: The agent handles missing images by returning feedback unchanged
+- **Optional agent**: The agent can be skipped if no image is provided
 - **Multipart form data** with `@RestForm FileUpload` makes image upload straightforward in Quarkus
 - **Base64 encoding** is used to convert uploaded files into `ImageContent`
 

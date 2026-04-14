@@ -66,11 +66,9 @@ public class CarManagementResource {
         return Response.ok(carManagementService.report()).build();
     }
 
-    private static final ImageContent EMPTY_IMAGE = ImageContent.from(java.nio.file.Path.of("src", "main", "resources", "white-pixel-icon.png"), "image/png");
-
     private ImageContent toImageContent(FileUpload fileUpload) {
         if (fileUpload == null || fileUpload.filePath() == null) {
-            return EMPTY_IMAGE;
+            return null;
         }
         try {
             byte[] bytes = Files.readAllBytes(fileUpload.filePath());
@@ -79,7 +77,7 @@ public class CarManagementResource {
             return new ImageContent(base64, mimeType);
         } catch (IOException e) {
             Log.error("Failed to read uploaded car image", e);
-            return EMPTY_IMAGE;
+            return null;
         }
     }
 }
