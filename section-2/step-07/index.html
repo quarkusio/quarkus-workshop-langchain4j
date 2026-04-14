@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2762,9 +2762,9 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 </code></pre></div>
 <h3 id="test-the-complete-flow">Test the Complete Flow<a class="headerlink" href="#test-the-complete-flow" title="Permanent link"></a></h3>
 <p>Open your browser to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>.</p>
-<p>You’ll see the same UI as Step 5 with the <strong>Returns and Dispositions</strong> section and the <strong>Dispositions</strong> tab.</p>
-<p><img alt="Maintenance Returns Tab" class="center" src="../../images/agentic-UI-maintenance-returns-2.png"></p>
-<p>On the Rental Return tab, enter feedback indicating severe damage for the Honda Civic:</p>
+<p>You’ll see the Fleet Status grid with inline feedback forms in the Action column and the approval notification button.</p>
+<p><img alt="Fleet Status Grid" class="center" src="../../images/agentic-UI-maintenance-returns-2.png"></p>
+<p>iFind the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>looks like this car hit a tree and is damaged beyond repair
 </code></pre></div>
 <p>Click <strong>Return</strong>.</p>
@@ -2805,7 +2805,7 @@ Clients can query this endpoint to discover the agent’s capabilities.</p>
 <p><strong>UI Update</strong>:</p>
 <ol>
 <li>Car status → <code>DISPOSED</code></li>
-<li>Car appears in the Dispositions tab</li>
+<li>Car status updates to <code>PENDING_DISPOSITION</code> in the Fleet Status grid</li>
 </ol>
 </li>
 </ol>

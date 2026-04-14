@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2148,8 +2148,6 @@ You are not viewing the latest version.
 <p>Step 04 adds a third perspective: <strong>disposition analysis</strong>. At that point, the similarity between the feedback agents becomes hard to ignore. Each one reads the same car information and the same feedback sources. The main difference is the instructions it follows and the output it produces.</p>
 <p>Instead of creating one more near-duplicate agent, this step refactors the design so the variability becomes explicit data. The analysis logic stays in one place, and the workflow passes in a task object that tells the agent what kind of feedback it is analyzing.</p>
 <p>This is a useful architectural progression to understand. You start with concrete, easy-to-read building blocks when learning the model. Once the pattern is familiar, you can refactor toward something more reusable and maintainable.</p>
-<p><strong>Context Objects Continue to Simplify:</strong></p>
-<p>Throughout this refactoring, the <code>CarInfo</code> and <code>FeedbackContext</code> pattern introduced in earlier steps continues to provide value. Even as we move to a more sophisticated architecture with parameterized agents, we still pass just 3-4 meaningful objects rather than 8-10 individual parameters. This keeps method signatures clean and maintainable.</p>
 <hr>
 <h2 id="what-is-being-added">What is Being Added?<a class="headerlink" href="#what-is-being-added" title="Permanent link"></a></h2>
 <p>We’re going to enhance our car management system with:</p>
@@ -2354,39 +2352,35 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <div class="highlight"><span class="filename">FeedbackAnalysisAgent.java</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarInfo</span><span class="p">;</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackContext</span><span class="p">;</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="cm">/**</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="cm"> * Unified agent that analyzes feedback based on the provided task configuration.</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="cm"> * This agent is parameterized to handle cleaning, maintenance, and disposition analysis.</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="cm"> */</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="hll"><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeedbackAnalysisAgent</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"{task.systemInstructions}"</span><span class="p">)</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="s">        Car Information:</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="s">        Make: {carInfo.make}</span>
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="s">        Model: {carInfo.model}</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="s">        Year: {carInfo.year}</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="s">        Previous Condition: {carInfo.condition}</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="s">        Feedback:</span>
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="s">        Rental Feedback: {feedback.rentalFeedback}</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="s">        Cleaning Feedback: {feedback.cleaningFeedback}</span>
-<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="hll"><span class="s">        Maintenance Feedback: {feedback.maintenanceFeedback}</span>
-</span><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="hll"><span class="s">        """</span><span class="p">)</span>
-</span><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="hll"><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Feedback analyzer. Using feedback, determines if action is needed based on task type."</span><span class="p">,</span>
-</span><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"feedbackAnalysis"</span><span class="p">)</span>
-</span><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeFeedback</span><span class="p">(</span>
-<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="w">            </span><span class="n">FeedbackTask</span><span class="w"> </span><span class="n">task</span><span class="p">,</span>
-<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
-<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">            </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
-<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="p">}</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="cm">/**</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="cm"> * Unified agent that analyzes feedback based on the provided task configuration.</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="cm"> * This agent is parameterized to handle cleaning, maintenance, and disposition analysis.</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="cm"> */</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeedbackAnalysisAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="hll">
+</span><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"{task.systemInstructions}"</span><span class="p">)</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="s">        Car Information:</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="s">        Make: {carInfo.make}</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="s">        Model: {carInfo.model}</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="s">        Year: {carInfo.year}</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="s">        Previous Condition: {carInfo.condition}</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="s">        Feedback: {feedback}</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Feedback analyzer. Using feedback, determines if action is needed based on task type."</span><span class="p">,</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"feedbackAnalysis"</span><span class="p">)</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">analyzeFeedback</span><span class="p">(</span>
+</span><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="hll"><span class="w">            </span><span class="n">FeedbackTask</span><span class="w"> </span><span class="n">task</span><span class="p">,</span>
+</span><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="hll"><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+</span><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="hll"><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+</span><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="p">}</span>
 </code></pre></div>
 <p>The key detail here is the system message. Instead of hardcoding the instructions in the agent itself, the agent uses <code>{task.systemInstructions}</code>. That means the same agent can behave like a cleaning analyzer, a maintenance analyzer, or a disposition analyzer depending on the <a href="section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"><code>FeedbackTask</code></a> that was passed in.</p>
 <p>This is the core of the refactoring: one agent, multiple task configurations.</p>
@@ -2477,57 +2471,56 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>In <a href="section-2/step-04/src/main/java/com/carmanagement/agentic/agents"><code>src/main/java/com/carmanagement/agentic/agents</code></a>, create <a href="section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"><code>DispositionAgent.java</code></a>:</p>
 <div class="highlight"><span class="filename">DispositionAgent.java</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackContext</span><span class="p">;</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="cm">/**</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="cm"> * Agent that determines how to dispose of a car based on value, condition, and damage.</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="cm"> */</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DispositionAgent</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="s">        You are a car disposition specialist for a car rental company.</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="s">        Your job is to determine the best disposition action based on the car's value, condition, age, and damage.</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="hll">
-</span><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">        Disposition Options:</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">        - SCRAP: Car is beyond economical repair or has severe safety concerns</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="s">        - SELL: Car has value but is aging out of the fleet or has moderate damage</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="s">        - DONATE: Car has minimal value but could serve a charitable purpose</span>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="s">        - KEEP: Car is worth keeping in the fleet</span>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="hll">
-</span><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="s">        Decision Criteria:</span>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="s">        - If estimated repair cost &gt; 50% of car value: Consider SCRAP or SELL</span>
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="s">        - If car is over 5 years old with significant damage: SCRAP</span>
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="s">        - If car is 3-5 years old in fair condition: SELL</span>
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="s">        - If car has low value (&lt;$5,000) but functional: DONATE</span>
-<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="s">        - If car is valuable and damage is minor: KEEP</span>
-<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="hll">
-</span><a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="s">        Provide your recommendation with a clear explanation of the reasoning.</span>
-<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="s">        Determine the disposition for this vehicle:</span>
-<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="s">        - Make: {carMake}</span>
-<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="s">        - Model: {carModel}</span>
-<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a><span class="s">        - Year: {carYear}</span>
-<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="s">        - Car Number: {carNumber}</span>
-<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="s">        - Current Condition: {carCondition}</span>
-<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="s">        - Estimated Value: {carValue}</span>
-<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a><span class="s">        - Damage/Feedback: {feedback.rentalFeedback}</span>
-<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a><span class="hll">
-</span><a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a><span class="s">        Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.</span>
-<a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a><span class="hll"><span class="s">        """</span><span class="p">)</span>
-</span><a id="__codelineno-7-44" name="__codelineno-7-44" href="#__codelineno-7-44"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"dispositionAction"</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car disposition specialist. Determines how to dispose of a car based on value and condition."</span><span class="p">)</span>
-<a id="__codelineno-7-45" name="__codelineno-7-45" href="#__codelineno-7-45"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processDisposition</span><span class="p">(</span>
-<a id="__codelineno-7-46" name="__codelineno-7-46" href="#__codelineno-7-46"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
-<a id="__codelineno-7-47" name="__codelineno-7-47" href="#__codelineno-7-47"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
-<a id="__codelineno-7-48" name="__codelineno-7-48" href="#__codelineno-7-48"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
-<a id="__codelineno-7-49" name="__codelineno-7-49" href="#__codelineno-7-49"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-7-50" name="__codelineno-7-50" href="#__codelineno-7-50"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
-<a id="__codelineno-7-51" name="__codelineno-7-51" href="#__codelineno-7-51"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carValue</span><span class="p">,</span>
-<a id="__codelineno-7-52" name="__codelineno-7-52" href="#__codelineno-7-52"></a><span class="w">            </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
-<a id="__codelineno-7-53" name="__codelineno-7-53" href="#__codelineno-7-53"></a><span class="p">}</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.SystemMessage</span><span class="p">;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.service.UserMessage</span><span class="p">;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="cm">/**</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="cm"> * Agent that determines how to dispose of a car based on value, condition, and damage.</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="cm"> */</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DispositionAgent</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="nd">@SystemMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s">        You are a car disposition specialist for a car rental company.</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="s">        Your job is to determine the best disposition action based on the car's value, condition, age, and damage.</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="hll"><span class="s">        Disposition Options:</span>
+</span><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">        - SCRAP: Car is beyond economical repair or has severe safety concerns</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">        - SELL: Car has value but is aging out of the fleet or has moderate damage</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="s">        - DONATE: Car has minimal value but could serve a charitable purpose</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="s">        - KEEP: Car is worth keeping in the fleet</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="hll"><span class="s">        Decision Criteria:</span>
+</span><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="s">        - If estimated repair cost &gt; 50% of car value: Consider SCRAP or SELL</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="s">        - If car is over 5 years old with significant damage: SCRAP</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="s">        - If car is 3-5 years old in fair condition: SELL</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="s">        - If car has low value (&lt;$5,000) but functional: DONATE</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="s">        - If car is valuable and damage is minor: KEEP</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="hll"><span class="s">        Provide your recommendation with a clear explanation of the reasoning.</span>
+</span><a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">    </span><span class="nd">@UserMessage</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="s">        Determine the disposition for this vehicle:</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="s">        - Make: {carMake}</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="s">        - Model: {carModel}</span>
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="s">        - Year: {carYear}</span>
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a><span class="s">        - Car Number: {carNumber}</span>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="s">        - Current Condition: {carCondition}</span>
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="s">        - Estimated Value: {carValue}</span>
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="s">        - Damage/Feedback: {feedback}</span>
+<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a>
+<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a><span class="hll"><span class="s">        Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.</span>
+</span><a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a><span class="s">        """</span><span class="p">)</span>
+<a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a><span class="hll"><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"dispositionAction"</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Car disposition specialist. Determines how to dispose of a car based on value and condition."</span><span class="p">)</span>
+</span><a id="__codelineno-7-44" name="__codelineno-7-44" href="#__codelineno-7-44"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processDisposition</span><span class="p">(</span>
+<a id="__codelineno-7-45" name="__codelineno-7-45" href="#__codelineno-7-45"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carMake</span><span class="p">,</span>
+<a id="__codelineno-7-46" name="__codelineno-7-46" href="#__codelineno-7-46"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carModel</span><span class="p">,</span>
+<a id="__codelineno-7-47" name="__codelineno-7-47" href="#__codelineno-7-47"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carYear</span><span class="p">,</span>
+<a id="__codelineno-7-48" name="__codelineno-7-48" href="#__codelineno-7-48"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-7-49" name="__codelineno-7-49" href="#__codelineno-7-49"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carCondition</span><span class="p">,</span>
+<a id="__codelineno-7-50" name="__codelineno-7-50" href="#__codelineno-7-50"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">carValue</span><span class="p">,</span>
+<a id="__codelineno-7-51" name="__codelineno-7-51" href="#__codelineno-7-51"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+<a id="__codelineno-7-52" name="__codelineno-7-52" href="#__codelineno-7-52"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="create-the-fleetsupervisoragent">Create the FleetSupervisorAgent<a class="headerlink" href="#create-the-fleetsupervisoragent" title="Permanent link"></a></h3>
 <p>Now create the <strong>supervisor agent</strong> that orchestrates everything.</p>
@@ -2577,71 +2570,70 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="cm">     * @param carNumber The car's identification number</span>
 <a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a><span class="cm">     * @param carCondition The current condition description</span>
 <a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="cm">     * @param feedbackAnalysisResults The results from parallel feedback analysis</span>
-<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a><span class="cm">     * @param rentalFeedback The original rental feedback</span>
-<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a><span class="cm">     * @return A formatted prompt instructing the supervisor which agents to invoke</span>
-<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a><span class="cm">     */</span>
-<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a><span class="w">    </span><span class="nd">@SupervisorRequest</span>
-<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">request</span><span class="p">(</span>
-<a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
-<a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a><span class="w">            </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span>
-<a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a><span class="hll"><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a><span class="hll"><span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">dispositionAnalysis</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span>
-</span><a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">dispositionAnalysis</span><span class="p">().</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"DISPOSITION_REQUIRED"</span><span class="p">);</span>
-</span><a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a><span class="hll">
-</span><a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a><span class="hll"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">noDispositionMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"""</span>
-</span><a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a><span class="hll"><span class="s">               No disposition has been requested.</span>
-</span><a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a><span class="hll">
-</span><a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a><span class="hll"><span class="s">                INSTRUCTIONS:</span>
-</span><a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a><span class="hll"><span class="s">                - DO NOT invoke PricingAgent</span>
-</span><a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a><span class="hll"><span class="s">                - DO NOT invoke DispositionAgent</span>
-</span><a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a><span class="hll"><span class="s">                - Only invoke MaintenanceAgent if maintenance needed</span>
-</span><a id="__codelineno-8-64" name="__codelineno-8-64" href="#__codelineno-8-64"></a><span class="hll"><span class="s">                - Only invoke CleaningAgent if cleaning needed</span>
-</span><a id="__codelineno-8-65" name="__codelineno-8-65" href="#__codelineno-8-65"></a><span class="s">               """</span><span class="p">;</span>
-<a id="__codelineno-8-66" name="__codelineno-8-66" href="#__codelineno-8-66"></a>
-<a id="__codelineno-8-67" name="__codelineno-8-67" href="#__codelineno-8-67"></a><span class="w">        </span><span class="c1">// Disposition required - complex path</span>
-<a id="__codelineno-8-68" name="__codelineno-8-68" href="#__codelineno-8-68"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">dispositionMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"""</span>
-<a id="__codelineno-8-69" name="__codelineno-8-69" href="#__codelineno-8-69"></a><span class="s">            The car has to be disposed.</span>
-<a id="__codelineno-8-70" name="__codelineno-8-70" href="#__codelineno-8-70"></a>
-<a id="__codelineno-8-71" name="__codelineno-8-71" href="#__codelineno-8-71"></a><span class="s">            STEP 1: Invoke PricingAgent to get car value</span>
-<a id="__codelineno-8-72" name="__codelineno-8-72" href="#__codelineno-8-72"></a><span class="s">            STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)</span>
-<a id="__codelineno-8-73" name="__codelineno-8-73" href="#__codelineno-8-73"></a><span class="s">            STEP 3: If DispositionAgent decides KEEP:</span>
-<a id="__codelineno-8-74" name="__codelineno-8-74" href="#__codelineno-8-74"></a><span class="s">                    - Invoke MaintenanceAgent if maintenance needed</span>
-<a id="__codelineno-8-75" name="__codelineno-8-75" href="#__codelineno-8-75"></a><span class="s">                    - Invoke CleaningAgent if cleaning needed</span>
-<a id="__codelineno-8-76" name="__codelineno-8-76" href="#__codelineno-8-76"></a>
-<a id="__codelineno-8-77" name="__codelineno-8-77" href="#__codelineno-8-77"></a><span class="s">            IMPORTANT: When invoking DispositionAgent:</span>
-<a id="__codelineno-8-78" name="__codelineno-8-78" href="#__codelineno-8-78"></a><span class="s">            - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)</span>
-<a id="__codelineno-8-79" name="__codelineno-8-79" href="#__codelineno-8-79"></a><span class="s">            - Use the EXACT format from PricingAgent's response</span>
-<a id="__codelineno-8-80" name="__codelineno-8-80" href="#__codelineno-8-80"></a>
-<a id="__codelineno-8-81" name="__codelineno-8-81" href="#__codelineno-8-81"></a><span class="s">            Follow the decision logic in your system message carefully.</span>
-<a id="__codelineno-8-82" name="__codelineno-8-82" href="#__codelineno-8-82"></a><span class="s">            """</span><span class="p">;</span>
-<a id="__codelineno-8-83" name="__codelineno-8-83" href="#__codelineno-8-83"></a>
-<a id="__codelineno-8-84" name="__codelineno-8-84" href="#__codelineno-8-84"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
-<a id="__codelineno-8-85" name="__codelineno-8-85" href="#__codelineno-8-85"></a><span class="s">            You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.</span>
-<a id="__codelineno-8-86" name="__codelineno-8-86" href="#__codelineno-8-86"></a>
-<a id="__codelineno-8-87" name="__codelineno-8-87" href="#__codelineno-8-87"></a><span class="s">            The feedback has already been analyzed and you have these inputs:</span>
-<a id="__codelineno-8-88" name="__codelineno-8-88" href="#__codelineno-8-88"></a><span class="s">            - cleaningAnalysis: What cleaning is needed (or "CLEANING_NOT_REQUIRED")</span>
-<a id="__codelineno-8-89" name="__codelineno-8-89" href="#__codelineno-8-89"></a><span class="s">            - maintenanceAnalysis: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")</span>
-<a id="__codelineno-8-90" name="__codelineno-8-90" href="#__codelineno-8-90"></a><span class="s">            - dispositionAnalysis: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")</span>
-<a id="__codelineno-8-91" name="__codelineno-8-91" href="#__codelineno-8-91"></a>
-<a id="__codelineno-8-92" name="__codelineno-8-92" href="#__codelineno-8-92"></a><span class="s">            Your job is to invoke the appropriate ACTION agents for this car</span>
-<a id="__codelineno-8-93" name="__codelineno-8-93" href="#__codelineno-8-93"></a><span class="hll">
-</span><a id="__codelineno-8-94" name="__codelineno-8-94" href="#__codelineno-8-94"></a><span class="hll"><span class="s">            Car: %d %s %s (#%d)</span>
-</span><a id="__codelineno-8-95" name="__codelineno-8-95" href="#__codelineno-8-95"></a><span class="hll"><span class="s">            Current Condition: %s</span>
-</span><a id="__codelineno-8-96" name="__codelineno-8-96" href="#__codelineno-8-96"></a><span class="hll">
-</span><a id="__codelineno-8-97" name="__codelineno-8-97" href="#__codelineno-8-97"></a><span class="hll"><span class="s">            Cleaning Analysis: %s</span>
-</span><a id="__codelineno-8-98" name="__codelineno-8-98" href="#__codelineno-8-98"></a><span class="hll"><span class="s">            Maintenance Analysis: %s</span>
-</span><a id="__codelineno-8-99" name="__codelineno-8-99" href="#__codelineno-8-99"></a><span class="hll">
-</span><a id="__codelineno-8-100" name="__codelineno-8-100" href="#__codelineno-8-100"></a><span class="hll"><span class="s">            In particular, your have to follow these steps</span>
-</span><a id="__codelineno-8-101" name="__codelineno-8-101" href="#__codelineno-8-101"></a><span class="hll">
-</span><a id="__codelineno-8-102" name="__codelineno-8-102" href="#__codelineno-8-102"></a><span class="hll"><span class="s">            %s</span>
-</span><a id="__codelineno-8-103" name="__codelineno-8-103" href="#__codelineno-8-103"></a><span class="hll"><span class="s">            """</span><span class="p">,</span>
-</span><a id="__codelineno-8-104" name="__codelineno-8-104" href="#__codelineno-8-104"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">year</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">make</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">model</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">condition</span><span class="p">,</span>
-</span><a id="__codelineno-8-105" name="__codelineno-8-105" href="#__codelineno-8-105"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">cleaningAnalysis</span><span class="p">(),</span>
-</span><a id="__codelineno-8-106" name="__codelineno-8-106" href="#__codelineno-8-106"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">maintenanceAnalysis</span><span class="p">(),</span>
-</span><a id="__codelineno-8-107" name="__codelineno-8-107" href="#__codelineno-8-107"></a><span class="hll"><span class="w">                </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">dispositionMessage</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">noDispositionMessage</span><span class="p">);</span>
-</span><a id="__codelineno-8-108" name="__codelineno-8-108" href="#__codelineno-8-108"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
-</span><a id="__codelineno-8-109" name="__codelineno-8-109" href="#__codelineno-8-109"></a><span class="hll"><span class="p">}</span>
+<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a><span class="cm">     * @return A formatted prompt instructing the supervisor which agents to invoke</span>
+<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a><span class="cm">     */</span>
+<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a><span class="w">    </span><span class="nd">@SupervisorRequest</span>
+<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">request</span><span class="p">(</span>
+<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+<a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a><span class="w">            </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span>
+<a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a><span class="hll"><span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">dispositionAnalysis</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+</span><a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">dispositionAnalysis</span><span class="p">().</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"DISPOSITION_REQUIRED"</span><span class="p">);</span>
+</span><a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a><span class="hll">
+</span><a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a><span class="hll"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">noDispositionMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"""</span>
+</span><a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a><span class="hll"><span class="s">               No disposition has been requested.</span>
+</span><a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a><span class="hll">
+</span><a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a><span class="hll"><span class="s">                INSTRUCTIONS:</span>
+</span><a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a><span class="hll"><span class="s">                - DO NOT invoke PricingAgent</span>
+</span><a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a><span class="hll"><span class="s">                - DO NOT invoke DispositionAgent</span>
+</span><a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a><span class="hll"><span class="s">                - Only invoke MaintenanceAgent if maintenance needed</span>
+</span><a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a><span class="hll"><span class="s">                - Only invoke CleaningAgent if cleaning needed</span>
+</span><a id="__codelineno-8-64" name="__codelineno-8-64" href="#__codelineno-8-64"></a><span class="hll"><span class="s">               """</span><span class="p">;</span>
+</span><a id="__codelineno-8-65" name="__codelineno-8-65" href="#__codelineno-8-65"></a>
+<a id="__codelineno-8-66" name="__codelineno-8-66" href="#__codelineno-8-66"></a><span class="w">        </span><span class="c1">// Disposition required - complex path</span>
+<a id="__codelineno-8-67" name="__codelineno-8-67" href="#__codelineno-8-67"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">dispositionMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"""</span>
+<a id="__codelineno-8-68" name="__codelineno-8-68" href="#__codelineno-8-68"></a><span class="s">            The car has to be disposed.</span>
+<a id="__codelineno-8-69" name="__codelineno-8-69" href="#__codelineno-8-69"></a>
+<a id="__codelineno-8-70" name="__codelineno-8-70" href="#__codelineno-8-70"></a><span class="s">            STEP 1: Invoke PricingAgent to get car value</span>
+<a id="__codelineno-8-71" name="__codelineno-8-71" href="#__codelineno-8-71"></a><span class="s">            STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)</span>
+<a id="__codelineno-8-72" name="__codelineno-8-72" href="#__codelineno-8-72"></a><span class="s">            STEP 3: If DispositionAgent decides KEEP:</span>
+<a id="__codelineno-8-73" name="__codelineno-8-73" href="#__codelineno-8-73"></a><span class="s">                    - Invoke MaintenanceAgent if maintenance needed</span>
+<a id="__codelineno-8-74" name="__codelineno-8-74" href="#__codelineno-8-74"></a><span class="s">                    - Invoke CleaningAgent if cleaning needed</span>
+<a id="__codelineno-8-75" name="__codelineno-8-75" href="#__codelineno-8-75"></a>
+<a id="__codelineno-8-76" name="__codelineno-8-76" href="#__codelineno-8-76"></a><span class="s">            IMPORTANT: When invoking DispositionAgent:</span>
+<a id="__codelineno-8-77" name="__codelineno-8-77" href="#__codelineno-8-77"></a><span class="s">            - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)</span>
+<a id="__codelineno-8-78" name="__codelineno-8-78" href="#__codelineno-8-78"></a><span class="s">            - Use the EXACT format from PricingAgent's response</span>
+<a id="__codelineno-8-79" name="__codelineno-8-79" href="#__codelineno-8-79"></a>
+<a id="__codelineno-8-80" name="__codelineno-8-80" href="#__codelineno-8-80"></a><span class="s">            Follow the decision logic in your system message carefully.</span>
+<a id="__codelineno-8-81" name="__codelineno-8-81" href="#__codelineno-8-81"></a><span class="s">            """</span><span class="p">;</span>
+<a id="__codelineno-8-82" name="__codelineno-8-82" href="#__codelineno-8-82"></a>
+<a id="__codelineno-8-83" name="__codelineno-8-83" href="#__codelineno-8-83"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">"""</span>
+<a id="__codelineno-8-84" name="__codelineno-8-84" href="#__codelineno-8-84"></a><span class="s">            You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.</span>
+<a id="__codelineno-8-85" name="__codelineno-8-85" href="#__codelineno-8-85"></a>
+<a id="__codelineno-8-86" name="__codelineno-8-86" href="#__codelineno-8-86"></a><span class="s">            The feedback has already been analyzed and you have these inputs:</span>
+<a id="__codelineno-8-87" name="__codelineno-8-87" href="#__codelineno-8-87"></a><span class="s">            - cleaningAnalysis: What cleaning is needed (or "CLEANING_NOT_REQUIRED")</span>
+<a id="__codelineno-8-88" name="__codelineno-8-88" href="#__codelineno-8-88"></a><span class="s">            - maintenanceAnalysis: What maintenance is needed (or "MAINTENANCE_NOT_REQUIRED")</span>
+<a id="__codelineno-8-89" name="__codelineno-8-89" href="#__codelineno-8-89"></a><span class="s">            - dispositionAnalysis: Whether severe damage requires disposition (or "DISPOSITION_NOT_REQUIRED")</span>
+<a id="__codelineno-8-90" name="__codelineno-8-90" href="#__codelineno-8-90"></a>
+<a id="__codelineno-8-91" name="__codelineno-8-91" href="#__codelineno-8-91"></a><span class="s">            Your job is to invoke the appropriate ACTION agents for this car</span>
+<a id="__codelineno-8-92" name="__codelineno-8-92" href="#__codelineno-8-92"></a>
+<a id="__codelineno-8-93" name="__codelineno-8-93" href="#__codelineno-8-93"></a><span class="hll"><span class="s">            Car: %d %s %s (#%d)</span>
+</span><a id="__codelineno-8-94" name="__codelineno-8-94" href="#__codelineno-8-94"></a><span class="hll"><span class="s">            Current Condition: %s</span>
+</span><a id="__codelineno-8-95" name="__codelineno-8-95" href="#__codelineno-8-95"></a><span class="hll">
+</span><a id="__codelineno-8-96" name="__codelineno-8-96" href="#__codelineno-8-96"></a><span class="hll"><span class="s">            Cleaning Analysis: %s</span>
+</span><a id="__codelineno-8-97" name="__codelineno-8-97" href="#__codelineno-8-97"></a><span class="hll"><span class="s">            Maintenance Analysis: %s</span>
+</span><a id="__codelineno-8-98" name="__codelineno-8-98" href="#__codelineno-8-98"></a><span class="hll">
+</span><a id="__codelineno-8-99" name="__codelineno-8-99" href="#__codelineno-8-99"></a><span class="hll"><span class="s">            In particular, your have to follow these steps</span>
+</span><a id="__codelineno-8-100" name="__codelineno-8-100" href="#__codelineno-8-100"></a><span class="hll">
+</span><a id="__codelineno-8-101" name="__codelineno-8-101" href="#__codelineno-8-101"></a><span class="hll"><span class="s">            %s</span>
+</span><a id="__codelineno-8-102" name="__codelineno-8-102" href="#__codelineno-8-102"></a><span class="hll"><span class="s">            """</span><span class="p">,</span>
+</span><a id="__codelineno-8-103" name="__codelineno-8-103" href="#__codelineno-8-103"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">year</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">make</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">model</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">carInfo</span><span class="p">.</span><span class="na">condition</span><span class="p">,</span>
+</span><a id="__codelineno-8-104" name="__codelineno-8-104" href="#__codelineno-8-104"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">cleaningAnalysis</span><span class="p">(),</span>
+</span><a id="__codelineno-8-105" name="__codelineno-8-105" href="#__codelineno-8-105"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">maintenanceAnalysis</span><span class="p">(),</span>
+</span><a id="__codelineno-8-106" name="__codelineno-8-106" href="#__codelineno-8-106"></a><span class="hll"><span class="w">                </span><span class="n">dispositionRequired</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">dispositionMessage</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">noDispositionMessage</span><span class="p">);</span>
+</span><a id="__codelineno-8-107" name="__codelineno-8-107" href="#__codelineno-8-107"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-8-108" name="__codelineno-8-108" href="#__codelineno-8-108"></a><span class="hll"><span class="p">}</span>
 </span></code></pre></div>
 <p><strong>Key points:</strong></p>
 <ul>
@@ -2708,50 +2700,49 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents.FeedbackAnalysisAgent</span><span class="p">;</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarInfo</span><span class="p">;</span>
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackAnalysisResults</span><span class="p">;</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackContext</span><span class="p">;</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.Output</span><span class="p">;</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.ParallelMapperAgent</span><span class="p">;</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.scope.AgenticScope</span><span class="p">;</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="cm">/**</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="cm"> * Workflow for processing car feedback in parallel.</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="cm"> * Analyzes feedback for cleaning, maintenance, and disposition needs using a unified agent.</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="cm"> */</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeedbackAnalysisWorkflow</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">    </span><span class="cm">/**</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="cm">     * Runs the feedback analysis agent in parallel for multiple tasks.</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="cm">     * Uses @ParallelMapperAgent to execute the same agent with different task configurations.</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="hll"><span class="cm">     * Returns a list of results that will be mapped to individual output keys.</span>
-</span><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="hll"><span class="cm">     */</span>
-</span><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="hll"><span class="w">    </span><span class="nd">@ParallelMapperAgent</span><span class="p">(</span>
-</span><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="hll"><span class="w">            </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Analyzes car feedback in parallel for cleaning, maintenance, and disposition needs"</span><span class="p">,</span>
-</span><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"feedbackAnalysisResults"</span><span class="p">,</span>
-</span><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">            </span><span class="n">subAgent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FeedbackAnalysisAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span>
-<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="hll"><span class="w">            </span><span class="n">itemsProvider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"tasks"</span><span class="p">)</span>
-</span><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="hll"><span class="w">    </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="nf">analyzeFeedback</span><span class="p">(</span>
-</span><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="hll"><span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="p">,</span>
-</span><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="hll"><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
-</span><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="hll"><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-</span><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="hll"><span class="w">            </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
-</span><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="hll">
-</span><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="hll"><span class="w">    </span><span class="cm">/**</span>
-</span><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="hll"><span class="cm">     * Output method that transforms the parallel feedback results into a structured object.</span>
-</span><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="hll"><span class="cm">     * The feedbackAnalysisResults list contains results in the same order as the input tasks:</span>
-</span><a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="cm">     * [0] = cleaning analysis, [1] = maintenance analysis, [2] = disposition analysis</span>
-<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a><span class="cm">     */</span>
-<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="w">    </span><span class="nd">@Output</span>
-<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="n">AgenticScope</span><span class="w"> </span><span class="n">scope</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FeedbackAnalysisResults</span><span class="p">(</span>
-<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w">  </span><span class="c1">// cleaningAnalysis</span>
-<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w">  </span><span class="c1">// maintenanceAnalysis</span>
-</span><a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">   </span><span class="c1">// dispositionAnalysis</span>
-</span><a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="hll"><span class="w">        </span><span class="p">);</span>
-</span><a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
-</span><a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a><span class="hll"><span class="p">}</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.Output</span><span class="p">;</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.ParallelMapperAgent</span><span class="p">;</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.scope.AgenticScope</span><span class="p">;</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="cm">/**</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="cm"> * Workflow for processing car feedback in parallel.</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="cm"> * Analyzes feedback for cleaning, maintenance, and disposition needs using a unified agent.</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="cm"> */</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeedbackAnalysisWorkflow</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="cm">     * Runs the feedback analysis agent in parallel for multiple tasks.</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="cm">     * Uses @ParallelMapperAgent to execute the same agent with different task configurations.</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="cm">     * Returns a list of results that will be mapped to individual output keys.</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="hll"><span class="cm">     */</span>
+</span><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="hll"><span class="w">    </span><span class="nd">@ParallelMapperAgent</span><span class="p">(</span>
+</span><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="hll"><span class="w">            </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Analyzes car feedback in parallel for cleaning, maintenance, and disposition needs"</span><span class="p">,</span>
+</span><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="hll"><span class="w">            </span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"feedbackAnalysisResults"</span><span class="p">,</span>
+</span><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="hll"><span class="w">            </span><span class="n">subAgent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FeedbackAnalysisAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span>
+</span><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">            </span><span class="n">itemsProvider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"tasks"</span><span class="p">)</span>
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="hll"><span class="w">    </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="nf">analyzeFeedback</span><span class="p">(</span>
+</span><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="hll"><span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="p">,</span>
+</span><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="hll"><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+</span><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="hll"><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+</span><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="hll"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+</span><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="hll">
+</span><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="hll"><span class="w">    </span><span class="cm">/**</span>
+</span><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="hll"><span class="cm">     * Output method that transforms the parallel feedback results into a structured object.</span>
+</span><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="hll"><span class="cm">     * The feedbackAnalysisResults list contains results in the same order as the input tasks:</span>
+</span><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="hll"><span class="cm">     * [0] = cleaning analysis, [1] = maintenance analysis, [2] = disposition analysis</span>
+</span><a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="cm">     */</span>
+<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a><span class="w">    </span><span class="nd">@Output</span>
+<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">FeedbackAnalysisResults</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="n">AgenticScope</span><span class="w"> </span><span class="n">scope</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">feedbackAnalysisResults</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FeedbackAnalysisResults</span><span class="p">(</span>
+<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w">  </span><span class="c1">// cleaningAnalysis</span>
+<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w">  </span><span class="c1">// maintenanceAnalysis</span>
+<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="hll"><span class="w">                </span><span class="n">feedbackAnalysisResults</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">   </span><span class="c1">// dispositionAnalysis</span>
+</span><a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a><span class="hll"><span class="w">        </span><span class="p">);</span>
+</span><a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a><span class="hll"><span class="p">}</span>
 </span></code></pre></div>
 <p>A few things are happening here.</p>
 <p>The <a href="section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java:23"><code>@ParallelMapperAgent</code></a> annotation points to <a href="section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java"><code>FeedbackAnalysisAgent</code></a> as the sub-agent and uses <code>itemsProvider = "tasks"</code> so the framework knows which collection to iterate over.</p>
@@ -2776,42 +2767,41 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents.FleetSupervisorAgent</span><span class="p">;</span>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarConditions</span><span class="p">;</span>
 <a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarInfo</span><span class="p">;</span>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackContext</span><span class="p">;</span>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.Output</span><span class="p">;</span>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.SequenceAgent</span><span class="p">;</span>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.logging.Log</span><span class="p">;</span>
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="cm">/**</span>
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="cm"> * Workflow for processing car returns using a supervisor agent for complete orchestration.</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="cm"> * The supervisor coordinates both feedback analysis and action agents.</span>
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="cm"> */</span>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarProcessingWorkflow</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>
-<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">    </span><span class="cm">/**</span>
-<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="cm">     * Processes a car return by first analyzing feedback, then using supervisor to coordinate actions.</span>
-<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="cm">     * FeedbackAnalysisWorkflow analyzes feedback in parallel and returns FeedbackAnalysisResults via its @Output method.</span>
-<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="cm">     * FleetSupervisorAgent uses these results to coordinate action agents.</span>
-<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="cm">     * CarConditionFeedbackAgent determines the final car assignment and condition.</span>
-<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="hll"><span class="cm">     */</span>
-</span><a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="hll"><span class="w">    </span><span class="nd">@SequenceAgent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carProcessingAgentResult"</span><span class="p">,</span>
-</span><a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a><span class="hll"><span class="w">            </span><span class="n">subAgents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">FeedbackAnalysisWorkflow</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">FleetSupervisorAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">CarConditionFeedbackAgent</span><span class="p">.</span><span class="na">class</span><span class="w"> </span><span class="p">})</span>
-</span><a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a><span class="hll"><span class="w">    </span><span class="n">CarConditions</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span>
-</span><a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a><span class="hll"><span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="p">,</span>
-</span><a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
-<a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a><span class="w">            </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
-<a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a>
-<a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a><span class="w">    </span><span class="nd">@Output</span>
-<a id="__codelineno-11-36" name="__codelineno-11-36" href="#__codelineno-11-36"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">CarConditions</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="n">CarConditions</span><span class="w"> </span><span class="n">carConditions</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-37" name="__codelineno-11-37" href="#__codelineno-11-37"></a><span class="w">        </span><span class="c1">// CarConditionFeedbackAgent handles all logic for determining</span>
-<a id="__codelineno-11-38" name="__codelineno-11-38" href="#__codelineno-11-38"></a><span class="w">        </span><span class="c1">// the final car assignment and condition description.</span>
-<a id="__codelineno-11-39" name="__codelineno-11-39" href="#__codelineno-11-39"></a><span class="w">        </span><span class="n">Log</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">"CarConditions: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" → "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">carAssignment</span><span class="p">());</span>
-<a id="__codelineno-11-40" name="__codelineno-11-40" href="#__codelineno-11-40"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">carConditions</span><span class="p">;</span>
-<a id="__codelineno-11-41" name="__codelineno-11-41" href="#__codelineno-11-41"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-11-42" name="__codelineno-11-42" href="#__codelineno-11-42"></a><span class="p">}</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.Output</span><span class="p">;</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.declarative.SequenceAgent</span><span class="p">;</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.logging.Log</span><span class="p">;</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="cm">/**</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="cm"> * Workflow for processing car returns using a supervisor agent for complete orchestration.</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="cm"> * The supervisor coordinates both feedback analysis and action agents.</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="cm"> */</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CarProcessingWorkflow</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="cm">     * Processes a car return by first analyzing feedback, then using supervisor to coordinate actions.</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="cm">     * FeedbackAnalysisWorkflow analyzes feedback in parallel and returns FeedbackAnalysisResults via its @Output method.</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="cm">     * FleetSupervisorAgent uses these results to coordinate action agents.</span>
+<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="cm">     * CarConditionFeedbackAgent determines the final car assignment and condition.</span>
+<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="cm">     */</span>
+<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="hll"><span class="w">    </span><span class="nd">@SequenceAgent</span><span class="p">(</span><span class="n">outputKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"carProcessingAgentResult"</span><span class="p">,</span>
+</span><a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="hll"><span class="w">            </span><span class="n">subAgents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">FeedbackAnalysisWorkflow</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">FleetSupervisorAgent</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">CarConditionFeedbackAgent</span><span class="p">.</span><span class="na">class</span><span class="w"> </span><span class="p">})</span>
+</span><a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a><span class="hll"><span class="w">    </span><span class="n">CarConditions</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span>
+</span><a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a><span class="hll"><span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="p">,</span>
+</span><a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a><span class="hll"><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+</span><a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+<a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a>
+<a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a><span class="w">    </span><span class="nd">@Output</span>
+<a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">CarConditions</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="n">CarConditions</span><span class="w"> </span><span class="n">carConditions</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-36" name="__codelineno-11-36" href="#__codelineno-11-36"></a><span class="w">        </span><span class="c1">// CarConditionFeedbackAgent handles all logic for determining</span>
+<a id="__codelineno-11-37" name="__codelineno-11-37" href="#__codelineno-11-37"></a><span class="w">        </span><span class="c1">// the final car assignment and condition description.</span>
+<a id="__codelineno-11-38" name="__codelineno-11-38" href="#__codelineno-11-38"></a><span class="w">        </span><span class="n">Log</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">"CarConditions: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" → "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">carAssignment</span><span class="p">());</span>
+<a id="__codelineno-11-39" name="__codelineno-11-39" href="#__codelineno-11-39"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">carConditions</span><span class="p">;</span>
+<a id="__codelineno-11-40" name="__codelineno-11-40" href="#__codelineno-11-40"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-41" name="__codelineno-11-41" href="#__codelineno-11-41"></a><span class="p">}</span>
 </code></pre></div>
 <p>The important change is that the workflow now accepts a list of <a href="section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"><code>FeedbackTask</code></a> values as input. That gives the feedback-analysis stage everything it needs to run the parameterized analysis.</p>
 <h3 id="update-the-final-condition-agent">Update the Final Condition Agent<a class="headerlink" href="#update-the-final-condition-agent" title="Permanent link"></a></h3>
@@ -2883,88 +2873,77 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarConditions</span><span class="p">;</span>
 <a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarInfo</span><span class="p">;</span>
 <a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.CarStatus</span><span class="p">;</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackContext</span><span class="p">;</span>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.logging.Log</span><span class="p">;</span>
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>
-<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
-<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>
-<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="cm">/**</span>
-<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="cm"> * Service for managing car returns from various operations.</span>
-<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="cm"> */</span>
-<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="nd">@ApplicationScoped</span>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CarManagementService</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>
-<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="w">    </span><span class="nd">@Inject</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="w">    </span><span class="n">CarProcessingWorkflow</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">;</span>
-<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="w">    </span><span class="cm">/**</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="cm">     * Process a car return from any operation.</span>
-<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="cm">     *</span>
-<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="cm">     * @param carNumber The car number</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="cm">     * @param rentalFeedback Optional rental feedback</span>
-<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="cm">     * @param cleaningFeedback Optional cleaning feedback</span>
-<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="cm">     * @param maintenanceFeedback Optional maintenance feedback</span>
-<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="cm">     * @return Result of the processing</span>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="cm">     */</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">    </span><span class="nd">@Transactional</span>
-<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="p">,</span>
-<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">                                   </span><span class="n">String</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="w">        </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
-<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">"Car not found with number: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carNumber</span><span class="p">;</span>
-<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a><span class="hll">
-</span><a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="hll"><span class="w">        </span><span class="c1">// Create the list of feedback tasks</span>
-</span><a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a><span class="hll"><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
-</span><a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a><span class="hll"><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">cleaning</span><span class="p">(),</span>
-</span><a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a><span class="hll"><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">maintenance</span><span class="p">(),</span>
-</span><a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a><span class="hll"><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">disposition</span><span class="p">()</span>
-</span><a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a><span class="hll"><span class="w">        </span><span class="p">);</span>
-</span><a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a><span class="hll">
-</span><a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a><span class="hll"><span class="w">        </span><span class="c1">// Create feedback context</span>
-</span><a id="__codelineno-13-51" name="__codelineno-13-51" href="#__codelineno-13-51"></a><span class="hll"><span class="w">        </span><span class="n">FeedbackContext</span><span class="w"> </span><span class="n">feedback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FeedbackContext</span><span class="p">(</span>
-</span><a id="__codelineno-13-52" name="__codelineno-13-52" href="#__codelineno-13-52"></a><span class="hll"><span class="w">                </span><span class="n">rentalFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">rentalFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="p">,</span>
-</span><a id="__codelineno-13-53" name="__codelineno-13-53" href="#__codelineno-13-53"></a><span class="hll"><span class="w">                </span><span class="n">cleaningFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">cleaningFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="p">,</span>
-</span><a id="__codelineno-13-54" name="__codelineno-13-54" href="#__codelineno-13-54"></a><span class="hll"><span class="w">                </span><span class="n">maintenanceFeedback</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">maintenanceFeedback</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
-</span><a id="__codelineno-13-55" name="__codelineno-13-55" href="#__codelineno-13-55"></a><span class="hll"><span class="w">        </span><span class="p">);</span>
-</span><a id="__codelineno-13-56" name="__codelineno-13-56" href="#__codelineno-13-56"></a><span class="hll">
-</span><a id="__codelineno-13-57" name="__codelineno-13-57" href="#__codelineno-13-57"></a><span class="hll"><span class="w">        </span><span class="c1">// Process the car return using the workflow with supervisor</span>
-</span><a id="__codelineno-13-58" name="__codelineno-13-58" href="#__codelineno-13-58"></a><span class="hll"><span class="w">        </span><span class="n">CarConditions</span><span class="w"> </span><span class="n">carConditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span>
-</span><a id="__codelineno-13-59" name="__codelineno-13-59" href="#__codelineno-13-59"></a><span class="hll"><span class="w">                </span><span class="n">tasks</span><span class="p">,</span>
-</span><a id="__codelineno-13-60" name="__codelineno-13-60" href="#__codelineno-13-60"></a><span class="w">                </span><span class="n">carInfo</span><span class="p">,</span>
-<a id="__codelineno-13-61" name="__codelineno-13-61" href="#__codelineno-13-61"></a><span class="w">                </span><span class="n">carNumber</span><span class="p">,</span>
-<a id="__codelineno-13-62" name="__codelineno-13-62" href="#__codelineno-13-62"></a><span class="w">                </span><span class="n">feedback</span><span class="p">);</span>
-<a id="__codelineno-13-63" name="__codelineno-13-63" href="#__codelineno-13-63"></a>
-<a id="__codelineno-13-64" name="__codelineno-13-64" href="#__codelineno-13-64"></a><span class="w">        </span><span class="n">Log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"CarConditionFeedbackAgent updating..."</span><span class="p">);</span>
-<a id="__codelineno-13-65" name="__codelineno-13-65" href="#__codelineno-13-65"></a>
-<a id="__codelineno-13-66" name="__codelineno-13-66" href="#__codelineno-13-66"></a><span class="w">        </span><span class="c1">// Update the car's condition with the result from CarConditionFeedbackAgent</span>
-<a id="__codelineno-13-67" name="__codelineno-13-67" href="#__codelineno-13-67"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">condition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">();</span>
-</span><a id="__codelineno-13-68" name="__codelineno-13-68" href="#__codelineno-13-68"></a><span class="hll">
-</span><a id="__codelineno-13-69" name="__codelineno-13-69" href="#__codelineno-13-69"></a><span class="hll"><span class="w">        </span><span class="c1">// Update the car status based on the required action</span>
-</span><a id="__codelineno-13-70" name="__codelineno-13-70" href="#__codelineno-13-70"></a><span class="hll"><span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">carConditions</span><span class="p">.</span><span class="na">carAssignment</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-13-71" name="__codelineno-13-71" href="#__codelineno-13-71"></a><span class="hll"><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">DISPOSITION</span><span class="p">:</span>
-</span><a id="__codelineno-13-72" name="__codelineno-13-72" href="#__codelineno-13-72"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">PENDING_DISPOSITION</span><span class="p">;</span>
-</span><a id="__codelineno-13-73" name="__codelineno-13-73" href="#__codelineno-13-73"></a><span class="hll"><span class="w">                </span><span class="n">Log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"Car marked for disposition - awaiting final decision"</span><span class="p">);</span>
-</span><a id="__codelineno-13-74" name="__codelineno-13-74" href="#__codelineno-13-74"></a><span class="hll"><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-</span><a id="__codelineno-13-75" name="__codelineno-13-75" href="#__codelineno-13-75"></a><span class="hll"><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">MAINTENANCE</span><span class="p">:</span>
-</span><a id="__codelineno-13-76" name="__codelineno-13-76" href="#__codelineno-13-76"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">IN_MAINTENANCE</span><span class="p">;</span>
-</span><a id="__codelineno-13-77" name="__codelineno-13-77" href="#__codelineno-13-77"></a><span class="hll"><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-</span><a id="__codelineno-13-78" name="__codelineno-13-78" href="#__codelineno-13-78"></a><span class="hll"><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">CLEANING</span><span class="p">:</span>
-</span><a id="__codelineno-13-79" name="__codelineno-13-79" href="#__codelineno-13-79"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AT_CLEANING</span><span class="p">;</span>
-</span><a id="__codelineno-13-80" name="__codelineno-13-80" href="#__codelineno-13-80"></a><span class="hll"><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-</span><a id="__codelineno-13-81" name="__codelineno-13-81" href="#__codelineno-13-81"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">NONE</span><span class="p">:</span>
-<a id="__codelineno-13-82" name="__codelineno-13-82" href="#__codelineno-13-82"></a><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
-<a id="__codelineno-13-83" name="__codelineno-13-83" href="#__codelineno-13-83"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-13-84" name="__codelineno-13-84" href="#__codelineno-13-84"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-13-85" name="__codelineno-13-85" href="#__codelineno-13-85"></a>
-<a id="__codelineno-13-86" name="__codelineno-13-86" href="#__codelineno-13-86"></a><span class="w">        </span><span class="c1">// Persist the changes to the database</span>
-<a id="__codelineno-13-87" name="__codelineno-13-87" href="#__codelineno-13-87"></a><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
-<a id="__codelineno-13-88" name="__codelineno-13-88" href="#__codelineno-13-88"></a>
-<a id="__codelineno-13-89" name="__codelineno-13-89" href="#__codelineno-13-89"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">();</span>
-<a id="__codelineno-13-90" name="__codelineno-13-90" href="#__codelineno-13-90"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-13-91" name="__codelineno-13-91" href="#__codelineno-13-91"></a><span class="p">}</span>
-</code></pre></div>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.FeedbackTask</span><span class="p">;</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.logging.Log</span><span class="p">;</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="cm">/**</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="cm"> * Service for managing car returns from various operations.</span>
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="cm"> */</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="nd">@ApplicationScoped</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CarManagementService</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="w">    </span><span class="nd">@Inject</span>
+<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="w">    </span><span class="n">CarProcessingWorkflow</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">;</span>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="w">    </span><span class="cm">/**</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="cm">     * Process a car return from any operation.</span>
+<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="cm">     *</span>
+<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="cm">     * @param carNumber The car number</span>
+<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="cm">     * @param feedback Optional feedback</span>
+<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="cm">     * @return Result of the processing</span>
+<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="cm">     */</span>
+<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">    </span><span class="nd">@Transactional</span>
+<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">        </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
+<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">"Car not found with number: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carNumber</span><span class="p">;</span>
+<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a>
+<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="w">        </span><span class="c1">// Create the list of feedback tasks</span>
+<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">cleaning</span><span class="p">(),</span>
+<a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a><span class="hll"><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">maintenance</span><span class="p">(),</span>
+</span><a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="hll"><span class="w">                </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">disposition</span><span class="p">()</span>
+</span><a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a><span class="hll"><span class="w">        </span><span class="p">);</span>
+</span><a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a><span class="hll">
+</span><a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a><span class="hll"><span class="w">        </span><span class="c1">// Process the car return using the workflow with supervisor</span>
+</span><a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a><span class="hll"><span class="w">        </span><span class="n">CarConditions</span><span class="w"> </span><span class="n">carConditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carProcessingWorkflow</span><span class="p">.</span><span class="na">processCarReturn</span><span class="p">(</span>
+</span><a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a><span class="hll"><span class="w">                </span><span class="n">tasks</span><span class="p">,</span>
+</span><a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">,</span>
+</span><a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a><span class="hll"><span class="w">                </span><span class="n">carNumber</span><span class="p">,</span>
+</span><a id="__codelineno-13-51" name="__codelineno-13-51" href="#__codelineno-13-51"></a><span class="hll"><span class="w">                </span><span class="n">feedback</span><span class="p">);</span>
+</span><a id="__codelineno-13-52" name="__codelineno-13-52" href="#__codelineno-13-52"></a><span class="hll">
+</span><a id="__codelineno-13-53" name="__codelineno-13-53" href="#__codelineno-13-53"></a><span class="hll"><span class="w">        </span><span class="n">Log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"CarConditionFeedbackAgent updating..."</span><span class="p">);</span>
+</span><a id="__codelineno-13-54" name="__codelineno-13-54" href="#__codelineno-13-54"></a><span class="hll">
+</span><a id="__codelineno-13-55" name="__codelineno-13-55" href="#__codelineno-13-55"></a><span class="hll"><span class="w">        </span><span class="c1">// Update the car's condition with the result from CarConditionFeedbackAgent</span>
+</span><a id="__codelineno-13-56" name="__codelineno-13-56" href="#__codelineno-13-56"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">condition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">();</span>
+</span><a id="__codelineno-13-57" name="__codelineno-13-57" href="#__codelineno-13-57"></a><span class="hll">
+</span><a id="__codelineno-13-58" name="__codelineno-13-58" href="#__codelineno-13-58"></a><span class="hll"><span class="w">        </span><span class="c1">// Update the car status based on the required action</span>
+</span><a id="__codelineno-13-59" name="__codelineno-13-59" href="#__codelineno-13-59"></a><span class="hll"><span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">carConditions</span><span class="p">.</span><span class="na">carAssignment</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-13-60" name="__codelineno-13-60" href="#__codelineno-13-60"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">DISPOSITION</span><span class="p">:</span>
+<a id="__codelineno-13-61" name="__codelineno-13-61" href="#__codelineno-13-61"></a><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">PENDING_DISPOSITION</span><span class="p">;</span>
+<a id="__codelineno-13-62" name="__codelineno-13-62" href="#__codelineno-13-62"></a><span class="w">                </span><span class="n">Log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"Car marked for disposition - awaiting final decision"</span><span class="p">);</span>
+<a id="__codelineno-13-63" name="__codelineno-13-63" href="#__codelineno-13-63"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-13-64" name="__codelineno-13-64" href="#__codelineno-13-64"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">MAINTENANCE</span><span class="p">:</span>
+<a id="__codelineno-13-65" name="__codelineno-13-65" href="#__codelineno-13-65"></a><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">IN_MAINTENANCE</span><span class="p">;</span>
+<a id="__codelineno-13-66" name="__codelineno-13-66" href="#__codelineno-13-66"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-13-67" name="__codelineno-13-67" href="#__codelineno-13-67"></a><span class="hll"><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">CLEANING</span><span class="p">:</span>
+</span><a id="__codelineno-13-68" name="__codelineno-13-68" href="#__codelineno-13-68"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AT_CLEANING</span><span class="p">;</span>
+</span><a id="__codelineno-13-69" name="__codelineno-13-69" href="#__codelineno-13-69"></a><span class="hll"><span class="w">                </span><span class="k">break</span><span class="p">;</span>
+</span><a id="__codelineno-13-70" name="__codelineno-13-70" href="#__codelineno-13-70"></a><span class="hll"><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="n">NONE</span><span class="p">:</span>
+</span><a id="__codelineno-13-71" name="__codelineno-13-71" href="#__codelineno-13-71"></a><span class="hll"><span class="w">                </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
+</span><a id="__codelineno-13-72" name="__codelineno-13-72" href="#__codelineno-13-72"></a><span class="hll"><span class="w">                </span><span class="k">break</span><span class="p">;</span>
+</span><a id="__codelineno-13-73" name="__codelineno-13-73" href="#__codelineno-13-73"></a><span class="hll"><span class="w">        </span><span class="p">}</span>
+</span><a id="__codelineno-13-74" name="__codelineno-13-74" href="#__codelineno-13-74"></a><span class="hll">
+</span><a id="__codelineno-13-75" name="__codelineno-13-75" href="#__codelineno-13-75"></a><span class="hll"><span class="w">        </span><span class="c1">// Persist the changes to the database</span>
+</span><a id="__codelineno-13-76" name="__codelineno-13-76" href="#__codelineno-13-76"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
+</span><a id="__codelineno-13-77" name="__codelineno-13-77" href="#__codelineno-13-77"></a><span class="hll">
+</span><a id="__codelineno-13-78" name="__codelineno-13-78" href="#__codelineno-13-78"></a><span class="hll"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">carConditions</span><span class="p">.</span><span class="na">generalCondition</span><span class="p">();</span>
+</span><a id="__codelineno-13-79" name="__codelineno-13-79" href="#__codelineno-13-79"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-13-80" name="__codelineno-13-80" href="#__codelineno-13-80"></a><span class="hll"><span class="p">}</span>
+</span></code></pre></div>
 <p>This is where the list of tasks is assembled:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">FeedbackTask</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">        </span><span class="n">FeedbackTask</span><span class="p">.</span><span class="na">cleaning</span><span class="p">(),</span>
@@ -3064,7 +3043,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li><a href="section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"><code>DispositionAgent</code></a> made a SCRAP decision based on economics</li>
 </ul>
 <h4 id="scenario-2-total-loss">Scenario 2: Total Loss<a class="headerlink" href="#scenario-2-total-loss" title="Permanent link"></a></h4>
-<p>Enter the following text in the <strong>Ford F-150</strong> feedback field from the Maintenance Returns tab:</p>
+<p>Enter the following text in the <strong>Ford F-150</strong> feedback field (status: In Maintenance) in the Fleet Status grid:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>The car is totaled after a major accident, completely inoperable
 </code></pre></div>
 <p>In this scenario, the car had already been sent to maintenance by the returns team, but the maintenance team is not able to repair it. The system can handle that scenario as well.</p>
@@ -3170,7 +3149,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li>Supervisor routes to <a href="section-2/step-04/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"><code>MaintenanceAgent</code></a>, not disposition</li>
 </ul>
 <h4 id="scenario-4-minor-issues">Scenario 4: Minor Issues<a class="headerlink" href="#scenario-4-minor-issues" title="Permanent link"></a></h4>
-<p>Enter the following text in the <strong>BMW X5</strong> feedback field (in the Maintenance Return tab):</p>
+<p>Enter the following text in the <strong>BMW X5</strong> feedback field (status: In Maintenance) in the Fleet Status grid:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Car is dirty, needs cleaning
 </code></pre></div>
 <p><strong>What happens:</strong></p>
