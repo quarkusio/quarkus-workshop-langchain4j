@@ -46,21 +46,21 @@ public class CarManagementService {
             if (carInfo == null) {
                 return "Car not found with number: " + carNumber;
             }
-            
+
             // Create the list of feedback tasks for parallel analysis
             List<FeedbackTask> tasks = List.of(
                     FeedbackTask.cleaning(),
                     FeedbackTask.maintenance(),
                     FeedbackTask.disposition()
             );
-            
+
             // Create feedback context
             FeedbackContext feedbackContext = new FeedbackContext(
                     rentalFeedback != null ? rentalFeedback : "",
                     cleaningFeedback != null ? cleaningFeedback : "",
                     maintenanceFeedback != null ? maintenanceFeedback : ""
             );
-                                
+
             // Process the car return using the workflow with supervisor
             // This may PAUSE if human approval is needed
             CarConditions carConditions = carProcessingWorkflow.processCarReturn(
