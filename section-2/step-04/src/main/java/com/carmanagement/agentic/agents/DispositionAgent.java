@@ -1,5 +1,6 @@
 package com.carmanagement.agentic.agents;
 
+import com.carmanagement.model.FeedbackContext;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -36,8 +37,8 @@ public interface DispositionAgent {
         - Car Number: {carNumber}
         - Current Condition: {carCondition}
         - Estimated Value: {carValue}
-        - Damage/Feedback: {rentalFeedback}
-        
+        - Damage/Feedback: {feedback.rentalFeedback}
+
         Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.
         """)
     @Agent(outputKey = "dispositionAction", description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
@@ -48,5 +49,5 @@ public interface DispositionAgent {
             Integer carNumber,
             String carCondition,
             String carValue,
-            String rentalFeedback);
+            FeedbackContext feedback);
 }

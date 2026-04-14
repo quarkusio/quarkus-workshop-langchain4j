@@ -54,7 +54,7 @@ public class CarManagementService {
             );
 
             // Create feedback context
-            FeedbackContext feedbackContext = new FeedbackContext(
+            FeedbackContext feedback = new FeedbackContext(
                     rentalFeedback != null ? rentalFeedback : "",
                     cleaningFeedback != null ? cleaningFeedback : "",
                     maintenanceFeedback != null ? maintenanceFeedback : ""
@@ -66,7 +66,7 @@ public class CarManagementService {
                     tasks,
                     carInfo,
                     carNumber,
-                    feedbackContext);
+                    feedback);
 
             Log.info("CarConditionFeedbackAgent updating...");
             

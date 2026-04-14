@@ -36,7 +36,7 @@ public interface CarProcessingWorkflow extends MonitoredAgent {
             List<FeedbackTask> tasks,
             CarInfo carInfo,
             Integer carNumber,
-            FeedbackContext feedbackContext,
+            FeedbackContext feedback,
             ImageContent carImage);
 
     @Output

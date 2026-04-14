@@ -27,7 +27,7 @@ public interface FleetSupervisorAgent {
     String superviseCarProcessing(
         CarInfo carInfo,
         Integer carNumber,
-        FeedbackContext feedbackContext,
+        FeedbackContext feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     );
 
@@ -35,7 +35,7 @@ public interface FleetSupervisorAgent {
     static String request(
         CarInfo carInfo,
         Integer carNumber,
-        FeedbackContext feedbackContext,
+        FeedbackContext feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     ) {
         boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
@@ -79,7 +79,7 @@ public interface FleetSupervisorAgent {
             
             Current Condition: """ + carInfo.condition + """
             
-            Rental Feedback: """ + feedbackContext.rentalFeedback() + """
+            Rental Feedback: """ + feedback.rentalFeedback() + """
             
             Cleaning Analysis: """ + feedbackAnalysisResults.cleaningAnalysis() + """
             
