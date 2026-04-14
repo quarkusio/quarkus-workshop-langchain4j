@@ -29,6 +29,6 @@ public interface CarImageAnalysisAgent {
         Feedback: {feedback}
         """)
     @Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
-            outputKey = "rentalFeedback")
+            outputKey = "feedback")
     String analyzeCarImage(String feedback, @UserMessage @V("carImage") ImageContent carImage);
 }
