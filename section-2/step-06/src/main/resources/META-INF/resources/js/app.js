@@ -194,8 +194,6 @@ function populateFleetStatusTable(cars) {
                         <button type="submit" class="return-button">Return</button>
                     </form>
                 </td>`;
-        } else if (car.status === 'PENDING_DISPOSITION') {
-            actionCell = `<td>${car.condition || 'Pending analysis'}</td>`;
         } else {
             actionCell = `<td></td>`;
         }
