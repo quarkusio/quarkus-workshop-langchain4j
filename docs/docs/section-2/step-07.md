@@ -136,15 +136,15 @@ We'll convert Step 5's architecture to use a remote pricing agent:
 graph TD
     subgraph "Main Application (localhost:8080)"
         R[Rental/Cleaning/Maintenance Returns]
-        FW[FeedbackWorkflow<br/>Parallel]
-        DFA[DispositionFeedbackAgent]
+        FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
+        FA[FeedbackAnalysisAgent]
         FSA[FleetSupervisorAgent<br/>Supervisor]
         PAC["PricingAgent<br/>@A2AClientAgent"]
         DA[DispositionAgent<br/>Local]
 
         R --> FW
-        FW --> DFA
-        DFA --> FSA
+        FW --> FA
+        FA --> FSA
         FSA --> PAC
         FSA --> DA
     end
@@ -188,9 +188,9 @@ section-2/step-07/
 │   │   │   │   ├── DispositionAgent.java          # Local agent
 │   │   │   │   ├── DispositionProposalAgent.java  # Creates proposals
 │   │   │   │   ├── HumanApprovalAgent.java        # @HumanInTheLoop
-│   │   │   │   └── DispositionFeedbackAgent.java  # Analyzes disposal needs
+│   │   │   │   └── FeedbackAnalysisAgent.java     # Parameterized feedback analyzer
 │   │   │   └── workflow/
-│   │   │       ├── FeedbackWorkflow.java          # Parallel analysis
+│   │   │       ├── FeedbackAnalysisWorkflow.java  # Parallel mapper analysis
 │   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
 │   │   ├── model/
 │   │   │   └── ApprovalProposal.java              # Approval entity
@@ -512,10 +512,10 @@ Click **Return**.
 
 **What happens?**
 
-1. **Parallel Analysis** (FeedbackWorkflow):
-    1. `DispositionFeedbackAgent`: "Disposition required — severe damage"
-    2. `MaintenanceFeedbackAgent`: "Major repairs needed"
-    3. `CleaningFeedbackAgent`: "Not applicable"
+1. **Parallel Analysis** (`FeedbackAnalysisWorkflow`):
+    1. `FeedbackTask.disposition()` executed by `FeedbackAnalysisAgent`: "Disposition required — severe damage"
+    2. `FeedbackTask.maintenance()` executed by `FeedbackAnalysisAgent`: "Major repairs needed"
+    3. `FeedbackTask.cleaning()` executed by `FeedbackAnalysisAgent`: "Not applicable"
 
 2. **Supervisor Orchestration** (FleetSupervisorAgent):
     1. Analyzes feedback and determines disposition is required
@@ -544,7 +544,7 @@ Remote A2A PricingAgent called
 
 **Terminal 2 (Main Application):**
 ```
-[DispositionFeedbackAgent] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
+[FeedbackAnalysisAgent/disposition] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
 [FleetSupervisorAgent] Invoking PricingAgent for value estimation
 [PricingAgent @A2AClientAgent] Sending task to http://localhost:8888
 [PricingAgent @A2AClientAgent] Received result: Estimated Value: $12,500
@@ -565,7 +565,7 @@ sequenceDiagram
     participant User
     participant Service as CarManagementService
     participant Workflow as CarProcessingWorkflow
-    participant FeedbackWF as FeedbackWorkflow
+    participant FeedbackWF as FeedbackAnalysisWorkflow
     participant Supervisor as FleetSupervisorAgent
     participant PricingClient as PricingAgent<br/>@A2AClientAgent
     participant A2A as A2A Protocol<br/>(JSON-RPC)
@@ -580,11 +580,11 @@ sequenceDiagram
     Note over Workflow,FeedbackWF: Parallel Analysis
     Workflow->>FeedbackWF: Execute
     par Concurrent Execution
-        FeedbackWF->>FeedbackWF: CleaningFeedbackAgent
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.cleaning()
     and
-        FeedbackWF->>FeedbackWF: MaintenanceFeedbackAgent
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.maintenance()
     and
-        FeedbackWF->>FeedbackWF: DispositionFeedbackAgent<br/>Result: "DISPOSITION_REQUIRED"
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.disposition()<br/>Result: "DISPOSITION_REQUIRED"
     end
     end
 

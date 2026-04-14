@@ -8,7 +8,10 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackTask;
 import io.quarkus.logging.Log;
+
+import java.util.List;
 
 /**
  * Service for managing car returns from various operations.
@@ -35,14 +38,17 @@ public class CarManagementService {
         if (carInfo == null) {
             return "Car not found with number: " + carNumber;
         }
-        
-        Log.info("FeedbackWorkflow executing...");
-        Log.info("  ├─ CleaningFeedbackAgent analyzing...");
-        Log.info("  └─ MaintenanceFeedbackAgent analyzing...");
-        Log.info("FleetSupervisorAgent orchestrating car processing...");
+                
+        // Create the list of feedback tasks
+        List<FeedbackTask> tasks = List.of(
+                FeedbackTask.cleaning(),
+                FeedbackTask.maintenance(),
+                FeedbackTask.disposition()
+        );
         
         // Process the car return using the workflow with supervisor
         CarConditions carConditions = carProcessingWorkflow.processCarReturn(
+                tasks,
                 carInfo.make,
                 carInfo.model,
                 carInfo.year,

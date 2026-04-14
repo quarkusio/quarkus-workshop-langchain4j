@@ -4,11 +4,14 @@ import com.carmanagement.agentic.agents.CarConditionFeedbackAgent;
 import com.carmanagement.agentic.agents.CarImageAnalysisAgent;
 import com.carmanagement.agentic.agents.FleetSupervisorAgent;
 import com.carmanagement.model.CarConditions;
+import com.carmanagement.model.FeedbackTask;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
 import dev.langchain4j.agentic.observability.MonitoredAgent;
 import dev.langchain4j.data.message.ImageContent;
 import io.quarkus.logging.Log;
+
+import java.util.List;
 
 /**
  * Workflow for processing car returns using a supervisor agent for complete orchestration.
@@ -18,14 +21,17 @@ public interface CarProcessingWorkflow extends MonitoredAgent {
 
     /**
      * Processes a car return by first analyzing feedback, then using supervisor to coordinate actions.
-     * FeedbackWorkflow produces cleaningRequest, maintenanceRequest, and dispositionRequest.
-     * FleetSupervisorAgent then uses these to coordinate action agents.
+     * CarImageAnalysisAgent analyzes the car image first.
+     * FeedbackAnalysisWorkflow analyzes feedback in parallel and returns FeedbackAnalysisResults via its @Output method.
+     * FleetSupervisorAgent uses these results to coordinate action agents.
+     * CarConditionFeedbackAgent determines the final car assignment and condition.
      */
     // --8<-- [start:sequence-agent]
     @SequenceAgent(outputKey = "carProcessingAgentResult",
-            subAgents = { CarImageAnalysisAgent.class, FeedbackWorkflow.class, FleetSupervisorAgent.class, CarConditionFeedbackAgent.class })
+            subAgents = { CarImageAnalysisAgent.class, FeedbackAnalysisWorkflow.class, FleetSupervisorAgent.class, CarConditionFeedbackAgent.class })
     // --8<-- [end:sequence-agent]
     CarConditions processCarReturn(
+            List<FeedbackTask> tasks,
             String carMake,
             String carModel,
             Integer carYear,

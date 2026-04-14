@@ -1,0 +1,10 @@
+flowchart TD
+    Input[Input] --> Agent1[Cleaning Feedback<br>Agent]
+    Input --> Agent2[Maintenance Feedback<br>Agent]
+    Agent1 --> Aggregate[Aggregate Results]
+    Agent2 --> Aggregate
+    Aggregate --> Output[Output]
+    
+    style Agent1 fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    style Agent2 fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    style Aggregate fill:#fff4e1,stroke:#ff9900,stroke-width:2px

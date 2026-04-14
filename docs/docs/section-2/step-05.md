@@ -106,13 +106,14 @@ We're enhancing our car management system with:
 graph TB
     Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential]
 
-    A --> B[Step 1: FeedbackWorkflow<br/>Parallel Analysis]
-    B --> B1[CleaningFeedbackAgent]
-    B --> B2[MaintenanceFeedbackAgent]
-    B --> B3[DispositionFeedbackAgent]
-    B1 --> BEnd[All feedback complete]
-    B2 --> BEnd
-    B3 --> BEnd
+    A --> B[Step 1: FeedbackAnalysisWorkflow<br/>Parallel Mapper]
+    B --> B1[FeedbackTask.cleaning()]
+    B --> B2[FeedbackTask.maintenance()]
+    B --> B3[FeedbackTask.disposition()]
+    B1 --> BA[FeedbackAnalysisAgent]
+    B2 --> BA
+    B3 --> BA
+    BA --> BEnd[FeedbackAnalysisResults]
 
     BEnd --> C[Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration]
     C --> C1{Disposition<br/>Required?}
@@ -357,7 +358,7 @@ The car was in a serious collision. Front end is completely destroyed and airbag
 flowchart TD
     Start([Input: Serious collision<br/>Front end destroyed])
 
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
+    Start --> FW[FeedbackAnalysisWorkflow<br/>Produces: FeedbackAnalysisResults]
 
     FW --> FSA[FleetSupervisorAgent<br/>Orchestration]
     FSA --> PA[PricingAgent]
@@ -409,7 +410,7 @@ Minor fender bender, small dent in rear bumper
 flowchart TD
     Start([Input: Minor fender bender<br/>small dent])
 
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
+    Start --> FW[FeedbackAnalysisWorkflow<br/>Produces: FeedbackAnalysisResults]
 
     FW --> FSA[FleetSupervisorAgent]
     FSA --> PA[PricingAgent]
@@ -457,7 +458,7 @@ The truck is totaled, completely inoperable, very old
 flowchart TD
     Start([Input: Totaled truck<br/>very old])
 
-    Start --> FW[FeedbackWorkflow<br/>Detects: DISPOSITION_REQUIRED]
+    Start --> FW[FeedbackAnalysisWorkflow<br/>Produces: FeedbackAnalysisResults]
 
     FW --> FSA[FleetSupervisorAgent]
     FSA --> PA[PricingAgent]
@@ -490,8 +491,8 @@ flowchart TD
 Watch the console output to see the approval workflow execution:
 
 ```bash
-FeedbackWorkflow executing...
-  |- DispositionFeedbackAgent: DISPOSITION_REQUIRED
+FeedbackAnalysisWorkflow executing...
+  |- FeedbackAnalysisAgent(disposition): DISPOSITION_REQUIRED
 FleetSupervisorAgent orchestrating...
   |- PricingAgent: Estimated value $18,000
   |- Value check: $18,000 > $15,000 -> Approval required
@@ -690,7 +691,7 @@ In `CarProcessingWorkflow.java`, the interface simply extends `MonitoredAgent`:
 public interface CarProcessingWorkflow extends MonitoredAgent {
 
     @SequenceAgent(outputKey = "carProcessingAgentResult",
-            subAgents = { FeedbackWorkflow.class, FleetSupervisorAgent.class,
+            subAgents = { FeedbackAnalysisWorkflow.class, FleetSupervisorAgent.class,
                           CarConditionFeedbackAgent.class })
     CarConditions processCarReturn(/* ... */);
 }

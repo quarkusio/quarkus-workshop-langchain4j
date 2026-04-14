@@ -8,8 +8,11 @@ import com.carmanagement.agentic.workflow.CarProcessingWorkflow;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.CarStatus;
+import com.carmanagement.model.FeedbackTask;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
+
+import java.util.List;
 
 import static dev.langchain4j.agentic.observability.HtmlReportGenerator.generateReport;
 
@@ -41,10 +44,18 @@ public class CarManagementService {
             if (carInfo == null) {
                 return "Car not found with number: " + carNumber;
             }
+            
+            // Create the list of feedback tasks for parallel analysis
+            List<FeedbackTask> tasks = List.of(
+                    FeedbackTask.cleaning(),
+                    FeedbackTask.maintenance(),
+                    FeedbackTask.disposition()
+            );
                                 
             // Process the car return using the workflow with supervisor
             // This may PAUSE if human approval is needed
             CarConditions carConditions = carProcessingWorkflow.processCarReturn(
+                    tasks,
                     carInfo.make,
                     carInfo.model,
                     carInfo.year,

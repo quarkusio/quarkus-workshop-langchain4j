@@ -45,7 +45,10 @@ nb-configuration.xml
 site/
 
 __pycache__/
-
-.continue
 /.mvn/wrapper/maven-wrapper.jar
-/docs/Pipfile.lock
+*Pipfile.lock
+
+# AI Agents
+.claude 
+.continue
+.bob
