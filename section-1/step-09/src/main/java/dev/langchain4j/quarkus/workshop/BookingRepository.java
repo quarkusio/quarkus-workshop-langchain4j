@@ -34,7 +34,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
     @Tool("List booking for a customer")
     @Transactional
     public List<Booking> listBookingsForCustomer(String customerName, String customerSurname) {
-        var found = Customer.find("firstName = ?1 and lastName = ?2", customerName, customerSurname).singleResultOptional();
+        var found = Customer.find("LOWER(firstName) = LOWER(?1) and LOWER(lastName) = LOWER(?2)", customerName, customerSurname).singleResultOptional();
         if (found.isEmpty()) {
             throw new CustomerNotFoundException(customerName, customerSurname);
         }
