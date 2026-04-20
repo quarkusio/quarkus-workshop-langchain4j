@@ -13,6 +13,6 @@ public class Customer extends PanacheEntity {
     String lastName;
 
     public static Optional<Customer> findByFirstAndLastName(String firstName, String lastName) {
-        return find("upper(firstName) = ?1 and upper(lastName) = ?2", firstName.toUpperCase(), lastName.toUpperCase()).firstResultOptional();
+        return find("LOWER(firstName) = LOWER(?1) and LOWER(lastName) = LOWER(?2)", firstName, lastName).firstResultOptional();
     }
 }
