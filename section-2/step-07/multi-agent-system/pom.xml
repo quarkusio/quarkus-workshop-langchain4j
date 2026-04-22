@@ -63,10 +63,6 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-agentic-a2a</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-agentic-a2a</artifactId>
             <version>1.13.1-beta23</version>
         </dependency>
         <dependency>
