@@ -16,7 +16,7 @@
         <quarkus.platform.version>3.34.3</quarkus.platform.version>
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.5</surefire-plugin.version>
-        <quarkus-langchain4j.version>1.9.0.CR2</quarkus-langchain4j.version>
+        <quarkus-langchain4j.version>1.9.1</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -63,6 +63,7 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-agentic-a2a</artifactId>
+            <version>1.13.1-beta23</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
