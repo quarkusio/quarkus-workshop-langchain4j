@@ -2399,20 +2399,20 @@ When cars are returned, they want the system to automatically:</p>
 </button>
     </nav>
     <pre class="mermaid"><code>graph TD
-    Main[Main Workflow&lt;br/&gt;Sequential] --&gt; Sub1[Sub-Workflow 1&lt;br/&gt;Parallel]
-    Main --&gt; Sub2[Sub-Workflow 2&lt;br/&gt;Conditional]
-    Main --&gt; Agent[Single Agent]
+    Main["Main Workflow&lt;br/&gt;Sequential"] --&gt; Sub1["Sub-Workflow 1&lt;br/&gt;Parallel"]
+    Main --&gt; Sub2["Sub-Workflow 2&lt;br/&gt;Conditional"]
+    Main --&gt; Agent["Single Agent"]
 
-    Sub1 --&gt; A1[Agent A]
-    Sub1 --&gt; A2[Agent B]
+    Sub1 --&gt; A1["Agent A"]
+    Sub1 --&gt; A2["Agent B"]
 
-    Sub2 --&gt; B1[Agent C]
-    Sub2 --&gt; B2[Agent D]
+    Sub2 --&gt; B1["Agent C"]
+    Sub2 --&gt; B2["Agent D"]
 
-    style Main fill:#90EE90
-    style Sub1 fill:#87CEEB
-    style Sub2 fill:#FFD700
-    style Agent fill:#90EE90</code></pre> 
+    style Main fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Sub1 fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style Sub2 fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style Agent fill:#90EE90,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2447,10 +2447,10 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </button>
     </nav>
     <pre class="mermaid"><code>graph LR
-    A[Main Workflow&lt;br/&gt;AgenticScope] --&gt; B[Sub-Workflow 1&lt;br/&gt;Same Scope]
-    B --&gt; C[Agent A&lt;br/&gt;Same Scope]
-    B --&gt; D[Agent B&lt;br/&gt;Same Scope]
-    A --&gt; E[Sub-Workflow 2&lt;br/&gt;Same Scope]</code></pre> 
+    A["Main Workflow&lt;br/&gt;AgenticScope"] --&gt; B["Sub-Workflow 1&lt;br/&gt;Same Scope"]
+    B --&gt; C["Agent A&lt;br/&gt;Same Scope"]
+    B --&gt; D["Agent B&lt;br/&gt;Same Scope"]
+    A --&gt; E["Sub-Workflow 2&lt;br/&gt;Same Scope"]</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2495,35 +2495,35 @@ We’re going to implement:</p>
 </button>
     </nav>
     <pre class="mermaid"><code>graph TB
-    Start([Car Return]) --&gt; A[CarProcessingWorkflow&lt;br/&gt;Sequential - Level 1]
+    Start(["Car Return"]) --&gt; A["CarProcessingWorkflow&lt;br/&gt;Sequential - Level 1"]
 
-    A --&gt; B[Step 1: FeedbackWorkflow&lt;br/&gt;Parallel - Level 2]
-    B --&gt; B1[CleaningFeedbackAgent]
-    B --&gt; B2[MaintenanceFeedbackAgent]
-    B1 --&gt; BEnd[Both complete]
+    A --&gt; B["Step 1: FeedbackWorkflow&lt;br/&gt;Parallel - Level 2"]
+    B --&gt; B1["CleaningFeedbackAgent"]
+    B --&gt; B2["MaintenanceFeedbackAgent"]
+    B1 --&gt; BEnd["Both complete"]
     B2 --&gt; BEnd
 
-    BEnd --&gt; C[Step 2: CarAssignmentWorkflow&lt;br/&gt;Conditional - Level 2]
-    C --&gt; C1{Maintenance&lt;br/&gt;needed?}
-    C1 --&gt;|Yes| C2[MaintenanceAgent]
-    C1 --&gt;|No| C3{Cleaning&lt;br/&gt;needed?}
-    C3 --&gt;|Yes| C4[CleaningAgent]
-    C3 --&gt;|No| C5[Skip both]
-    C2 --&gt; CEnd[Action complete]
+    BEnd --&gt; C["Step 2: CarAssignmentWorkflow&lt;br/&gt;Conditional - Level 2"]
+    C --&gt; C1{"Maintenance&lt;br/&gt;needed?"}
+    C1 --&gt;|Yes| C2["MaintenanceAgent"]
+    C1 --&gt;|No| C3{"Cleaning&lt;br/&gt;needed?"}
+    C3 --&gt;|Yes| C4["CleaningAgent"]
+    C3 --&gt;|No| C5["Skip both"]
+    C2 --&gt; CEnd["Action complete"]
     C4 --&gt; CEnd
     C5 --&gt; CEnd
 
-    CEnd --&gt; D[Step 3: CarConditionFeedbackAgent&lt;br/&gt;Single Agent - Level 1]
-    D --&gt; End([Updated Car Conditions])
+    CEnd --&gt; D["Step 3: CarConditionFeedbackAgent&lt;br/&gt;Single Agent - Level 1"]
+    D --&gt; End(["Updated Car Conditions"])
 
-    style A fill:#90EE90
-    style B fill:#87CEEB
-    style C fill:#FFD700
-    style D fill:#90EE90
-    style Start fill:#E8E8E8
-    style End fill:#E8E8E8
-    style BEnd fill:#F0F0F0
-    style CEnd fill:#F0F0F0</code></pre> 
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style BEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
+    style CEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2652,10 +2652,10 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     CAW --&gt;|Maintenance has higher priority| MA[Route to MaintenanceAgent]
     MA --&gt; Result([Result: Car goes to maintenance])
 
-    style FW fill:#FAE5D3
-    style CAW fill:#D5F5E3
-    style MA fill:#F9E79F
-    style Result fill:#D2B4DE</code></pre> 
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style MA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2703,10 +2703,10 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     CAW --&gt;|No maintenance needed, 2nd priority is cleaning| CA[Route to CleaningAgent]
     CA --&gt; Result([Result: Car goes to cleaning])
 
-    style FW fill:#FAE5D3
-    style CAW fill:#D5F5E3
-    style CA fill:#F9E79F
-    style Result fill:#D2B4DE</code></pre> 
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style CA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>

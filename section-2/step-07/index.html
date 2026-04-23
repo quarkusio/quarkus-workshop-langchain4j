@@ -2154,27 +2154,27 @@ The Quarkus LangChain4j team is working on higher-level abstractions to simplify
     </nav>
     <pre class="mermaid"><code>graph LR
     subgraph "Quarkus Runtime 1: Car Management System"
-        W[CarProcessingWorkflow] 
+        W["CarProcessingWorkflow"]
         PA["PricingAgent&lt;br/&gt;@A2AClientAgent"]
         W --&gt; PA
     end
 
     subgraph "A2A Protocol Layer"
-        AP[JSON-RPC over HTTP]
+        AP["JSON-RPC over HTTP"]
     end
 
     subgraph "Quarkus Runtime 2: Pricing Service"
-        AC[AgentCard&lt;br/&gt;Agent Metadata]
-        AE[AgentExecutor&lt;br/&gt;Request Handler]
-        PAI[PricingAgent&lt;br/&gt;AI Service]
+        AC["AgentCard&lt;br/&gt;Agent Metadata"]
+        AE["AgentExecutor&lt;br/&gt;Request Handler"]
+        PAI["PricingAgent&lt;br/&gt;AI Service"]
 
         AC -.describes.-&gt; PAI
         AE --&gt; PAI
     end
 
-    PA --&gt;|A2A Request| AP
-    AP --&gt;|A2A Response| PA
-    AP &lt;--&gt;|JSON-RPC| AE
+    PA --&gt;|"A2A Request"| AP
+    AP --&gt;|"A2A Response"| PA
+    AP &lt;--&gt;|"JSON-RPC"| AE
 </code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
@@ -2290,12 +2290,12 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     </nav>
     <pre class="mermaid"><code>graph TD
     subgraph "Main Application (localhost:8080)"
-        R[Rental/Cleaning/Maintenance Returns]
-        FW[FeedbackAnalysisWorkflow&lt;br/&gt;Parallel Mapper]
-        FA[FeedbackAnalysisAgent]
-        FSA[FleetSupervisorAgent&lt;br/&gt;Supervisor]
+        R["Rental/Cleaning/Maintenance Returns"]
+        FW["FeedbackAnalysisWorkflow&lt;br/&gt;Parallel Mapper"]
+        FA["FeedbackAnalysisAgent"]
+        FSA["FleetSupervisorAgent&lt;br/&gt;Supervisor"]
         PAC["PricingAgent&lt;br/&gt;@A2AClientAgent"]
-        DA[DispositionAgent&lt;br/&gt;Local]
+        DA["DispositionAgent&lt;br/&gt;Local"]
 
         R --&gt; FW
         FW --&gt; FA
@@ -2305,14 +2305,14 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
     end
 
     subgraph "Remote Pricing Service (localhost:8888)"
-        AC[AgentCard]
-        AE[AgentExecutor]
-        PAI[PricingAgent&lt;br/&gt;AI Service]
+        AC["AgentCard"]
+        AE["AgentExecutor"]
+        PAI["PricingAgent&lt;br/&gt;AI Service"]
 
         AE --&gt; PAI
     end
 
-    PAC --&gt;|A2A Protocol| AE
+    PAC --&gt;|"A2A Protocol"| AE
 </code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom

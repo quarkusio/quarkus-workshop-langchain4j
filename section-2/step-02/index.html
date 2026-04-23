@@ -2129,10 +2129,10 @@ Much like the building blocks of a programming language, <code>quarkus-langchain
 </button>
     </nav>
     <pre class="mermaid"><code>graph LR
-    A[Agent 1] --&gt; B[Agent 2] --&gt; C[Agent 3]
-    style A fill:#90EE90
-    style B fill:#90EE90
-    style C fill:#90EE90</code></pre> 
+    A["Agent 1"] --&gt; B["Agent 2"] --&gt; C["Agent 3"]
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style B fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style C fill:#90EE90,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2164,15 +2164,15 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </button>
     </nav>
     <pre class="mermaid"><code>graph TD
-    Start[Start] --&gt; A[Agent 1]
-    Start --&gt; B[Agent 2]
-    Start --&gt; C[Agent 3]
-    A --&gt; End[Continue]
+    Start["Start"] --&gt; A["Agent 1"]
+    Start --&gt; B["Agent 2"]
+    Start --&gt; C["Agent 3"]
+    A --&gt; End["Continue"]
     B --&gt; End
     C --&gt; End
-    style A fill:#87CEEB
-    style B fill:#87CEEB
-    style C fill:#87CEEB</code></pre> 
+    style A fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#87CEEB,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2205,15 +2205,15 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </button>
     </nav>
     <pre class="mermaid"><code>graph TD
-    Start[Start] --&gt; Check1{Condition 1?}
-    Check1 --&gt;|Yes| A[Agent 1]
-    Check1 --&gt;|No| Check2{Condition 2?}
-    A --&gt; End[Continue]
-    Check2 --&gt;|Yes| B[Agent 2]
+    Start["Start"] --&gt; Check1{"Condition 1?"}
+    Check1 --&gt;|Yes| A["Agent 1"]
+    Check1 --&gt;|No| Check2{"Condition 2?"}
+    A --&gt; End["Continue"]
+    Check2 --&gt;|Yes| B["Agent 2"]
     Check2 --&gt;|No| End
     B --&gt; End
-    style A fill:#FFD700
-    style B fill:#FFD700</code></pre> 
+    style A fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style B fill:#FFD700,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2245,11 +2245,11 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </button>
     </nav>
     <pre class="mermaid"><code>graph TD
-    Start[Start] --&gt; A[Agent]
-    A --&gt; Check{Continue?}
+    Start["Start"] --&gt; A["Agent"]
+    A --&gt; Check{"Continue?"}
     Check --&gt;|Yes| A
-    Check --&gt;|No| End[Done]
-    style A fill:#FFA07A</code></pre> 
+    Check --&gt;|No| End["Done"]
+    style A fill:#FFA07A,stroke:#333,stroke-width:2,color:#000</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
@@ -2459,12 +2459,12 @@ This is where <code>AgenticScope</code> comes in.</p>
 </button>
     </nav>
     <pre class="mermaid"><code>graph LR
-    A[Workflow Inputs] --&gt;|Populate| B[AgenticScope]
-    B --&gt;|Read state| C[Agent 1]
-    C --&gt;|Write state| B
-    B --&gt;|Read state| D[Agent 2]
-    D --&gt;|Write state| B
-    B --&gt;|Extract| E[Workflow Result]</code></pre> 
+    A["Workflow Inputs"] --&gt;|Populate| B["AgenticScope"]
+    B --&gt;|"Read state"| C["Agent 1"]
+    C --&gt;|"Write state"| B
+    B --&gt;|"Read state"| D["Agent 2"]
+    D --&gt;|"Write state"| B
+    B --&gt;|Extract| E["Workflow Result"]</code></pre> 
     <div class="panzoom-info-box panzoom-info-box-bottom panzoom-hidden">
 Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
