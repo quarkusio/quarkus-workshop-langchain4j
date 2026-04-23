@@ -56,20 +56,20 @@ Workflow nesting means using a workflow as a sub-agent within another workflow. 
 
 ```mermaid
 graph TD
-    Main[Main Workflow<br/>Sequential] --> Sub1[Sub-Workflow 1<br/>Parallel]
-    Main --> Sub2[Sub-Workflow 2<br/>Conditional]
-    Main --> Agent[Single Agent]
+    Main["Main Workflow<br/>Sequential"] --> Sub1["Sub-Workflow 1<br/>Parallel"]
+    Main --> Sub2["Sub-Workflow 2<br/>Conditional"]
+    Main --> Agent["Single Agent"]
     
-    Sub1 --> A1[Agent A]
-    Sub1 --> A2[Agent B]
+    Sub1 --> A1["Agent A"]
+    Sub1 --> A2["Agent B"]
     
-    Sub2 --> B1[Agent C]
-    Sub2 --> B2[Agent D]
+    Sub2 --> B1["Agent C"]
+    Sub2 --> B2["Agent D"]
     
-    style Main fill:#90EE90
-    style Sub1 fill:#87CEEB
-    style Sub2 fill:#FFD700
-    style Agent fill:#90EE90
+    style Main fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Sub1 fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style Sub2 fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style Agent fill:#90EE90,stroke:#333,stroke-width:2,color:#000
 ```
 
 This creates a **three-level nested workflow** where:
@@ -84,10 +84,10 @@ When workflows are nested, the `AgenticScope` flows through all levels:
 
 ```mermaid
 graph LR
-    A[Main Workflow<br/>AgenticScope] --> B[Sub-Workflow 1<br/>Same Scope]
-    B --> C[Agent A<br/>Same Scope]
-    B --> D[Agent B<br/>Same Scope]
-    A --> E[Sub-Workflow 2<br/>Same Scope]
+    A["Main Workflow<br/>AgenticScope"] --> B["Sub-Workflow 1<br/>Same Scope"]
+    B --> C["Agent A<br/>Same Scope"]
+    B --> D["Agent B<br/>Same Scope"]
+    A --> E["Sub-Workflow 2<br/>Same Scope"]
 ```
 
 **Key points:**
@@ -114,35 +114,35 @@ The final system uses a 3-level nested workflow, similar to what we saw above in
 
 ```mermaid
 graph TB
-    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential - Level 1]
+    Start(["Car Return"]) --> A["CarProcessingWorkflow<br/>Sequential - Level 1"]
     
-    A --> B[Step 1: FeedbackWorkflow<br/>Parallel - Level 2]
-    B --> B1[CleaningFeedbackAgent]
-    B --> B2[MaintenanceFeedbackAgent]
-    B1 --> BEnd[Both complete]
+    A --> B["Step 1: FeedbackWorkflow<br/>Parallel - Level 2"]
+    B --> B1["CleaningFeedbackAgent"]
+    B --> B2["MaintenanceFeedbackAgent"]
+    B1 --> BEnd["Both complete"]
     B2 --> BEnd
     
-    BEnd --> C[Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2]
-    C --> C1{Maintenance<br/>needed?}
-    C1 -->|Yes| C2[MaintenanceAgent]
-    C1 -->|No| C3{Cleaning<br/>needed?}
-    C3 -->|Yes| C4[CleaningAgent]
-    C3 -->|No| C5[Skip both]
-    C2 --> CEnd[Action complete]
+    BEnd --> C["Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2"]
+    C --> C1{"Maintenance<br/>needed?"}
+    C1 -->|Yes| C2["MaintenanceAgent"]
+    C1 -->|No| C3{"Cleaning<br/>needed?"}
+    C3 -->|Yes| C4["CleaningAgent"]
+    C3 -->|No| C5["Skip both"]
+    C2 --> CEnd["Action complete"]
     C4 --> CEnd
     C5 --> CEnd
     
-    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1]
-    D --> End([Updated Car Conditions])
+    CEnd --> D["Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1"]
+    D --> End(["Updated Car Conditions"])
     
-    style A fill:#90EE90
-    style B fill:#87CEEB
-    style C fill:#FFD700
-    style D fill:#90EE90
-    style Start fill:#E8E8E8
-    style End fill:#E8E8E8
-    style BEnd fill:#F0F0F0
-    style CEnd fill:#F0F0F0
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style BEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
+    style CEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
 ```
 
 **The Flow:**
@@ -247,10 +247,10 @@ flowchart TD
     CAW -->|Maintenance has higher priority| MA[Route to MaintenanceAgent]
     MA --> Result([Result: Car goes to maintenance])
     
-    style FW fill:#FAE5D3
-    style CAW fill:#D5F5E3
-    style MA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style MA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
 ```
 
 #### Scenario 2: Cleaning Only
@@ -281,10 +281,10 @@ flowchart TD
     CAW -->|No maintenance needed, 2nd priority is cleaning| CA[Route to CleaningAgent]
     CA --> Result([Result: Car goes to cleaning])
     
-    style FW fill:#FAE5D3
-    style CAW fill:#D5F5E3
-    style CA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style CA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
 ```
 
 #### Scenario 3: Maintenance Return

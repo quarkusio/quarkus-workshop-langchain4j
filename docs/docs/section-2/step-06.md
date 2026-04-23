@@ -6,14 +6,9 @@ In Step 5, you implemented the Human-in-the-Loop pattern for safe, controlled di
 
 The Miles of Smiles management team wants to enhance the rental return process:
 
-**Allow employees to optionally upload an image of the car when returning it, so the system can automatically enrich the rental feedback with visual observations.**
+Allow employees to optionally upload an image of the car when returning it, so the system can automatically enrich the rental feedback with visual observations.
 
-This is a common real-world scenario where:
-
-1. **Text alone is insufficient**: An employee might write "car looks fine" but a photo reveals scratches or dents they missed
-2. **Multimodal AI is powerful**: Modern LLMs can analyze images alongside text to provide richer assessments
-
-You'll learn how to integrate **multimodal capabilities** (text + image) into your existing agentic workflow using LangChain4j's `ImageContent`.
+In this step you'll learn how to integrate **multimodal capabilities** (text + image) into your existing agentic workflow using LangChain4j's `ImageContent` to enrich the rental feedback with visual insights.
 
 ---
 
@@ -41,28 +36,17 @@ In this step, you will:
 
 LangChain4j provides the `ImageContent` class to represent image data in messages sent to the LLM:
 
-- **`ImageContent`**: Wraps an image (as base64-encoded data with a MIME type) as a content part
+- **`ImageContent`** wraps an image (as base64-encoded data with a MIME type) as a content part
 - When passed as a method parameter annotated with `@UserMessage`, it is automatically included alongside text in the message sent to the LLM
 - The LLM receives both the text prompt and the image, enabling visual reasoning
 
-### The Enrichment Pattern
+Rather than creating a separate "image analysis" output, the `CarImageAnalysisAgent` will use an **enrichment pattern**:
 
-Rather than creating a separate "image analysis" output, the `CarImageAnalysisAgent` uses an **enrichment pattern**:
+1. Receive the original rental feedback text and an optional car image
+2. If an image is present, analyze it and **append visual observations** to the feedback
+3. If no image is present, return the feedback **unchanged**
+4. The enriched feedback then flows into the existing `FeedbackAnalysisWorkflow`
 
-1. Receives the original rental feedback text and an optional car image
-2. If an image is present, analyzes it and **appends visual observations** to the feedback
-3. If no image is present, returns the feedback **unchanged**
-4. The enriched feedback then flows into the existing `FeedbackAnalysisWorkflow` — no downstream changes needed
-
-This is elegant because it preserves the existing workflow structure while adding new capabilities.
-
-**Why ImageContent Stays Separate:**
-
-`ImageContent` is passed as a separate parameter alongside the `String feedback`:
-
-- `ImageContent` is a special LangChain4j type for multimodal AI, not simple text data
-- It's only used by the image analysis agent, not by other agents in the workflow
-- Keeping it separate maintains the clean separation between feedback text and multimodal content
 
 ---
 
@@ -70,46 +54,45 @@ This is elegant because it preserves the existing workflow structure while addin
 
 We're enhancing the car management system with multimodal image analysis:
 
-1. **Update the UI**: Add an image upload field for rented cars in the Fleet Status grid
-2. **Update the REST endpoint**: Accept multipart form data with an optional image
-3. **Convert to `ImageContent`**: Transform the uploaded file into a LangChain4j `ImageContent`
-4. **Create `CarImageAnalysisAgent`**: A new agent that analyzes car images
-5. **Update the workflow**: Insert the new agent at the beginning of the sequence
+1. Update the UI to add an image upload field for rented cars in the Fleet Status grid
+2. Modify the REST endpoint to accept multipart form data with an optional image
+3. Transform the uploaded file into a LangChain4j `ImageContent` object
+4. Create a `CarImageAnalysisAgent` that analyzes car images
+5. Insert the new agent at the beginning of the workflow sequence
 
 **The Updated Architecture:**
 
 ```mermaid
 graph TB
-    Start([Car Return with optional image]) --> A[CarProcessingWorkflow<br/>Sequential]
+    Start(["Car Return with optional image"]) --> A["CarProcessingWorkflow<br/>Sequential"]
 
-    A --> IMG[Step 1: CarImageAnalysisAgent<br/>Image Analysis]
-    IMG -->|enriched rentalFeedback| B[Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    B --> B1[FeedbackTask.cleaning()]
-    B --> B2[FeedbackTask.maintenance()]
-    B --> B3[FeedbackTask.disposition()]
-    B1 --> BA[FeedbackAnalysisAgent]
+    A --> IMG["Step 1: CarImageAnalysisAgent<br/>Image Analysis"]
+    IMG -->|"enriched rentalFeedback"| B["Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    B --> B1["FeedbackTask.cleaning()"]
+    B --> B2["FeedbackTask.maintenance()"]
+    B --> B3["FeedbackTask.disposition()"]
+    B1 --> BA["FeedbackAnalysisAgent"]
     B2 --> BA
     B3 --> BA
-    BA --> BEnd[FeedbackAnalysisResults]
+    BA --> BEnd["FeedbackAnalysisResults"]
 
-    BEnd --> C[Step 3: FleetSupervisorAgent<br/>Autonomous Orchestration]
-    C --> CEnd[Supervisor Decision]
+    BEnd --> C["Step 3: FleetSupervisorAgent<br/>Autonomous Orchestration"]
+    C --> CEnd["Supervisor Decision"]
 
-    CEnd --> D[Step 4: CarConditionFeedbackAgent<br/>Final Summary]
-    D --> End([Updated Car])
+    CEnd --> D["Step 4: CarConditionFeedbackAgent<br/>Final Summary"]
+    D --> End(["Updated Car"])
 
-    style A fill:#90EE90
-    style IMG fill:#E8B4F8
-    style B fill:#87CEEB
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style Start fill:#E8E8E8
-    style End fill:#E8E8E8
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style IMG fill:#E8B4F8,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#FFB6C1,stroke:#333,stroke-width:2,color:#000
+    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
 ```
 
-**The Key Innovation:**
 
-The **`CarImageAnalysisAgent`** sits at the beginning of the sequence, _before_ the `FeedbackAnalysisWorkflow`. Its output key is `rentalFeedback`, which means it **replaces** the original rental feedback in the agentic scope with the enriched version. All downstream agents automatically receive the enriched feedback without any code changes.
+
 
 ---
 
@@ -123,7 +106,7 @@ Before starting:
 
 ---
 
-## Part 1: Update the UI for Image Upload
+## Update the UI for Image Upload
 
 ### Update the JavaScript
 
@@ -158,15 +141,9 @@ fetch(`/car-management/return/${carId}`, {
 })
 ```
 
-**Key Points:**
-
-- Uses `FormData` for multipart encoding — all statuses use the same endpoint and format
-- The image is only appended if the user selected a file
-- No `Content-Type` header is set — the browser automatically adds `multipart/form-data` with the correct boundary
-
 ---
 
-## Part 2: Update the REST Endpoint
+## Update the REST Endpoint
 
 ### Accept Multipart Form Data
 
@@ -220,7 +197,7 @@ private ImageContent toImageContent(FileUpload fileUpload) {
 
 ---
 
-## Part 3: Pass the Image Through the Service Layer
+## Pass the Image Through the Service Layer
 
 ### Update `src/main/java/com/carmanagement/service/CarManagementService`
 
@@ -243,7 +220,7 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 
 ---
 
-## Part 4: Create the CarImageAnalysisAgent
+## Create the CarImageAnalysisAgent
 
 This is the core of this step — a new agent that processes car images.
 
@@ -297,7 +274,7 @@ The agent's output key is `rentalFeedback`, which means its result **replaces** 
 
 ---
 
-## Part 5: Update the Workflow
+## Update the Workflow
 
 ### Add the Agent to the Sequence
 
