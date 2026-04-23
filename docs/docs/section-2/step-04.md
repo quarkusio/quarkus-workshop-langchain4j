@@ -75,79 +75,61 @@ Use supervisor agents when you need:
 
 ---
 
-## From Step 03's Concrete Agents to Step 04's Parameterized Design
+## Understanding the ParallelMapperAgent pattern
 
-Step 03 deliberately used concrete feedback agents because that made the composition pattern easy to understand. You had one agent for cleaning feedback and one for maintenance feedback, and the workflow simply ran both in parallel. That was the right teaching choice for introducing workflow composition.
+Step 03 deliberately used concrete feedback analysis agents because that made the composition pattern easy to understand. You had one explicit agent for **cleaning analysis**, and one for **maintenance analysis**, and the workflow simply ran both in parallel. 
 
-Step 04 adds a third perspective: **disposition analysis**. At that point, the similarity between the feedback agents becomes hard to ignore. Each one reads the same car information and the same feedback sources. The main difference is the instructions it follows and the output it produces.
+Step 04 adds yet another analysis agent, this time for figuring out if a car is beyond repair and needs to be **dispositioned**.  Each one of these agents reads the same car information and the same feedback sources. The main difference is the instructions it follows and the output it produces.
 
-Instead of creating one more near-duplicate agent, this step refactors the design so the variability becomes explicit data. The analysis logic stays in one place, and the workflow passes in a task object that tells the agent what kind of feedback it is analyzing.
-
-This is a useful architectural progression to understand. You start with concrete, easy-to-read building blocks when learning the model. Once the pattern is familiar, you can refactor toward something more reusable and maintainable.
+Instead of creating one more near-duplicate agent, this step refactors the design to implement a **single, multi-purpose analysis agent** that can be dynamically configured for the different cleaning, maintenance and disposition outcomes and called multiple times in parallel using a `ParallelMapperAgent`.
 
 ---
 
-## What is Being Added?
-
-We're going to enhance our car management system with:
-
-- a [`FleetSupervisorAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java) that orchestrates action agents autonomously
-- a unified [`FeedbackAnalysisAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java) that handles cleaning, maintenance, and disposition analysis
-- a [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) model that defines each analysis task
-- a [`FeedbackAnalysisWorkflow`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java) that runs the same agent multiple times in parallel
-- a [`FeedbackAnalysisResults`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java) record that holds the three analysis results
-- a [`PricingAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java) that estimates vehicle market value
-- a [`DispositionAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java) that decides whether to SCRAP, SELL, DONATE, or KEEP a vehicle
-- an updated workflow with two distinct phases: **parallel analysis** followed by **supervisor-driven action orchestration**
 
 ### The New Architecture
 
 ```mermaid
 graph TB
-    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential]
+    Start(["Car Return"]) --> A["CarProcessingWorkflow"]
 
-    A --> B[Step 1: FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    B --> B1[FeedbackTask.cleaning()]
-    B --> B2[FeedbackTask.maintenance()]
-    B --> B3[FeedbackTask.disposition()<br/>NEW]
-    B1 --> BA[FeedbackAnalysisAgent]
+    A --> B["Step 1: FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    B --> B1["cleaning Analysis"]
+    B --> B2["maintenance Analysis"]
+    B --> B3["disposition Analysis<br/>NEW"]
+    B1 --> BA["FeedbackAnalysisAgent"]
     B2 --> BA
     B3 --> BA
-    BA --> BEnd[FeedbackAnalysisResults]
+    BA --> BEnd["FeedbackAnalysisResults"]
 
-    BEnd --> C[Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration]
-    C --> C1{AI Supervisor<br/>Analyzes Results}
-    C1 -->|Severe Damage| C2[PricingAgent<br/>Estimate Value]
-    C2 --> C3[DispositionAgent<br/>SCRAP/SELL/DONATE/KEEP]
-    C1 -->|Repairable| C4[MaintenanceAgent]
-    C1 -->|Minor Issues| C5[CleaningAgent]
+    BEnd --> C["Step 2: FleetSupervisorAgent<br/>Autonomous Orchestration"]
+    C --> C1{"AI Supervisor"}
+    C1 -->|"Severe Damage"| C2["PricingAgent<br/>Estimate Value"]
+    C2 --> C3["DispositionAgent<br/>SCRAP/SELL/DONATE/KEEP"]
+    C1 -->|Repairable| C4["MaintenanceAgent"]
+    C1 -->|"Minor Issues"| C5["CleaningAgent"]
 
-    C3 --> CEnd[Supervisor Decision]
+    C3 --> CEnd["Supervisor Decision"]
     C4 --> CEnd
     C5 --> CEnd
 
-    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Final Summary]
-    D --> End([Updated Car with Status])
+    CEnd --> D["Step 3: CarConditionFeedbackAgent<br/>Final Summary"]
+    D --> End(["Updated Car with Status"])
 
-    style A fill:#90EE90
-    style B fill:#87CEEB
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style C1 fill:#FFA07A
-    style B3 fill:#FFD700
-    style C2 fill:#FFD700
-    style C3 fill:#FFD700
-    style Start fill:#E8E8E8
-    style End fill:#E8E8E8
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#FFB6C1,stroke:#333,stroke-width:2,color:#000
+    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style C1 fill:#FFA07A,stroke:#333,stroke-width:2,color:#000
+    style B3 fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style C2 fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style C3 fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
 ```
-
-**The key innovation** is that the system still performs three analyses in parallel, but it no longer needs three separate feedback agent types to do that work. Instead, the workflow builds a list of tasks and executes the same agent once per task.
-
-That gives you a cleaner design with less duplication, while preserving the same behavior and the same parallelism.
 
 ---
 
-## Implementing the Supervisor Pattern
+## Implementing the new patterns
 
 Let's build the new autonomous dispositioning system step by step.
 
@@ -203,7 +185,7 @@ Each factory method returns a configured [`FeedbackTask`](section-2/step-04/src/
 - the feedback type (for identification and debugging)
 - the system instructions to use for that analysis
 
-This design keeps the agent generic and moves the task-specific behavior into data. If you ever want to add another feedback dimension later, you can usually start by adding another task factory rather than introducing another near-identical agent.
+This design keeps the agent generic and moves the task-specific behavior into data. If you ever want to add another feedback dimension later, you can simply add another task factory rather than introducing another near-identical agent.
 
 ### Create the Unified FeedbackAnalysisAgent
 
@@ -217,7 +199,6 @@ In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main
 
 The key detail here is the system message. Instead of hardcoding the instructions in the agent itself, the agent uses `{task.systemInstructions}`. That means the same agent can behave like a cleaning analyzer, a maintenance analyzer, or a disposition analyzer depending on the [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) that was passed in.
 
-This is the core of the refactoring: one agent, multiple task configurations.
 
 ### Create the FeedbackAnalysisResults Record
 
@@ -235,7 +216,7 @@ This record gives the rest of the workflow a stable, readable contract. Instead 
 
 The Miles & Smiles management has decided they feel comfortable using AI to determine the value of their cars to make further decisions on whether to keep or dispose the car. A wise decision? That remains to be seen 😉.
 
-Either way, let's create the agent. We'll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when pricing is needed.
+Either way, our task is to implement their idea in the form of a new PricingAgent. We'll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
 
 In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`PricingAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java):
 
@@ -247,7 +228,7 @@ In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main
 
 Management also feels comfortable letting an AI model decide whether to SCRAP, SELL, DONATE, or KEEP the vehicle based on repair economics.
 
-Create an agent that makes disposition decisions based on the pricing outcome as well as the car's age and condition.
+Create an agent that makes disposition decisions based on the pricing outcome from the PricingAgent, as well as the car's age and condition.
 
 In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`DispositionAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java):
 
@@ -350,11 +331,7 @@ The [`@ParallelMapperAgent`](section-2/step-04/src/main/java/com/carmanagement/a
 
 The method therefore receives a `List<FeedbackTask>` and executes the same analysis agent in parallel for each entry in that list.
 
-The raw result of that execution is a `List<String>`, one result per task. That is useful, but it is not yet the shape we want for the rest of the workflow. The static [`@Output`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java:45) method solves that by converting the list into a [`FeedbackAnalysisResults`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java) record.
-
-This is one of the nicest aspects of the pattern: the workflow can do its work in whatever low-level format is convenient, and then present a cleaner structured result to downstream components.
-
-### Why the `@Output` Method Matters
+The raw result of that execution is a `List<String>`, with one result per task. That is useful, but it is not yet the shape we want for the rest of the workflow. The static [`@Output`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java:45) method solves that by converting the list into a [`FeedbackAnalysisResults`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java) record.
 
 Without the [`@Output`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java:45) method, downstream agents would need to know that index `0` means cleaning, index `1` means maintenance, and index `2` means disposition. That would make the design more fragile and harder to understand.
 
@@ -364,7 +341,7 @@ By transforming the parallel results into [`FeedbackAnalysisResults`](section-2/
 
 ## Update the CarProcessingWorkflow
 
-Since we want the supervisor to determine which agents need to be called, we replace the previous conditional routing with the supervisor agent. The workflow now becomes a clean three-step sequence:
+Now that we've built the new components, we'll replace the previous parallel agent and the subsequent conditional routing with the supervisor agent. The workflow now becomes a clean three-step sequence:
 
 1. [`FeedbackAnalysisWorkflow`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java) performs parallel analysis
 2. [`FleetSupervisorAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java) decides which action agents to invoke
@@ -376,7 +353,6 @@ Update [`src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
-The important change is that the workflow now accepts a list of [`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java) values as input. That gives the feedback-analysis stage everything it needs to run the parameterized analysis.
 
 ### Update the Final Condition Agent
 
@@ -412,23 +388,10 @@ List<FeedbackTask> tasks = List.of(
 
 That list is then passed into the main workflow. This is a small change in code, but it is a significant architectural improvement. The service is now explicitly defining which analyses should run, and the workflow is generic enough to execute them without knowing about separate feedback agent types.
 
+
 ---
 
-## Why This Refactoring Is Worth It
-
-At first glance, replacing three small agents with one configurable agent plus a task model might look like extra abstraction. In practice, it makes the design easier to maintain.
-
-You now have:
-
-- one place to evolve the shared feedback-analysis structure
-- one workflow pattern that can scale to more analysis types
-- a clean separation between **what to analyze** ([`FeedbackTask`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java)) and **how to analyze it** ([`FeedbackAnalysisAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java))
-- a structured result object that is easier for downstream agents to consume
-
-This refactoring is a good example of how to evolve a codebase: start with a simple, working solution, then gradually introduce abstractions that make the code more maintainable and scalable.
----
-
-## Try the Supervisor Pattern
+## Test our changes
 
 You've now implemented the supervisor pattern together with a parameterized parallel analysis stage. Let's test it.
 
@@ -462,29 +425,29 @@ The car was in a serious collision. Front end is completely destroyed and airbag
 
 ```mermaid
 flowchart TD
-    Start([Input: Car was in serious collision<br/>Front end destroyed, airbags deployed])
+    Start(["Input: Car was in serious collision<br/>Front end destroyed, airbags deployed"])
 
-    Start --> FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    FW --> T1[FeedbackTask.cleaning()]
-    FW --> T2[FeedbackTask.maintenance()]
-    FW --> T3[FeedbackTask.disposition()]
-    T1 --> A1[FeedbackAnalysisAgent]
+    Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    FW --> T1["FeedbackTask.cleaning()"]
+    FW --> T2["FeedbackTask.maintenance()"]
+    FW --> T3["FeedbackTask.disposition()"]
+    T1 --> A1["FeedbackAnalysisAgent"]
     T2 --> A1
     T3 --> A1
-    A1 --> Results[FeedbackAnalysisResults]
+    A1 --> Results["FeedbackAnalysisResults"]
 
-    Results --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
-    FSA -->|Disposition has highest priority| PA[Invoke PricingAgent]
-    PA --> PV[Estimate: $8,500<br/>2020 Honda Civic with severe damage]
-    PV --> DA[Invoke DispositionAgent]
-    DA --> DD[Decision: SCRAP<br/>Repair cost > 50% of value]
-    DD --> Result([Result: PENDING_DISPOSITION<br/>Condition: SCRAP - severe damage])
+    Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
+    FSA -->|"Disposition has highest priority"| PA["Invoke PricingAgent"]
+    PA --> PV["Estimate: $8,500<br/>2020 Honda Civic with severe damage"]
+    PV --> DA["Invoke DispositionAgent"]
+    DA --> DD["Decision: SCRAP<br/>Repair cost > 50% of value"]
+    DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP - severe damage"])
 
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style PA fill:#F9E79F
-    style DA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#e8d5b5,stroke:#333,stroke-width:2,color:#333
+    style FSA fill:#a8d8a0,stroke:#333,stroke-width:2,color:#333
+    style PA fill:#f5e69c,stroke:#333,stroke-width:2,color:#333
+    style DA fill:#f5e69c,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#b58dd0,stroke:#333,stroke-width:2,color:#333
 ```
 
 **Expected result:**
@@ -508,23 +471,23 @@ In this scenario, the car had already been sent to maintenance by the returns te
 
 ```mermaid
 flowchart TD
-    Start([Input: Car is totaled<br/>completely inoperable])
+    Start(["Input: Car is totaled<br/>completely inoperable"])
 
-    Start --> FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    FW --> Results[FeedbackAnalysisResults]
-    Results --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    FW --> Results["FeedbackAnalysisResults"]
+    Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
-    FSA -->|Severe damage detected| PA[Invoke PricingAgent]
-    PA --> PV[Estimate: $12,000<br/>2019 Toyota Camry, totaled]
-    PV --> DA[Invoke DispositionAgent]
-    DA --> DD[Decision: SCRAP or SELL<br/>Beyond economical repair]
-    DD --> Result([Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled])
+    FSA -->|"Severe damage detected"| PA["Invoke PricingAgent"]
+    PA --> PV["Estimate: $12,000<br/>2019 Toyota Camry, totaled"]
+    PV --> DA["Invoke DispositionAgent"]
+    DA --> DD["Decision: SCRAP or SELL<br/>Beyond economical repair"]
+    DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled"])
 
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style PA fill:#F9E79F
-    style DA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#e8d5b5,stroke:#333,stroke-width:2,color:#333
+    style FSA fill:#a8d8a0,stroke:#333,stroke-width:2,color:#333
+    style PA fill:#f5e69c,stroke:#333,stroke-width:2,color:#333
+    style DA fill:#f5e69c,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#b58dd0,stroke:#333,stroke-width:2,color:#333
 ```
 
 **Expected result:**
@@ -546,19 +509,19 @@ Engine making noise, needs inspection
 
 ```mermaid
 flowchart TD
-    Start([Input: Engine making noise<br/>needs inspection])
+    Start(["Input: Engine making noise<br/>needs inspection"])
 
-    Start --> FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    FW --> Results[FeedbackAnalysisResults]
-    Results --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    FW --> Results["FeedbackAnalysisResults"]
+    Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
-    FSA -->|No disposition, maintenance is priority| MA[Invoke MaintenanceAgent]
-    MA --> Result([Result: IN_MAINTENANCE<br/>Condition: Engine inspection required])
+    FSA -->|"No disposition, maintenance is priority"| MA["Invoke MaintenanceAgent"]
+    MA --> Result(["Result: IN_MAINTENANCE<br/>Condition: Engine inspection required"])
 
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style MA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style FSA fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style MA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
 ```
 
 **Expected result:**
@@ -579,19 +542,19 @@ Car is dirty, needs cleaning
 
 ```mermaid
 flowchart TD
-    Start([Input: Car is dirty<br/>needs cleaning])
+    Start(["Input: Car is dirty<br/>needs cleaning"])
 
-    Start --> FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-    FW --> Results[FeedbackAnalysisResults]
-    Results --> FSA{FleetSupervisorAgent<br/>Autonomous Orchestration}
+    Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    FW --> Results["FeedbackAnalysisResults"]
+    Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
-    FSA -->|No disposition or maintenance| CA[Invoke CleaningAgent]
-    CA --> Result([Result: IN_CLEANING<br/>Condition: Requires thorough cleaning])
+    FSA -->|"No disposition or maintenance"| CA["Invoke CleaningAgent"]
+    CA --> Result(["Result: IN_CLEANING<br/>Condition: Requires thorough cleaning"])
 
-    style FW fill:#FAE5D3
-    style FSA fill:#D5F5E3
-    style CA fill:#F9E79F
-    style Result fill:#D2B4DE
+    style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style FSA fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
+    style CA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
+    style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
 ```
 
 **Expected result:**

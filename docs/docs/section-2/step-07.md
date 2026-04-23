@@ -52,27 +52,27 @@ The [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blan
 ```mermaid
 graph LR
     subgraph "Quarkus Runtime 1: Car Management System"
-        W[CarProcessingWorkflow] 
+        W["CarProcessingWorkflow"]
         PA["PricingAgent<br/>@A2AClientAgent"]
         W --> PA
     end
 
     subgraph "A2A Protocol Layer"
-        AP[JSON-RPC over HTTP]
+        AP["JSON-RPC over HTTP"]
     end
 
     subgraph "Quarkus Runtime 2: Pricing Service"
-        AC[AgentCard<br/>Agent Metadata]
-        AE[AgentExecutor<br/>Request Handler]
-        PAI[PricingAgent<br/>AI Service]
+        AC["AgentCard<br/>Agent Metadata"]
+        AE["AgentExecutor<br/>Request Handler"]
+        PAI["PricingAgent<br/>AI Service"]
 
         AC -.describes.-> PAI
         AE --> PAI
     end
 
-    PA -->|A2A Request| AP
-    AP -->|A2A Response| PA
-    AP <-->|JSON-RPC| AE
+    PA -->|"A2A Request"| AP
+    AP -->|"A2A Response"| PA
+    AP <-->|"JSON-RPC"| AE
 
 ```
 
@@ -135,12 +135,12 @@ We'll convert Step 5's architecture to use a remote pricing agent:
 ```mermaid
 graph TD
     subgraph "Main Application (localhost:8080)"
-        R[Rental/Cleaning/Maintenance Returns]
-        FW[FeedbackAnalysisWorkflow<br/>Parallel Mapper]
-        FA[FeedbackAnalysisAgent]
-        FSA[FleetSupervisorAgent<br/>Supervisor]
+        R["Rental/Cleaning/Maintenance Returns"]
+        FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+        FA["FeedbackAnalysisAgent"]
+        FSA["FleetSupervisorAgent<br/>Supervisor"]
         PAC["PricingAgent<br/>@A2AClientAgent"]
-        DA[DispositionAgent<br/>Local]
+        DA["DispositionAgent<br/>Local"]
 
         R --> FW
         FW --> FA
@@ -150,14 +150,14 @@ graph TD
     end
 
     subgraph "Remote Pricing Service (localhost:8888)"
-        AC[AgentCard]
-        AE[AgentExecutor]
-        PAI[PricingAgent<br/>AI Service]
+        AC["AgentCard"]
+        AE["AgentExecutor"]
+        PAI["PricingAgent<br/>AI Service"]
 
         AE --> PAI
     end
 
-    PAC -->|A2A Protocol| AE
+    PAC -->|"A2A Protocol"| AE
 
 ```
 

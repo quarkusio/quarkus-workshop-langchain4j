@@ -53,10 +53,10 @@ With sequential workflows, agents execute **one after another** in a defined ord
 
 ```mermaid
 graph LR
-    A[Agent 1] --> B[Agent 2] --> C[Agent 3]
-    style A fill:#90EE90
-    style B fill:#90EE90
-    style C fill:#90EE90
+    A["Agent 1"] --> B["Agent 2"] --> C["Agent 3"]
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style B fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style C fill:#90EE90,stroke:#333,stroke-width:2,color:#000
 ```
 
 **When to use:** Each agent needs the output from the previous agent.
@@ -71,15 +71,15 @@ Parallel workflows allow agents to be executed **simultaneously** on separate th
 
 ```mermaid
 graph TD
-    Start[Start] --> A[Agent 1]
-    Start --> B[Agent 2]
-    Start --> C[Agent 3]
-    A --> End[Continue]
+    Start["Start"] --> A["Agent 1"]
+    Start --> B["Agent 2"]
+    Start --> C["Agent 3"]
+    A --> End["Continue"]
     B --> End
     C --> End
-    style A fill:#87CEEB
-    style B fill:#87CEEB
-    style C fill:#87CEEB
+    style A fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
 ```
 
 **When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of both.
@@ -96,15 +96,15 @@ Conditional Workflows will execute agents **only if their activation condition i
 
 ```mermaid
 graph TD
-    Start[Start] --> Check1{Condition 1?}
-    Check1 -->|Yes| A[Agent 1]
-    Check1 -->|No| Check2{Condition 2?}
-    A --> End[Continue]
-    Check2 -->|Yes| B[Agent 2]
+    Start["Start"] --> Check1{"Condition 1?"}
+    Check1 -->|Yes| A["Agent 1"]
+    Check1 -->|No| Check2{"Condition 2?"}
+    A --> End["Continue"]
+    Check2 -->|Yes| B["Agent 2"]
     Check2 -->|No| End
     B --> End
-    style A fill:#FFD700
-    style B fill:#FFD700
+    style A fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    style B fill:#FFD700,stroke:#333,stroke-width:2,color:#000
 ```
 
 **When to use:** When different execution paths are needed based on runtime data (e.g. the output of a previous agent execution).
@@ -119,11 +119,11 @@ With Loop workflows, agents run **repeatedly until a condition is met**.
 
 ```mermaid
 graph TD
-    Start[Start] --> A[Agent]
-    A --> Check{Continue?}
+    Start["Start"] --> A["Agent"]
+    A --> Check{"Continue?"}
     Check -->|Yes| A
-    Check -->|No| End[Done]
-    style A fill:#FFA07A
+    Check -->|No| End["Done"]
+    style A fill:#FFA07A,stroke:#333,stroke-width:2,color:#000
 ```
 
 **When to use:** When iterative refinement or retries are needed.
@@ -281,12 +281,12 @@ Other agents or the workflow can then access this value.
     
     ```mermaid
     graph LR
-        A[Workflow Inputs] -->|Populate| B[AgenticScope]
-        B -->|Read state| C[Agent 1]
-        C -->|Write state| B
-        B -->|Read state| D[Agent 2]
-        D -->|Write state| B
-        B -->|Extract| E[Workflow Result]
+        A["Workflow Inputs"] -->|Populate| B["AgenticScope"]
+        B -->|"Read state"| C["Agent 1"]
+        C -->|"Write state"| B
+        B -->|"Read state"| D["Agent 2"]
+        D -->|"Write state"| B
+        B -->|Extract| E["Workflow Result"]
     ```
     
     When an agent completes, its result is stored in the `AgenticScope`'s state using the `outputKey` specified in the `@Agent` annotation.

@@ -10,7 +10,7 @@ Throughout the workshop, participants build an LLM-powered customer support chat
 
 ## Technology Stack
 
-The workshop uses Java 21 with Quarkus 3.34.2 and the LangChain4j Quarkiverse extension (version 1.8.4). Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
+The workshop uses Java 21 with Quarkus 3.34.3 and the LangChain4j Quarkiverse extension (version 1.9.1). Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
 
 ## Project Structure
 
