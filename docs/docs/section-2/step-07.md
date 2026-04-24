@@ -767,17 +767,9 @@ Before moving to the conclusion, let's clean up:
 
 2. **Return to the root project directory** (in both terminals):
 
-=== "Linux / macOS"
     ```bash
-    cd ../..
+    cd ..
     ```
-
-=== "Windows"
-    ```cmd
-    cd ..\..
-    ```
-
-You should now be in the root project directory.
 
 ---
 

@@ -469,13 +469,7 @@ Before moving to the next step, let's clean up:
 
 2. **Return to the root project directory**:
 
-=== "Linux / macOS"
     ```bash
-    cd ..
-    ```
-
-=== "Windows"
-    ```cmd
     cd ..
     ```
 
