@@ -168,7 +168,7 @@ Agents share similarities with AI Services from [Section 1](../section-1/step-01
 ### Key Differences
 
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
-- Designed to be composed with for **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
+- Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
 - Focus on **autonomous actions** rather than conversational responses
 
 ---
