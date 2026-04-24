@@ -236,6 +236,7 @@ section-2/step-07/
     
     === "Linux / macOS"
         ```bash
+        cd ../step-06
         cp ../step-07/multi-agent-system/pom.xml ./pom.xml
         cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
         cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
@@ -247,6 +248,7 @@ section-2/step-07/
     
     === "Windows"
         ```cmd
+        cd ..\step-06
         copy ..\step-07\multi-agent-system\pom.xml .\pom.xml
         copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
         copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
