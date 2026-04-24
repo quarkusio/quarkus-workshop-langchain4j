@@ -467,6 +467,20 @@ Modify the `CarImageAnalysisAgent`'s system message to focus on specific aspects
     - Compressing images client-side before upload
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

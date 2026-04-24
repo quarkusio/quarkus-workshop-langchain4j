@@ -532,6 +532,20 @@ Second, generate an HTML report from the monitor. In `CarManagementService.java`
 The report is exposed via a REST endpoint in `CarManagementResource.java`. After processing one or more cars, click the "Generate Report" button in the UI (next to "Refresh Data") to open the report in a new tab. The report shows the full agent topology of your system, every execution grouped by workflow run, and for each agent invocation, what went in, what came out, and how long it took. This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 
