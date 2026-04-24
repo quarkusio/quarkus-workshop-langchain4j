@@ -419,7 +419,7 @@ Now update the service to use the workflow instead of calling agents directly.
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java hl_lines="17-18 34-42 44-50" title="CarManagementService.java"
+```java hl_lines="20-21 31-45 47-53" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -623,7 +623,7 @@ How does the condition agent synthesize feedback from multiple sources?
     We chose a **sequential** workflow in this step because:
 
     1. It's simpler to understand as your first workflow
-    2. It sets us up for [Step 03](step-03.md){target="_blank"}, where we'll add more agents that DO depend on each other
+    2. It sets us up for [Step 03](step-03.md){target="_blank"}, where we'll add more agents that **do** depend on each other
 
     Feel free to try converting this to a parallel workflow as an experiment! Replace `@SequenceAgent` with `@ParallelAgent` and see what happens.
 
