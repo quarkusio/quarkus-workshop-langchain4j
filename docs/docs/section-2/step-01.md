@@ -40,7 +40,7 @@ Before diving in, let's clarify some key differences:
 | **Purpose**     | Answer user questions                           | Perform autonomous tasks                                                                                                                                                                                                         |
 | **Interaction** | Reactive (responds to prompts)                  | Reactive and Proactive (takes actions)                                                                                                                                                                                           |
 | **Tool Usage**  | Can call tools when needed                      | Can call tools to accomplish goals                                                                                                                                                                                               |
-| **Workflows**   | Single-agent interactions                       | Multi-agent collaboration  ([workflow](https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns){target="_blank"} or [supervisor-based](https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai){target="_blank"} |
+| **Workflows**   | Single-agent interactions                       | Multi-agent collaboration  ([workflow](https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns){target="_blank"} or [supervisor-based](https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai){target="_blank"}) |
 | **Annotation**  | Methods use `@SystemMessage` and `@UserMessage` | One method per interface (using `@Agent`)                                                                                                                                                                                        |
 | **Use Cases**   | Chatbots, Q&A, content generation               | Automation, decision-making, orchestration                                                                                                                                                                                       |
 
@@ -50,12 +50,7 @@ In this section, you'll see how agents extend the capabilities you created in Se
 
 ## Prerequisites
 
-Before starting, ensure you have:
-
-- Completed Section 1 (or you are familiar with Quarkus LangChain4j basics)
-- JDK 21+ installed
-- OpenAI API key set as `OPENAI_API_KEY` environment variable
-- A container runtime (Docker/Podman) for running a PostgreSQL [Dev Service](https://quarkus.io/guides/databases-dev-services)
+Before starting, ensure you have met the [workshop setup requirements](requirements.md){target="_blank"}.
 
 ---
 
@@ -208,7 +203,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 The `CarManagementService` orchestrates the car return process:
 
-```java hl_lines="10 16-28" title="CarManagementService.java"
+```java hl_lines="1 18-30" title="CarManagementService.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
 ```
 
