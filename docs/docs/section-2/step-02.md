@@ -215,9 +215,17 @@ sequenceDiagram
 
     If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-02` directory:
 
-    ```bash
-    cd section-2/step-02
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-02
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-02
+        mvnw quarkus:dev
+        ```
 
 ---
 

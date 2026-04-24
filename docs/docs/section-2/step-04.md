@@ -159,9 +159,17 @@ Let's build the new autonomous dispositioning system step by step.
 
     If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-04` directory:
 
-    ```bash
-    cd section-2/step-04
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-04
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-04
+        mvnw quarkus:dev
+        ```
 
 ---
 

@@ -439,9 +439,17 @@ Starting from your current code in `section-2/step-02`, you'll add:
 
     If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-03` directory:
 
-    ```bash
-    cd section-2/step-03
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-03
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-03
+        mvnw quarkus:dev
+        ```
 
 ### Create Feedback Analysis Agents
 
