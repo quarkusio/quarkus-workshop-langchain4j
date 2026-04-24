@@ -593,11 +593,20 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 
 #### Update the Service Layer
 
-And finally, we'll update the Car Management service to handle the result from the Agentic AI workflow and update the system accordingly.
+We'll update the Car Management service to handle the result from the Agentic AI workflow and update the system accordingly.
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 ```java title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
+```
+
+#### Update the Rest Resource
+
+And finally, we'll update the Car Management REST resource to accept maintenance returns and maintenance feedback.
+Update `src/main/java/com/carmanagement/resource/CarManagementResource.java`:
+
+```java title="CarManagementResource.java"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
 ### Test Your Implementation
