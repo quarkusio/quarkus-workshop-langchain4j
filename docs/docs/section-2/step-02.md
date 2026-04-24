@@ -185,14 +185,9 @@ sequenceDiagram
 
 ## Prerequisites
 
-Before starting:
-
-- Completed [Step 01](step-01.md){target="_blank"} (or have the `section-2/step-01` code available)
-- Application from Step 01 is stopped (Ctrl+C)
-
 === "Option 1: Continue from Step 01"
 
-    If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
+    If you want to continue building on top of Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
     === "Linux / macOS"
         ```bash
@@ -216,9 +211,9 @@ Before starting:
 
     These files add the "Condition" column to the UI and update the data model to track car conditions.
 
-=== "Option 2: Start Fresh from Step 02"
+=== "Option 2: Follow along using the completed solution"
 
-    Alternatively, navigate to the complete `section-2/step-02` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-02` directory:
 
     ```bash
     cd section-2/step-02
@@ -649,6 +644,26 @@ How does the condition agent synthesize feedback from multiple sources?
 ## What's Next?
 
 You've successfully built your first multi-agent workflow!
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+=== "Linux / macOS"
+    ```bash
+    cd ..
+    ```
+
+=== "Windows"
+    ```cmd
+    cd ..
+    ```
+
+---
+
 You learned how agents collaborate through `AgenticScope` and how sequential workflows coordinate their execution.
 
 In **Step 03**, you'll learn about **composing Multiple Agentic Workflows**, combining sequential, parallel, and conditional workflows to build sophisticated agent systems!

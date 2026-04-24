@@ -222,21 +222,13 @@ section-2/step-07/
     we recommend starting fresh from Step 07 with the changes already applied.
     You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
 
-=== "Option 2: Start Fresh from Step 07 [Recommended]"
-
-    Navigate to the complete `section-2/step-07/multi-agent-system` directory:
-    
-    ```bash
-    cd section-2/step-07/multi-agent-system
-    ```
-
 === "Option 1: Continue from Step 06"
 
-    If you want to continue building on your previous code, place yourself at the root of your project and copy the updated files:
+    If you want to continue building on top of Step-06 code, copy the updated files:
     
     === "Linux / macOS"
         ```bash
-        cd ../step-06
+        cd section-2/step-06
         cp ../step-07/multi-agent-system/pom.xml ./pom.xml
         cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
         cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
@@ -248,7 +240,7 @@ section-2/step-07/
     
     === "Windows"
         ```cmd
-        cd ..\step-06
+        cd section-2\step-06
         copy ..\step-07\multi-agent-system\pom.xml .\pom.xml
         copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
         copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
@@ -257,6 +249,14 @@ section-2/step-07/
         copy ..\step-07\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
         copy ..\step-07\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
         ```
+
+=== "Option 2: Follow along using the completed solution [Recommended]"
+
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-07/multi-agent-system` directory:
+    
+    ```bash
+    cd section-2/step-07/multi-agent-system
+    ```
 
 ---
 
@@ -484,7 +484,7 @@ The remote service is now running and ready to accept A2A requests for pricing!
 
 ### Terminal 2: Start the Main Application
 
-Open a **new terminal** and run:
+Open a **new terminal**, navigate to the root project directory, and run:
 
 ```bash
 cd section-2/step-07/multi-agent-system
@@ -757,6 +757,30 @@ This shows the raw A2A protocol messages.
     - Check for zombie Java processes: `ps aux | grep java`
 
 ---
+## Cleanup
+
+Before moving to the conclusion, let's clean up:
+
+1. **Stop both running servers**:
+   - In Terminal 1 (remote-a2a-agent): Press `Ctrl+C`
+   - In Terminal 2 (multi-agent-system): Press `Ctrl+C`
+
+2. **Return to the root project directory** (in both terminals):
+
+=== "Linux / macOS"
+    ```bash
+    cd ../..
+    ```
+
+=== "Windows"
+    ```cmd
+    cd ..\..
+    ```
+
+You should now be in the root project directory.
+
+---
+
 
 ## What's Next?
 

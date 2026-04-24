@@ -205,14 +205,15 @@ Now that you understand the architecture, let's see it in action!
 
 ### Start the Application
 
-1. Navigate to the complete solution directory:
+1. If a previous step's Quarkus server is still running, stop it first (press `Ctrl+C` in the terminal).
+2. Navigate to the complete solution directory:
 
 ```bash
 cd section-2/step-03
 ./mvnw quarkus:dev
 ```
 
-2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
+3. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
 ### Test Different Scenarios
 
@@ -409,17 +410,13 @@ Starting from your current code in `section-2/step-02`, you'll add:
 
 ### Prerequisites
 
-Before starting:
-
-- Completed [Step 02](step-02.md){target="_blank"} (or have the `section-2/step-02` code available)
-- Application from Step 02 is stopped (Ctrl+C)
-
 === "Option 1: Continue from Step 02"
 
-    If you want to continue building on your Step 02 code, you'll need to copy the updated UI files from `step-03`:
+    If you want to continue building on top of Step 02 code, you'll need to copy the updated UI files from `step-03`:
 
     === "Linux / macOS"
         ```bash
+        cd section-2/step-02
         cp ../step-03/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
         cp ../step-03/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
         cp ../step-03/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
@@ -429,6 +426,7 @@ Before starting:
 
     === "Windows"
         ```cmd
+        cd section-2\step-02
         copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
         copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
         copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
@@ -437,9 +435,9 @@ Before starting:
         copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
         ```
 
-=== "Option 2: Start Fresh from Step 03 [Recommended]"
+=== "Option 2: Follow along using the completed solution [Recommended]"
 
-    If you prefer to start with the complete Step 03 code, and walk through the code instead of implementing everything yourself:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-03` directory:
 
     ```bash
     cd section-2/step-03
@@ -684,6 +682,26 @@ Add logging to each agent and workflow to print when they start and finish. Obse
     Remember that parameter names must match the `outputKey` from previous agents or workflow inputs. Check for typos!
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+=== "Linux / macOS"
+    ```bash
+    cd ..
+    ```
+
+=== "Windows"
+    ```cmd
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

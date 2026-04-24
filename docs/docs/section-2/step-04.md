@@ -135,18 +135,13 @@ Let's build the new autonomous dispositioning system step by step.
 
 ## Prerequisites
 
-Before starting:
-
-- Completed [Step 03](step-03.md){target="_blank"} (or have the `section-2/step-03` code available)
-- Application from Step 03 is stopped (Ctrl+C)
-
 === "Option 1: Continue from Step 03"
 
-    If you want to continue building on your Step 03 code, copy the updated UI files from `step-04`:
+    If you want to continue building on on top of Step 03 code, copy the updated UI files from `step-04`:
 
     === "Linux / macOS"
         ```bash
-        cd ../step-03
+        cd section-2/step-03
         cp ../step-04/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
         cp ../step-04/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
         cp ../step-04/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
@@ -154,15 +149,15 @@ Before starting:
 
     === "Windows"
         ```cmd
-        cd ..\step-03
+        cd section-2\step-03
         copy ..\step-04\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
         copy ..\step-04\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
         copy ..\step-04\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
         ```
 
-=== "Option 2: Start Fresh from Step 04"
+=== "Option 2: Follow along using the completed solution"
 
-    Navigate to the complete `section-2/step-04` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-04` directory:
 
     ```bash
     cd section-2/step-04
@@ -597,6 +592,26 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
     - Verify the LLM is following the expected output format
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+=== "Linux / macOS"
+    ```bash
+    cd ..
+    ```
+
+=== "Windows"
+    ```cmd
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 
