@@ -22,7 +22,7 @@ Management wants the system to:
 In this step, you'll learn how to compose **multiple agents into workflows** that work together to solve more complex problems.
 
 !!!note
-    "Workflow" is a pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called).
+    "Workflow" is a pattern to compose agents with limited autonomy, where you define the control flow (when each agent is called).
     This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
 
 ---
@@ -82,7 +82,7 @@ graph TD
     style C fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
 ```
 
-**When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of both.
+**When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of multiple agents.
 
 **Example:** Analyze for cleaning needs AND maintenance needs at the same time
 

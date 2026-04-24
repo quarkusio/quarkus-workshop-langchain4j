@@ -7,11 +7,10 @@ In the previous step, you created a **sequential workflow** that orchestrated tw
 1. The `CleaningAgent` determined if a car needed cleaning
 2. The `CarConditionFeedbackAgent` updated the car's condition based on feedback
 
-A single sequential pattern works well you just need agents to run one after another.
+A single sequential pattern works well when you just need agents to run one after another.
 However, real-world scenarios often require more sophisticated orchestration patterns.
 
-In this step, you'll learn how to **compose workflows by nesting them within other workflows** to build complex
-agentic systems, by creating multi-level orchestration patterns that combine mixed pattern executions.
+In this step, you'll learn how to **compose workflows by nesting them within other workflows** to build complex agentic systems. You'll create multi-level orchestration patterns that combine different execution patterns (sequential, parallel, and conditional).
 
 ---
 
@@ -299,7 +298,7 @@ Fixed the brakes, car could use a wash now
 
 - FeedbackWorkflow: Analyzes maintenance feedback
 - CarAssignmentWorkflow: Routes to CleaningAgent
-- Result: Car goes to cleaning after maintenance
+- Result: Car goes from maintenance to cleaning
 
 ### Check the Logs
 
@@ -590,8 +589,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 - `@SequenceAgent` runs the workflows and agents in order
 - Sub-agents can be **other workflows** (FeedbackWorkflow, CarAssignmentWorkflow)
 - All agents share the same `AgenticScope`
-- The `@Output` method retrieves the maintenanceRequest and cleaningRequest from the AgenticScope
-to determine what needs to happen next, and then returns this result.
+- The `@Output` method retrieves the carCondition, maintenanceRequest and cleaningRequest from the AgenticScope, determines what needs to happen next, and then returns the result.
 
 #### Update the Service Layer
 
@@ -607,13 +605,23 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 Once you've implemented all the parts:
 
 1. Start your application:
-```bash
-./mvnw quarkus:dev
-```
+
+
+
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
+
 
 2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
-3. Test with the scenarios described earlier
+3. Test with the scenarios described earlier (in the Test Different Scenarios section)
 
 4. Compare your implementation with the complete solution in `section-2/step-03`
 
@@ -672,6 +680,6 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 
 You've built a sophisticated multi-level nested workflow combining sequence, parallel, and conditional execution!
 
-In **Step 04**, you'll learn about **Agent-to-Agent (A2A) communication** — connecting your workflows to remote agents running in separate systems!
+In **Step 04**, you'll learn about **using a supervisor pattern for dynamic orchestration** of a set of agents!
 
-[Continue to Step 04 - Using Remote Agents (A2A)](step-04.md)
+[Continue to Step 04 - Supervisor Pattern for Dynamic Orchestration](step-04.md)

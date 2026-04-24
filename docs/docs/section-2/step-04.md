@@ -214,7 +214,7 @@ This record gives the rest of the workflow a stable, readable contract. Instead 
 
 ### Create the PricingAgent
 
-The Miles & Smiles management has decided they feel comfortable using AI to determine the value of their cars to make further decisions on whether to keep or dispose the car. A wise decision? That remains to be seen 😉.
+The Miles of Smiles management feels comfortable using AI to determine the value of their cars. A wise decision? That remains to be seen 😉.
 
 Either way, our task is to implement their idea in the form of a new PricingAgent. We'll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
 
@@ -478,7 +478,7 @@ flowchart TD
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
     FSA -->|"Severe damage detected"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $12,000<br/>2019 Toyota Camry, totaled"]
+    PA --> PV["Estimate: $12,000<br/>2014 Ford F-150, totaled"]
     PV --> DA["Invoke DispositionAgent"]
     DA --> DD["Decision: SCRAP or SELL<br/>Beyond economical repair"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled"])
