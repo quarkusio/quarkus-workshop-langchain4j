@@ -172,6 +172,11 @@ Before starting:
 - Ports 8080 and 8888 are available (you'll run two applications simultaneously)
 - Understanding of Step 6's multimodal image analysis, Step 5's HITL Pattern, and Step 4's Supervisor Pattern (we keep the same patterns, just make PricingAgent remote)
 
+Before starting:
+
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
+
 ---
 
 ## Understanding the Project Structure
@@ -224,39 +229,64 @@ section-2/step-07/
 
 === "Option 1: Continue from Step 06"
 
-    If you want to continue building on top of Step-06 code, copy the updated files:
+    If you want to continue building on top of Step-06 code, you'll need to restructure the directory and copy updated files:
     
     === "Linux / macOS"
         ```bash
         cd section-2/step-06
-        cp ../step-07/multi-agent-system/pom.xml ./pom.xml
-        cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarInfo.java ./src/main/java/com/carmanagement/model/CarInfo.java
-        cp ../step-07/multi-agent-system/src/main/java/com/carmanagement/model/CarStatus.java ./src/main/java/com/carmanagement/model/CarStatus.java
-        cp ../step-07/multi-agent-system/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
-        cp ../step-07/multi-agent-system/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
-        cp ../step-07/multi-agent-system/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
-        cp ../step-07/multi-agent-system/src/main/resources/import.sql ./src/main/resources/import.sql
+        mkdir -p multi-agent-system
+        mv mvnw mvnw.cmd pom.xml src multi-agent-system/
+        cp ../step-07/multi-agent-system/pom.xml ./multi-agent-system/pom.xml
+        mkdir -p remote-a2a-agent/src/main/java/com/demo
+        mkdir -p remote-a2a-agent/src/main/java/com/carmanagement/model
+        mkdir -p remote-a2a-agent/src/main/java/com/carmanagement/repository
+        mkdir -p remote-a2a-agent/src/main/resources
+        cp ../step-07/remote-a2a-agent/mvnw ./remote-a2a-agent/
+        cp ../step-07/remote-a2a-agent/mvnw.cmd ./remote-a2a-agent/
+        cp ../step-07/remote-a2a-agent/pom.xml ./remote-a2a-agent/
+        cp ../step-07/remote-a2a-agent/src/main/resources/application.properties ./remote-a2a-agent/src/main/resources/
+        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/model/CarInfo.java ./remote-a2a-agent/src/main/java/com/carmanagement/model/
+        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/model/CarStatus.java ./remote-a2a-agent/src/main/java/com/carmanagement/model/
+        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/repository/CarInfoRepository.java ./remote-a2a-agent/src/main/java/com/carmanagement/repository/
         ```
     
     === "Windows"
         ```cmd
         cd section-2\step-06
-        copy ..\step-07\multi-agent-system\pom.xml .\pom.xml
-        copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarInfo.java .\src\main\java\com\carmanagement\model\CarInfo.java
-        copy ..\step-07\multi-agent-system\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
-        copy ..\step-07\multi-agent-system\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
-        copy ..\step-07\multi-agent-system\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
-        copy ..\step-07\multi-agent-system\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
-        copy ..\step-07\multi-agent-system\src\main\resources\import.sql .\src\main\resources\import.sql
+        mkdir multi-agent-system
+        move mvnw multi-agent-system\
+        move mvnw.cmd multi-agent-system\
+        move pom.xml multi-agent-system\
+        move src multi-agent-system\
+        copy ..\step-07\multi-agent-system\pom.xml .\multi-agent-system\pom.xml
+        mkdir remote-a2a-agent\src\main\java\com\demo
+        mkdir remote-a2a-agent\src\main\java\com\carmanagement\model
+        mkdir remote-a2a-agent\src\main\java\com\carmanagement\repository
+        mkdir remote-a2a-agent\src\main\resources
+        copy ..\step-07\remote-a2a-agent\mvnw .\remote-a2a-agent\
+        copy ..\step-07\remote-a2a-agent\mvnw.cmd .\remote-a2a-agent\
+        copy ..\step-07\remote-a2a-agent\pom.xml .\remote-a2a-agent\
+        copy ..\step-07\remote-a2a-agent\src\main\resources\application.properties .\remote-a2a-agent\src\main\resources\
+        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\model\CarInfo.java .\remote-a2a-agent\src\main\java\com\carmanagement\model\
+        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\model\CarStatus.java .\remote-a2a-agent\src\main\java\com\carmanagement\model\
+        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\repository\CarInfoRepository.java .\remote-a2a-agent\src\main\java\com\carmanagement\repository\
         ```
+    
+    **Note:** The `remote-a2a-agent` directory now contains the necessary infrastructure (pom.xml, mvnw, application.properties, and shared models). The `com/demo` directory is empty and ready for you to create the A2A agent files in Part 2. You'll update `PricingAgent.java` in the `multi-agent-system` in Part 1 below.
 
 === "Option 2: Follow along using the completed solution [Recommended]"
 
-    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-07/multi-agent-system` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-07/remote-a2a-agent` directory:
     
-    ```bash
-    cd section-2/step-07/multi-agent-system
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-07/remote-a2a-agent
+        ```
+    
+    === "Windows"
+        ```cmd
+        cd section-2\step-07\remote-a2a-agent
+        ```
 
 ---
 
@@ -280,9 +310,9 @@ The only change needed in the main application is converting the `PricingAgent` 
 - Delegates all pricing logic to the remote service
 - No `@Output` method needed — the remote service handles formatting
 
-In `src/main/java/com/carmanagement/agentic/agents`, update `PricingAgent.java`:
+Update `multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java`:
 
-```java title="PricingAgent.java"
+```java hl_lines="10" title="PricingAgent.java"
 --8<-- "../../section-2/step-07/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
 ```
 
@@ -326,9 +356,15 @@ Now let's build the remote pricing service that will handle A2A requests from th
 
 Navigate to the remote-a2a-agent directory:
 
-```bash
-cd section-2/step-07/remote-a2a-agent
-```
+=== "Linux / macOS"
+    ```bash
+    cd remote-a2a-agent
+    ```
+
+=== "Windows"
+    ```cmd
+    cd remote-a2a-agent
+    ```
 
 ### Step 2: Create the PricingAgent (AI Service)
 
@@ -346,7 +382,7 @@ Create `PricingAgent.java`:
     type nul > src\main\java\com\demo\PricingAgent.java
     ```
 
-```java title="PricingAgent.java"
+```java hl_lines="45-46" title="PricingAgent.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgent.java"
 ```
 
@@ -377,7 +413,7 @@ Create `PricingAgentCard.java`:
     type nul > src\main\java\com\demo\PricingAgentCard.java
     ```
 
-```java title="PricingAgentCard.java"
+```java hl_lines="18-20" title="PricingAgentCard.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentCard.java"
 ```
 
@@ -450,7 +486,7 @@ Create `PricingAgentExecutor.java`:
     type nul > src\main\java\com\demo\PricingAgentExecutor.java
     ```
 
-```java title="PricingAgentExecutor.java"
+```java hl_lines="13 46 48 50-56" title="PricingAgentExecutor.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentExecutor.java"
 ```
 
@@ -500,10 +536,16 @@ You'll need to run **two applications simultaneously**.
 
 ### Terminal 1: Start the Remote A2A Server
 
-```bash
-cd section-2/step-07/remote-a2a-agent
-./mvnw quarkus:dev
-```
+From the `remote-a2a-agent` directory, run:
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
 
 Wait for:
 ```
@@ -514,12 +556,17 @@ The remote service is now running and ready to accept A2A requests for pricing!
 
 ### Terminal 2: Start the Main Application
 
-Open a **new terminal**, navigate to the root project directory, and run:
+Open a **new terminal**, navigate to the `multi-agent-system` directory, and run:
 
-```bash
-cd section-2/step-07/multi-agent-system
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
 
 Wait for:
 ```
@@ -792,14 +839,8 @@ This shows the raw A2A protocol messages.
 Before moving to the conclusion, let's clean up:
 
 1. **Stop both running servers**:
-   - In Terminal 1 (remote-a2a-agent): Press `Ctrl+C`
-   - In Terminal 2 (multi-agent-system): Press `Ctrl+C`
-
-2. **Return to the root project directory** (in both terminals):
-
-    ```bash
-    cd ..
-    ```
+    - In Terminal 1 (remote-a2a-agent): Press `Ctrl+C`
+    - In Terminal 2 (multi-agent-system): Press `Ctrl+C`
 
 ---
 
