@@ -130,7 +130,7 @@ Car looks good
 In your logs, you'll see the agent's response contains:
 
 ```
-"content":"CLEANING_NOT_REQUIRED"
+"content": "CLEANING_NOT_REQUIRED"
 ```
 
 Notice how the agent **made a decision** without calling the cleaning tool. This demonstrates reasoning!
