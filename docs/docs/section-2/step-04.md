@@ -269,8 +269,7 @@ Create `PricingAgent.java`:
 
 Management also feels comfortable letting an AI model decide whether to SCRAP, SELL, DONATE, or KEEP the vehicle based on repair economics.
 
-Create an agent that makes disposition decisions based on the value outcome of the
-PricingAgent's value estimate as well as the car's age and condition.
+Create an agent that makes disposition decisions based on the pricing outcome from the PricingAgent, as well as the car's age and condition.
 
 Create `DispositionAgent.java`:
 
