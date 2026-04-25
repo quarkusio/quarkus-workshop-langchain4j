@@ -173,6 +173,26 @@ Let's build the new autonomous dispositioning system step by step.
 
 ---
 
+### Create DispositionFeedbackAgent
+
+Create an agent that detects severe damage requiring disposition evaluation.
+
+Create `DispositionFeedbackAgent.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\DispositionFeedbackAgent.java
+    ```
+
+```java title="DispositionFeedbackAgent.java" hl_lines="15-19 22 25 42"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
+```
+
 ### Create the Feedback Task Model
 
 The first step in the refactoring is to make the analysis type explicit. Instead of encoding "cleaning", "maintenance", or "disposition" in three separate agent interfaces, we represent that variation with a task model.
@@ -219,9 +239,22 @@ This record gives the rest of the workflow a stable, readable contract. Instead 
 
 The Miles of Smiles management feels comfortable using AI to determine the value of their cars. A wise decision? That remains to be seen 😉.
 
-Either way, our task is to implement their idea in the form of a new PricingAgent. We'll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
+Either way, our task is to implement their idea in the form of a new PricingAgent.
+We'll add some prompt engineering in the system message to 'train' the AI model on how to estimate
+the value based on the brand, its state and its age.
+As a reminder, the agent will be invoked by the supervisor when pricing is needed.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`PricingAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java):
+Create `PricingAgent.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/PricingAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\PricingAgent.java
+    ```
 
 ```java title="PricingAgent.java" hl_lines="16 43-45 55"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
@@ -231,9 +264,20 @@ In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main
 
 Management also feels comfortable letting an AI model decide whether to SCRAP, SELL, DONATE, or KEEP the vehicle based on repair economics.
 
-Create an agent that makes disposition decisions based on the pricing outcome from the PricingAgent, as well as the car's age and condition.
+Create an agent that makes disposition decisions based on the value outcome of the
+PricingAgent's value estimate as well as the car's age and condition.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`DispositionAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java):
+Create `DispositionAgent.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\DispositionAgent.java
+    ```
 
 ```java title="DispositionAgent.java" hl_lines="16 22 32 41 43"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
@@ -245,7 +289,17 @@ Now create the **supervisor agent** that orchestrates everything.
 The prompt about the workflow and agents available to it must be **as clear as possible**. The more precise you are,
 the better the supervisor will be at deciding which agents to invoke.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`FleetSupervisorAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java):
+Create `FleetSupervisorAgent.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\FleetSupervisorAgent.java
+    ```
 
 ```java title="FleetSupervisorAgent.java" hl_lines="12-14 35"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"

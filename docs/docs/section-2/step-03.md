@@ -464,9 +464,19 @@ while the `CleaningFeedbackAgent` is specialized in looking for clues in the str
 
 #### MaintenanceFeedbackAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java`:
+Create `MaintenanceFeedbackAgent.java`:
 
-```java title="MaintenanceFeedbackAgent.java" hl_lines="10 17-18 29-31 34"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceFeedbackAgent.java
+    ```
+
+```java title="MaintenanceFeedbackAgent.java" hl_lines="10 19 16-17 35"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
@@ -479,9 +489,19 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 
 #### CleaningFeedbackAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java`:
+Create `CleaningFeedbackAgent.java`:
 
-```java title="CleaningFeedbackAgent.java" hl_lines="16-17 28-30 33"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\CleaningFeedbackAgent.java
+    ```
+
+```java title="CleaningFeedbackAgent.java" hl_lines="13-14 19 35"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java"
 ```
 
@@ -496,7 +516,17 @@ Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.jav
 Now, we'll create a **parallel** workflow that runs both feedback agents simultaneously.
 This is where the `@ParallelAgent` annotation comes into play.
 
-Create `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
+Create `FeedbackWorkflow.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\FeedbackWorkflow.java
+    ```
 
 ```java title="FeedbackWorkflow.java" hl_lines="15-16"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
@@ -514,9 +544,19 @@ These agents will examine the analysis results and determine what should happen 
 
 #### MaintenanceAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java`:
+Create `MaintenanceAgent.java`:
 
-```java title="MaintenanceAgent.java" hl_lines="30"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceAgent.java
+    ```
+
+```java title="MaintenanceAgent.java" hl_lines="40"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
@@ -542,9 +582,19 @@ Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 The Car Assignment workflow is the conditional workflow which will active the appropriate
 service agent path based on the analysis results. Notice the same analysisResult from the previous 2 agents we created.
 
-Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
+Create `CarAssignmentWorkflow.java`:
 
-```java title="CarAssignmentWorkflow.java" hl_lines="16-17 27 32"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\CarAssignmentWorkflow.java
+    ```
+
+```java title="CarAssignmentWorkflow.java" hl_lines="16-17 27 29 32 34"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
 ```
 
@@ -565,9 +615,37 @@ Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent
 
 ### Create Supporting Infrastructure
 
+#### Create a Maintenance Tool for function calling
+
+Create `MaintenanceTool.java` to add a function for creating a request to the maintenance team:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\tools\MaintenanceTool.java
+    ```
+
+```java title="MaintenanceTool.java" hl_lines="29"
+--8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java"
+```
+
 #### Create CarAssignment Model
 
-Create `src/main/java/com/carmanagement/model/CarAssignment.java`:
+Create `CarAssignment.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/CarAssignment.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\CarAssignment.java
+    ```
 
 ```java title="CarAssignment.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/model/CarAssignment.java"
@@ -587,11 +665,11 @@ Now it's finally time to compose the sub workflows in the main Car Processing wo
 We need to replace the direct call to the CleaningAgent with the FeedbackWorkflow that will analyze the feedback from the intake,
 and then the CarAssignmentWorkflow to actually assign the car to the appropriate team based on the analysis.
 
-We'll also update the outputKey and the output method to make sure the assignment happens with the right priority.
+We'll also update the `outputKey` and the output method to make sure the assignment happens with the right priority.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java" hl_lines="17-18 27 30-41 43-45"
+```java title="CarProcessingWorkflow.java" hl_lines="17-18 29 30-41"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
