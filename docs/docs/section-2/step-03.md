@@ -440,7 +440,7 @@ Before starting:
         copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
         ```
 
-=== "Option 2: Follow along using the completed solution [Recommended]"
+=== "Option 2: Follow along using the completed solution"
 
     If you prefer to follow along (without making any code changes), navigate to the completed `step-03` directory:
 
@@ -719,7 +719,7 @@ Once you've implemented all the parts:
 
 2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
-3. Test with the scenarios described earlier (in the Test Different Scenarios section)
+3. Test with the scenarios described earlier (in the [Test Different Scenarios](#test-different-scenarios) section)
 
 4. Compare your implementation with the complete solution in `section-2/step-03`
 
