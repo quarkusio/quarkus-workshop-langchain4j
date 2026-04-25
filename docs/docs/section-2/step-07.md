@@ -617,9 +617,7 @@ Click **Return**.
 ### Check the Logs
 
 **Terminal 1 (Remote A2A Server):**
-```
-Remote A2A PricingAgent called
-```
+The logs will show that the remote agent has made the decision to scrap the car.
 
 **Terminal 2 (Main Application):**
 ```
