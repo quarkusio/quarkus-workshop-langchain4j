@@ -231,7 +231,7 @@ Engine making strange noise and car is dirty
 
 ```mermaid
 flowchart TD
-    Start([Input: Engine making strange noise<br/>and car is dirty])
+    Start([Input: Brakes squealing <br>and car is dirty])
     
     Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
     
@@ -410,6 +410,11 @@ Starting from your current code in `section-2/step-02`, you'll add:
 
 ### Prerequisites
 
+Before starting:
+
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
+
 === "Option 1: Continue from Step 02"
 
     If you want to continue building on top of Step 02 code, you'll need to copy the updated UI files from `step-03`:
@@ -437,7 +442,7 @@ Starting from your current code in `section-2/step-02`, you'll add:
 
 === "Option 2: Follow along using the completed solution [Recommended]"
 
-    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-03` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `step-03` directory:
 
     === "Linux / macOS"
         ```bash
