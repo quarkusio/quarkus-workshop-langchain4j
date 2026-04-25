@@ -135,6 +135,11 @@ Let's build the new autonomous dispositioning system step by step.
 
 ## Prerequisites
 
+Before starting:
+
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
+
 === "Option 1: Continue from Step 03"
 
     If you want to continue building on on top of Step 03 code, copy the updated UI files from `step-04`:
@@ -301,7 +306,7 @@ Create `FleetSupervisorAgent.java`:
     type nul > src\main\java\com\carmanagement\agentic\agents\FleetSupervisorAgent.java
     ```
 
-```java title="FleetSupervisorAgent.java" hl_lines="12-14 35"
+```java title="FleetSupervisorAgent.java" hl_lines="12-13 35"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
 ```
 
@@ -455,7 +460,7 @@ The car was in a serious collision. Front end is completely destroyed and airbag
 
 ```mermaid
 flowchart TD
-    Start(["Input: Car was in serious collision<br/>Front end destroyed, airbags deployed"])
+    Start(["Input: The car was in a serious collision. Front end is completely destroyed and airbags deployed."])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> T1["FeedbackTask.cleaning()"]
@@ -501,7 +506,7 @@ In this scenario, the car had already been sent to maintenance by the returns te
 
 ```mermaid
 flowchart TD
-    Start(["Input: Car is totaled<br/>completely inoperable"])
+    Start(["Input: The car is totaled after a major accident, completely inoperable"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> Results["FeedbackAnalysisResults"]
