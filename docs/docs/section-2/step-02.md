@@ -378,8 +378,8 @@ Create `CarProcessingWorkflow.java`:
     ```cmd
     type nul > src\main\java\com\carmanagement\agentic\workflow\CarProcessingWorkflow.java
     ```
-
-```java hl_lines="17-19" title="CarProcessingWorkflow.java"
+    
+```java hl_lines="17-19 29-30" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 

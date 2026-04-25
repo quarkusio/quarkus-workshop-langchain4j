@@ -159,9 +159,6 @@ Agents share similarities with AI Services from [Section 1](../section-1/step-01
 - Use `@UserMessage` to provide request-specific context
 - Can be assigned **tools** to perform actions
 - Support both programmatic and declarative (annotation-based) definitions, even if in Quarkus, we recommend the declarative approach
-
-### Key Differences
-
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
 - Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
 - Focus on **autonomous actions** rather than conversational responses
@@ -303,7 +300,7 @@ Defines the inputs and output:
 
 If you went through Section 1, you'll remember that we already covered [tool and function calling](../section-1/step-07.md){target="_blank"} for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
-These tools can be local, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md){target="_blank"}..
+These tools can be local LangChain4j tools running within the same Quarkus application, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md){target="_blank"}..
 
 ```java hl_lines="4 21 40 47-48" title="CleaningTool.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CleaningTool.java:CleaningTool"
