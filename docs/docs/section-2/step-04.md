@@ -522,7 +522,7 @@ The car was in a serious collision. Front end is completely destroyed and airbag
 
 ```mermaid
 flowchart TD
-    Start(["Input: The car was in a serious collision. Front end is completely destroyed and airbags deployed."])
+    Start(["Input: Car was in serious collision<br/>Front end destroyed, airbags deployed"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> T1["FeedbackTask.cleaning()"]
@@ -568,7 +568,7 @@ In this scenario, the car had already been sent to maintenance by the returns te
 
 ```mermaid
 flowchart TD
-    Start(["Input: The car is totaled completely inoperable"])
+    Start(["Input: Car is totaled<br/>completely inoperable"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> Results["FeedbackAnalysisResults"]

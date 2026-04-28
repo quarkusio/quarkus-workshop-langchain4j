@@ -151,9 +151,6 @@ Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.
     type nul > src\main\java\com\carmanagement\agentic\agents\DispositionProposalAgent.java
     ```
 
-
-
-
 ```java title="DispositionProposalAgent.java" hl_lines="14-29 38-48 51"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java"
 ```
@@ -223,7 +220,6 @@ Create `src/main/java/com/carmanagement/service/ApprovalService.java`:
 ### Create the ApprovalProposal Entity
 
 This entity stores proposals in the database so the UI can display them.
-
 
 Create `src/main/java/com/carmanagement/model/ApprovalProposal.java`:
 
@@ -325,13 +321,10 @@ Now let's see the Human-in-the-Loop pattern in action!
     cd section-2/step-05
     ```
 
-
-
 === "Windows"
     ```cmd
     cd section-2\step-05
     ```
-
 
 2. Start the application:
 

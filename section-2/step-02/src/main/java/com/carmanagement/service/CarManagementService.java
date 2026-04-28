@@ -21,7 +21,7 @@ public class CarManagementService {
      * Process a car return from any operation.
      *
      * @param carNumber The car number
-     * @param feedback Optional feedback (rental and/or cleaning)
+     * @param feedback Optional feedback
      * @return Result of the processing
      */
     @Transactional
