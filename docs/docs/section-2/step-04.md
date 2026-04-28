@@ -70,7 +70,7 @@ A **supervisor agent** is an AI agent that:
 Use supervisor agents when you need:
 
 - **Context-aware routing** where decisions are based on multiple factors that are hard to predict
-- **Business rule flexibility** without requiring code changes
+- **Business rule flexibility** that is easier to adjust through instructions than code changes
 - **Complex orchestration** with multiple agents that have interdependencies
 
 ---
@@ -178,33 +178,26 @@ Before starting:
 
 ---
 
-### Create DispositionFeedbackAgent
-
-Create an agent that detects severe damage requiring disposition evaluation.
-
-Create `DispositionFeedbackAgent.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\agentic\agents\DispositionFeedbackAgent.java
-    ```
-
-```java title="DispositionFeedbackAgent.java" hl_lines="15-19 22 25 42"
---8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionFeedbackAgent.java"
-```
-
 ### Create the Feedback Task Model
 
 The first step in the refactoring is to make the analysis type explicit. Instead of encoding "cleaning", "maintenance", or "disposition" in three separate agent interfaces, we represent that variation with a task model.
 
-Create [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java):
+Create `FeedbackTask.java`:
 
-```java title="FeedbackTask.java" hl_lines="16-30 35-49 55-77"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/FeedbackTask.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\FeedbackTask.java
+    ```
+
+Add the following content to [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java):
+
+
+```java title="FeedbackTask.java" hl_lines="15-25 32-44 51-70"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"
 ```
 
@@ -219,9 +212,19 @@ This design keeps the agent generic and moves the task-specific behavior into da
 
 Now create the single feedback analyzer that can handle any of those tasks.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`FeedbackAnalysisAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java):
+Create `FeedbackAnalysisAgent.java`:
 
-```java title="FeedbackAnalysisAgent.java" hl_lines="14 27-30"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\FeedbackAnalysisAgent.java
+    ```
+
+```java title="FeedbackAnalysisAgent.java" hl_lines="15"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java"
 ```
 
@@ -232,7 +235,17 @@ The key detail here is the system message. Instead of hardcoding the instruction
 
 Once the parallel analysis is complete, we want to pass the results around as structured data rather than as a raw list of strings.
 
-Create [`src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java):
+Create `FeedbackAnalysisResults.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\FeedbackAnalysisResults.java
+    ```
 
 ```java title="FeedbackAnalysisResults.java"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java"
@@ -242,12 +255,9 @@ This record gives the rest of the workflow a stable, readable contract. Instead 
 
 ### Create the PricingAgent
 
-The Miles of Smiles management feels comfortable using AI to determine the value of their cars. A wise decision? That remains to be seen 😉.
+The Miles of Smiles management has decided they feel comfortable using AI to determine the value of their cars to make further decisions on whether to keep or dispose the car. A wise decision? That remains to be seen 😉.
 
-Either way, our task is to implement their idea in the form of a new PricingAgent.
-We'll add some prompt engineering in the system message to 'train' the AI model on how to estimate
-the value based on the brand, its state and its age.
-As a reminder, the agent will be invoked by the supervisor when pricing is needed.
+Either way, our task is to implement their idea in the form of a new PricingAgent. We’ll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
 
 Create `PricingAgent.java`:
 
@@ -305,26 +315,61 @@ Create `FleetSupervisorAgent.java`:
     type nul > src\main\java\com\carmanagement\agentic\agents\FleetSupervisorAgent.java
     ```
 
-```java title="FleetSupervisorAgent.java" hl_lines="12-13 35"
+```java title="FleetSupervisorAgent.java" hl_lines="18-26 47"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
 ```
 
 **Key points:**
 
-- The supervisor receives feedback analysis results and **decides which action agents to invoke**.
-- Notice how the `subAgents` parameter lists only action agents (not feedback agents) - the supervisor coordinates actions after feedback is complete.
-- The **prompt clearly explains the workflow and available agents**.
+- The [`@SupervisorAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java:17) annotation enables **autonomous orchestration**
+- The supervisor receives a [`FeedbackAnalysisResults`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java) object and **decides which action agents to invoke**
+- Notice that the `subAgents` list contains only **action agents**. Feedback analysis has already been completed before the supervisor begins.
+- The prompt clearly explains both the available inputs and the routing expectations.
+- The [`@SupervisorRequest`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java:53) method provides the runtime request context for the supervisor.
 
-**Understanding `@SupervisorRequest`:**
+### Understanding `@SupervisorRequest`
 
-The `@SupervisorRequest` method provides the initial context and instructions that the supervisor needs to make decisions. It receives all the method parameters and formats them into a clear request.
+The [`@SupervisorRequest`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java:53) annotation is what gives the supervisor its runtime instructions. This method inspects the feedback analysis results and builds a different request depending on whether disposition is required.
 
-- **Conditional Logic**: The implementation provides different instructions based on whether disposition is required.
-- **Prevents unnecessary invocations**: When no disposition is needed, the instructions tell the supervisor NOT to invoke PricingAgent/DispositionAgent
-- **Step-by-step workflow**: For complex disposition cases the instructions provide a numbered sequence to follow
-- **Format specifications**: Includes important details like how to pass the carValue parameter
+```java
+@SupervisorRequest
+static String request(
+        String carMake,
+        String carModel,
+        Integer carYear,
+        Integer carNumber,
+        String carCondition,
+        FeedbackAnalysisResults feedbackAnalysisResults,
+        String rentalFeedback
+) {
+    boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
+            feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
 
-This method is automatically called by the framework before the supervisor begins orchestration, providing it the necessary context to make informed decisions about which sub-agents to invoke.
+    String noDispositionMessage = """
+           No disposition has been requested.
+
+            INSTRUCTIONS:
+            - DO NOT invoke PricingAgent
+            - DO NOT invoke DispositionAgent
+            - Only invoke MaintenanceAgent if maintenance needed
+            - Only invoke CleaningAgent if cleaning needed
+           """;
+
+    String dispositionMessage = """
+        The car has to be disposed.
+
+        STEP 1: Invoke PricingAgent to get car value
+        STEP 2: Invoke DispositionAgent to decide disposition action (SCRAP/SELL/DONATE/KEEP)
+        STEP 3: If DispositionAgent decides KEEP:
+                - Invoke MaintenanceAgent if maintenance needed
+                - Invoke CleaningAgent if cleaning needed
+        """;
+
+    // returns the final formatted request string...
+}
+```
+
+This approach is useful because it keeps the supervisor's instructions tightly aligned with the structured analysis results. The supervisor is not re-analyzing raw feedback from scratch. It is consuming the work already done by the feedback-analysis phase and using that to decide which actions to orchestrate.
 
 ---
 
@@ -345,9 +390,19 @@ That second model is a much better fit when the only thing that varies is config
 
 Now create the workflow that runs the unified agent once for each task.
 
-Create [`src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java):
+Create `FeedbackAnalysisWorkflow.java`:
 
-```java title="FeedbackAnalysisWorkflow.java" hl_lines="23-27 29-38 45-51"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\FeedbackAnalysisWorkflow.java
+    ```
+
+```java title="FeedbackAnalysisWorkflow.java" hl_lines="24-33 43-45"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java"
 ```
 
@@ -367,12 +422,15 @@ By transforming the parallel results into [`FeedbackAnalysisResults`](section-2/
 
 ## Update the CarProcessingWorkflow
 
-Since we want the supervisor to determine which agents need to be called,
-we will replace the previous conditional workflow with the supervisor agent.
+Now that we've built the new components, we'll replace the previous parallel agent and the subsequent conditional routing with the supervisor agent. The workflow now becomes a clean three-step sequence:
+
+1. [`FeedbackAnalysisWorkflow`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java) performs parallel analysis
+2. [`FleetSupervisorAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java) decides which action agents to invoke
+3. [`CarConditionFeedbackAgent`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java) summarizes the outcome into structured car conditions
 
 Update [`src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java):
 
-```java title="CarProcessingWorkflow.java" hl_lines="4 23"
+```java title="CarProcessingWorkflow.java" hl_lines="27"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -392,21 +450,26 @@ Update `src/main/java/com/carmanagement/model/CarStatus.java`:
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/CarStatus.java"
 ```
 
-### Update the CarConditionFeedbackAgent
+### Update the Final Condition Agent
 
-We need to update the `CarConditionFeedbackAgent` to handle the new disposition status. We'll also get the `CarConditionFeedbackAgent` to choose the right next assignment for the car based on a set of rules.
-Update `src/main/java/com/carmanagement/agentic/agent/CarConditionFeedbackAgent.java`:
+Because the feedback-analysis phase now returns a structured results object, the final condition agent also becomes simpler and clearer.
 
-```java title="CarConditionFeedbackAgent.java" hl_lines="23-30 44"
+Update [`src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java):
+
+
+```java title="CarConditionFeedbackAgent.java" hl_lines="25-33 46"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
+The agent now consumes [`FeedbackAnalysisResults`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java) directly. It also explicitly checks the actual supervisor decision so that a disposition analysis does not automatically imply a final disposition outcome. If the supervisor reaches a KEEP decision, the workflow can still fall back to maintenance or cleaning.
+
 ### Update the Service Layer
 
-Finally, we need to handle the new disposition status in the processCarReturn method.
-Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
+Finally, the service layer needs to create the feedback tasks before invoking the workflow.
 
-```java title="CarManagementService.java" hl_lines="64-67"
+Update [`src/main/java/com/carmanagement/service/CarManagementService.java`](section-2/step-04/src/main/java/com/carmanagement/service/CarManagementService.java):
+
+```java title="CarManagementService.java" hl_lines="40-44 60-63"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -493,7 +556,7 @@ flowchart TD
 
 #### Scenario 2: Total Loss
 
-Enter the following text in the **Ford F-150** feedback field:
+Enter the following text in the **Ford F-150** feedback field in the Fleet Status grid:
 
 ```text
 The car is totaled after a major accident, completely inoperable
@@ -505,7 +568,7 @@ In this scenario, the car had already been sent to maintenance by the returns te
 
 ```mermaid
 flowchart TD
-    Start(["Input: The car is totaled after a major accident, completely inoperable"])
+    Start(["Input: The car is totaled completely inoperable"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> Results["FeedbackAnalysisResults"]
@@ -566,7 +629,7 @@ flowchart TD
 
 #### Scenario 4: Minor Issues
 
-Enter the following text in the **Mercedes Benz** feedback field (in the Maintenance Return tab):
+Enter the following text in the **BMW X5** feedback field (status: In Maintenance) in the Fleet Status grid:
 
 ```text
 Car is dirty, needs cleaning

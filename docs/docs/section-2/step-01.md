@@ -50,7 +50,7 @@ In this section, you'll see how agents extend the capabilities you created in Se
 
 ## Prerequisites
 
-Before starting, ensure you have met the [workshop setup requirements](requirements.md){target="_blank"}.
+Before starting, ensure you have met the [workshop setup requirements](../requirements.md){target="_blank"}.
 
 ---
 
@@ -159,6 +159,9 @@ Agents share similarities with AI Services from [Section 1](../section-1/step-01
 - Use `@UserMessage` to provide request-specific context
 - Can be assigned **tools** to perform actions
 - Support both programmatic and declarative (annotation-based) definitions, even if in Quarkus, we recommend the declarative approach
+
+### Key Differences
+
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
 - Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
 - Focus on **autonomous actions** rather than conversational responses
@@ -184,14 +187,13 @@ Let's explore each component.
 
 The `CarManagementResource` provides REST APIs to handle car returns:
 
-```java hl_lines="19 22 41 44" title="CarManagementResource.java"
+```java hl_lines="19 22" title="CarManagementResource.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java:car-management"
 ```
 
 **Key Points:**
 
 - The `processReturn` method (endpoint `/car-management/return/{carNumber}`): Accepts feedback and routes it based on the car's current status
-- Looks up the car via `CarInfo.findById` to determine which type of feedback to pass
 - Delegates to `CarManagementService.processCarReturn`
 
 ---
@@ -200,7 +202,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 The `CarManagementService` orchestrates the car return process:
 
-```java hl_lines="1 18-30" title="CarManagementService.java"
+```java hl_lines="1-2 13 19-24" title="CarManagementService.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
 ```
 
@@ -219,7 +221,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 
 Here's where the magic happens — the AI agent definition:
 
-```java hl_lines="6-11 23-24" title="CleaningAgent.java"
+```java hl_lines="6-11 21-22" title="CleaningAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java:cleaningAgent"
 ```
 
@@ -278,7 +280,7 @@ Marks this as an **agent method** — only one per interface.
 Assigns the `CleaningTool` to this agent:
 
 - The agent can call methods in this tool to perform actions
-- The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)
+- The LLM decides when and how to use the tool based on the task (function calling has been covered in Section 1 of the workshop)
 
 ### Method Signature
 Defines the inputs and output:

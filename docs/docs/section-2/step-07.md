@@ -280,12 +280,12 @@ section-2/step-07/
     
     === "Linux / macOS"
         ```bash
-        cd section-2/step-07/remote-a2a-agent
+        cd section-2/step-07/multi-agent-system
         ```
     
     === "Windows"
         ```cmd
-        cd section-2\step-07\remote-a2a-agent
+        cd section-2\step-07\multi-agent-system
         ```
 
 ---
@@ -312,7 +312,7 @@ The only change needed in the main application is converting the `PricingAgent` 
 
 Update `multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java`:
 
-```java hl_lines="10" title="PricingAgent.java"
+```java title="PricingAgent.java"
 --8<-- "../../section-2/step-07/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
 ```
 
@@ -358,12 +358,12 @@ Navigate to the remote-a2a-agent directory:
 
 === "Linux / macOS"
     ```bash
-    cd remote-a2a-agent
+    cd section-2/step-07/remote-a2a-agent
     ```
 
 === "Windows"
     ```cmd
-    cd remote-a2a-agent
+    cd section-2\step-07\remote-a2a-agent
     ```
 
 ### Step 2: Create the PricingAgent (AI Service)
@@ -382,7 +382,7 @@ Create `PricingAgent.java`:
     type nul > src\main\java\com\demo\PricingAgent.java
     ```
 
-```java hl_lines="45-46" title="PricingAgent.java"
+```java title="PricingAgent.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgent.java"
 ```
 
@@ -413,7 +413,7 @@ Create `PricingAgentCard.java`:
     type nul > src\main\java\com\demo\PricingAgentCard.java
     ```
 
-```java hl_lines="18-20" title="PricingAgentCard.java"
+```java title="PricingAgentCard.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentCard.java"
 ```
 
@@ -486,7 +486,7 @@ Create `PricingAgentExecutor.java`:
     type nul > src\main\java\com\demo\PricingAgentExecutor.java
     ```
 
-```java hl_lines="13 46 48 50-56" title="PricingAgentExecutor.java"
+```java title="PricingAgentExecutor.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentExecutor.java"
 ```
 
@@ -536,14 +536,15 @@ You'll need to run **two applications simultaneously**.
 
 ### Terminal 1: Start the Remote A2A Server
 
-From the `remote-a2a-agent` directory, run:
 === "Linux / macOS"
     ```bash
+    cd section-2/step-07/remote-a2a-agent
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
+    cd section-2\step-07\remote-a2a-agent
     mvnw quarkus:dev
     ```
 
@@ -556,15 +557,17 @@ The remote service is now running and ready to accept A2A requests for pricing!
 
 ### Terminal 2: Start the Main Application
 
-Open a **new terminal**, navigate to the `multi-agent-system` directory, and run:
+Open a **new terminal** and run:
 
 === "Linux / macOS"
     ```bash
+    cd section-2/step-07/multi-agent-system
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
+    cd section-2\step-07\multi-agent-system
     mvnw quarkus:dev
     ```
 
@@ -581,7 +584,7 @@ You'll see the Fleet Status grid with inline feedback forms in the Action column
 
 ![Fleet Status Grid](../images/agentic-UI-maintenance-returns-2.png){: .center}
 
-iFind the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:
+Find the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:
 
 ```
 looks like this car hit a tree and is damaged beyond repair
@@ -617,7 +620,9 @@ Click **Return**.
 ### Check the Logs
 
 **Terminal 1 (Remote A2A Server):**
-The logs will show that the remote agent has made the decision to scrap the car.
+```
+Remote A2A PricingAgent called
+```
 
 **Terminal 2 (Main Application):**
 ```

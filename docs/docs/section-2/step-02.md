@@ -96,20 +96,20 @@ Conditional Workflows will execute agents **only if their activation condition i
 
 ```mermaid
 graph TD
-    Start["Start"] --> Check1{"Condition 1?"}
-    Check1 -->|Yes| A["Agent 1"]
-    Check1 -->|No| Check2{"Condition 2?"}
-    A --> End["Continue"]
-    Check2 -->|Yes| B["Agent 2"]
+    Start[Start] --> Check1{Condition 1?}
+    Check1 -->|Yes| A[Agent 1]
+    Check1 -->|No| Check2{Condition 2?}
+    A --> Check2
+    Check2 -->|Yes| B[Agent 2]
     Check2 -->|No| End
-    B --> End
-    style A fill:#FFD700,stroke:#333,stroke-width:2,color:#000
-    style B fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    B --> End[Continue]
+    style A fill:#FFD700
+    style B fill:#FFD700
 ```
 
 **When to use:** When different execution paths are needed based on runtime data (e.g. the output of a previous agent execution).
 
-**Example:** If maintenance needed → send to maintenance, else if cleaning needed → send to cleaning
+**Example:** If maintenance needed → send to maintenance, if maintenance not needed and cleaning needed → send to cleaning
 
 ---
 
@@ -337,7 +337,7 @@ The `CleaningAgent` needs to specify an `outputKey` so its result can be accesse
 
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
-```java hl_lines="35" title="CleaningAgent.java"
+```java hl_lines="34-35" title="CleaningAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java"
 ```
 
@@ -379,7 +379,7 @@ Create `CarProcessingWorkflow.java`:
     type nul > src\main\java\com\carmanagement\agentic\workflow\CarProcessingWorkflow.java
     ```
     
-```java hl_lines="17-19 29-30" title="CarProcessingWorkflow.java"
+```java hl_lines="18-20" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -452,7 +452,7 @@ Now update the service to use the workflow instead of calling agents directly.
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java hl_lines="20-21 31-45 47-53" title="CarManagementService.java"
+```java hl_lines="17-18 34-43" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -504,9 +504,15 @@ We extract both the updated condition and whether a cleaning is required, then u
 
 Start the application:
 
-```bash
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
 
 Open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
@@ -679,9 +685,6 @@ How does the condition agent synthesize feedback from multiple sources?
 
 ---
 
-## What's Next?
-
-You've successfully built your first multi-agent workflow!
 ## Cleanup
 
 Before moving to the next step, let's clean up:
@@ -696,6 +699,9 @@ Before moving to the next step, let's clean up:
 
 ---
 
+## What's Next?
+
+You've successfully built your first multi-agent workflow!
 You learned how agents collaborate through `AgenticScope` and how sequential workflows coordinate their execution.
 
 In **Step 03**, you'll learn about **composing Multiple Agentic Workflows**, combining sequential, parallel, and conditional workflows to build sophisticated agent systems!

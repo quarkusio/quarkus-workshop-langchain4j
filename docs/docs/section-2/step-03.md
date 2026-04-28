@@ -113,35 +113,34 @@ The final system uses a 3-level nested workflow, similar to what we saw above in
 
 ```mermaid
 graph TB
-    Start(["Car Return"]) --> A["CarProcessingWorkflow<br/>Sequential - Level 1"]
+    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential - Level 1]
     
-    A --> B["Step 1: FeedbackWorkflow<br/>Parallel - Level 2"]
-    B --> B1["CleaningFeedbackAgent"]
-    B --> B2["MaintenanceFeedbackAgent"]
-    B1 --> BEnd["Both complete"]
+    A --> B[Step 1: FeedbackWorkflow<br/>Parallel - Level 2]
+    B --> B1[CleaningFeedbackAgent]
+    B --> B2[MaintenanceFeedbackAgent]
+    B1 --> BEnd[Both complete]
     B2 --> BEnd
     
-    BEnd --> C["Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2"]
-    C --> C1{"Maintenance<br/>needed?"}
-    C1 -->|Yes| C2["MaintenanceAgent"]
-    C1 -->|No| C3{"Cleaning<br/>needed?"}
-    C3 -->|Yes| C4["CleaningAgent"]
-    C3 -->|No| C5["Skip both"]
-    C2 --> CEnd["Action complete"]
+    BEnd --> C[Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2]
+    C --> C1{Maintenance<br/>needed?}
+    C1 -->|Yes| C2[MaintenanceAgent]
+    C1 -->|No| C3{Maintenance not needed and Cleaning<br/>needed?}
+    C3 -->|Yes| C4[CleaningAgent]
+    C2 --> C3
+    C3 -->|No| CEnd[Action complete]
     C4 --> CEnd
-    C5 --> CEnd
     
-    CEnd --> D["Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1"]
-    D --> End(["Updated Car Conditions"])
+    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1]
+    D --> End([Updated Car Conditions])
     
-    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
-    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
-    style C fill:#FFD700,stroke:#333,stroke-width:2,color:#000
-    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
-    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
-    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
-    style BEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
-    style CEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
+    style A fill:#90EE90
+    style B fill:#87CEEB
+    style C fill:#FFD700
+    style D fill:#90EE90
+    style Start fill:#E8E8E8
+    style End fill:#E8E8E8
+    style BEnd fill:#F0F0F0
+    style CEnd fill:#F0F0F0
 ```
 
 **The Flow:**
@@ -152,8 +151,7 @@ graph TB
 
 2. **CarAssignmentWorkflow** (Conditional): Routes the car based on the analysis:
     - If maintenance needed, then send to maintenance team
-    - Else if cleaning needed, then send to cleaning
-    - Else: do nothing
+    - if maintenance not needed and cleaning needed, then send to cleaning
 
 3. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
 
@@ -187,15 +185,14 @@ The agents analyze different aspects (cleaning vs. maintenance) and don't depend
 
 The `CarAssignmentWorkflow` uses **activation conditions** to intelligently route cars to the appropriate team based on the analysis it has done:
 
-```java title="CarAssignmentWorkflow.java" hl_lines="1 12 17 22"
+```java title="CarAssignmentWorkflow.java" hl_lines="1 10 15"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java:conditional-agent"
 ```
 
-- If `assignToMaintenance()` returns `true` → MaintenanceAgent runs, CleaningAgent skipped
-- Else if `assignToCleaning()` returns `true` → CleaningAgent runs
-- Else → Both skipped
+- If `assignToMaintenance()` returns `true` → MaintenanceAgent runs
+- If `assignToCleaning()` returns `true` → CleaningAgent runs
 
-This implements **priority routing**: maintenance takes precedence over cleaning.
+The logic in `assignToCleaning()` will only let the CleaningAgent run if no maintenance is required. This implements **priority routing**: maintenance takes precedence over cleaning.
 
 ---
 
@@ -208,10 +205,17 @@ Now that you understand the architecture, let's see it in action!
 1. If a previous step's Quarkus server is still running, stop it first (press `Ctrl+C` in the terminal).
 2. Navigate to the complete solution directory:
 
-```bash
-cd section-2/step-03
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    cd section-2/step-03
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    cd section-2\step-03
+    mvnw quarkus:dev
+    ```
 
 3. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
@@ -289,7 +293,7 @@ flowchart TD
 
 #### Scenario 3: Maintenance Return
 
-Find the Ford F-150 (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
+Find the Honda Civic (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
 
 ```text
 Fixed the brakes, car could use a wash now
@@ -476,7 +480,7 @@ Create `MaintenanceFeedbackAgent.java`:
     type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceFeedbackAgent.java
     ```
 
-```java title="MaintenanceFeedbackAgent.java" hl_lines="10 19 16-17 35"
+```java title="MaintenanceFeedbackAgent.java" hl_lines="11 14-15 20 33"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
@@ -501,7 +505,7 @@ Create `CleaningFeedbackAgent.java`:
     type nul > src\main\java\com\carmanagement\agentic\agents\CleaningFeedbackAgent.java
     ```
 
-```java title="CleaningFeedbackAgent.java" hl_lines="13-14 19 35"
+```java title="CleaningFeedbackAgent.java" hl_lines="11 15-16 20 33"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java"
 ```
 
@@ -528,7 +532,7 @@ Create `FeedbackWorkflow.java`:
     type nul > src\main\java\com\carmanagement\agentic\workflow\FeedbackWorkflow.java
     ```
 
-```java title="FeedbackWorkflow.java" hl_lines="15-16"
+```java title="FeedbackWorkflow.java" hl_lines="16-17"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -556,7 +560,7 @@ Create `MaintenanceAgent.java`:
     type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceAgent.java
     ```
 
-```java title="MaintenanceAgent.java" hl_lines="40"
+```java title="MaintenanceAgent.java" hl_lines="40-41"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
@@ -573,7 +577,7 @@ The CleaningAgent we created previously should now return analysisResult as well
 
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
-```java title="CleaningAgent.java" hl_lines="35"
+```java title="CleaningAgent.java" hl_lines="35-36"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java"
 ```
 
@@ -594,7 +598,7 @@ Create `CarAssignmentWorkflow.java`:
     type nul > src\main\java\com\carmanagement\agentic\workflow\CarAssignmentWorkflow.java
     ```
 
-```java title="CarAssignmentWorkflow.java" hl_lines="16-17 27 29 32 34"
+```java title="CarAssignmentWorkflow.java" hl_lines="17-18 26 31"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
 ```
 
@@ -602,36 +606,18 @@ Create `CarAssignmentWorkflow.java`:
 
 - `@ConditionalAgent` evaluates conditions to determine which agent runs
 - `@ActivationCondition` methods return `true` to activate an agent
-- Maintenance has priority (checked first)
+- Maintenance has priority 
 - Cleaning only runs if maintenance is not needed
 
 ### Update CarConditionFeedbackAgent
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java` to add the new maintenance recommendations:
 
-```java title="CarConditionFeedbackAgent.java" hl_lines="27 38"
+```java title="CarConditionFeedbackAgent.java" hl_lines="28 36"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
 ### Create Supporting Infrastructure
-
-#### Create a Maintenance Tool for function calling
-
-Create `MaintenanceTool.java` to add a function for creating a request to the maintenance team:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\agentic\tools\MaintenanceTool.java
-    ```
-
-```java title="MaintenanceTool.java" hl_lines="29"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/tools/MaintenanceTool.java"
-```
 
 #### Create CarAssignment Model
 
@@ -669,7 +655,7 @@ We'll also update the `outputKey` and the output method to make sure the assignm
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java" hl_lines="17-18 29 30-41"
+```java title="CarProcessingWorkflow.java" hl_lines="18-19 26-37"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -682,20 +668,11 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 
 #### Update the Service Layer
 
-We'll update the Car Management service to handle the result from the Agentic AI workflow and update the system accordingly.
+And finally, we'll update the Car Management service to handle the result from the Agentic AI workflow and update the system accordingly.
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 ```java title="CarManagementService.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/service/CarManagementService.java"
-```
-
-#### Update the Rest Resource
-
-And finally, we'll update the Car Management REST resource to accept maintenance returns and maintenance feedback.
-Update `src/main/java/com/carmanagement/resource/CarManagementResource.java`:
-
-```java title="CarManagementResource.java"
---8<-- "../../section-2/step-03/src/main/java/com/carmanagement/resource/CarManagementResource.java"
 ```
 
 ### Test Your Implementation
