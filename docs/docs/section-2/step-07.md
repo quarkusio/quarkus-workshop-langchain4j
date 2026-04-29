@@ -238,16 +238,11 @@ section-2/step-07/
         mv mvnw mvnw.cmd pom.xml src multi-agent-system/
         cp ../step-07/multi-agent-system/pom.xml ./multi-agent-system/pom.xml
         mkdir -p remote-a2a-agent/src/main/java/com/demo
-        mkdir -p remote-a2a-agent/src/main/java/com/carmanagement/model
-        mkdir -p remote-a2a-agent/src/main/java/com/carmanagement/repository
         mkdir -p remote-a2a-agent/src/main/resources
         cp ../step-07/remote-a2a-agent/mvnw ./remote-a2a-agent/
         cp ../step-07/remote-a2a-agent/mvnw.cmd ./remote-a2a-agent/
         cp ../step-07/remote-a2a-agent/pom.xml ./remote-a2a-agent/
         cp ../step-07/remote-a2a-agent/src/main/resources/application.properties ./remote-a2a-agent/src/main/resources/
-        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/model/CarInfo.java ./remote-a2a-agent/src/main/java/com/carmanagement/model/
-        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/model/CarStatus.java ./remote-a2a-agent/src/main/java/com/carmanagement/model/
-        cp ../step-07/remote-a2a-agent/src/main/java/com/carmanagement/repository/CarInfoRepository.java ./remote-a2a-agent/src/main/java/com/carmanagement/repository/
         ```
     
     === "Windows"
@@ -260,16 +255,11 @@ section-2/step-07/
         move src multi-agent-system\
         copy ..\step-07\multi-agent-system\pom.xml .\multi-agent-system\pom.xml
         mkdir remote-a2a-agent\src\main\java\com\demo
-        mkdir remote-a2a-agent\src\main\java\com\carmanagement\model
-        mkdir remote-a2a-agent\src\main\java\com\carmanagement\repository
         mkdir remote-a2a-agent\src\main\resources
         copy ..\step-07\remote-a2a-agent\mvnw .\remote-a2a-agent\
         copy ..\step-07\remote-a2a-agent\mvnw.cmd .\remote-a2a-agent\
         copy ..\step-07\remote-a2a-agent\pom.xml .\remote-a2a-agent\
         copy ..\step-07\remote-a2a-agent\src\main\resources\application.properties .\remote-a2a-agent\src\main\resources\
-        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\model\CarInfo.java .\remote-a2a-agent\src\main\java\com\carmanagement\model\
-        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\model\CarStatus.java .\remote-a2a-agent\src\main\java\com\carmanagement\model\
-        copy ..\step-07\remote-a2a-agent\src\main\java\com\carmanagement\repository\CarInfoRepository.java .\remote-a2a-agent\src\main\java\com\carmanagement\repository\
         ```
     
     **Note:** The `remote-a2a-agent` directory now contains the necessary infrastructure (pom.xml, mvnw, application.properties, and shared models). The `com/demo` directory is empty and ready for you to create the A2A agent files in Part 2. You'll update `PricingAgent.java` in the `multi-agent-system` in Part 1 below.
@@ -356,15 +346,9 @@ Now let's build the remote pricing service that will handle A2A requests from th
 
 Navigate to the remote-a2a-agent directory:
 
-=== "Linux / macOS"
-    ```bash
-    cd section-2/step-07/remote-a2a-agent
-    ```
-
-=== "Windows"
-    ```cmd
-    cd section-2\step-07\remote-a2a-agent
-    ```
+```bash
+cd remote-a2a-agent
+```
 
 ### Step 2: Create the PricingAgent (AI Service)
 
@@ -538,13 +522,13 @@ You'll need to run **two applications simultaneously**.
 
 === "Linux / macOS"
     ```bash
-    cd section-2/step-07/remote-a2a-agent
+    cd remote-a2a-agent
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
-    cd section-2\step-07\remote-a2a-agent
+    cd remote-a2a-agent
     mvnw quarkus:dev
     ```
 
@@ -561,13 +545,13 @@ Open a **new terminal** and run:
 
 === "Linux / macOS"
     ```bash
-    cd section-2/step-07/multi-agent-system
+    cd multi-agent-system
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
-    cd section-2\step-07\multi-agent-system
+    cd multi-agent-system
     mvnw quarkus:dev
     ```
 

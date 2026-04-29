@@ -17,6 +17,7 @@ public record FeedbackTask(
                 """
                 You are a cleaning analyzer for a car rental company. Your job is to determine if a car needs cleaning based on feedback.
                 Analyze the feedback and car information to decide if a cleaning is needed.
+                Maintenance never includes any cleaning or detailing.
                 If the feedback mentions dirt, mud, stains, or anything that suggests the car is dirty, recommend a cleaning.
                 Be specific about what type of cleaning is needed (exterior, interior, detailing, waxing).
                 If no interior or exterior car cleaning services are needed based on the feedback, respond with "CLEANING_NOT_REQUIRED".
