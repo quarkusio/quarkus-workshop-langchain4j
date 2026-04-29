@@ -411,7 +411,7 @@ Create `PricingAgentCard.java`:
 public AgentCard agentCard();
 ```
 
-This makes the AgentCard available at the `/card` endpoint. 
+This makes the AgentCard available at the `/.well-known/agent-card.json` endpoint. 
 Clients can query this endpoint to discover the agent's capabilities.
 
 #### AgentCard Components
@@ -705,7 +705,7 @@ The server requires more components:
 
 | Component | Purpose |
 |-----------|---------|
-| **AgentCard** | Describes agent capabilities, published at `/card` endpoint |
+| **AgentCard** | Describes agent capabilities, published at `/.well-known/agent-card.json` endpoint |
 | **AgentExecutor** | Receives and processes A2A task requests |
 | **TaskUpdater** | Updates task status and sends results back to client |
 | **AI Agent** | The actual AI service (PricingAgent) |
@@ -736,10 +736,10 @@ This separation allows:
 
 ### 1. Add Agent Discovery
 
-The AgentCard is published at `http://localhost:8888/card`. Try:
+The AgentCard is published at `http://localhost:8888/.well-known/agent-card.json`. Try:
 
 ```bash
-curl http://localhost:8888/card | jq
+curl http://localhost:8888/.well-known/agent-card.json | jq
 ```
 
 You'll see the full agent description including the pricing skill, capabilities, and transport protocols.
