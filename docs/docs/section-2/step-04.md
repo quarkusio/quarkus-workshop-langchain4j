@@ -137,12 +137,12 @@ Let's build the new autonomous dispositioning system step by step.
 
 Before starting:
 
-- Completed [Step 03](step-03.md){target="_blank"} (or have the `section-2/step-03` code available)
-- Application from Step 03 is stopped (Ctrl+C)
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
 
 === "Option 1: Continue from Step 03"
 
-    If you want to continue building on your Step 03 code, copy the updated UI files from `step-04`:
+    If you want to continue building on on top of Step 03 code, copy the updated UI files from `step-04`:
 
     === "Linux / macOS"
         ```bash
@@ -160,13 +160,21 @@ Before starting:
         copy ..\step-04\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
         ```
 
-=== "Option 2: Start Fresh from Step 04"
+=== "Option 2: Follow along using the completed solution"
 
-    Navigate to the complete `section-2/step-04` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-04` directory:
 
-    ```bash
-    cd section-2/step-04
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-04
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-04
+        mvnw quarkus:dev
+        ```
 
 ---
 
@@ -174,9 +182,22 @@ Before starting:
 
 The first step in the refactoring is to make the analysis type explicit. Instead of encoding "cleaning", "maintenance", or "disposition" in three separate agent interfaces, we represent that variation with a task model.
 
-Create [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java):
+Create `FeedbackTask.java`:
 
-```java title="FeedbackTask.java" hl_lines="16-30 35-49 55-77"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/FeedbackTask.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\FeedbackTask.java
+    ```
+
+Add the following content to [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java):
+
+
+```java title="FeedbackTask.java" hl_lines="15-25 32-44 51-70"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"
 ```
 
@@ -191,9 +212,19 @@ This design keeps the agent generic and moves the task-specific behavior into da
 
 Now create the single feedback analyzer that can handle any of those tasks.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`FeedbackAnalysisAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java):
+Create `FeedbackAnalysisAgent.java`:
 
-```java title="FeedbackAnalysisAgent.java" hl_lines="14 27-30"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\FeedbackAnalysisAgent.java
+    ```
+
+```java title="FeedbackAnalysisAgent.java" hl_lines="15"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java"
 ```
 
@@ -204,7 +235,17 @@ The key detail here is the system message. Instead of hardcoding the instruction
 
 Once the parallel analysis is complete, we want to pass the results around as structured data rather than as a raw list of strings.
 
-Create [`src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java):
+Create `FeedbackAnalysisResults.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\FeedbackAnalysisResults.java
+    ```
 
 ```java title="FeedbackAnalysisResults.java"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackAnalysisResults.java"
@@ -214,13 +255,23 @@ This record gives the rest of the workflow a stable, readable contract. Instead 
 
 ### Create the PricingAgent
 
-The Miles & Smiles management has decided they feel comfortable using AI to determine the value of their cars to make further decisions on whether to keep or dispose the car. A wise decision? That remains to be seen 😉.
+The Miles of Smiles management has decided they feel comfortable using AI to determine the value of their cars to make further decisions on whether to keep or dispose the car. A wise decision? That remains to be seen 😉.
 
-Either way, our task is to implement their idea in the form of a new PricingAgent. We'll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
+Either way, our task is to implement their idea in the form of a new PricingAgent. We’ll add some prompt engineering in the system message to guide the model on how to estimate value based on the brand, its state, and its age. The agent will be invoked by the supervisor when it deems that pricing is needed.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`PricingAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java):
+Create `PricingAgent.java`:
 
-```java title="PricingAgent.java" hl_lines="16 35-37 39-41 50-53"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/PricingAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\PricingAgent.java
+    ```
+
+```java title="PricingAgent.java" hl_lines="16 43-45 55"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
 ```
 
@@ -230,21 +281,41 @@ Management also feels comfortable letting an AI model decide whether to SCRAP, S
 
 Create an agent that makes disposition decisions based on the pricing outcome from the PricingAgent, as well as the car's age and condition.
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`DispositionAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java):
+Create `DispositionAgent.java`:
 
-```java title="DispositionAgent.java" hl_lines="16 22 29 41 43"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\DispositionAgent.java
+    ```
+
+```java title="DispositionAgent.java" hl_lines="16 22 32 41 43"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java"
 ```
 
 ### Create the FleetSupervisorAgent
 
 Now create the **supervisor agent** that orchestrates everything.
+The prompt about the workflow and agents available to it must be **as clear as possible**. The more precise you are,
+the better the supervisor will be at deciding which agents to invoke.
 
-What matters most here is making the prompt as clear as possible about the workflow and the agents available to it. The more explicit you are, the better the supervisor can reason about which action agents to invoke.
+Create `FleetSupervisorAgent.java`:
 
-In [`src/main/java/com/carmanagement/agentic/agents`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents), create [`FleetSupervisorAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java):
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java
+    ```
 
-```java title="FleetSupervisorAgent.java" hl_lines="17-24 35 53-64 93-117"
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\FleetSupervisorAgent.java
+    ```
+
+```java title="FleetSupervisorAgent.java" hl_lines="18-26 47"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
 ```
 
@@ -319,9 +390,19 @@ That second model is a much better fit when the only thing that varies is config
 
 Now create the workflow that runs the unified agent once for each task.
 
-Create [`src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java):
+Create `FeedbackAnalysisWorkflow.java`:
 
-```java title="FeedbackAnalysisWorkflow.java" hl_lines="23-27 29-38 45-51"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\FeedbackAnalysisWorkflow.java
+    ```
+
+```java title="FeedbackAnalysisWorkflow.java" hl_lines="24-33 43-45"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java"
 ```
 
@@ -349,10 +430,25 @@ Now that we've built the new components, we'll replace the previous parallel age
 
 Update [`src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java):
 
-```java title="CarProcessingWorkflow.java" hl_lines="26-30"
+```java title="CarProcessingWorkflow.java" hl_lines="27"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
+### Update the Model
+
+We need to update the list of assignments that a car can have to include `DISPOSITION`.
+Update `src/main/java/com/carmanagement/model/CarAssignment.java`:
+
+```java title="CarAssignment.java" hl_lines="7"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/CarAssignment.java"
+```
+
+We also need to update the list of status values that a car can have to include `PENDING_DISPOSITION`.
+Update `src/main/java/com/carmanagement/model/CarStatus.java`:
+
+```java title="CarStatus.java" hl_lines="10"
+--8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/CarStatus.java"
+```
 
 ### Update the Final Condition Agent
 
@@ -360,7 +456,8 @@ Because the feedback-analysis phase now returns a structured results object, the
 
 Update [`src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java`](section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java):
 
-```java title="CarConditionFeedbackAgent.java" hl_lines="25-31 38-41 45-52"
+
+```java title="CarConditionFeedbackAgent.java" hl_lines="25-33 46"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
@@ -372,7 +469,7 @@ Finally, the service layer needs to create the feedback tasks before invoking th
 
 Update [`src/main/java/com/carmanagement/service/CarManagementService.java`](section-2/step-04/src/main/java/com/carmanagement/service/CarManagementService.java):
 
-```java title="CarManagementService.java" hl_lines="42-59 67-80"
+```java title="CarManagementService.java" hl_lines="40-44 60-63"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -459,7 +556,7 @@ flowchart TD
 
 #### Scenario 2: Total Loss
 
-Enter the following text in the **Ford F-150** feedback field (status: In Maintenance) in the Fleet Status grid:
+Enter the following text in the **Ford F-150** feedback field in the Fleet Status grid:
 
 ```text
 The car is totaled after a major accident, completely inoperable
@@ -478,7 +575,7 @@ flowchart TD
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
     FSA -->|"Severe damage detected"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $12,000<br/>2019 Toyota Camry, totaled"]
+    PA --> PV["Estimate: $12,000<br/>2014 Ford F-150, totaled"]
     PV --> DA["Invoke DispositionAgent"]
     DA --> DD["Decision: SCRAP or SELL<br/>Beyond economical repair"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled"])
@@ -624,6 +721,20 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
     - Verify the LLM is following the expected output format
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

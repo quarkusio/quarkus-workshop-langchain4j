@@ -34,6 +34,7 @@ public record FeedbackTask(
                 """
                 You are a car maintenance analyzer for a car rental company. Your job is to determine if a car needs maintenance based on feedback.
                 Analyze the feedback and car information to decide if maintenance is needed.
+                Maintenance never includes any cleaning or detailing.
                 If the feedback mentions mechanical issues, strange noises, performance problems, significant body damage or anything that suggests
                 the car needs maintenance, recommend appropriate maintenance.
                 Be specific about what type of maintenance is needed (oil change, tire rotation, brake service, engine service, transmission service, body work).

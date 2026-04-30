@@ -22,7 +22,7 @@ Management wants the system to:
 In this step, you'll learn how to compose **multiple agents into workflows** that work together to solve more complex problems.
 
 !!!note
-    "Workflow" is a pattern to compose agents with limited autonomy as you defined the control flow (when each agent is called).
+    "Workflow" is a pattern to compose agents with limited autonomy, where you define the control flow (when each agent is called).
     This is different from the supervisor pattern where a special agent determines when to call _sub-agents_.
 
 ---
@@ -82,7 +82,7 @@ graph TD
     style C fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
 ```
 
-**When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of both.
+**When to use:** When agents can work independently and you want faster execution, and/or you want to aggregate the results of multiple agents.
 
 **Example:** Analyze for cleaning needs AND maintenance needs at the same time
 
@@ -96,20 +96,20 @@ Conditional Workflows will execute agents **only if their activation condition i
 
 ```mermaid
 graph TD
-    Start["Start"] --> Check1{"Condition 1?"}
-    Check1 -->|Yes| A["Agent 1"]
-    Check1 -->|No| Check2{"Condition 2?"}
-    A --> End["Continue"]
-    Check2 -->|Yes| B["Agent 2"]
+    Start[Start] --> Check1{Condition 1?}
+    Check1 -->|Yes| A[Agent 1]
+    Check1 -->|No| Check2{Condition 2?}
+    A --> Check2
+    Check2 -->|Yes| B[Agent 2]
     Check2 -->|No| End
-    B --> End
-    style A fill:#FFD700,stroke:#333,stroke-width:2,color:#000
-    style B fill:#FFD700,stroke:#333,stroke-width:2,color:#000
+    B --> End[Continue]
+    style A fill:#FFD700
+    style B fill:#FFD700
 ```
 
 **When to use:** When different execution paths are needed based on runtime data (e.g. the output of a previous agent execution).
 
-**Example:** If maintenance needed → send to maintenance, else if cleaning needed → send to cleaning
+**Example:** If maintenance needed → send to maintenance, if maintenance not needed and cleaning needed → send to cleaning
 
 ---
 
@@ -185,14 +185,9 @@ sequenceDiagram
 
 ## Prerequisites
 
-Before starting:
-
-- Completed [Step 01](step-01.md){target="_blank"} (or have the `section-2/step-01` code available)
-- Application from Step 01 is stopped (Ctrl+C)
-
 === "Option 1: Continue from Step 01"
 
-    If you want to continue building on your Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
+    If you want to continue building on top of Step 01 code, you'll need to copy some updated UI files and the updated `CarInfo.java` from `step-02`:
 
     === "Linux / macOS"
         ```bash
@@ -216,13 +211,21 @@ Before starting:
 
     These files add the "Condition" column to the UI and update the data model to track car conditions.
 
-=== "Option 2: Start Fresh from Step 02"
+=== "Option 2: Follow along using the completed solution"
 
-    Alternatively, navigate to the complete `section-2/step-02` directory:
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-02` directory:
 
-    ```bash
-    cd section-2/step-02
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-02
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-02
+        mvnw quarkus:dev
+        ```
 
 ---
 
@@ -230,7 +233,17 @@ Before starting:
 
 Create a new agent that analyzes feedback to determine a car's current condition.
 
-In `src/main/java/com/carmanagement/agentic/agents`, create `CarConditionFeedbackAgent.java`:
+Create `CarConditionFeedbackAgent.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\CarConditionFeedbackAgent.java
+    ```
 
 ```java title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
@@ -298,7 +311,17 @@ Other agents or the workflow can then access this value.
 
 Before creating the workflow, we need a data model to return both the car condition and whether a cleaning is required.
 
-In `src/main/java/com/carmanagement/model`, create `CarConditions.java`:
+Create `CarConditions.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/CarConditions.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\CarConditions.java
+    ```
 
 ```java title="CarConditions.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/model/CarConditions.java"
@@ -314,7 +337,7 @@ The `CleaningAgent` needs to specify an `outputKey` so its result can be accesse
 
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
-```java hl_lines="35" title="CleaningAgent.java"
+```java hl_lines="34-35" title="CleaningAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java"
 ```
 
@@ -344,9 +367,19 @@ If continuing from Step 01, create the workflow directory:
 
 Now, create the workflow that orchestrates both agents.
 
-In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWorkflow.java`:
+Create `CarProcessingWorkflow.java`:
 
-```java hl_lines="17-19" title="CarProcessingWorkflow.java"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\CarProcessingWorkflow.java
+    ```
+    
+```java hl_lines="18-20" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -419,7 +452,7 @@ Now update the service to use the workflow instead of calling agents directly.
 
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
-```java hl_lines="17-18 34-42 44-50" title="CarManagementService.java"
+```java hl_lines="17-18 34-43" title="CarManagementService.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java"
 ```
 
@@ -471,9 +504,15 @@ We extract both the updated condition and whether a cleaning is required, then u
 
 Start the application:
 
-```bash
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
 
 Open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
@@ -623,7 +662,7 @@ How does the condition agent synthesize feedback from multiple sources?
     We chose a **sequential** workflow in this step because:
 
     1. It's simpler to understand as your first workflow
-    2. It sets us up for [Step 03](step-03.md){target="_blank"}, where we'll add more agents that DO depend on each other
+    2. It sets us up for [Step 03](step-03.md){target="_blank"}, where we'll add more agents that **do** depend on each other
 
     Feel free to try converting this to a parallel workflow as an experiment! Replace `@SequenceAgent` with `@ParallelAgent` and see what happens.
 
@@ -643,6 +682,20 @@ How does the condition agent synthesize feedback from multiple sources?
 
 ??? warning "UI not showing Condition column"
     Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)
+
+---
+
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
 
 ---
 

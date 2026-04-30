@@ -7,11 +7,10 @@ In the previous step, you created a **sequential workflow** that orchestrated tw
 1. The `CleaningAgent` determined if a car needed cleaning
 2. The `CarConditionFeedbackAgent` updated the car's condition based on feedback
 
-A single sequential pattern works well you just need agents to run one after another.
+A single sequential pattern works well when you just need agents to run one after another.
 However, real-world scenarios often require more sophisticated orchestration patterns.
 
-In this step, you'll learn how to **compose workflows by nesting them within other workflows** to build complex
-agentic systems, by creating multi-level orchestration patterns that combine mixed pattern executions.
+In this step, you'll learn how to **compose workflows by nesting them within other workflows** to build complex agentic systems. You'll create multi-level orchestration patterns that combine different execution patterns (sequential, parallel, and conditional).
 
 ---
 
@@ -114,35 +113,34 @@ The final system uses a 3-level nested workflow, similar to what we saw above in
 
 ```mermaid
 graph TB
-    Start(["Car Return"]) --> A["CarProcessingWorkflow<br/>Sequential - Level 1"]
+    Start([Car Return]) --> A[CarProcessingWorkflow<br/>Sequential - Level 1]
     
-    A --> B["Step 1: FeedbackWorkflow<br/>Parallel - Level 2"]
-    B --> B1["CleaningFeedbackAgent"]
-    B --> B2["MaintenanceFeedbackAgent"]
-    B1 --> BEnd["Both complete"]
+    A --> B[Step 1: FeedbackWorkflow<br/>Parallel - Level 2]
+    B --> B1[CleaningFeedbackAgent]
+    B --> B2[MaintenanceFeedbackAgent]
+    B1 --> BEnd[Both complete]
     B2 --> BEnd
     
-    BEnd --> C["Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2"]
-    C --> C1{"Maintenance<br/>needed?"}
-    C1 -->|Yes| C2["MaintenanceAgent"]
-    C1 -->|No| C3{"Cleaning<br/>needed?"}
-    C3 -->|Yes| C4["CleaningAgent"]
-    C3 -->|No| C5["Skip both"]
-    C2 --> CEnd["Action complete"]
+    BEnd --> C[Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2]
+    C --> C1{Maintenance<br/>needed?}
+    C1 -->|Yes| C2[MaintenanceAgent]
+    C1 -->|No| C3{Maintenance not needed and Cleaning<br/>needed?}
+    C3 -->|Yes| C4[CleaningAgent]
+    C2 --> C3
+    C3 -->|No| CEnd[Action complete]
     C4 --> CEnd
-    C5 --> CEnd
     
-    CEnd --> D["Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1"]
-    D --> End(["Updated Car Conditions"])
+    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1]
+    D --> End([Updated Car Conditions])
     
-    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
-    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
-    style C fill:#FFD700,stroke:#333,stroke-width:2,color:#000
-    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
-    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
-    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
-    style BEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
-    style CEnd fill:#F0F0F0,stroke:#333,stroke-width:2,color:#000
+    style A fill:#90EE90
+    style B fill:#87CEEB
+    style C fill:#FFD700
+    style D fill:#90EE90
+    style Start fill:#E8E8E8
+    style End fill:#E8E8E8
+    style BEnd fill:#F0F0F0
+    style CEnd fill:#F0F0F0
 ```
 
 **The Flow:**
@@ -153,8 +151,7 @@ graph TB
 
 2. **CarAssignmentWorkflow** (Conditional): Routes the car based on the analysis:
     - If maintenance needed, then send to maintenance team
-    - Else if cleaning needed, then send to cleaning
-    - Else: do nothing
+    - if maintenance not needed and cleaning needed, then send to cleaning
 
 3. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
 
@@ -188,15 +185,14 @@ The agents analyze different aspects (cleaning vs. maintenance) and don't depend
 
 The `CarAssignmentWorkflow` uses **activation conditions** to intelligently route cars to the appropriate team based on the analysis it has done:
 
-```java title="CarAssignmentWorkflow.java" hl_lines="1 12 17 22"
+```java title="CarAssignmentWorkflow.java" hl_lines="1 10 15"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java:conditional-agent"
 ```
 
-- If `assignToMaintenance()` returns `true` → MaintenanceAgent runs, CleaningAgent skipped
-- Else if `assignToCleaning()` returns `true` → CleaningAgent runs
-- Else → Both skipped
+- If `assignToMaintenance()` returns `true` → MaintenanceAgent runs
+- If `assignToCleaning()` returns `true` → CleaningAgent runs
 
-This implements **priority routing**: maintenance takes precedence over cleaning.
+The logic in `assignToCleaning()` will only let the CleaningAgent run if no maintenance is required. This implements **priority routing**: maintenance takes precedence over cleaning.
 
 ---
 
@@ -206,14 +202,22 @@ Now that you understand the architecture, let's see it in action!
 
 ### Start the Application
 
-1. Navigate to the complete solution directory:
+1. If a previous step's Quarkus server is still running, stop it first (press `Ctrl+C` in the terminal).
+2. Navigate to the complete solution directory:
 
-```bash
-cd section-2/step-03
-./mvnw quarkus:dev
-```
+=== "Linux / macOS"
+    ```bash
+    cd section-2/step-03
+    ./mvnw quarkus:dev
+    ```
 
-2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
+=== "Windows"
+    ```cmd
+    cd section-2\step-03
+    mvnw quarkus:dev
+    ```
+
+3. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
 ### Test Different Scenarios
 
@@ -231,7 +235,7 @@ Engine making strange noise and car is dirty
 
 ```mermaid
 flowchart TD
-    Start([Input: Engine making strange noise<br/>and car is dirty])
+    Start([Input: Brakes squealing <br>and car is dirty])
     
     Start --> FW[FeedbackWorkflow<br/>Parallel Analysis]
     
@@ -289,7 +293,7 @@ flowchart TD
 
 #### Scenario 3: Maintenance Return
 
-Find the Ford F-150 (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
+Find the Honda Civic (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
 
 ```text
 Fixed the brakes, car could use a wash now
@@ -299,7 +303,7 @@ Fixed the brakes, car could use a wash now
 
 - FeedbackWorkflow: Analyzes maintenance feedback
 - CarAssignmentWorkflow: Routes to CleaningAgent
-- Result: Car goes to cleaning after maintenance
+- Result: Car goes from maintenance to cleaning
 
 ### Check the Logs
 
@@ -412,15 +416,16 @@ Starting from your current code in `section-2/step-02`, you'll add:
 
 Before starting:
 
-- Completed [Step 02](step-02.md){target="_blank"} (or have the `section-2/step-02` code available)
-- Application from Step 02 is stopped (Ctrl+C)
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
 
 === "Option 1: Continue from Step 02"
 
-    If you want to continue building on your Step 02 code, you'll need to copy the updated UI files from `step-03`:
+    If you want to continue building on top of Step 02 code, you'll need to copy the updated UI files from `step-03`:
 
     === "Linux / macOS"
         ```bash
+        cd section-2/step-02
         cp ../step-03/src/main/resources/META-INF/resources/css/styles.css ./src/main/resources/META-INF/resources/css/styles.css
         cp ../step-03/src/main/resources/META-INF/resources/js/app.js ./src/main/resources/META-INF/resources/js/app.js
         cp ../step-03/src/main/resources/META-INF/resources/index.html ./src/main/resources/META-INF/resources/index.html
@@ -430,6 +435,7 @@ Before starting:
 
     === "Windows"
         ```cmd
+        cd section-2\step-02
         copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\resources\META-INF\resources\css\styles.css
         copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
         copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
@@ -438,13 +444,21 @@ Before starting:
         copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
         ```
 
-=== "Option 2: Start Fresh from Step 03 [Recommended]"
+=== "Option 2: Follow along using the completed solution"
 
-    If you prefer to start with the complete Step 03 code, and walk through the code instead of implementing everything yourself:
+    If you prefer to follow along (without making any code changes), navigate to the completed `step-03` directory:
 
-    ```bash
-    cd section-2/step-03
-    ```
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-03
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-2\step-03
+        mvnw quarkus:dev
+        ```
 
 ### Create Feedback Analysis Agents
 
@@ -454,9 +468,19 @@ while the `CleaningFeedbackAgent` is specialized in looking for clues in the str
 
 #### MaintenanceFeedbackAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java`:
+Create `MaintenanceFeedbackAgent.java`:
 
-```java title="MaintenanceFeedbackAgent.java" hl_lines="10 17-18 29-31 34"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceFeedbackAgent.java
+    ```
+
+```java title="MaintenanceFeedbackAgent.java" hl_lines="11 14-15 20 33"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java"
 ```
 
@@ -469,9 +493,19 @@ Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.
 
 #### CleaningFeedbackAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java`:
+Create `CleaningFeedbackAgent.java`:
 
-```java title="CleaningFeedbackAgent.java" hl_lines="16-17 28-30 33"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\CleaningFeedbackAgent.java
+    ```
+
+```java title="CleaningFeedbackAgent.java" hl_lines="11 15-16 20 33"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java"
 ```
 
@@ -486,9 +520,19 @@ Create `src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.jav
 Now, we'll create a **parallel** workflow that runs both feedback agents simultaneously.
 This is where the `@ParallelAgent` annotation comes into play.
 
-Create `src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java`:
+Create `FeedbackWorkflow.java`:
 
-```java title="FeedbackWorkflow.java" hl_lines="15-16"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\FeedbackWorkflow.java
+    ```
+
+```java title="FeedbackWorkflow.java" hl_lines="16-17"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java"
 ```
 
@@ -504,9 +548,19 @@ These agents will examine the analysis results and determine what should happen 
 
 #### MaintenanceAgent
 
-Create `src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java`:
+Create `MaintenanceAgent.java`:
 
-```java title="MaintenanceAgent.java" hl_lines="30"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\agents\MaintenanceAgent.java
+    ```
+
+```java title="MaintenanceAgent.java" hl_lines="40-41"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java"
 ```
 
@@ -523,7 +577,7 @@ The CleaningAgent we created previously should now return analysisResult as well
 
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
-```java title="CleaningAgent.java" hl_lines="35"
+```java title="CleaningAgent.java" hl_lines="35-36"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java"
 ```
 
@@ -532,9 +586,19 @@ Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 The Car Assignment workflow is the conditional workflow which will active the appropriate
 service agent path based on the analysis results. Notice the same analysisResult from the previous 2 agents we created.
 
-Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java`:
+Create `CarAssignmentWorkflow.java`:
 
-```java title="CarAssignmentWorkflow.java" hl_lines="16-17 27 32"
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\agentic\workflow\CarAssignmentWorkflow.java
+    ```
+
+```java title="CarAssignmentWorkflow.java" hl_lines="17-18 26 31"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java"
 ```
 
@@ -542,14 +606,14 @@ Create `src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.j
 
 - `@ConditionalAgent` evaluates conditions to determine which agent runs
 - `@ActivationCondition` methods return `true` to activate an agent
-- Maintenance has priority (checked first)
+- Maintenance has priority 
 - Cleaning only runs if maintenance is not needed
 
 ### Update CarConditionFeedbackAgent
 
 Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java` to add the new maintenance recommendations:
 
-```java title="CarConditionFeedbackAgent.java" hl_lines="27 38"
+```java title="CarConditionFeedbackAgent.java" hl_lines="28 36"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
 ```
 
@@ -557,7 +621,17 @@ Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent
 
 #### Create CarAssignment Model
 
-Create `src/main/java/com/carmanagement/model/CarAssignment.java`:
+Create `CarAssignment.java`:
+
+=== "Linux / macOS"
+    ```bash
+    touch src/main/java/com/carmanagement/model/CarAssignment.java
+    ```
+
+=== "Windows"
+    ```cmd
+    type nul > src\main\java\com\carmanagement\model\CarAssignment.java
+    ```
 
 ```java title="CarAssignment.java"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/model/CarAssignment.java"
@@ -577,11 +651,11 @@ Now it's finally time to compose the sub workflows in the main Car Processing wo
 We need to replace the direct call to the CleaningAgent with the FeedbackWorkflow that will analyze the feedback from the intake,
 and then the CarAssignmentWorkflow to actually assign the car to the appropriate team based on the analysis.
 
-We'll also update the outputKey and the output method to make sure the assignment happens with the right priority.
+We'll also update the `outputKey` and the output method to make sure the assignment happens with the right priority.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
-```java title="CarProcessingWorkflow.java" hl_lines="17-18 27 30-41 43-45"
+```java title="CarProcessingWorkflow.java" hl_lines="18-19 26-37"
 --8<-- "../../section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
 ```
 
@@ -590,8 +664,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 - `@SequenceAgent` runs the workflows and agents in order
 - Sub-agents can be **other workflows** (FeedbackWorkflow, CarAssignmentWorkflow)
 - All agents share the same `AgenticScope`
-- The `@Output` method retrieves the maintenanceRequest and cleaningRequest from the AgenticScope
-to determine what needs to happen next, and then returns this result.
+- The `@Output` method retrieves the carCondition, maintenanceRequest and cleaningRequest from the AgenticScope, determines what needs to happen next, and then returns the result.
 
 #### Update the Service Layer
 
@@ -607,13 +680,23 @@ Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 Once you've implemented all the parts:
 
 1. Start your application:
-```bash
-./mvnw quarkus:dev
-```
+
+
+
+=== "Linux / macOS"
+    ```bash
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    mvnw quarkus:dev
+    ```
+
 
 2. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
-3. Test with the scenarios described earlier
+3. Test with the scenarios described earlier (in the [Test Different Scenarios](#test-different-scenarios) section)
 
 4. Compare your implementation with the complete solution in `section-2/step-03`
 
@@ -667,11 +750,25 @@ Add logging to each agent and workflow to print when they start and finish. Obse
     Remember that parameter names must match the `outputKey` from previous agents or workflow inputs. Check for typos!
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 
 You've built a sophisticated multi-level nested workflow combining sequence, parallel, and conditional execution!
 
-In **Step 04**, you'll learn about **Agent-to-Agent (A2A) communication** — connecting your workflows to remote agents running in separate systems!
+In **Step 04**, you'll learn about **using a supervisor pattern for dynamic orchestration** of a set of agents!
 
-[Continue to Step 04 - Using Remote Agents (A2A)](step-04.md)
+[Continue to Step 04 - Supervisor Pattern for Dynamic Orchestration](step-04.md)
