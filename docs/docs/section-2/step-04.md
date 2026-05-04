@@ -184,9 +184,6 @@ The first step in the refactoring is to make the analysis type explicit. Instead
 
 In `src/main/java/com/carmanagement/model`, create `FeedbackTask.java`:
 
-Add the following content to [`src/main/java/com/carmanagement/model/FeedbackTask.java`](section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java):
-
-
 ```java title="FeedbackTask.java" hl_lines="15-25 32-44 51-70"
 --8<-- "../../section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java"
 ```
