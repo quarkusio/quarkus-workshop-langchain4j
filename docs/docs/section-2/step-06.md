@@ -224,18 +224,7 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 
 This is the core of this step — a new agent that processes car images.
 
-Create `src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java`:
-
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\agentic\agents\CarImageAnalysisAgent.java
-    ```
+In `src/main/java/com/carmanagement/agentic/agents`, create `CarImageAnalysisAgent.java`:
 
 ```java title="CarImageAnalysisAgent.java  hl_lines="28 30-32"
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java"

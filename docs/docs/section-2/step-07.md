@@ -354,17 +354,7 @@ cd remote-a2a-agent
 
 The AI agent that estimates vehicle market values — the same logic that was local in Step 5.
 
-Create `PricingAgent.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/demo/PricingAgent.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\demo\PricingAgent.java
-    ```
+In `src/main/java/com/demo`, create `PricingAgent.java`:
 
 ```java title="PricingAgent.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgent.java"
@@ -385,17 +375,7 @@ Create `PricingAgent.java`:
 
 The **AgentCard** describes the agent's capabilities, skills, and interface.
 
-Create `PricingAgentCard.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/demo/PricingAgentCard.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\demo\PricingAgentCard.java
-    ```
+In `src/main/java/com/demo`, create `PricingAgentCard.java`:
 
 ```java title="PricingAgentCard.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentCard.java"
@@ -458,17 +438,7 @@ Specifies that this agent communicates via JSON-RPC over HTTP.
 
 The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
 
-Create `PricingAgentExecutor.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/demo/PricingAgentExecutor.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\demo\PricingAgentExecutor.java
-    ```
+In `src/main/java/com/demo`, create `PricingAgentExecutor.java`:
 
 ```java title="PricingAgentExecutor.java"
 --8<-- "../../section-2/step-07/remote-a2a-agent/src/main/java/com/demo/PricingAgentExecutor.java"

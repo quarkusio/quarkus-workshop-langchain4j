@@ -233,17 +233,7 @@ sequenceDiagram
 
 Create a new agent that analyzes feedback to determine a car's current condition.
 
-Create `CarConditionFeedbackAgent.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\agentic\agents\CarConditionFeedbackAgent.java
-    ```
+In `src/main/java/com/carmanagement/agentic/agents`, create `CarConditionFeedbackAgent.java`:
 
 ```java title="CarConditionFeedbackAgent.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java"
@@ -311,17 +301,7 @@ Other agents or the workflow can then access this value.
 
 Before creating the workflow, we need a data model to return both the car condition and whether a cleaning is required.
 
-Create `CarConditions.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/model/CarConditions.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\model\CarConditions.java
-    ```
+In `src/main/java/com/carmanagement/model`, create `CarConditions.java`:
 
 ```java title="CarConditions.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/model/CarConditions.java"
@@ -367,17 +347,7 @@ If continuing from Step 01, create the workflow directory:
 
 Now, create the workflow that orchestrates both agents.
 
-Create `CarProcessingWorkflow.java`:
-
-=== "Linux / macOS"
-    ```bash
-    touch src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java
-    ```
-
-=== "Windows"
-    ```cmd
-    type nul > src\main\java\com\carmanagement\agentic\workflow\CarProcessingWorkflow.java
-    ```
+In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWorkflow.java`:
     
 ```java hl_lines="18-20" title="CarProcessingWorkflow.java"
 --8<-- "../../section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java"
