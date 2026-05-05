@@ -29,10 +29,10 @@ public interface CarAssignmentWorkflow {
     }
 
     @ActivationCondition(CleaningAgent.class)
-    static boolean assignToCleaning(String cleaningRequest) {
-        return isRequired(cleaningRequest);
+    static boolean assignToCleaning(String maintenanceRequest, String cleaningRequest) {
+        return !isRequired(maintenanceRequest) && isRequired(cleaningRequest);
     }
-
+    
     private static boolean isRequired(String value) {
         return value != null && !value.isEmpty() && !value.toUpperCase().contains("NOT_REQUIRED");
     }

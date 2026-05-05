@@ -139,7 +139,7 @@ Let's build the HITL system step by step.
 
 This agent creates disposition proposals that will be reviewed by humans.
 
-Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java`:
+In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionProposalAgent.java`:
 
 ```java title="DispositionProposalAgent.java" hl_lines="14-29 38-48 51"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java"
@@ -153,7 +153,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.
 
 This agent implements Human-in-the-Loop using LangChain4j's **`@HumanInTheLoop`** annotation. Instead of relying on a separate tool, the agent method itself **pauses workflow execution** until a human makes a decision through the UI.
 
-Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
+In `src/main/java/com/carmanagement/agentic/agents`, create `HumanApprovalAgent.java`:
 
 ```java title="HumanApprovalAgent.java" hl_lines="6 17"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java"
@@ -174,7 +174,7 @@ Create `src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java`:
 
 The `ApprovalService` manages the `CompletableFuture` instances that pause and resume workflow execution. This is the bridge between the `HumanApprovalAgent` and the REST endpoints that the UI calls.
 
-Create `src/main/java/com/carmanagement/service/ApprovalService.java`:
+In `src/main/java/com/carmanagement/service`, create `ApprovalService.java`:
 
 ```java title="ApprovalService.java"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/service/ApprovalService.java"
@@ -192,7 +192,7 @@ Create `src/main/java/com/carmanagement/service/ApprovalService.java`:
 
 This entity stores proposals in the database so the UI can display them.
 
-Create `src/main/java/com/carmanagement/model/ApprovalProposal.java`:
+In `src/main/java/com/carmanagement/model`, create `ApprovalProposal.java`:
 
 ```java title="ApprovalProposal.java"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/model/ApprovalProposal.java"
@@ -207,6 +207,8 @@ Create `src/main/java/com/carmanagement/resource/ApprovalResource.java` to creat
 - `GET /api/approvals/pending` - Returns all pending approval proposals
 - `POST /api/approvals/{id}/approve` - Approve a proposal
 - `POST /api/approvals/{id}/reject` - Reject a proposal
+
+In `src/main/java/com/carmanagement/resource`, create `ApprovalResource.java`:
 
 ```java title="ApprovalResource.java"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/resource/ApprovalResource.java"
@@ -266,9 +268,16 @@ Now let's see the Human-in-the-Loop pattern in action!
 
 1. Navigate to the step-05 directory:
 
-```bash
-cd section-2/step-05
-```
+
+=== "Linux / macOS"
+    ```bash
+    cd section-2/step-05
+    ```
+
+=== "Windows"
+    ```cmd
+    cd section-2\step-05
+    ```
 
 2. Start the application:
 
@@ -532,6 +541,20 @@ Second, generate an HTML report from the monitor. In `CarManagementService.java`
 The report is exposed via a REST endpoint in `CarManagementResource.java`. After processing one or more cars, click the "Generate Report" button in the UI (next to "Refresh Data") to open the report in a new tab. The report shows the full agent topology of your system, every execution grouped by workflow run, and for each agent invocation, what went in, what came out, and how long it took. This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

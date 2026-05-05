@@ -14,10 +14,11 @@ import com.carmanagement.model.CarStatus;
 @ApplicationScoped
 public class CarManagementService {
 
+        
+    // --8<-- [start:processCarReturn]
     @Inject
     CleaningAgent cleaningAgent;
 
-    // --8<-- [start:processCarReturn]
     /**
      * Process a car return from any operation.
      *

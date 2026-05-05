@@ -40,7 +40,7 @@ Before diving in, let's clarify some key differences:
 | **Purpose**     | Answer user questions                           | Perform autonomous tasks                                                                                                                                                                                                         |
 | **Interaction** | Reactive (responds to prompts)                  | Reactive and Proactive (takes actions)                                                                                                                                                                                           |
 | **Tool Usage**  | Can call tools when needed                      | Can call tools to accomplish goals                                                                                                                                                                                               |
-| **Workflows**   | Single-agent interactions                       | Multi-agent collaboration  ([workflow](https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns){target="_blank"} or [supervisor-based](https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai){target="_blank"} |
+| **Workflows**   | Single-agent interactions                       | Multi-agent collaboration  ([workflow](https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns){target="_blank"} or [supervisor-based](https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai){target="_blank"}) |
 | **Annotation**  | Methods use `@SystemMessage` and `@UserMessage` | One method per interface (using `@Agent`)                                                                                                                                                                                        |
 | **Use Cases**   | Chatbots, Q&A, content generation               | Automation, decision-making, orchestration                                                                                                                                                                                       |
 
@@ -50,12 +50,7 @@ In this section, you'll see how agents extend the capabilities you created in Se
 
 ## Prerequisites
 
-Before starting, ensure you have:
-
-- Completed Section 1 (or you are familiar with Quarkus LangChain4j basics)
-- JDK 21+ installed
-- OpenAI API key set as `OPENAI_API_KEY` environment variable
-- A container runtime (Docker/Podman) for running a PostgreSQL [Dev Service](https://quarkus.io/guides/databases-dev-services)
+Before starting, ensure you have met the [workshop setup requirements](../requirements.md){target="_blank"}.
 
 ---
 
@@ -135,7 +130,7 @@ Car looks good
 In your logs, you'll see the agent's response contains:
 
 ```
-"content":"CLEANING_NOT_REQUIRED"
+"content": "CLEANING_NOT_REQUIRED"
 ```
 
 Notice how the agent **made a decision** without calling the cleaning tool. This demonstrates reasoning!
@@ -168,7 +163,7 @@ Agents share similarities with AI Services from [Section 1](../section-1/step-01
 ### Key Differences
 
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
-- Designed to be composed with for **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
+- Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md){target="_blank"})
 - Focus on **autonomous actions** rather than conversational responses
 
 ---
@@ -192,14 +187,13 @@ Let's explore each component.
 
 The `CarManagementResource` provides REST APIs to handle car returns:
 
-```java hl_lines="19 22 41 44" title="CarManagementResource.java"
+```java hl_lines="19 22" title="CarManagementResource.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java:car-management"
 ```
 
 **Key Points:**
 
 - The `processReturn` method (endpoint `/car-management/return/{carNumber}`): Accepts feedback and routes it based on the car's current status
-- Looks up the car via `CarInfo.findById` to determine which type of feedback to pass
 - Delegates to `CarManagementService.processCarReturn`
 
 ---
@@ -208,7 +202,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 
 The `CarManagementService` orchestrates the car return process:
 
-```java hl_lines="10 16-28" title="CarManagementService.java"
+```java hl_lines="1-2 13 19-24" title="CarManagementService.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java:processCarReturn"
 ```
 
@@ -227,7 +221,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 
 Here's where the magic happens — the AI agent definition:
 
-```java hl_lines="6-11 23-24" title="CleaningAgent.java"
+```java hl_lines="6-11 21-22" title="CleaningAgent.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java:cleaningAgent"
 ```
 
@@ -286,7 +280,7 @@ Marks this as an **agent method** — only one per interface.
 Assigns the `CleaningTool` to this agent:
 
 - The agent can call methods in this tool to perform actions
-- The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)
+- The LLM decides when and how to use the tool based on the task (function calling has been covered in Section 1 of the workshop)
 
 ### Method Signature
 Defines the inputs and output:
@@ -308,7 +302,7 @@ Defines the inputs and output:
 
 If you went through Section 1, you'll remember that we already covered [tool and function calling](../section-1/step-07.md){target="_blank"} for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
-These tools can be local, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md){target="_blank"}..
+These tools can be local LangChain4j tools running within the same Quarkus application, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md){target="_blank"}..
 
 ```java hl_lines="4 21 40 47-48" title="CleaningTool.java"
 --8<-- "../../section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CleaningTool.java:CleaningTool"
@@ -466,6 +460,20 @@ Does the agent automatically learn to use it?
    - Consider providing examples in the system message
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

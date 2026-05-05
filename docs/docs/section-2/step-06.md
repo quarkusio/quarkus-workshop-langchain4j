@@ -224,7 +224,7 @@ CarConditions carConditions = carProcessingWorkflow.processCarReturn(
 
 This is the core of this step — a new agent that processes car images.
 
-Create `src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java`:
+In `src/main/java/com/carmanagement/agentic/agents`, create `CarImageAnalysisAgent.java`:
 
 ```java title="CarImageAnalysisAgent.java  hl_lines="28 30-32"
 --8<-- "../../section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java"
@@ -467,6 +467,20 @@ Modify the `CarImageAnalysisAgent`'s system message to focus on specific aspects
     - Compressing images client-side before upload
 
 ---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
 
 ## What's Next?
 

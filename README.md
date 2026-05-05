@@ -9,7 +9,7 @@ website](https://quarkus.io/quarkus-workshop-langchain4j/). Alternatively,
 you may serve the instructions locally by following the [docs/README
 file](docs/README.md).
 
-The final state of each step is available in the [step-XX](step-XX) directory.
+The final state of each step is available in the `step-XX` directory.
 You can quickly jump to the final state of a step by navigating to the corresponding directory, and then running the following command:
 
 ```shell
