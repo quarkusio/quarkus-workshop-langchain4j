@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1230,6 +1230,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1715,6 +1726,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1906,7 +1928,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>Let’s build the HITL system step by step.</p>
 <h3 id="create-the-dispositionproposalagent">Create the DispositionProposalAgent<a class="headerlink" href="#create-the-dispositionproposalagent" title="Permanent link"></a></h3>
 <p>This agent creates disposition proposals that will be reviewed by humans.</p>
-<p>Create <code>src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java</code>:</p>
+<p>In <code>src/main/java/com/carmanagement/agentic/agents</code>, create <code>DispositionProposalAgent.java</code>:</p>
 <div class="highlight"><span class="filename">DispositionProposalAgent.java</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
@@ -1976,7 +1998,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </div>
 <h3 id="create-the-humanapprovalagent">Create the HumanApprovalAgent<a class="headerlink" href="#create-the-humanapprovalagent" title="Permanent link"></a></h3>
 <p>This agent implements Human-in-the-Loop using LangChain4j’s <strong><code>@HumanInTheLoop</code></strong> annotation. Instead of relying on a separate tool, the agent method itself <strong>pauses workflow execution</strong> until a human makes a decision through the UI.</p>
-<p>Create <code>src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java</code>:</p>
+<p>In <code>src/main/java/com/carmanagement/agentic/agents</code>, create <code>HumanApprovalAgent.java</code>:</p>
 <div class="highlight"><span class="filename">HumanApprovalAgent.java</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.ApprovalProposal</span><span class="p">;</span>
@@ -2068,7 +2090,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <h3 id="the-approvalservice">The ApprovalService<a class="headerlink" href="#the-approvalservice" title="Permanent link"></a></h3>
 <p>The <code>ApprovalService</code> manages the <code>CompletableFuture</code> instances that pause and resume workflow execution. This is the bridge between the <code>HumanApprovalAgent</code> and the REST endpoints that the UI calls.</p>
-<p>Create <code>src/main/java/com/carmanagement/service/ApprovalService.java</code>:</p>
+<p>In <code>src/main/java/com/carmanagement/service</code>, create <code>ApprovalService.java</code>:</p>
 <div class="highlight"><span class="filename">ApprovalService.java</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.service</span><span class="p">;</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.ApprovalProposal</span><span class="p">;</span>
@@ -2276,7 +2298,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <h3 id="create-the-approvalproposal-entity">Create the ApprovalProposal Entity<a class="headerlink" href="#create-the-approvalproposal-entity" title="Permanent link"></a></h3>
 <p>This entity stores proposals in the database so the UI can display them.</p>
-<p>Create <code>src/main/java/com/carmanagement/model/ApprovalProposal.java</code>:</p>
+<p>In <code>src/main/java/com/carmanagement/model</code>, create <code>ApprovalProposal.java</code>:</p>
 <div class="highlight"><span class="filename">ApprovalProposal.java</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.model</span><span class="p">;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.quarkus.hibernate.orm.panache.PanacheEntity</span><span class="p">;</span>
@@ -2410,6 +2432,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li><code>POST /api/approvals/{id}/approve</code> - Approve a proposal</li>
 <li><code>POST /api/approvals/{id}/reject</code> - Reject a proposal</li>
 </ul>
+<p>In <code>src/main/java/com/carmanagement/resource</code>, create <code>ApprovalResource.java</code>:</p>
 <div class="highlight"><span class="filename">ApprovalResource.java</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.resource</span><span class="p">;</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.carmanagement.model.ApprovalProposal</span><span class="p">;</span>
@@ -2737,19 +2760,29 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <ol>
 <li>Navigate to the step-05 directory:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">cd</span><span class="w"> </span>section-2/step-05
-</code></pre></div>
-<ol>
-<li>Start the application:</li>
-</ol>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Linux / macOS</label><label for="__tabbed_1_2">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./mvnw<span class="w"> </span>quarkus:dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">cd</span><span class="w"> </span>section-2/step-05
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>mvnw quarkus:dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>cd section-2\step-05
+</code></pre></div>
+</div>
+</div>
+</div>
+<ol>
+<li>Start the application:</li>
+</ol>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">Linux / macOS</label><label for="__tabbed_2_2">Windows</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>./mvnw<span class="w"> </span>quarkus:dev
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>mvnw quarkus:dev
 </code></pre></div>
 </div>
 </div>
@@ -2761,7 +2794,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>Try these scenarios to see how the approval workflow handles different vehicle values:</p>
 <h4 id="scenario-1-high-value-vehicle-requiring-approval">Scenario 1: High-Value Vehicle Requiring Approval<a class="headerlink" href="#scenario-1-high-value-vehicle-requiring-approval" title="Permanent link"></a></h4>
 <p>Enter the following text in the feedback field for the <strong>Honda Civic</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>The car was in a serious collision. Front end is completely destroyed and airbags deployed.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>The car was in a serious collision. Front end is completely destroyed and airbags deployed.
 </code></pre></div>
 <p><strong>What happens:</strong></p>
 <div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
@@ -2830,7 +2863,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <h4 id="scenario-2-high-value-vehicle-approval-rejected">Scenario 2: High-Value Vehicle - Approval Rejected<a class="headerlink" href="#scenario-2-high-value-vehicle-approval-rejected" title="Permanent link"></a></h4>
 <p>Enter the following text in the <strong>Mercedes Benz</strong> feedback field:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Minor fender bender, small dent in rear bumper
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Minor fender bender, small dent in rear bumper
 </code></pre></div>
 <p><strong>What happens:</strong></p>
 <div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
@@ -2895,7 +2928,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <h4 id="scenario-3-low-value-vehicle-no-approval-needed">Scenario 3: Low-Value Vehicle - No Approval Needed<a class="headerlink" href="#scenario-3-low-value-vehicle-no-approval-needed" title="Permanent link"></a></h4>
 <p>Enter the following text in the <strong>Ford F-150</strong> feedback field (status: In Maintenance) in the Fleet Status grid:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>The truck is totaled, completely inoperable, very old
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>The truck is totaled, completely inoperable, very old
 </code></pre></div>
 <p><strong>What happens:</strong></p>
 <div class="panzoom-box" data-key="alt" id="panzoom0" oncontextmenu="return false;">
@@ -2954,18 +2987,18 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 </ul>
 <h3 id="check-the-logs">Check the Logs<a class="headerlink" href="#check-the-logs" title="Permanent link"></a></h3>
 <p>Watch the console output to see the approval workflow execution:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>FeedbackAnalysisWorkflow<span class="w"> </span>executing...
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>FeedbackAnalysisAgent<span class="o">(</span>disposition<span class="o">)</span>:<span class="w"> </span>DISPOSITION_REQUIRED
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>FleetSupervisorAgent<span class="w"> </span>orchestrating...
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>PricingAgent:<span class="w"> </span>Estimated<span class="w"> </span>value<span class="w"> </span><span class="nv">$18</span>,000
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Value<span class="w"> </span>check:<span class="w"> </span><span class="nv">$18</span>,000<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$15</span>,000<span class="w"> </span>-&gt;<span class="w"> </span>Approval<span class="w"> </span>required
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>DispositionProposalAgent:<span class="w"> </span>Proposed<span class="w"> </span>SCRAP
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>HumanApprovalAgent<span class="w"> </span><span class="o">(</span>@HumanInTheLoop<span class="o">)</span>:<span class="w"> </span>Workflow<span class="w"> </span>paused...
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>human<span class="w"> </span>decision<span class="w"> </span>via<span class="w"> </span>UI...
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Human<span class="w"> </span>decision<span class="w"> </span>received:<span class="w"> </span>APPROVED
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Workflow<span class="w"> </span>resumed
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>CarConditionFeedbackAgent<span class="w"> </span>updating...
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Disposition<span class="w"> </span>status:<span class="w"> </span>DISPOSITION_APPROVED
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>FeedbackAnalysisWorkflow<span class="w"> </span>executing...
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>FeedbackAnalysisAgent<span class="o">(</span>disposition<span class="o">)</span>:<span class="w"> </span>DISPOSITION_REQUIRED
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>FleetSupervisorAgent<span class="w"> </span>orchestrating...
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>PricingAgent:<span class="w"> </span>Estimated<span class="w"> </span>value<span class="w"> </span><span class="nv">$18</span>,000
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Value<span class="w"> </span>check:<span class="w"> </span><span class="nv">$18</span>,000<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$15</span>,000<span class="w"> </span>-&gt;<span class="w"> </span>Approval<span class="w"> </span>required
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>DispositionProposalAgent:<span class="w"> </span>Proposed<span class="w"> </span>SCRAP
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>HumanApprovalAgent<span class="w"> </span><span class="o">(</span>@HumanInTheLoop<span class="o">)</span>:<span class="w"> </span>Workflow<span class="w"> </span>paused...
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>human<span class="w"> </span>decision<span class="w"> </span>via<span class="w"> </span>UI...
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Human<span class="w"> </span>decision<span class="w"> </span>received:<span class="w"> </span>APPROVED
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Workflow<span class="w"> </span>resumed
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>CarConditionFeedbackAgent<span class="w"> </span>updating...
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="p">|</span>-<span class="w"> </span>Disposition<span class="w"> </span>status:<span class="w"> </span>DISPOSITION_APPROVED
 </code></pre></div>
 <p>Notice how the workflow <strong>pauses</strong> at the <code>HumanApprovalAgent</code> and only resumes after the human makes a decision in the UI.</p>
 <hr>
@@ -3062,6 +3095,19 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <p>Enabling this feature requires two simple steps. First, make your workflow interface extend <code>MonitoredAgent</code>. In <code>CarProcessingWorkflow.java</code>, the interface simply extends <code>MonitoredAgent</code> with no other changes needed. The framework handles everything automatically without requiring annotations on individual agents or manual tracking code.</p>
 <p>Second, generate an HTML report from the monitor. In <code>CarManagementService.java</code>, the <code>report()</code> method uses the static <code>HtmlReportGenerator.generateReport()</code> helper to produce a self-contained HTML page. This page includes an agent topology showing a visual map of all agents and their relationships, an execution timeline with a detailed breakdown of every agent invocation including inputs, outputs, duration, and nesting level, and error tracking that highlights any failed invocations with their exception details.</p>
 <p>The report is exposed via a REST endpoint in <code>CarManagementResource.java</code>. After processing one or more cars, click the “Generate Report” button in the UI (next to “Refresh Data”) to open the report in a new tab. The report shows the full agent topology of your system, every execution grouped by workflow run, and for each agent invocation, what went in, what came out, and how long it took. This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.</p>
+<hr>
+<h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link"></a></h2>
+<p>Before moving to the next step, let’s clean up:</p>
+<ol>
+<li>
+<p><strong>Stop the running server</strong> by pressing <code>Ctrl+C</code> in the terminal where Quarkus is running</p>
+</li>
+<li>
+<p><strong>Return to the root project directory</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>..
+</code></pre></div>
+</li>
+</ol>
 <hr>
 <h2 id="whats-next">What’s Next?<a class="headerlink" href="#whats-next" title="Permanent link"></a></h2>
 <p>You’ve successfully implemented the Human-in-the-Loop pattern for safe, controlled autonomous decision-making. The system now routes high-value vehicles through human approval using LangChain4j’s <code>@HumanInTheLoop</code> annotation, creates proposals for human review via the DispositionProposalAgent, and pauses workflow execution in the HumanApprovalAgent until a human decides. It tracks approval decisions for audit trails, provides fallback paths for rejected proposals, and balances automation with human oversight.</p>

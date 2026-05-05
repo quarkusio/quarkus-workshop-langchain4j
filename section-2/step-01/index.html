@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1219,6 +1219,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1917,6 +1928,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2000,7 +2022,7 @@ Here’s the business process flow:</p>
 <tr>
 <td><strong>Workflows</strong></td>
 <td>Single-agent interactions</td>
-<td>Multi-agent collaboration  (<a href="https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns" target="_blank">workflow</a> or <a href="https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai" target="_blank">supervisor-based</a></td>
+<td>Multi-agent collaboration  (<a href="https://docs.langchain4j.dev/tutorials/agents/#workflow-patterns" target="_blank">workflow</a> or <a href="https://docs.langchain4j.dev/tutorials/agents/#pure-agentic-ai" target="_blank">supervisor-based</a>)</td>
 </tr>
 <tr>
 <td><strong>Annotation</strong></td>
@@ -2017,13 +2039,7 @@ Here’s the business process flow:</p>
 <p>In this section, you’ll see how agents extend the capabilities you created in Section 1 to build sophisticated, intelligent, and autonomous systems.</p>
 <hr>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link"></a></h2>
-<p>Before starting, ensure you have:</p>
-<ul>
-<li>Completed Section 1 (or you are familiar with Quarkus LangChain4j basics)</li>
-<li>JDK 21+ installed</li>
-<li>OpenAI API key set as <code>OPENAI_API_KEY</code> environment variable</li>
-<li>A container runtime (Docker/Podman) for running a PostgreSQL <a href="https://quarkus.io/guides/databases-dev-services">Dev Service</a></li>
-</ul>
+<p>Before starting, ensure you have met the <a href="../../requirements/" target="_blank">workshop setup requirements</a>.</p>
 <hr>
 <h2 id="running-the-application">Running the Application<a class="headerlink" href="#running-the-application" title="Permanent link"></a></h2>
 <p>Navigate to the <code>section-2/step-01</code> directory and start the application:</p>
@@ -2081,7 +2097,7 @@ Here’s the business process flow:</p>
 <li>Updates the car’s status to <code>AVAILABLE</code></li>
 </ul>
 <p>In your logs, you’ll see the agent’s response contains:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>"content":"CLEANING_NOT_REQUIRED"
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>"content": "CLEANING_NOT_REQUIRED"
 </code></pre></div>
 <p>Notice how the agent <strong>made a decision</strong> without calling the cleaning tool. This demonstrates reasoning!</p>
 <hr>
@@ -2106,7 +2122,7 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <h3 id="key-differences">Key Differences<a class="headerlink" href="#key-differences" title="Permanent link"></a></h3>
 <ul>
 <li><strong>Only one method</strong> per interface can be annotated with <code>@Agent</code> - this is the agent entry point</li>
-<li>Designed to be composed with for <strong>workflows</strong> or be invoked by a supervisor — agents can be composed together (more on this in <a href="../step-02/" target="_blank">Step 02</a>)</li>
+<li>Designed to be composed with <strong>workflows</strong> or be invoked by a supervisor — agents can be composed together (more on this in <a href="../step-02/" target="_blank">Step 02</a>)</li>
 <li>Focus on <strong>autonomous actions</strong> rather than conversational responses</li>
 </ul>
 <hr>
@@ -2158,37 +2174,39 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <p><strong>Key Points:</strong></p>
 <ul>
 <li>The <code>processReturn</code> method (endpoint <code>/car-management/return/{carNumber}</code>): Accepts feedback and routes it based on the car’s current status</li>
-<li>Looks up the car via <code>CarInfo.findById</code> to determine which type of feedback to pass</li>
 <li>Delegates to <code>CarManagementService.processCarReturn</code></li>
 </ul>
 <hr>
 <h2 id="component-2-business-logic-agent-invocation">Component 2: Business Logic &amp; Agent Invocation<a class="headerlink" href="#component-2-business-logic-agent-invocation" title="Permanent link"></a></h2>
 <p>The <code>CarManagementService</code> orchestrates the car return process:</p>
-<div class="highlight"><span class="filename">CarManagementService.java</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="cm">/**</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="cm"> * Process a car return from any operation.</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="cm"> *</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="cm"> * @param carNumber The car number</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="cm"> * @param feedback Optional feedback</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="cm"> * @return Result of the processing</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="cm"> */</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nd">@Transactional</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="hll"><span class="w">    </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
-</span><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Car not found with number: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carNumber</span><span class="p">;</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="c1">// Process the car result</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cleaningAgent</span><span class="p">.</span><span class="na">processCleaning</span><span class="p">(</span><span class="n">carInfo</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
-</span><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="hll">
-</span><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="hll"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"CLEANING_NOT_REQUIRED"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
-</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
-</span><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
-</span><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="hll">
-</span><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="hll"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
-</span><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="hll"><span class="p">}</span>
-</span></code></pre></div>
+<div class="highlight"><span class="filename">CarManagementService.java</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="hll"><span class="nd">@Inject</span>
+</span><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="hll"><span class="n">CleaningAgent</span><span class="w"> </span><span class="n">cleaningAgent</span><span class="p">;</span>
+</span><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="cm">/**</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="cm"> * Process a car return from any operation.</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="cm"> *</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="cm"> * @param carNumber The car number</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="cm"> * @param feedback Optional feedback</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="cm"> * @return Result of the processing</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="cm"> */</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nd">@Transactional</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">processCarReturn</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="hll"><span class="w">    </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarInfo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">carNumber</span><span class="p">);</span>
+</span><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">carInfo</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Car not found with number: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">carNumber</span><span class="p">;</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="c1">// Process the car result</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cleaningAgent</span><span class="p">.</span><span class="na">processCleaning</span><span class="p">(</span><span class="n">carInfo</span><span class="p">,</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
+</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="hll">
+</span><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="hll"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="s">"CLEANING_NOT_REQUIRED"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CarStatus</span><span class="p">.</span><span class="na">AVAILABLE</span><span class="p">;</span>
+</span><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="hll"><span class="w">        </span><span class="n">carInfo</span><span class="p">.</span><span class="na">persist</span><span class="p">();</span>
+</span><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="p">}</span>
+</code></pre></div>
 <p><strong>Key Points:</strong></p>
 <ul>
 <li>The <code>CleaningAgent</code> field is injected as a CDI bean</li>
@@ -2222,11 +2240,11 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
 <a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="s">        Feedback: {feedback}</span>
 <a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="s">        """</span><span class="p">)</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="s">"Cleaning specialist. Determines what cleaning services are needed."</span><span class="p">)</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">CleaningTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="hll"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processCleaning</span><span class="p">(</span>
-</span><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="hll"><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
-</span><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="hll"><span class="w">    </span><span class="nd">@Agent</span><span class="p">(</span><span class="s">"Cleaning specialist. Determines what cleaning services are needed."</span><span class="p">)</span>
+</span><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="hll"><span class="w">    </span><span class="nd">@ToolBox</span><span class="p">(</span><span class="n">CleaningTool</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+</span><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">processCleaning</span><span class="p">(</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">            </span><span class="n">CarInfo</span><span class="w"> </span><span class="n">carInfo</span><span class="p">,</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">            </span><span class="n">Integer</span><span class="w"> </span><span class="n">carNumber</span><span class="p">,</span>
 <a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">feedback</span><span class="p">);</span>
 <a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="p">}</span>
 </code></pre></div>
@@ -2279,7 +2297,7 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <p>Assigns the <code>CleaningTool</code> to this agent:</p>
 <ul>
 <li>The agent can call methods in this tool to perform actions</li>
-<li>The LLM decides when and how to use the tool based on the task (function calling has been covered in the Section 1 of the workshop)</li>
+<li>The LLM decides when and how to use the tool based on the task (function calling has been covered in Section 1 of the workshop)</li>
 </ul>
 <h3 id="method-signature">Method Signature<a class="headerlink" href="#method-signature" title="Permanent link"></a></h3>
 <p>Defines the inputs and output:</p>
@@ -2301,7 +2319,7 @@ If you open the <code>pom.xml</code> file from the project, you will see this de
 <h2 id="component-4-the-cleaningtool">Component 4: The CleaningTool<a class="headerlink" href="#component-4-the-cleaningtool" title="Permanent link"></a></h2>
 <p>If you went through Section 1, you’ll remember that we already covered <a href="../../section-1/step-07/" target="_blank">tool and function calling</a> for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
-These tools can be local, like in the following <code>CleaningTool</code> example, or remote, using the <a href="../../section-1/step-08/" target="_blank">MCP protocol we visited in Section 1, Step 8</a>..</p>
+These tools can be local LangChain4j tools running within the same Quarkus application, like in the following <code>CleaningTool</code> example, or remote, using the <a href="../../section-1/step-08/" target="_blank">MCP protocol we visited in Section 1, Step 8</a>..</p>
 <div class="highlight"><span class="filename">CleaningTool.java</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="cm">/**</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="cm"> * Tool for requesting cleaning operations.</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="cm"> */</span>
@@ -2528,6 +2546,19 @@ Does the agent automatically learn to use it?</p>
 <li>Try adding more explicit instructions</li>
 <li>Consider providing examples in the system message</li>
 </ul>
+<hr>
+<h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link"></a></h2>
+<p>Before moving to the next step, let’s clean up:</p>
+<ol>
+<li>
+<p><strong>Stop the running server</strong> by pressing <code>Ctrl+C</code> in the terminal where Quarkus is running</p>
+</li>
+<li>
+<p><strong>Return to the root project directory</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">cd</span><span class="w"> </span>..
+</code></pre></div>
+</li>
+</ol>
 <hr>
 <h2 id="whats-next">What’s Next?<a class="headerlink" href="#whats-next" title="Permanent link"></a></h2>
 <p>In this step, you built a <strong>single autonomous agent</strong> that makes decisions and uses tools.</p>

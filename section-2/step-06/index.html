@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1354,6 +1354,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1907,6 +1918,17 @@ You are not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2324,7 +2346,7 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <hr>
 <h2 id="create-the-carimageanalysisagent">Create the CarImageAnalysisAgent<a class="headerlink" href="#create-the-carimageanalysisagent" title="Permanent link"></a></h2>
 <p>This is the core of this step — a new agent that processes car images.</p>
-<p>Create <code>src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java</code>:</p>
+<p>In <code>src/main/java/com/carmanagement/agentic/agents</code>, create <code>CarImageAnalysisAgent.java</code>:</p>
 <div class="highlight"><span class="filename">CarImageAnalysisAgent.java  hl_lines=</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.carmanagement.agentic.agents</span><span class="p">;</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dev.langchain4j.agentic.Agent</span><span class="p">;</span>
@@ -2639,6 +2661,19 @@ Hold "Alt" / "Option" to enable pan &amp; zoom
 <li>Compressing images client-side before upload</li>
 </ul>
 </details>
+<hr>
+<h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link"></a></h2>
+<p>Before moving to the next step, let’s clean up:</p>
+<ol>
+<li>
+<p><strong>Stop the running server</strong> by pressing <code>Ctrl+C</code> in the terminal where Quarkus is running</p>
+</li>
+<li>
+<p><strong>Return to the root project directory</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">cd</span><span class="w"> </span>..
+</code></pre></div>
+</li>
+</ol>
 <hr>
 <h2 id="whats-next">What’s Next?<a class="headerlink" href="#whats-next" title="Permanent link"></a></h2>
 <p>You’ve successfully added multimodal image analysis to the car management system!</p>
