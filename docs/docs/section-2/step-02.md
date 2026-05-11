@@ -442,13 +442,9 @@ Quarkus LangChain4j generates the implementation automatically.
 
 ```java
 CarConditions carConditions = carProcessingWorkflow.processCarReturn(
-                carInfo.make,
-                carInfo.model,
-                carInfo.year,
-                carNumber,
-                carInfo.condition,
-                rentalFeedback != null ? rentalFeedback : "",
-                cleaningFeedback != null ? cleaningFeedback : "");
+                carInfo,
+                carNumber, 
+                feedback);
 ```
 
 Instead of calling agents individually, we call the workflow.
