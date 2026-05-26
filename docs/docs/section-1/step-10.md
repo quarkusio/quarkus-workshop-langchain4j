@@ -178,14 +178,13 @@ we can create meaningful graphs, dashboards and alerts.
 The (currently) preferred way to gather metrics in Quarkus is to use the micrometer project.
 You can add metrics collection with micrometer by adding the `quarkus-micrometer` extension to the pom.xml.
 You then need to add a collector specific extension to format the metrics accordingly. In the below example
-we have included the `quarkus-micrometer-registry-otlp` extension for the general purpose OpenTelemetry. This extension imports the quarkus-micrometer as well, so no need to specify it implicitly. Add the following dependency to your code:
+we have included the `quarkus-micrometer-opentelemetry` extension for the general purpose OpenTelemetry. This extension imports the quarkus-micrometer as well, so no need to specify it implicitly. Add the following dependency to your code:
 
 ```xml title="pom.xml"
         <!-- Export metrics for OpenTelemetry compatible collectors -->
         <dependency>
-            <groupId>io.quarkiverse.micrometer.registry</groupId>
-            <artifactId>quarkus-micrometer-registry-otlp</artifactId>
-            <version>3.4.1</version>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-opentelemetry</artifactId>
         </dependency>
 ```
 
@@ -227,17 +226,12 @@ Quarkus relies on OpenTelemetry for tracing capabilities, allowing you to collec
 such as Jaeger, Zipkin, or Tempo, which can then be used for monitoring and debugging purposes.
 
 To add OpenTelemetry (and by extension tracing) to your application, you will need to add the opentelemetry
-extensions to your pom.xml file. You can optionally also add the opentelemetry-jdbc dependency to collect
- trace data from JDBC queries.
+extension to your pom.xml file.
 
 ```xml title="pom.xml"
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-opentelemetry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.instrumentation</groupId>
-            <artifactId>opentelemetry-jdbc</artifactId>
         </dependency>
 ```
 
@@ -251,10 +245,12 @@ by adding the following properties to the `src/main/resources/application.proper
 
 ```properties
 # quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
-quarkus.otel.exporter.otlp.traces.headers=authorization=Bearer my_secret 
-quarkus.log.console.format=%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n  
+
 # enable tracing db requests
 quarkus.datasource.jdbc.telemetry=true
+
+# enable metrics in db requests
+quarkus.datasource.metrics.enabled=true
 ```
 
 You might notice in the above example that the traces endpoint is commented out.
@@ -284,11 +280,12 @@ Add the following dependencies in your `pom.xml`:
         </dependency>
 ```
 
-In the `src/main/resources/application.properties` file, let's enable the OpenTelemetry tracing and log collection features:
+In the `src/main/resources/application.properties` file, let's enable the OpenTelemetry tracing, metrics, and log collection features:
 
 ```properties
 quarkus.otel.logs.enabled=true
 quarkus.otel.traces.enabled=true
+quarkus.otel.metrics.enabled=true
 # Disable LTGM in test mode
 %test.quarkus.observability.enabled=false
 ```
@@ -303,8 +300,8 @@ The easiest way to access Grafana is to go to the Quarkus Dev UI ([http://localh
 ![Quarkus Dev UI](../images/dev-ui-observability.png)
 
 Let's first explore the provided custom metrics dashboards that the Dev Service creates. Go to "Dashboards" in the left menu.
-You will notice 4 dashboards, including one for OTLP and one for Prometheus. Remember how we added both the Micrometer OpenTelemetry and Prometheus
-registry extensions? They're both reflected here. Feel free to explore the dashboards.
+You will notice 4 dashboards, including one for OTLP and one for Prometheus. Remember how we added the Micrometer OpenTelemetry
+extension? It's reflected here. Feel free to explore the dashboards.
 If you don't see much data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
 create some more chat requests.
 
