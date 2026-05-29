@@ -104,6 +104,9 @@ We'll add a `@McpToolBox("weather")` annotation to our AI Service to reference t
 --8<-- "../../section-1/step-08/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
+!!! note
+    Note that the `chat` method returns `Multi<String>` to support streaming responses, as introduced in [Step 04](./step-04.md). This streaming pattern is maintained throughout the workshop, including when using MCP tools.
+
 ## Testing the function calling
 
 Let's test the function calling.
