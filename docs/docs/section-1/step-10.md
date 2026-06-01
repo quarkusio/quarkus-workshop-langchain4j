@@ -26,7 +26,7 @@ This will allow us to track the input and output of each interaction with the mo
 as well as any errors or exceptions that occur. As you might have noticed throughout this lab, you have in fact
 already been logging interactions with the model in previous steps.
 
-Go ahead and examine the application.properties file in the `src/main/resources` directory.
+Examine the application.properties file in the `src/main/resources` directory.
 You will see 2 properties (if you don't see them, go ahead and add them):
 
 ```properties
@@ -37,9 +37,15 @@ quarkus.langchain4j.openai.chat-model.log-responses=true
 The `log-requests` property enables logging of all requests made to the model,
 while the `log-responses` property enables logging of all responses received from the model.
 These logs provide valuable insights into how the LLM is interacting with your application and any issues that arise.
-Go ahead and start up Quarkus Dev Mode if you haven't already with `./mvnw quarkus:dev` go to [http://localhost:8080](http://localhost:8080/){target="_blank"}
-and open the chat interface in the bottom right of your screen. Send an instruction to the bot and then come
-back to your console. You'll see a series requests/responses to/from the LLM with a bunch of information such as
+
+
+Start up Quarkus Dev Mode if you haven't already with `./mvnw quarkus:dev` go to [http://localhost:8080](http://localhost:8080/){target="_blank"}.
+
+!!! note "MCP Weather Server Required"
+    This step continues to use the MCP Weather Server from [Step 8](./step-08.md#create-a-new-mcp-weather-server-project). Make sure it's running on port 8081 before testing. If you haven't started it yet, navigate to the `quarkus-workshop-langchain4j-08-mcp-server` directory and run `./mvnw quarkus:dev`.
+
+Open the chat interface in the bottom right of your screen. Send an instruction to the bot and then come
+back to your console. You'll see a series requests/responses to/from the LLM with information such as
 the url, headers, and in the body, the model you called, the messages, temperature, tokens and more.
 
 ```Bash title="Example Log Output"
@@ -370,7 +376,7 @@ and what delay there should be in between the calls
 Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the
 following annotations:
 
-```java hl_lines="7-11 31-33 36-44" title="CustomerSupportAgent.java"
+```java hl_lines="7-11 29-30 34-36 37-39 42-50" title="CustomerSupportAgent.java"
 --8<-- "../../section-1/step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 

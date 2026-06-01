@@ -25,6 +25,9 @@ public interface CustomerSupportAgent {
             
             When calling tools or functions, strictly use JSON objects,
             do not wrap in quotes or use plain strings.
+
+            When asked to provide details about a reservation, 
+            provide weather details and gently try to upsell the customer based on this info.
                         
             Today is {current_date}.
             """)
