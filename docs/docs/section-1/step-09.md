@@ -35,6 +35,7 @@ That will also highlight a few more capabilities of Quarkus LangChain4j.
 
 The final code of this step is available in the `step-09` directory.
 
+
 ## An AI service to detect prompt injection
 
 To prevent prompt injection, we will use an AI service to analyze the user's input and detect malicious content.
@@ -85,14 +86,15 @@ We use an arbitrary threshold of 0.7 to determine whether the user message is li
 
 ## Using the guardrail
 
-Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the 
+Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.CustomerSupportAgent` AI service with the
 annotation highlighted below:
 
-```java hl_lines="3 22" title="CustomerSupportAgent.java"
+```java hl_lines="3 23-24 28 30" title="CustomerSupportAgent.java"
 --8<-- "../../section-1/step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java"
 ```
 
 Notice the `@InputGuardrails(PromptInjectionGuard.class)` annotation that was added to the `chat` method.
+The system prompt has also been enhanced to instruct the agent to provide weather details and upsell opportunities when discussing reservations, which is why the MCP Weather Server is needed.
 
 When the application invokes the `chat` method, the `PromptInjectionGuard` guardrail will be executed first.
 If it fails, an exception is thrown and the offensive user message is not passed to _main_ LLM.
@@ -113,7 +115,11 @@ If we do not catch the exception, the WebSocket connection would be closed, and 
 ## Testing the guardrail
 
 Let's test the guardrail by sending a prompt injection attack.
-Make sure the application is running, including the MCP server from step 8, and open the chatbot in your browser ([http://localhost:8080](http://localhost:8080){target="_blank"}).
+
+!!! note "MCP Weather Server Required"
+    This step continues to use the MCP Weather Server from [Step 8](./step-08.md#create-a-new-mcp-weather-server-project). Make sure it's running on port 8081 before testing. If you haven't started it yet, navigate to the `quarkus-workshop-langchain4j-08-mcp-server` directory and run `./mvnw quarkus:dev`.
+
+Make sure your main application (port 8080) is still running in Dev Mode, then open the chatbot in your browser at [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
 Send the following message to the chatbot:
 
