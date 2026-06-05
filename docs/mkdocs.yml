@@ -121,6 +121,9 @@ plugins:
       output_folder: "target"
       input_folder: "diagrams"
       input_extensions: "puml"
+      theme_enabled: true
+      theme_folder: "include/themes"
+      theme_light: "light.puml"
   - macros:
       verbose: true
       module_name: mkdocs-customizations/macros/docissimo
