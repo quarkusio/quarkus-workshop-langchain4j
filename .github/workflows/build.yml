@@ -64,8 +64,9 @@ jobs:
     runs-on: ubuntu-latest
     name: "Build Docs"
     permissions:
-      contents: write
+      contents: read
       pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v6
 
@@ -90,9 +91,17 @@ jobs:
           pipenv install
           pipenv run mkdocs build --clean
 
-      - name: Publish documentation
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Pages
         if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/site
+          path: ./docs/site
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
