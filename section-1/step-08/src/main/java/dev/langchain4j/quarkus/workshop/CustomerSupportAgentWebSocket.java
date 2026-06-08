@@ -3,6 +3,7 @@ package dev.langchain4j.quarkus.workshop;
 import io.quarkus.websockets.next.OnOpen;
 import io.quarkus.websockets.next.OnTextMessage;
 import io.quarkus.websockets.next.WebSocket;
+import io.smallrye.mutiny.Multi;
 
 @WebSocket(path = "/customer-support-agent")
 public class CustomerSupportAgentWebSocket {
@@ -19,7 +20,7 @@ public class CustomerSupportAgentWebSocket {
     }
     // --8<-- [start:tools]
     @OnTextMessage
-    public String onTextMessage(String message) {
+    public Multi<String> onTextMessage(String message) {
         return customerSupportAgent.chat(message);
     }
     // --8<-- [end:tools]
