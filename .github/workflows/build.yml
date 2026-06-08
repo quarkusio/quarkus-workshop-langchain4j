@@ -60,16 +60,9 @@ jobs:
         run: ./mvnw -B clean verify -Dquarkus.http.host=0.0.0.0 -DskipITs=false
 
 
-  docs:
+  docs-build:
     runs-on: ubuntu-latest
     name: "Build Docs"
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v6
 
@@ -94,17 +87,39 @@ jobs:
           pipenv install
           pipenv run mkdocs build --clean
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: ./docs/site
+
+  docs-deploy:
+    runs-on: ubuntu-latest
+    name: "Deploy Docs"
+    needs: docs-build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-site
+          path: ./docs/site
+
       - name: Setup Pages
-        if: github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v6
 
-      - name: Upload artifact
-        if: github.ref == 'refs/heads/main'
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs/site
 
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
         id: deployment
         uses: actions/deploy-pages@v5
