@@ -95,7 +95,7 @@ They are transformed into vectors, also called _embeddings_.
 This is a way to represent the text in a numerical form.
 So, in the knowledge base, we have the text and the corresponding embeddings.
 These embeddings are computed using _embedding models_.
-Right now, we use the [default embedding model provided by OpenAI](https://platform.openai.com/docs/guides/embeddings){target="_blank"}.
+Right now, we use the [default embedding model provided by OpenAI](https://developers.openai.com/api/docs/guides/embeddings){target="_blank"}.
 We will see in the next steps how to use your own embedding model.
 
 Let's have a look at the content of our knowledge base.

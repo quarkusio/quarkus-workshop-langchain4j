@@ -20,7 +20,7 @@
 ## AI Model Requirements
 
 You will need an OpenAI API key to complete this workshop.  
-If your instructor provided a key, use that one. Otherwise, [create an API key](https://platform.openai.com/docs/quickstart/create-and-export-an-api-key){target="_blank"}.
+If your instructor provided a key, use that one. Otherwise, [create an API key](https://developers.openai.com/api/docs/quickstart){target="_blank"}.
 
 ??? info "No instructor-provided key?"
     New OpenAI developer accounts receive $5 in free trial credits.  
