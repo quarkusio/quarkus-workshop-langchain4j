@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: miles-and-smiles-a2a
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+    app.kubernetes.io/version: 1.0.0
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: view-secrets-a2a
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: miles-and-smiles-a2a-view-secrets
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: view-secrets-a2a
+subjects:
+  - kind: ServiceAccount
+    name: miles-and-smiles-a2a
+    namespace: miles-and-smiles
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: miles-and-smiles-a2a
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+    app.kubernetes.io/version: 1.0.0
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miles-and-smiles-a2a
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles-a2a
+    app.kubernetes.io/version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: miles-and-smiles-a2a
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: miles-and-smiles-a2a
+        app.kubernetes.io/version: 1.0.0
+    spec:
+      serviceAccountName: miles-and-smiles-a2a
+      containers:
+        - name: miles-and-smiles-a2a
+          image: quay.io/kevindubois/miles-and-smiles-a2a:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: miles-and-smiles
+                  key: OPENAI_API_KEY
+            - name: QUARKUS_LANGCHAIN4J_OPENAI_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: OPENAI_BASE_URL
+            - name: QUARKUS_LANGCHAIN4J_OPENAI_CHAT_MODEL_MODEL_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: OPENAI_MODEL_NAME
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /q/health/started
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
+      terminationGracePeriodSeconds: 10
