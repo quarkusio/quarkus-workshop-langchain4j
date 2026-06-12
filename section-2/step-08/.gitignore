@@ -1,0 +1,22 @@
+# Maven
+multi-agent-system/target/
+remote-a2a-agent/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Quarkus
+.quarkus/

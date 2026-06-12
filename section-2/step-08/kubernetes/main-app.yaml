@@ -1,0 +1,183 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: miles-and-smiles
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+    app.kubernetes.io/version: 1.0.0
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: view-secrets
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: miles-and-smiles-view-secrets
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: view-secrets
+subjects:
+  - kind: ServiceAccount
+    name: miles-and-smiles
+    namespace: miles-and-smiles
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: miles-and-smiles
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+    app.kubernetes.io/version: 1.0.0
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: miles-and-smiles
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miles-and-smiles
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+    app.kubernetes.io/version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: miles-and-smiles
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: miles-and-smiles
+        app.kubernetes.io/version: 1.0.0
+    spec:
+      serviceAccountName: miles-and-smiles
+      containers:
+        - name: miles-and-smiles
+          image: quay.io/kevindubois/miles-and-smiles:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: miles-and-smiles
+                  key: OPENAI_API_KEY
+            - name: QUARKUS_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: miles-and-smiles
+                  key: POSTGRES_USER
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: miles-and-smiles
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: POSTGRES_PORT
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: miles-and-smiles
+                  key: POSTGRES_DB
+            - name: QUARKUS_LANGCHAIN4J_OPENAI_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: OPENAI_BASE_URL
+            - name: QUARKUS_LANGCHAIN4J_OPENAI_CHAT_MODEL_MODEL_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: miles-and-smiles-config
+                  key: OPENAI_MODEL_NAME
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /q/health/started
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
+      terminationGracePeriodSeconds: 10
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: miles-and-smiles
+  namespace: miles-and-smiles
+  labels:
+    app.kubernetes.io/name: miles-and-smiles
+spec:
+  parentRefs:
+    - name: default-gateway
+      namespace: openshift-ingress
+  hostnames:
+    - miles-and-smiles.apps.cluster.example.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: miles-and-smiles
+          port: 80

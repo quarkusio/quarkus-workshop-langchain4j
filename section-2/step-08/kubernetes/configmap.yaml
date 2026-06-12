@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: miles-and-smiles-config
+  namespace: miles-and-smiles
+data:
+  # PostgreSQL connection details
+  POSTGRES_HOST: "postgresql"
+  POSTGRES_PORT: "5432"
+  # OpenAI configuration
+  OPENAI_BASE_URL: "https://api.openai.com/v1"
+  OPENAI_MODEL_NAME: "gpt-4o"
