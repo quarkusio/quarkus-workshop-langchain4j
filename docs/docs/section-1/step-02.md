@@ -25,7 +25,7 @@ The rest of the configuration indicates which model is used (`gpt-4o`) and wheth
     so you have to refresh the page in your browser.
 
 !!! info
-    The precise meaning of most model parameters is described on the website of [OpenAI](https://platform.openai.com/docs/api-reference/chat/create).
+    The precise meaning of most model parameters is described on the website of [OpenAI](https://developers.openai.com/api/docs/api-reference/chat/create).
 
 ## Temperature
 

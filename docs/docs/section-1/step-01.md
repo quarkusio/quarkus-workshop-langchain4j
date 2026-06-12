@@ -111,7 +111,7 @@ We will see how to manage this in the subsequent steps.
 
 Before going further, let's take a look at the code.
 
-If you open the `pom.xml` file, you will see that the project is a Quarkus application with the [`quarkus-langchain4j-openai`](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html){target="_blank"} extension.
+If you open the `pom.xml` file, you will see that the project is a Quarkus application with the [`quarkus-langchain4j-openai`](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai-chat-model.html){target="_blank"} extension.
 
 ```xml
 <dependency>
@@ -120,7 +120,7 @@ If you open the `pom.xml` file, you will see that the project is a Quarkus appli
 </dependency>
 ```
 
-[Quarkus LangChain4j OpenAI](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai.html){target="_blank"} is a Quarkus extension that provides a simple way to interact with language models (LLMs), like [gpt-4o from OpenAI](https://platform.openai.com/docs/models/gpt-4o){target="_blank"}.
+[Quarkus LangChain4j OpenAI](https://docs.quarkiverse.io/quarkus-langchain4j/dev/openai-chat-model.html){target="_blank"} is a Quarkus extension that provides a simple way to interact with language models (LLMs), like [gpt-4o from OpenAI](https://developers.openai.com/api/docs/models/gpt-4o){target="_blank"}.
 It actually can interact with any model serving the OpenAI API (like [vLLM](https://docs.vllm.ai/en/latest/){target="_blank"} or [Podman AI Lab](https://podman-desktop.io/docs/ai-lab){target="_blank"}).
 Quarkus LangChain4j abstracts the complexity of calling the model and provides a simple API to interact with it.
 

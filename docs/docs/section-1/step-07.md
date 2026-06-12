@@ -3,7 +3,7 @@
 The RAG pattern allows passing knowledge to the LLM based on your own data.
 It's a very popular pattern, but not the only one that can be used.
 
-In this step, we are going to see another way to give superpowers to the LLM: [Function Calling](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agent-and-tools.html){target="_blank"}.
+In this step, we are going to see another way to give superpowers to the LLM: [Function Calling](https://docs.quarkiverse.io/quarkus-langchain4j/dev/function-calling.html){target="_blank"}.
 Basically, we will allow the LLM to call a function that you have defined in your code.
 The LLM will decide when and with which parameters to call the function.
 Of course, make sure that you do not allow the LLM to call a function that could be harmful to your system, and make sure to sanitize any input data.

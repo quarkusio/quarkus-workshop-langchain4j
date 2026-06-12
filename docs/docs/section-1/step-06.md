@@ -67,7 +67,7 @@ Thus, you do not have to send your document to a remote service to compute the e
 This embedding model generates vectors of size 384.
 It's a small model, but it's enough for our use case.
 
-To use the model, we will use the [`dev.langchain4j.model.embedding.onnx.bgesmallenq.BgeSmallEnQuantizedEmbeddingModel`](https://github.com/langchain4j/langchain4j-embeddings/blob/main/langchain4j-embeddings-bge-small-en-q/src/main/java/dev/langchain4j/model/embedding/onnx/bgesmallenq/BgeSmallEnQuantizedEmbeddingModel.java){target="_blank"} CDI bean automatically created by Quarkus by adding the following to `src/main/resources/application.properties`:
+To use the model, we will use the [`dev.langchain4j.model.embedding.onnx.bgesmallenq.BgeSmallEnQuantizedEmbeddingModel`](https://github.com/langchain4j/langchain4j/blob/main/embeddings/langchain4j-embeddings-bge-small-en-q/src/main/java/dev/langchain4j/model/embedding/onnx/bgesmallenq/BgeSmallEnQuantizedEmbeddingModel.java){target="_blank"} CDI bean automatically created by Quarkus by adding the following to `src/main/resources/application.properties`:
 
 ```properties title="application.properties"
 --8<-- "../../section-1/step-06/src/main/resources/application.properties:embedding-model"
