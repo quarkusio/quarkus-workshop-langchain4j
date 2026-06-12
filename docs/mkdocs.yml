@@ -28,6 +28,16 @@ nav:
     - Step 6 - Multimodal agents: 'section-2/step-06.md'
     - Step 7 - Using remote agents (A2A): 'section-2/step-07.md'
     - Mastering Agentic Systems: 'section-2/conclusion.md'
+  #- Section 3 - Enterprise Patterns:
+  #  - Step 1 - Agent Skills and Discovery: 'section-3/step-01.md'
+  #  - Step 2 - Guardrails and Compliance: 'section-3/step-02.md'
+  #  - Step 3 - Persistent State and Event-Driven Workflows: 'section-3/step-03.md'
+  #  - Step 4 - Voting, Loops, and Adaptive Model Selection: 'section-3/step-04.md'
+  #  - Step 5 - Custom Orchestration with PlannerAgent: 'section-3/step-05.md'
+  #  - Step 6 - MCP Integration: 'section-3/step-06.md'
+  #  - Step 7 - A2A Communication: 'section-3/step-07.md'
+  #  - Step 8 - Testing and Evaluation: 'section-3/step-08.md'
+  #  - Enterprise Agentic Patterns: 'section-3/conclusion.md'
   - Conclusion: 'conclusion.md'
 
 theme:
