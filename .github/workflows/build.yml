@@ -48,7 +48,7 @@ jobs:
 
     name: "Build ${{ matrix.app }}"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Build Docs"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Python
         uses: actions/setup-python@v6
