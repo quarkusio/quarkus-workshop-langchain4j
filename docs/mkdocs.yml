@@ -27,6 +27,7 @@ nav:
     - Step 5 - Human-in-the-Loop pattern: 'section-2/step-05.md'
     - Step 6 - Multimodal agents: 'section-2/step-06.md'
     - Step 7 - Using remote agents (A2A): 'section-2/step-07.md'
+    - Bonus - Deploying to Kubernetes: 'section-2/step-08.md'
     - Mastering Agentic Systems: 'section-2/conclusion.md'
   #- Section 3 - Enterprise Patterns:
   #  - Step 1 - Agent Skills and Discovery: 'section-3/step-01.md'

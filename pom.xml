@@ -30,6 +30,8 @@
         <module>section-2/step-06</module>
         <module>section-2/step-07/multi-agent-system</module>
         <module>section-2/step-07/remote-a2a-agent</module>
+        <module>section-2/step-08/multi-agent-system</module>
+        <module>section-2/step-08/remote-a2a-agent</module>
         <module>section-3/step-01</module>
     </modules>
 </project>

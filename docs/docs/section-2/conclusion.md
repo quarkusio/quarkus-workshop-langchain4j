@@ -2,7 +2,7 @@
 
 Congratulations! You've completed **Section 2: Agentic Systems** of the Quarkus LangChain4j workshop.
 
-Over the past seven steps, you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight and multimodal capabilities.
+Over the past seven steps — plus an optional bonus deployment step — you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight and multimodal capabilities.
 Let's reflect on what you've built and why these patterns matter.
 
 ---
@@ -132,6 +132,26 @@ You added **multimodal capabilities** to the car return workflow, enabling the s
 - **Graceful degradation**: Agent handles missing images by returning feedback unchanged
 
 **Why it matters:** Real-world data is multimodal. Text descriptions are often incomplete or subjective. By combining visual analysis with textual feedback, AI systems can make more informed decisions. The enrichment pattern demonstrates how to add new capabilities to existing workflows with minimal disruption.
+
+---
+
+### Bonus Step: Deploying to Kubernetes
+
+If you completed the bonus step, you took the entire system built in steps 01–07 and deployed it to a real Kubernetes cluster.
+
+**What you did:**
+- Packaged both Quarkus applications as container images using `quarkus:image-push`
+- Deployed PostgreSQL, the remote A2A agent, and the main multi-agent system to a `miles-and-smiles` namespace
+- Used Quarkus `%prod` profile properties to switch from localhost URLs to Kubernetes service names automatically
+- Exposed the application externally via an OpenShift Route (or Gateway API HTTPRoute on vanilla Kubernetes)
+
+**Key concepts:**
+- **JBang deployment scripts**: A portable, self-contained alternative to shell scripts for complex deployment workflows
+- **Quarkus profiles in production**: `%prod.` property prefixes make dev/prod configuration switches seamless and explicit
+- **Kubernetes service discovery**: Applications communicate via DNS service names rather than hardcoded IPs
+- **Health probes**: Liveness, readiness, and startup probes ensure the deployment sequence waits for each component before proceeding
+
+**Why it matters:** Building an agentic system is one thing — shipping it is another. Kubernetes gives your agents reliable service discovery, health monitoring, and scalability. The profile-based configuration pattern means your local development experience stays fast and simple while the production deployment is fully automated.
 
 ---
 
