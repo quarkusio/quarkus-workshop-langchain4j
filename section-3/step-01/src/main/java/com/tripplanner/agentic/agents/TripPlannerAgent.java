@@ -2,17 +2,14 @@ package com.tripplanner.agentic.agents;
 
 import com.tripplanner.model.TripPlan;
 import dev.langchain4j.agentic.Agent;
-import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.agentic.declarative.SystemMessageProviderSupplier;
 import dev.langchain4j.service.UserMessage;
+import io.quarkiverse.langchain4j.skills.runtime.SkillsToolProvider;
+import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.inject.spi.CDI;
 
 public interface TripPlannerAgent {
 
-    @SystemMessage("""
-            You are an intelligent trip planner for Miles of Smiles, a European car rental company.
-            You help customers plan road trips across Europe by recommending vehicles, routes, stops, and activities.
-            Use any available skills/tools to provide specialized advice for the type of trip requested.
-            All costs should be in euros (€) unless the destination uses a different currency.
-            """)
     @UserMessage("""
             Plan a trip with the following details:
             - Destination: {destination}
@@ -24,9 +21,21 @@ public interface TripPlannerAgent {
             """)
     @Agent("Plans road trips based on customer preferences and trip type")
     TripPlan planTrip(String destination,
-                      int days,
+                      Integer days,
                       String tripType,
-                      int travelers,
+                      Integer travelers,
                       String budget,
                       String preferences);
+
+    @SystemMessageProviderSupplier
+    static String systemMessageProvider(Object memoryId) {
+        Instance<SkillsToolProvider> skillsToolProvider = CDI.current().select(SkillsToolProvider.class);
+        if (skillsToolProvider.isResolvable()) {
+            return """
+                    You have access to the following skills:
+                    %s
+                    """.formatted(skillsToolProvider.get().getSkills().formatAvailableSkills());
+        }
+        return "";
+    }
 }
