@@ -57,7 +57,7 @@ sequenceDiagram
 
 ## Understanding Skills
 
-In Sections 1 and 2, agents got their behavior entirely from annotations like `@SystemMessage`. This works well, but it means every change to the agent's knowledge requires a code change and a recompilation. It also implied that those messages where fixed at compile time, instead of being contextualized with the specific user request.
+In Sections 1 and 2, agents got their behavior from annotations like `@SystemMessage`. While those messages can also reference external files, thus not requiring recompilation in case you want to change them, they nevertheless remain static, as they are not contextualized with the specific user request at runtime.
 
 **Skills** solve this problem by externalizing domain expertise into Markdown files that are loaded at runtime. Each skill is a `SKILL.md` file with YAML frontmatter (name and description) followed by Markdown content:
 
