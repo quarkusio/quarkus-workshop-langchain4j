@@ -147,7 +147,7 @@ Now try a different trip type:
 
 **What happens?**
 
-- The agent uses the `adventure-trip` skill, which recommends 4WD vehicles, legendary driving roads like Stelvio Pass, and outdoor activities like via ferrata
+- The agent uses the `adventure-trip` skill, which recommends 4WD vehicles, legendary driving roads like Furka Pass, and outdoor activities like via ferrata
 - Notice how the vehicle recommendation, route, and tips are completely different from the family trip — the skill shapes the entire response
 
 ### Test 3: Refine the Plan
@@ -155,7 +155,7 @@ Now try a different trip type:
 With a plan displayed, use the **Refine** input at the bottom:
 
 ```
-Skip the first day in Genoa and add a day at Cinque Terre instead
+Skip the first first day in Zermatt and a day in Verbier instead
 ```
 
 The agent generates a new plan incorporating your adjustment.
