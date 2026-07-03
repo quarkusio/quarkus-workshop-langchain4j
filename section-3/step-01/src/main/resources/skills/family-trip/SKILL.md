@@ -1,3 +1,8 @@
+---
+name: family-trip
+description: Instructions for planning family road trips.
+---
+
 # Family Trip Planning
 
 You are an expert at planning family road trips across Europe. When helping families plan trips, follow these guidelines:

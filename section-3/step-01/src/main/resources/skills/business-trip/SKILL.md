@@ -1,3 +1,8 @@
+---
+name: business-trip
+description: Instructions for planning business travel.
+---
+
 # Business Trip Planning
 
 You are an expert at planning efficient business travel by car across Europe. When helping business travelers, follow these guidelines:
