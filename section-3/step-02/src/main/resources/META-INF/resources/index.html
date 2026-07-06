@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miles of Smiles - Trip Planner</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+        .app-header { background: #1a237e; color: white; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; }
+        .app-header h1 { font-size: 1.25rem; font-weight: 500; }
+        .app-header .logo { font-size: 1.5rem; }
+
+        .app-layout { display: grid; grid-template-columns: 380px 1fr; height: calc(100vh - 56px); }
+
+        /* Left Panel - Trip Form */
+        .form-panel { background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; padding: 1.5rem; }
+        .form-panel h2 { font-size: 1rem; font-weight: 600; color: #333; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 500; color: #555; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #1a237e; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+        .btn-plan { width: 100%; padding: 0.75rem; background: #1a237e; color: white; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .btn-plan:hover { background: #283593; }
+        .btn-plan:disabled { background: #9e9e9e; cursor: not-allowed; }
+        .btn-plan.loading::after { content: '...'; animation: dots 1.5s steps(4) infinite; }
+        @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+        /* Main Panel - Results */
+        .main-panel { display: flex; flex-direction: column; overflow: hidden; }
+
+        .results-area { flex: 1; overflow-y: auto; padding: 2rem; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #888; }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state p { font-size: 1.1rem; }
+        .empty-state .hint { font-size: 0.85rem; margin-top: 0.5rem; color: #aaa; }
+
+        .trip-plan { max-width: 800px; margin: 0 auto; }
+        .trip-plan .plan-header { margin-bottom: 1.5rem; }
+        .trip-plan .plan-header h2 { font-size: 1.4rem; color: #1a237e; }
+        .trip-plan .plan-header .meta { color: #666; font-size: 0.85rem; margin-top: 0.25rem; }
+
+        .plan-section { margin-bottom: 1.5rem; }
+        .plan-section h3 { font-size: 1rem; color: #444; margin-bottom: 0.6rem; }
+        .card { background: white; border-radius: 10px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); line-height: 1.6; font-size: 0.9rem; color: #333; margin-bottom: 0.5rem; }
+        .card p { margin: 0.25rem 0; }
+        .card ul { padding-left: 1.25rem; }
+        .card ul li { margin-bottom: 0.3rem; }
+        .day-card .day-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .day-card .day-num { background: #e8eaf6; color: #1a237e; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .day-card .overnight { margin-top: 0.4rem; font-size: 0.8rem; color: #666; }
+        .costs-grid { display: flex; flex-direction: column; gap: 0.4rem; }
+        .cost-item { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+        .cost-item:last-child { border-bottom: none; }
+        .cost-item.total { font-weight: 600; border-top: 2px solid #1a237e; padding-top: 0.5rem; margin-top: 0.3rem; }
+
+        /* Chat Drawer */
+        .chat-drawer { border-top: 1px solid #e0e0e0; background: white; padding: 0.75rem 2rem; display: flex; align-items: center; gap: 0.75rem; }
+        .chat-drawer input { flex: 1; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 20px; font-size: 0.9rem; }
+        .chat-drawer input:focus { outline: none; border-color: #1a237e; }
+        .chat-drawer button { padding: 0.6rem 1.25rem; background: #1a237e; color: white; border: none; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
+        .chat-drawer button:hover { background: #283593; }
+        .chat-drawer .label { font-size: 0.75rem; color: #888; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <span class="logo">🚗</span>
+        <h1>Miles of Smiles &mdash; Trip Planner</h1>
+    </header>
+
+    <div class="app-layout">
+        <aside class="form-panel">
+            <h2>Plan a New Trip</h2>
+            <div class="form-group">
+                <label>Destination</label>
+                <input type="text" id="destination" placeholder="e.g. Italian Riviera, Swiss Alps, Provence">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Duration (days)</label>
+                    <input type="number" id="days" value="7" min="1" max="30">
+                </div>
+                <div class="form-group">
+                    <label>Travelers</label>
+                    <input type="number" id="travelers" value="2" min="1" max="10">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Trip Type</label>
+                <select id="tripType">
+                    <option value="family">Family Vacation</option>
+                    <option value="business">Business Travel</option>
+                    <option value="adventure">Adventure Trip</option>
+                    <option value="romantic">Romantic Getaway</option>
+                    <option value="roadtrip">Classic Road Trip</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Budget Range</label>
+                <select id="budget">
+                    <option value="economy (€500-€1000)">Economy (€500–€1,000)</option>
+                    <option value="moderate (€1000-€2500)">Moderate (€1,000–€2,500)</option>
+                    <option value="comfortable (€2500-€5000)" selected>Comfortable (€2,500–€5,000)</option>
+                    <option value="luxury (€5000+)">Luxury (€5,000+)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Additional Preferences</label>
+                <textarea id="preferences" placeholder="e.g. We love wine tasting, prefer coastal routes, interested in history..."></textarea>
+            </div>
+            <button class="btn-plan" id="planBtn" onclick="planTrip()">Generate Trip Plan</button>
+        </aside>
+
+        <main class="main-panel">
+            <div class="results-area" id="results">
+                <div class="empty-state">
+                    <div class="icon">🗺️</div>
+                    <p>Your trip plan will appear here</p>
+                    <span class="hint">Fill in the form and click "Generate Trip Plan" to get started</span>
+                </div>
+            </div>
+            <div class="chat-drawer">
+                <span class="label">Refine:</span>
+                <input type="text" id="chatInput" placeholder="Adjust the plan... (e.g. 'skip Florence', 'add a lake day')" onkeypress="if(event.key==='Enter')refine()" disabled>
+                <button onclick="refine()" id="chatBtn" disabled>Send</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentPlan = null;
+
+        async function planTrip() {
+            const btn = document.getElementById('planBtn');
+            btn.disabled = true;
+            btn.textContent = 'Planning';
+            btn.classList.add('loading');
+
+            const request = {
+                destination: document.getElementById('destination').value,
+                days: parseInt(document.getElementById('days').value),
+                tripType: document.getElementById('tripType').value,
+                travelers: parseInt(document.getElementById('travelers').value),
+                budget: document.getElementById('budget').value,
+                preferences: document.getElementById('preferences').value || 'No specific preferences'
+            };
+
+            try {
+                const res = await fetch('/trip/plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(request)
+                });
+                currentPlan = await res.json();
+                displayPlan(request, currentPlan);
+                document.getElementById('chatInput').disabled = false;
+                document.getElementById('chatBtn').disabled = false;
+            } catch (e) {
+                document.getElementById('results').innerHTML = '<div class="empty-state"><p>Error: ' + e.message + '</p></div>';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Generate Trip Plan';
+            btn.classList.remove('loading');
+        }
+
+        function displayPlan(request, plan) {
+            const v = plan.vehicle || {};
+            const costs = plan.costs || {};
+            const itinerary = plan.itinerary || [];
+            const tips = plan.tips || [];
+
+            document.getElementById('results').innerHTML = `
+                <div class="trip-plan">
+                    <div class="plan-header">
+                        <h2>${request.destination} — ${request.days}-Day ${capitalize(request.tripType)} Trip</h2>
+                        <div class="meta">${request.travelers} travelers · ${request.budget}</div>
+                    </div>
+
+                    <div class="plan-section">
+                        <h3>🚗 Vehicle Recommendation</h3>
+                        <div class="card">
+                            <strong>${v.type || ''} — ${v.model || ''}</strong>
+                            <p>${v.reasoning || ''}</p>
+                        </div>
+                    </div>
+
+                    <div class="plan-section">
+                        <h3>🗺️ Route Overview</h3>
+                        <div class="card"><p>${plan.routeOverview || ''}</p></div>
+                    </div>
+
+                    <div class="plan-section">
+                        <h3>📅 Daily Itinerary</h3>
+                        ${itinerary.map(day => `
+                            <div class="card day-card">
+                                <div class="day-header"><span class="day-num">Day ${day.day}</span> <strong>${day.title || ''}</strong></div>
+                                <p>${day.description || ''}</p>
+                                ${day.overnightStop ? `<div class="overnight">🏨 ${day.overnightStop}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="plan-section">
+                        <h3>💶 Estimated Costs</h3>
+                        <div class="card costs-grid">
+                            ${costs.vehiclePerDay ? `<div class="cost-item"><span>Vehicle/day</span><span>${costs.vehiclePerDay}</span></div>` : ''}
+                            ${costs.fuel ? `<div class="cost-item"><span>Fuel</span><span>${costs.fuel}</span></div>` : ''}
+                            ${costs.tolls ? `<div class="cost-item"><span>Tolls</span><span>${costs.tolls}</span></div>` : ''}
+                            ${costs.accommodation ? `<div class="cost-item"><span>Accommodation</span><span>${costs.accommodation}</span></div>` : ''}
+                            ${costs.food ? `<div class="cost-item"><span>Food</span><span>${costs.food}</span></div>` : ''}
+                            ${costs.activities ? `<div class="cost-item"><span>Activities</span><span>${costs.activities}</span></div>` : ''}
+                            ${costs.total ? `<div class="cost-item total"><span>Total</span><span>${costs.total}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    ${tips.length ? `
+                    <div class="plan-section">
+                        <h3>💡 Practical Tips</h3>
+                        <div class="card"><ul>${tips.map(t => `<li>${t}</li>`).join('')}</ul></div>
+                    </div>` : ''}
+                </div>
+            `;
+        }
+
+        async function refine() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg || !currentPlan) return;
+            input.value = '';
+            document.getElementById('chatBtn').disabled = true;
+
+            const request = {
+                destination: document.getElementById('destination').value,
+                days: parseInt(document.getElementById('days').value),
+                tripType: document.getElementById('tripType').value,
+                travelers: parseInt(document.getElementById('travelers').value),
+                budget: document.getElementById('budget').value,
+                preferences: msg
+            };
+
+            try {
+                const res = await fetch('/trip/plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(request)
+                });
+                currentPlan = await res.json();
+                displayPlan(request, currentPlan);
+            } catch (e) {
+                console.error(e);
+            }
+            document.getElementById('chatBtn').disabled = false;
+        }
+
+        function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    </script>
+</body>
+</html>
