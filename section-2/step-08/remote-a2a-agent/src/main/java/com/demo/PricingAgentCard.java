@@ -18,13 +18,16 @@ import org.a2aproject.sdk.spec.TransportProtocol;
 @ApplicationScoped
 public class PricingAgentCard {
 
+    @ConfigProperty(name = "a2a.base-url", defaultValue = "http://localhost:8888/")
+    String baseUrl;
+
     @Produces
     @PublicAgentCard
     public AgentCard agentCard() {
         return AgentCard.builder()
                 .name("Pricing Agent")
                 .description("Estimates the market value of a vehicle based on make, model, year, and condition.")
-                .url("http://localhost:8888/")
+                .url(baseUrl)
                 .version("1.0.0")
                 .capabilities(AgentCapabilities.builder()
                         .streaming(true)
@@ -40,7 +43,7 @@ public class PricingAgentCard {
                         .build()))
                 .preferredTransport(TransportProtocol.JSONRPC.asString())
                 .supportedInterfaces(Collections.singletonList(
-                        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888/")))
+                        new AgentInterface(TransportProtocol.JSONRPC.asString(), baseUrl)))
                 .build();
     }
 }
