@@ -47,12 +47,6 @@ public class TripSafetyGuardrail implements OutputGuardrail {
             return retry("The trip plan must include a day-by-day itinerary. Please provide at least one day.");
         }
 
-        JsonNode total = root.path("costs").path("total");
-        if (total.isMissingNode() || total.isNull() || total.asText().isBlank()) {
-            auditLog.log("TripSafetyGuardrail", "RETRY", "Total cost estimate is missing");
-            return retry("The trip plan must include a total cost estimate for transparency. Please add costs.total.");
-        }
-
         List<String> dangerousMatches = findDangerousContent(root);
         if (!dangerousMatches.isEmpty()) {
             String matched = String.join(", ", dangerousMatches);

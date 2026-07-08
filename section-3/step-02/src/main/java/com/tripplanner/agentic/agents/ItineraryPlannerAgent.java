@@ -1,8 +1,7 @@
 package com.tripplanner.agentic.agents;
 
-import com.tripplanner.guardrails.TripAppropriatenessGuardrail;
 import com.tripplanner.guardrails.TripSafetyGuardrail;
-import com.tripplanner.model.TripPlan;
+import com.tripplanner.model.ItineraryResult;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.declarative.SystemMessageProviderSupplier;
 import dev.langchain4j.service.UserMessage;
@@ -11,25 +10,25 @@ import io.quarkiverse.langchain4j.skills.runtime.SkillsToolProvider;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.spi.CDI;
 
-public interface TripPlannerAgent {
+public interface ItineraryPlannerAgent {
 
     @UserMessage("""
-            Plan a trip with the following details:
+            You are an expert trip itinerary planner.
+            Create a detailed day-by-day itinerary and a route overview for the trip.
+            Include a title, description, and overnight stop for each day.
+
             - Destination: {destination}
             - Duration: {days} days
             - Trip type: {tripType}
-            - Number of travelers: {travelers}
-            - Budget: {budget}
             - Additional preferences: {preferences}
             """)
-    @Agent("Plans road trips based on customer preferences and trip type")
-    @OutputGuardrails(value = {TripSafetyGuardrail.class, TripAppropriatenessGuardrail.class}, maxRetries = 3)
-    TripPlan planTrip(String destination,
-                      Integer days,
-                      String tripType,
-                      Integer travelers,
-                      String budget,
-                      String preferences);
+    @Agent(description = "Creates a detailed day-by-day itinerary and route overview",
+           outputKey = "itineraryResult")
+    @OutputGuardrails(value = TripSafetyGuardrail.class, maxRetries = 3)
+    ItineraryResult planItinerary(String destination,
+                                  Integer days,
+                                  String tripType,
+                                  String preferences);
 
     @SystemMessageProviderSupplier
     static String systemMessageProvider(Object memoryId) {

@@ -1,11 +1,11 @@
 package com.tripplanner.model;
 
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
-@RequestScoped
+@ApplicationScoped
 public class TripRequestContext {
 
-    private TripRequest request;
+    private volatile TripRequest request;
 
     public void set(TripRequest request) {
         this.request = request;

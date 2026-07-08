@@ -8,24 +8,26 @@ import io.quarkiverse.langchain4j.skills.runtime.SkillsToolProvider;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.spi.CDI;
 
-public interface TripPlannerAgent {
+public interface VehicleAdvisorAgent {
 
     @UserMessage("""
-            Plan a trip with the following details:
+            You are a vehicle specialist for road trips.
+            Based on the trip details below, recommend the most suitable vehicle.
+            Consider the destination terrain, trip type, number of travelers, and budget.
+
             - Destination: {destination}
-            - Duration: {days} days
             - Trip type: {tripType}
             - Number of travelers: {travelers}
             - Budget: {budget}
             - Additional preferences: {preferences}
             """)
-    @Agent("Plans road trips based on customer preferences and trip type")
-    TripPlan planTrip(String destination,
-                      Integer days,
-                      String tripType,
-                      Integer travelers,
-                      String budget,
-                      String preferences);
+    @Agent(description = "Recommends the best vehicle for the trip based on destination, travelers, and budget",
+           outputKey = "vehicle")
+    TripPlan.VehicleRecommendation recommendVehicle(String destination,
+                                                    String tripType,
+                                                    Integer travelers,
+                                                    String budget,
+                                                    String preferences);
 
     @SystemMessageProviderSupplier
     static String systemMessageProvider(Object memoryId) {
