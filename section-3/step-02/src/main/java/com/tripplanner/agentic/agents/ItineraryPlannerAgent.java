@@ -3,12 +3,9 @@ package com.tripplanner.agentic.agents;
 import com.tripplanner.guardrails.TripSafetyGuardrail;
 import com.tripplanner.model.ItineraryResult;
 import dev.langchain4j.agentic.Agent;
-import dev.langchain4j.agentic.declarative.SystemMessageProviderSupplier;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.guardrail.OutputGuardrails;
-import io.quarkiverse.langchain4j.skills.runtime.SkillsToolProvider;
-import jakarta.enterprise.inject.Instance;
-import jakarta.enterprise.inject.spi.CDI;
+import io.quarkiverse.langchain4j.skills.Skills;
 
 public interface ItineraryPlannerAgent {
 
@@ -25,20 +22,9 @@ public interface ItineraryPlannerAgent {
     @Agent(description = "Creates a detailed day-by-day itinerary and route overview",
            outputKey = "itineraryResult")
     @OutputGuardrails(value = TripSafetyGuardrail.class, maxRetries = 3)
+    @Skills
     ItineraryResult planItinerary(String destination,
                                   Integer days,
                                   String tripType,
                                   String preferences);
-
-    @SystemMessageProviderSupplier
-    static String systemMessageProvider(Object memoryId) {
-        Instance<SkillsToolProvider> skillsToolProvider = CDI.current().select(SkillsToolProvider.class);
-        if (skillsToolProvider.isResolvable()) {
-            return """
-                    You have access to the following skills:
-                    %s
-                    """.formatted(skillsToolProvider.get().getSkills().formatAvailableSkills());
-        }
-        return "";
-    }
 }
