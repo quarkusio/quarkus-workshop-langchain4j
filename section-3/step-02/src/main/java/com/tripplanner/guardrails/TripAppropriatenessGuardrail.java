@@ -2,7 +2,6 @@ package com.tripplanner.guardrails;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tripplanner.model.TripRequest;
 import com.tripplanner.model.TripRequestContext;
@@ -12,7 +11,6 @@ import dev.langchain4j.guardrail.OutputGuardrailResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.Iterator;
 import java.util.Set;
 
 @ApplicationScoped
@@ -23,9 +21,6 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
 
     private static final Set<String> LUXURY_BRANDS = Set.of(
             "ferrari", "porsche", "lamborghini", "maserati", "bentley", "rolls-royce", "aston martin", "mclaren");
-
-    private static final Set<String> FAMILY_INAPPROPRIATE_KEYWORDS = Set.of(
-            "nightclub", "nightlife", "bar hopping", "casino", "adult-only", "strip club", "pub crawl");
 
     @Inject
     GuardrailAuditLog auditLog;
@@ -56,35 +51,23 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
             return success();
         }
 
-        boolean rewritten = false;
-
-        String vehicleType = root.path("vehicle").path("type").asText("").toLowerCase();
-        String vehicleModel = root.path("vehicle").path("model").asText("").toLowerCase();
+        String vehicleType = root.path("type").asText("").toLowerCase();
+        String vehicleModel = root.path("model").asText("").toLowerCase();
 
         if (request.travelers() >= 4 && isSmallVehicle(vehicleType)) {
-            rewriteVehicle((ObjectNode) root.path("vehicle"), request);
+            rewriteVehicle((ObjectNode) root, request);
             auditLog.log("TripAppropriatenessGuardrail", "REWRITE",
                     "Vehicle type '" + vehicleType + "' is too small for " + request.travelers() + " travelers");
-            rewritten = true;
+            return successWith(AiMessage.from(root.toString()));
         }
 
         if (request.budget().toLowerCase().contains("economy") && isLuxuryBrand(vehicleModel)) {
-            auditLog.log("TripAppropriatenessGuardrail", "RETRY",
+            auditLog.log("TripAppropriatenessGuardrail", "REPROMPT",
                     "Luxury vehicle '" + vehicleModel + "' does not match economy budget");
-            return retry("The vehicle recommendation is a luxury vehicle but the budget is economy. "
-                    + "Please recommend an affordable, budget-friendly vehicle instead.");
-        }
-
-        if ("family".equalsIgnoreCase(request.tripType())) {
-            if (removeInappropriateFamilyContent(root)) {
-                auditLog.log("TripAppropriatenessGuardrail", "REWRITE",
-                        "Removed family-inappropriate content from tips or itinerary");
-                rewritten = true;
-            }
-        }
-
-        if (rewritten) {
-            return successWith(AiMessage.from(root.toString()));
+            return reprompt("The vehicle recommendation is a luxury vehicle but the budget is economy. "
+                    + "Please recommend an affordable, budget-friendly vehicle instead.",
+                    "You are a vehicle advisor for road trips. You MUST recommend only budget-friendly, "
+                    + "affordable vehicles. Never suggest luxury, premium, or sports brands.");
         }
 
         auditLog.log("TripAppropriatenessGuardrail", "PASS", "All appropriateness checks passed");
@@ -108,36 +91,5 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         vehicle.put("type", replacement);
         vehicle.put("reasoning", "Vehicle upgraded by guardrail: original recommendation was too small for "
                 + request.travelers() + " travelers. Replaced with a " + replacement + ".");
-    }
-
-    private boolean removeInappropriateFamilyContent(JsonNode root) {
-        boolean modified = false;
-
-        JsonNode tips = root.path("tips");
-        if (tips.isArray()) {
-            ArrayNode tipsArray = (ArrayNode) tips;
-            Iterator<JsonNode> it = tipsArray.iterator();
-            while (it.hasNext()) {
-                String tip = it.next().asText("").toLowerCase();
-                if (FAMILY_INAPPROPRIATE_KEYWORDS.stream().anyMatch(tip::contains)) {
-                    it.remove();
-                    modified = true;
-                }
-            }
-        }
-
-        JsonNode itinerary = root.path("itinerary");
-        if (itinerary.isArray()) {
-            for (JsonNode day : itinerary) {
-                String description = day.path("description").asText("").toLowerCase();
-                if (FAMILY_INAPPROPRIATE_KEYWORDS.stream().anyMatch(description::contains)) {
-                    ((ObjectNode) day).put("description",
-                            "Explore the local area with family-friendly activities and sightseeing.");
-                    modified = true;
-                }
-            }
-        }
-
-        return modified;
     }
 }
