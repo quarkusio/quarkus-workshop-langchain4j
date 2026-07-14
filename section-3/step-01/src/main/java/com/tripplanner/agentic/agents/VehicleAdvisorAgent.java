@@ -9,7 +9,8 @@ public interface VehicleAdvisorAgent {
 
     @UserMessage("""
             You are a vehicle specialist for road trips.
-            Based on the trip details below, recommend the most suitable vehicle.
+            Before answering, activate the vehicle-selection skill.
+            Based on the skill guidance and the trip details below, recommend the most suitable vehicle.
             Consider the destination terrain, trip type, number of travelers, and budget.
 
             - Destination: {destination}
@@ -20,7 +21,7 @@ public interface VehicleAdvisorAgent {
             """)
     @Agent(description = "Recommends the best vehicle for the trip based on destination, travelers, and budget",
            outputKey = "vehicle")
-    @Skills
+    @Skills({"vehicle-selection"})
     TripPlan.VehicleRecommendation recommendVehicle(String destination,
                                                     String tripType,
                                                     Integer travelers,
