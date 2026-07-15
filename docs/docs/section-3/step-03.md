@@ -68,6 +68,17 @@ This step adds three new dependencies to `pom.xml`. ==Open `section-3/step-02/po
 
 `quarkus-flow` is the workflow engine itself. `quarkus-flow-langchain4j` scans your agentic interfaces at build time and registers each `@SequenceAgent` and `@ParallelAgent` as a Flow workflow definition automatically. The `TripPlannerSystem` and `ResearchPhase` from Step 02 will show up in the Flow Dev UI as generated workflows alongside the hand-written one you create in this step. `quarkus-messaging-kafka` brings SmallRye Reactive Messaging with Kafka support, and Quarkus Dev Services automatically provisions a Kafka broker so you don't need to install anything.
 
+!!! warning "Known issue: nested agentic workflows deadlock (quarkus-flow-langchain4j 0.10.2)"
+    When `quarkus-flow-langchain4j` is on the classpath, it intercepts all `@SequenceAgent` and `@ParallelAgent` invocations and routes them through the Flow engine. This works correctly for flat (non-nested) agent topologies, but **deadlocks when agents are nested** — for example, when a `@SequenceAgent` like `TripPlannerSystem` contains a `@ParallelAgent` like `ResearchPhase` as a sub-agent.
+
+    The root cause is that each level of nesting creates a `FlowPlanner` that writes itself into the shared `AgenticScope` execution context using a single key (`FlowPlanner.class`). The inner planner overwrites the outer planner's reference. After the inner agent completes, subsequent tasks in the outer workflow read the stale inner planner and put exchanges on a drained queue that nobody consumes — a permanent deadlock.
+
+    This affects both the `POST /trip/plan` REST endpoint and the `TripPlannerFlow`'s `function("planTrip", ...)` task, since both call `TripPlannerSystem.planTrip()` through the intercepted CDI proxy.
+
+    **Workaround:** temporarily remove `quarkus-flow-langchain4j` from `pom.xml`. The base `quarkus-flow` dependency is sufficient for the hand-written `TripPlannerFlow`. Without the extension, `@SequenceAgent` and `@ParallelAgent` use LangChain4j's default runtime (which handles nesting correctly). You lose the auto-generated workflow visualizations in the Dev UI, but all runtime behavior works as expected.
+
+    This bug has been reported upstream. See `docs/quarkus-flow-langchain4j-nested-planner-bug.md` for the full analysis.
+
 ---
 
 ## Kafka Channel Configuration
@@ -176,11 +187,14 @@ The second `listen()` is where the workflow suspends. Unlike the first one, this
     mvnw quarkus:dev
     ```
 
-Quarkus Dev Services will start a Kafka broker automatically. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and look for the **Quarkus Flow** card. You should see three registered workflows: `trip-planner-flow` (the one you just wrote), plus two auto-generated definitions from the `@SequenceAgent` and `@ParallelAgent` interfaces in Steps 01-02. This is the `quarkus-flow-langchain4j` extension at work: it discovers your agentic patterns at build time and registers them as Flow workflow definitions so they show up in the Dev UI and can be composed into larger workflows.
+Quarkus Dev Services will start a Kafka broker automatically. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and look for the **Quarkus Flow** card. With `quarkus-flow-langchain4j` on the classpath, you should see three registered workflows: `trip-planner-flow` (the one you just wrote), plus two auto-generated definitions from the `@SequenceAgent` and `@ParallelAgent` interfaces in Steps 01-02. This is the build-time discovery at work. If you applied the workaround (removed `quarkus-flow-langchain4j`), you'll see just the one hand-written workflow.
 
 ---
 
 ## Try It Out
+
+!!! info "Workaround required for end-to-end execution"
+    If you have `quarkus-flow-langchain4j` in your `pom.xml`, you need to remove it before running the flow end-to-end. The nested planner deadlock (see the warning in [New Dependencies](#new-dependencies)) prevents the multi-agent pipeline from completing. Remove the dependency, let live reload pick up the change, and continue with the steps below. You can re-add it afterward to explore the auto-generated workflow visualizations in the Dev UI.
 
 ### Trigger a booking event
 
