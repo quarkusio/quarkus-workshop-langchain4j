@@ -1,34 +1,24 @@
 ---
 name: business-trip
-description: Instructions for planning business travel.
+description: Itinerary planning guidance for business road trips — efficient routing, city access restrictions, meeting-paced scheduling, and productivity stops.
 ---
 
-# Business Trip Planning
+# Business Road Trip Planning
 
-You are an expert at planning efficient business travel by car across Europe. When helping business travelers, follow these guidelines:
+## Routing Principles
+- Optimize for time, not distance. Use motorways throughout — scenic detours cost business travelers more than they're worth.
+- Germany's autobahn has no speed limit on many sections; France and Italy are capped at 130 km/h. Account for these differences in time estimates.
+- The A6/A7 Paris–Lyon–Marseille corridor and the A1 Rome–Milan are both heavily tolled (€40–60 each way). Factor this into cost estimates.
 
-## Vehicle Recommendations
-- Prioritize comfort for long drives between European cities
-- Executive sedans (BMW 5 Series, Mercedes E-Class, Audi A6) project professionalism
-- Ensure reliable GPS with European maps and hands-free phone connectivity
-- Consider diesel for fuel efficiency on motorways
+## City Access Restrictions
+- **Italy:** ZTL (Zona a Traffico Limitato) zones in Rome, Florence, and Milan restrict non-resident vehicles during business hours. Camera-enforced; fines arrive weeks later via the rental company. Tell the traveler to use park-and-ride or public transport for the last leg.
+- **UK:** London's ULEZ covers all of Greater London (£12.50/day for non-compliant vehicles). Most rental cars comply, but worth confirming at booking.
+- **Parking:** Budget €20–50/day for city-centre parking in a garage. Pre-booking saves 20–40%.
 
-## Route Planning
-- Optimize for fastest travel time using motorways (autobahn, autostrada, autoroute)
-- Identify meeting locations and plan routes between business districts
-- Include buffer time for border crossings (especially non-Schengen areas)
-- Note that speed limits vary by country (unlimited on German autobahn sections, 130 km/h in France/Italy)
-- Plan around ZTL zones in Italian cities and Low Emission Zones in major cities
+## Meeting-Day Scheduling
+- Cap driving at 3–4 hours on any day with an important meeting. Arriving fatigued after 6 hours on the motorway is a real risk.
+- Build at least one driving-free day into any multi-city itinerary of 4+ stops.
 
-## Accommodation Tips
-- Recommend hotels near business districts or convention centers
-- Prioritize hotels with business centers, meeting rooms, and reliable WiFi
-- Consider chains with European loyalty programs (Accor, IHG, Marriott)
-- In cities like Zurich, Geneva, or Munich, book well in advance for reasonable rates
-
-## Productivity Tips
-- Suggest stopping points at autogrill or Raststätte with good WiFi for calls
-- Recommend restaurants suitable for client lunches (Michelin Bib Gourmand for value)
-- Plan driving segments to avoid fatigue before important meetings
-- Note time zone changes when crossing multiple countries
-- Factor in parking costs in city centers (often €20-50/day)
+## Productivity on the Road
+- French autoroute Aires and Italian Autogrill stops have reliable WiFi and power outlets — usable for focused work or a call.
+- A local SIM with a data plan (€10–20 for 15–30 GB) is more reliable than service area WiFi for video calls.

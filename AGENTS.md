@@ -10,7 +10,7 @@ The workshop follows the Miles of Smiles car rental company across three section
 
 ## Technology Stack
 
-The workshop uses Java 21 with Quarkus 3.34.3 and the LangChain4j Quarkiverse extension (version 1.9.1). Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
+The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
 
 ## Project Structure
 
@@ -36,7 +36,7 @@ For the documentation, navigate to the `docs` directory, install pipenv if neede
 
 AI Services are defined as interfaces annotated with `@RegisterAiService`. These services are typically `@SessionScoped` to maintain conversation continuity across multiple interactions.
 
-In Section 2, Agents are defined as interfaces with the `@Agent` annotation, usually accompanied by `@SystemMessage` and `@UserMessage` annotations to define their behavior and prompts. Tools are classes with methods annotated with `@Tool` and are registered via `@ToolBox`.
+In Sections 2 and 3, agents are defined as interfaces where each method carries the `@Agent` annotation alongside `@UserMessage` (and optionally `@SystemMessage`) to define behavior and prompts. Tools are classes with methods annotated with `@Tool` and are registered via `@ToolBox`.
 
 The package structure differs between sections. Section 1 uses the simpler `dev.langchain4j.quarkus.workshop` package. Section 2 uses `com.carmanagement` with subpackages for `agentic`, `model`, `resource`, and `service`. Section 3 uses `com.tripplanner` with the same subpackage layout (`agentic`, `model`, `resource`, `service`).
 
@@ -60,14 +60,16 @@ public interface CustomerSupportAgent {
 }
 ```
 
-The Agent pattern used in Section 2 is more elaborate:
+The Agent pattern used in Sections 2 and 3 is more elaborate. `@Agent` goes on the interface method and carries a `description` and an `outputKey` (the key under which the result is stored in the `AgenticScope`). `@Skills` can be added to enable dynamic skill injection at runtime:
 
 ```java
-@Agent("Agent description")
-@ToolBox(ToolClass.class)
-@SystemMessage("System instructions...")
-@UserMessage("User message template with {parameters}")
-String processTask(String param1, String param2);
+public interface MyAgent {
+
+    @UserMessage("Do something with {input}")
+    @Agent(description = "Agent description", outputKey = "result")
+    @Skills
+    MyResult doSomething(String input);
+}
 ```
 
 Tools follow a simple pattern:
@@ -89,26 +91,17 @@ Section 1 uses a simpler package structure and focuses on single-agent patterns,
 
 ## Documentation Writing Guidelines
 
-When writing or modifying documentation for this workshop, use natural, flowing prose rather than the typical AI pattern of bullet points followed by colons and descriptions. Write as a human would write technical documentation.
+A detailed style guide for workshop documentation is maintained at `.agent/skills/workshop-docs-style.md`. Read it before writing or editing any file under `docs/docs/`. The key points are summarised here.
 
-Avoid creating artificial section divisions like "Part 1", "Part 2", or "Step 1", "Step 2" within a single page. The documentation already has a table of contents that provides navigation structure. Instead, use descriptive section titles that clearly indicate what each section covers.
+Write natural, flowing prose rather than the AI pattern of bullet points followed by colon-separated descriptions. The reference voice is Section 1 of the workshop, which was written by the project owner.
 
-Use bullet points sparingly and only when they genuinely improve readability, such as when listing prerequisites, commands, or distinct items that don't require explanation. When explaining concepts, processes, or providing instructions, prefer paragraph form with clear transitions between ideas.
+Avoid the em-dash clarification pattern (`X — it does Y`). Write it as a full sentence instead. Avoid `**Label**: description` inline patterns, and avoid "Key Points:" / "Key Takeaways:" bullet blocks after code snippets.
 
-For example, instead of writing:
-```
-Prerequisites:
-- Java 21: Required for running the application
-- Maven: Used for building the project
-- API Key: Needed to access the LLM
-```
+Avoid creating artificial section divisions like "Part 1" or "Step 1" within a single page. The MkDocs table of contents provides navigation structure. Use descriptive headings.
 
-Write naturally:
-```
-You'll need Java 21 or higher, Maven 3.8 or higher, and an OpenAI API key or access to a compatible LLM endpoint.
-```
+Use `==highlighted text==` action directives whenever the reader is expected to do something: open a file, run a command, click a button.
 
-When describing a process, integrate the steps into flowing paragraphs rather than numbered lists, unless the sequence is complex enough that numbered steps genuinely aid comprehension.
+Use bullet lists only when they genuinely aid readability: form field values, prerequisites, troubleshooting checks, or sequential commands. For everything else, prefer paragraphs.
 
 ## Common Commands
 

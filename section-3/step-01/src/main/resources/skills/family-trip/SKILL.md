@@ -1,34 +1,24 @@
 ---
 name: family-trip
-description: Instructions for planning family road trips.
+description: Itinerary planning guidance for family road trips — stop frequency, kid-friendly pacing, accommodation, and toll considerations.
 ---
 
-# Family Trip Planning
+# Family Road Trip Planning
 
-You are an expert at planning family road trips across Europe. When helping families plan trips, follow these guidelines:
+## Pacing
+- Break every 2–3 hours for young children. Build explicit stops into the itinerary — do not treat them as optional.
+- Cap driving at 5–6 hours per day. Include at least one rest day on trips of 7+ days.
+- Use motorway service areas (Autogrill in Italy, Aires in France) as planned stops — they have playgrounds, toilets, and food.
 
-## Vehicle Recommendations
-- Recommend spacious vehicles for the whole family plus luggage (estates, MPVs, large SUVs)
-- Consider car seat compatibility for families with young children
-- Ensure the vehicle handles well on motorways and mountain roads
-- Automatic transmission preferred for stress-free driving in cities like Rome or Barcelona
+## What to Include in the Itinerary
+- Kid-friendly anchors at each overnight stop: a beach, castle, aquarium, adventure park, or accessible hiking trail.
+- A gelato stop is never wrong.
+- Scenic routes (Alpine passes, coastlines, wine regions) are worth the extra time when children are old enough to appreciate them.
 
-## Route Planning
-- Plan stops every 2-3 hours for bathroom breaks and stretching
-- Include kid-friendly attractions: aquariums, castles, adventure parks, gelato stops
-- Avoid long stretches without service areas (especially in rural Southern Europe)
-- Prefer scenic routes through the Alps, along coastlines, or through wine regions when time allows
-- Note toll road costs (France, Italy, Spain) and plan accordingly
+## Accommodation
+- For stays of 3+ nights, prefer vacation rentals (agriturismo in Italy, gîte in France) over hotels — a kitchen and outdoor space make a real difference with children.
+- Look for "familienzimmer" (Germany/Austria) or "camera familiare" (Italy) room categories — one room sleeping a family at a fixed rate, cheaper than two rooms.
 
-## Accommodation Tips
-- Recommend family-friendly hotels or agriturismos with pools
-- Consider vacation rentals for longer stays (more space, kitchen for preparing meals)
-- In Italy, look for family-run hotels with half-board options
-- In Switzerland, recommend locations near lakes or mountains with easy access
-
-## Budget Considerations
-- Factor in motorway tolls (vignettes in Switzerland/Austria, toll booths in France/Italy)
-- Account for fuel costs (diesel is often cheaper in Europe)
-- Suggest free attractions: beaches, public parks, town squares, hiking trails
-- Recommend family museum passes where available (e.g. Paris Museum Pass)
-- Budget in euros; note that Switzerland and the UK use different currencies
+## Tolls and Budget
+- Switzerland and Austria require motorway vignettes (CHF 40 and €9.90–€29 respectively). Factor these in upfront — they catch families by surprise.
+- France and Italy toll each motorway segment. A full cross-country route can add €50–100 in tolls each way.
