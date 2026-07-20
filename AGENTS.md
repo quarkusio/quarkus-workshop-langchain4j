@@ -10,7 +10,7 @@ The workshop follows the Miles of Smiles car rental company across three section
 
 ## Technology Stack
 
-The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
+The workshop uses Java 25 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
 
 ## Project Structure
 
@@ -24,7 +24,7 @@ The documentation lives in the `docs/` directory and can be served locally at ht
 
 ## Building and Running
 
-You'll need Java 21 or higher, Maven 3.8 or higher, and Python 3.x with pipenv for the documentation. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
+You'll need Java 25 or higher, Maven 3.8 or higher, and Python 3.x with pipenv for the documentation. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
 
 Each step is a self-contained Quarkus application. To run any step, navigate to its directory and execute `./mvnw quarkus:dev`. The application will start on http://localhost:8080 with Quarkus dev mode features like live reload and the dev UI enabled.
 

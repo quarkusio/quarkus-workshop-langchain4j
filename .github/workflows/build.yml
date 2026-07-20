@@ -1,7 +1,7 @@
 name: Build
 
 env:
-  JVM_VERSION: '21'
+  JVM_VERSION: '25'
 
 on:
   push:
@@ -74,7 +74,7 @@ jobs:
           python-version: '3.x'
 
       - uses: actions/setup-java@v5
-        name: Set up Java 21
+        name: Set up Java 25
         with:
           java-version: ${{ env.JVM_VERSION }}
           distribution: temurin

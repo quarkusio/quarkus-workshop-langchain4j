@@ -56,6 +56,6 @@ Open a terminal in VS Code (either click on the "terminal" menu item at the top 
 
 Now finally we can install SDKMAN!, and then use it to install OpenJDK (and while we're at it, also the Quarkus CLI). We'll do this in one go with the following command:
 
-`curl -s "https://get.sdkman.io" | bash && source "/home/student/.sdkman/bin/sdkman-init.sh" && sdk install java 21.0.4-tem && sdk install quarkus`
+`curl -s "https://get.sdkman.io" | bash && source "/home/student/.sdkman/bin/sdkman-init.sh" && sdk install java 25-tem && sdk install quarkus`
 
 Well done! You can now go back to the [original requirements page](./requirements.md) and get started with the lab:

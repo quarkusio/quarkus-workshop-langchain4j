@@ -2,7 +2,7 @@
 
 ## Software Requirements
 
-- **JDK 21.0 or later** – [Download from Adoptium](https://adoptium.net/){target="_blank"}
+- **JDK 25.0 or later** – [Download from Adoptium](https://adoptium.net/){target="_blank"}
 - **OpenAI API key** – provided by the workshop organizer
 - **Podman or Docker** – see [Podman installation](https://podman.io/getting-started/installation){target="_blank"} or [Docker installation](https://docs.docker.com/get-docker/){target="_blank"}
     - If you use Podman, we recommend [Podman Desktop](https://podman-desktop.io/docs/installation){target="_blank"} for easier container management.
