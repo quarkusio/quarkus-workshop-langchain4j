@@ -17,9 +17,9 @@ public interface TripPlannerSystem extends MonitoredAgent {
             })
     TripPlan planTrip(String destination,
                       String startDate,
-                      String days,
+                      Integer days,
                       String tripType,
-                      String travelers,
+                      Integer travelers,
                       String budget,
                       String preferences);
 

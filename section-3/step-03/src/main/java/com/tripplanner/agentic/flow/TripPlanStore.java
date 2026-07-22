@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.model.BookingConfirmation;
 import com.tripplanner.model.TripPlan;
 import io.cloudevents.CloudEvent;
-import io.cloudevents.core.provider.EventFormatProvider;
-import io.cloudevents.jackson.JsonFormat;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -27,8 +25,7 @@ public class TripPlanStore {
     private final AtomicReference<String> latestInstanceId = new AtomicReference<>();
 
     @Incoming("flow-out-consumer")
-    public void consume(byte[] payload) {
-        CloudEvent event = deserializeCloudEvent(payload);
+    public void consume(CloudEvent event) {
         if (event == null) {
             return;
         }
@@ -42,7 +39,6 @@ public class TripPlanStore {
             case "com.tripplanner.trip.approval.requested" -> handleApprovalRequested(event, instanceId);
             case "com.tripplanner.booking.finalized" -> handleBookingFinalized(event, instanceId);
             default -> {
-                // Ignore other events for this workshop step.
             }
         }
     }
@@ -81,45 +77,24 @@ public class TripPlanStore {
     }
 
     private void handleApprovalRequested(CloudEvent event, String instanceId) {
-        TripPlan plan = deserializeData(event, TripPlan.class);
-        if (plan == null) {
-            return;
+        try {
+            TripPlan plan = objectMapper.readValue(event.getData().toBytes(), TripPlan.class);
+            plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_AWAITING_APPROVAL, plan, null));
+            latestInstanceId.set(instanceId);
+        } catch (Exception e) {
+            // skip malformed events
         }
-
-        plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_AWAITING_APPROVAL, plan, null));
-        latestInstanceId.set(instanceId);
     }
 
     private void handleBookingFinalized(CloudEvent event, String instanceId) {
-        BookingConfirmation confirmation = deserializeData(event, BookingConfirmation.class);
-        if (confirmation == null) {
-            return;
-        }
-
-        TripPlanStatus previous = plansByInstanceId.get(instanceId);
-        TripPlan plan = previous == null ? null : previous.plan();
-        plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_CONFIRMED, plan, confirmation));
-        latestInstanceId.set(instanceId);
-    }
-
-    private <T> T deserializeData(CloudEvent event, Class<T> clazz) {
-        if (event.getData() == null) {
-            return null;
-        }
         try {
-            return objectMapper.readValue(event.getData().toBytes(), clazz);
+            BookingConfirmation confirmation = objectMapper.readValue(event.getData().toBytes(), BookingConfirmation.class);
+            TripPlanStatus previous = plansByInstanceId.get(instanceId);
+            TripPlan plan = previous == null ? null : previous.plan();
+            plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_CONFIRMED, plan, confirmation));
+            latestInstanceId.set(instanceId);
         } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private CloudEvent deserializeCloudEvent(byte[] payload) {
-        try {
-            return EventFormatProvider.getInstance()
-                    .resolveFormat(JsonFormat.CONTENT_TYPE)
-                    .deserialize(payload);
-        } catch (Exception e) {
-            return null;
+            // skip malformed events
         }
     }
 

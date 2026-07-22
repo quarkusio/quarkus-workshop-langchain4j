@@ -27,7 +27,7 @@ public interface VehicleAdvisorAgent {
     @Skills({"vehicle-selection"})
     TripPlan.VehicleRecommendation recommendVehicle(String destination,
                                                     String tripType,
-                                                    String travelers,
+                                                    Integer travelers,
                                                     String budget,
                                                     String preferences);
 }

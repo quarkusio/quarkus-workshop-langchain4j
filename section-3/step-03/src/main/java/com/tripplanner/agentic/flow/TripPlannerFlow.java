@@ -13,8 +13,6 @@ import io.serverlessworkflow.fluent.func.FuncWorkflowBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.function.Function;
-
 @ApplicationScoped
 public class TripPlannerFlow extends Flow {
 
@@ -24,14 +22,9 @@ public class TripPlannerFlow extends Flow {
     @Override
     public Workflow descriptor() {
         return FuncWorkflowBuilder.workflow("trip-planner-flow")
-                .schedule(s -> s.on(events ->
-                        events.one(f -> f.with(p -> p.type("com.tripplanner.booking.confirmed")))))
+                .schedule(on(one("com.tripplanner.booking.confirmed")))
                 .tasks(
-                        set(".[0].data"),
-
-                        function("planTrip",
-                                (Function<TripRequest, TripPlan>) req -> adapter.planFromRequest(req),
-                                TripRequest.class),
+                        function("planTrip", (TripRequest req) -> adapter.planFromRequest(req)),
 
                         emitJson("com.tripplanner.trip.approval.requested", TripPlan.class),
 
@@ -45,9 +38,7 @@ public class TripPlannerFlow extends Flow {
                                 FlowDirectiveEnum.END,
                                 TripApproval.class),
 
-                        function("finalizeBooking",
-                                (Function<TripApproval, BookingConfirmation>) adapter::finalizeBooking,
-                                TripApproval.class),
+                        function("finalizeBooking", adapter::finalizeBooking),
 
                         emitJson("com.tripplanner.booking.finalized", BookingConfirmation.class))
                 .build();

@@ -20,9 +20,9 @@ public class TripPlannerFlowAdapter {
         return tripPlannerSystem.planTrip(
                 request.destination(),
                 request.startDate(),
-                String.valueOf(request.days()),
+                request.days(),
                 request.tripType(),
-                String.valueOf(request.travelers()),
+                request.travelers(),
                 request.budget(),
                 request.preferences());
     }
