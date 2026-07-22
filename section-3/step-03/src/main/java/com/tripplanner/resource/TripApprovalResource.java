@@ -7,7 +7,6 @@ import io.cloudevents.core.builder.CloudEventBuilder;
 import io.cloudevents.jackson.JsonFormat;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
@@ -30,8 +29,13 @@ public class TripApprovalResource {
     @PUT
     @Path("/approve")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response approveTrip(TripApproval approval,
-                                @HeaderParam("X-Flow-Instance-Id") String instanceId) throws Exception {
+    public Response approveTrip(TripApproval approval) throws Exception {
+        if (approval.instanceId() == null || approval.instanceId().isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("instanceId is required")
+                    .build();
+        }
+
         byte[] body = objectMapper.writeValueAsBytes(approval);
 
         CloudEvent ce = CloudEventBuilder.v1()
@@ -40,7 +44,7 @@ public class TripApprovalResource {
                 .withType("com.tripplanner.trip.approval.done")
                 .withDataContentType("application/json")
                 .withData(body)
-                .withExtension("flowinstanceid", instanceId)
+                .withExtension("flowinstanceid", approval.instanceId())
                 .build();
 
         flowIn.send(new JsonFormat().serialize(ce));

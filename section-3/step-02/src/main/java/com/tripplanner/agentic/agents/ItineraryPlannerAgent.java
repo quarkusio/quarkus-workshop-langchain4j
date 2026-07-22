@@ -14,8 +14,10 @@ public interface ItineraryPlannerAgent {
             Before answering, activate the skill that matches the trip type.
             Create a detailed day-by-day itinerary and a route overview for the trip.
             Include a title, description, and overnight stop for each day.
+            Consider the travel dates when suggesting activities and seasonal attractions.
 
             - Destination: {destination}
+            - Start date: {startDate}
             - Duration: {days} days
             - Trip type: {tripType}
             - Additional preferences: {preferences}
@@ -25,7 +27,8 @@ public interface ItineraryPlannerAgent {
     @OutputGuardrails(value = TripSafetyGuardrail.class, maxRetries = 3)
     @Skills({"family-trip", "adventure-trip", "business-trip"})
     ItineraryResult planItinerary(String destination,
-                                  Integer days,
+                                  String startDate,
+                                  String days,
                                   String tripType,
                                   String preferences);
 }

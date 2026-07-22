@@ -4,5 +4,6 @@ import java.util.List;
 
 public record ItineraryResult(
         String routeOverview,
-        List<TripPlan.DayItinerary> itinerary
+        List<TripPlan.DayItinerary> itinerary,
+        List<String> tips
 ) {}

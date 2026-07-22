@@ -1,23 +1,37 @@
 # Step 03 - Event-Driven Workflows with Quarkus Flow
 
-## From Synchronous Calls to Suspendable Workflows
+## From REST Calls to Suspendable Workflows
 
-So far, trip planning happens synchronously: a REST call comes in, the multi-agent pipeline runs, and a response goes back. That works fine when everything completes in one go, but real-world trip planning isn't like that. A partner confirms a booking, the system generates a trip plan, sends it to the customer for approval, and then... waits. The customer might not respond for hours. Holding a thread open the whole time isn't an option.
+In the previous steps, we saw how the trip planning flow runs as one synchronous call. The request comes in, the agents run, and the response comes back. This works for immediate answers, but real-world workflows often need to pause for a human decision, wait for an external system, or coordinate multiple asynchronous steps, and each of those wait points should be observable and recoverable rather than hidden inside a blocked thread.
 
-In this step, you'll wrap the existing trip planning pipeline inside a [Quarkus Flow](https://docs.quarkiverse.io/quarkus-flow/dev/){target="_blank"} workflow connected to Kafka via CloudEvents. The workflow generates a trip plan and emits it for approval, then **suspends execution entirely**. No thread held, no resource consumed. When the customer eventually responds, the engine correlates the approval event to the correct workflow instance and resumes right where it left off.
+[Quarkus Flow](https://quarkiverse.github.io/quarkiverse-docs/quarkus-flow/dev/index.html){target="_blank"} is an event-driven workflow engine where each step emits and consumes [CloudEvents](https://cloudevents.io/){target="_blank"}. The workflow suspends without holding a thread, and any service that receives CloudEvents from e.g. a Kafka topic can see what happened and what the workflow is waiting for.
 
-You'll write a single `Flow` class with five tasks in a fluent DSL chain. The starter project provides everything else: the Kafka configuration, the REST endpoint that bridges approvals into CloudEvents, and the adapter that connects to your existing agents.
+In this step, you will wire the trip planner through a Quarkus Flow workflow. It will generate a plan, emit an approval request, and suspend. Then, when the user approves or rejects, a second event will resume the same workflow instance.
 
 ---
 
 ## What Is Quarkus Flow?
 
-Quarkus Flow is a Java-native workflow engine built on the [CNCF Serverless Workflow specification](https://serverlessworkflow.io/){target="_blank"}. It discovers workflow definitions at build time from CDI beans, connects to messaging systems for event-driven execution, and integrates tightly with Quarkus Dev Services (Kafka, databases, etc.).
+Quarkus Flow lets you model long-running, event-driven workflows directly in Java, using the [CNCF Serverless Workflow specification](https://serverlessworkflow.io/){target="_blank"} under the hood. This specification defines a common way to describe workflow concepts such as tasks, events, branching, waiting states, and transitions, without tying them to one particular runtime. In practice, it gives Quarkus Flow a shared vocabulary for workflows while still letting you write them in normal Java code.
 
-The key concept for this step is the **listen-emit pattern**. A workflow can emit a CloudEvent, then call `listen()` to suspend itself until a matching event arrives. The engine releases the thread, keeps the workflow state in memory, and resumes execution when the event shows up. This is the foundation of human-in-the-loop (HITL) workflows: the system does its work, asks for a human decision, and goes to sleep until the answer comes.
+The workflow in this step is triggered by a [CloudEvent](https://cloudevents.io/){target="_blank"}, which is a standard open source specification for event envelopes. This means events sent via systems like Kafka, Knative Eventing, or HTTP webhooks can all use the same format with common fields such as type, source, id, and data. Because of this, different tools and services (for example, a microservice listening on a Kafka topic or a cloud function triggered by a webhook) can exchange events easily, without having to invent new event formats for each integration.
 
-!!! note "In-memory only"
-    In this step, workflow state lives in memory. If you restart the application while a workflow is suspended, that instance is lost. This is a deliberate limitation. In **Step 04**, you'll add `quarkus-flow-jpa` and a database to make workflows durable with zero changes to the `Flow` class you write here.
+The workflow in this step takes a booking event, generates a trip plan, sends that plan out for approval, and then waits for a response. Once an approval or rejection event comes back, the workflow resumes and either finalizes the booking or cancels, depending on the decision. In the code, those stages are expressed with `schedule`, `emitJson`, `listen`, and `switchWhenOrElse`.
+
+```mermaid
+flowchart TD
+    bookingEvent[Booking confirmed event] --> scheduleTask[schedule]
+    scheduleTask --> planTripTask[planTrip]
+    planTripTask --> emitApproval[emitJson approval requested]
+    emitApproval --> waitApproval[listen waitApproval]
+    waitApproval --> decision{switchWhenOrElse}
+    decision -->|approved| finalizeBooking[finalizeBooking]
+    finalizeBooking --> emitConfirmed[emitJson booking finalized]
+    decision -->|rejected| stopWorkflow[End workflow]
+```
+
+!!! note "In-memory state"
+    In this step, the workflow state will be kept in memory. This means that if you restart the app while a workflow is waiting for approval, that waiting instance is lost. In Step 04 we will introduce loop-oriented orchestration concepts and  advanced control flow patterns to address this scenario.
 
 ---
 
@@ -25,11 +39,11 @@ The key concept for this step is the **listen-emit pattern**. A workflow can emi
 
 === "Option 1: Continue from Step 02"
 
-    If you want to continue building on top of Step 02 code, stay in the `section-3/step-02` directory. You'll add the new dependencies and files as described below.
+    Stay in the code you've built in the previous step(s) and apply the changes described in this page. You can continue to run Quarkus in Dev Mode.
 
-=== "Option 2: Follow along using the completed solution"
+=== "Option 2: Use the completed Step 03 project"
 
-    If you prefer to follow along (without making any code changes), navigate to the completed `section-3/step-03` directory:
+    ==Open `section-3/step-03` and start dev mode:==
 
     === "Linux / macOS"
         ```bash
@@ -45,20 +59,36 @@ The key concept for this step is the **listen-emit pattern**. A workflow can emi
 
 ---
 
-## New Dependencies
+## Dependencies
 
-This step adds three new dependencies to `pom.xml`. ==Open `section-3/step-02/pom.xml` and add the following:==
+==Open `section-3/step-02/pom.xml` and add the Quarkus Flow BOM inside `<dependencyManagement>`:==
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flow</groupId>
+    <artifactId>quarkus-flow-bom</artifactId>
+    <version>${quarkus-flow.version}</version>
+    <type>pom</type>
+    <scope>import</scope>
+</dependency>
+```
+
+==Add the version property in `<properties>`:==
+
+```xml
+<quarkus-flow.version>0.13.0</quarkus-flow.version>
+```
+
+==Add these dependencies to `<dependencies>`:==
 
 ```xml
 <dependency>
     <groupId>io.quarkiverse.flow</groupId>
     <artifactId>quarkus-flow</artifactId>
-    <version>0.10.2</version>
 </dependency>
 <dependency>
     <groupId>io.quarkiverse.flow</groupId>
     <artifactId>quarkus-flow-langchain4j</artifactId>
-    <version>0.10.2</version>
 </dependency>
 <dependency>
     <groupId>io.quarkus</groupId>
@@ -66,28 +96,19 @@ This step adds three new dependencies to `pom.xml`. ==Open `section-3/step-02/po
 </dependency>
 ```
 
-`quarkus-flow` is the workflow engine itself. `quarkus-flow-langchain4j` scans your agentic interfaces at build time and registers each `@SequenceAgent` and `@ParallelAgent` as a Flow workflow definition automatically. The `TripPlannerSystem` and `ResearchPhase` from Step 02 will show up in the Flow Dev UI as generated workflows alongside the hand-written one you create in this step. `quarkus-messaging-kafka` brings SmallRye Reactive Messaging with Kafka support, and Quarkus Dev Services automatically provisions a Kafka broker so you don't need to install anything.
-
-!!! warning "Known issue: nested agentic workflows deadlock (quarkus-flow-langchain4j 0.10.2)"
-    When `quarkus-flow-langchain4j` is on the classpath, it intercepts all `@SequenceAgent` and `@ParallelAgent` invocations and routes them through the Flow engine. This works correctly for flat (non-nested) agent topologies, but **deadlocks when agents are nested** — for example, when a `@SequenceAgent` like `TripPlannerSystem` contains a `@ParallelAgent` like `ResearchPhase` as a sub-agent.
-
-    The root cause is that each level of nesting creates a `FlowPlanner` that writes itself into the shared `AgenticScope` execution context using a single key (`FlowPlanner.class`). The inner planner overwrites the outer planner's reference. After the inner agent completes, subsequent tasks in the outer workflow read the stale inner planner and put exchanges on a drained queue that nobody consumes — a permanent deadlock.
-
-    This affects both the `POST /trip/plan` REST endpoint and the `TripPlannerFlow`'s `function("planTrip", ...)` task, since both call `TripPlannerSystem.planTrip()` through the intercepted CDI proxy.
-
-    **Workaround:** temporarily remove `quarkus-flow-langchain4j` from `pom.xml`. The base `quarkus-flow` dependency is sufficient for the hand-written `TripPlannerFlow`. Without the extension, `@SequenceAgent` and `@ParallelAgent` use LangChain4j's default runtime (which handles nesting correctly). You lose the auto-generated workflow visualizations in the Dev UI, but all runtime behavior works as expected.
-
-    This bug has been reported upstream. See `docs/quarkus-flow-langchain4j-nested-planner-bug.md` for the full analysis.
-
 ---
 
-## Kafka Channel Configuration
+## Messaging Configuration
 
-==Add the following to `application.properties`:==
+==Add this configuration to `application.properties`:==
 
 ```properties
 # Quarkus Flow messaging bridge
 quarkus.flow.messaging.defaults-enabled=true
+
+# Quarkus Flow execution logging
+quarkus.log.category."io.quarkiverse.flow".level=DEBUG
+quarkus.log.category."io.serverlessworkflow".level=DEBUG
 
 # Kafka channels for Flow events
 mp.messaging.incoming.flow-in.connector=smallrye-kafka
@@ -104,29 +125,31 @@ mp.messaging.outgoing.flow-in-producer.connector=smallrye-kafka
 mp.messaging.outgoing.flow-in-producer.topic=flow-in
 mp.messaging.outgoing.flow-in-producer.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
 mp.messaging.outgoing.flow-in-producer.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+
+mp.messaging.incoming.flow-out-consumer.connector=smallrye-kafka
+mp.messaging.incoming.flow-out-consumer.topic=flow-out
+mp.messaging.incoming.flow-out-consumer.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+mp.messaging.incoming.flow-out-consumer.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 ```
 
-The `flow-in` channel is where the engine listens for incoming CloudEvents (booking confirmations, approval responses). The `flow-out` channel is where it publishes outgoing events (approval requests, confirmed plans). The `flow-in-producer` channel is a separate outgoing channel that the approval REST endpoint uses to publish CloudEvents back onto the same `flow-in` Kafka topic. SmallRye Reactive Messaging doesn't allow the same channel name for both incoming and outgoing, so the producer needs its own channel name pointing to the same underlying topic. The `defaults-enabled=true` setting activates the Quarkus Flow messaging bridge, which handles the CloudEvent envelope serialization and routing between the engine and Kafka.
+Four channels make up the messaging layer:
+
+| Channel | Direction | Purpose |
+|---|---|---|
+| `flow-in` | incoming | Quarkus Flow reads events from this topic to start or resume workflows |
+| `flow-out` | outgoing | Quarkus Flow publishes workflow events (approval requests, booking confirmations) here |
+| `flow-in-producer` | outgoing | The REST endpoint writes to `flow-in` so it can trigger the workflow from application code |
+| `flow-out-consumer` | incoming | The application reads `flow-out` so it can capture the plan and confirmation for the UI |
+
+Once the app is running, you can verify the channel wiring in the Dev UI under **Messaging > Channels**:
+
+![Messaging Channels view in the Dev UI showing the four Kafka channels and their publishers/subscribers](../images/step-03-messaging-channels.png)
 
 ---
 
-## What the Starter Provides
+## New Models
 
-Before you write the Flow class, three supporting files need to be in place. These bridge the existing trip planning agents to the event-driven world.
-
-### TripPlannerFlowAdapter
-
-The existing `TripPlannerSystem.planTrip()` takes six individual parameters, but a Flow `function()` task needs a single-argument function. This adapter bridges the gap.
-
-==Create `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java`:==
-
-```java title="TripPlannerFlowAdapter.java"
---8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java"
-```
-
-The adapter destructures a `TripRequest` into the six parameters that `planTrip()` expects. This keeps the Flow class clean: `function("planTrip", adapter::planFromRequest, TripRequest.class)` reads naturally.
-
-### TripApproval
+The workflow introduces two new records that don't exist in Step 02.
 
 ==Create `src/main/java/com/tripplanner/model/TripApproval.java`:==
 
@@ -134,9 +157,43 @@ The adapter destructures a `TripRequest` into the six parameters that `planTrip(
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/model/TripApproval.java"
 ```
 
+==Create `src/main/java/com/tripplanner/model/BookingConfirmation.java`:==
+
+```java title="BookingConfirmation.java"
+--8<-- "../../section-3/step-03/src/main/java/com/tripplanner/model/BookingConfirmation.java"
+```
+
+`TripApproval` carries the user's decision (approved or rejected) along with the `instanceId` that ties it back to the right workflow instance. `BookingConfirmation` is what the workflow produces at the end of the approve path.
+
+---
+
+## Supporting Classes
+
+Before writing the workflow itself, you need the classes that connect it to the REST layer and the UI.
+
+### TripPlannerFlowAdapter
+
+This bean bridges `TripRequest` to the existing `TripPlannerSystem.planTrip(...)` method so the workflow can call it as a function. It also handles post-approval booking finalization.
+
+==Create `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java`:==
+
+```java title="TripPlannerFlowAdapter.java"
+--8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java"
+```
+
+### TripPlanStore
+
+This bean listens on the `flow-out-consumer` channel and captures workflow events so the REST layer can return results to the UI. It stores plan payloads when the workflow emits an approval request, and booking confirmations after the workflow finalizes.
+
+==Create `src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java`:==
+
+```java title="TripPlanStore.java"
+--8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java"
+```
+
 ### TripApprovalResource
 
-This REST endpoint is the human-in-the-loop bridge. It takes an approval decision from the customer and turns it into a CloudEvent that the suspended workflow is waiting for.
+This endpoint turns the UI's approve or reject action into a `com.tripplanner.trip.approval.done` CloudEvent and publishes it to `flow-in`, where the waiting workflow instance picks it up.
 
 ==Create `src/main/java/com/tripplanner/resource/TripApprovalResource.java`:==
 
@@ -144,13 +201,21 @@ This REST endpoint is the human-in-the-loop bridge. It takes an approval decisio
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/resource/TripApprovalResource.java"
 ```
 
-The endpoint receives a `TripApproval` body and an `X-Flow-Instance-Id` header. It builds a CloudEvent with the `flowinstanceid` extension attribute set to that header value, serializes it, and sends it to the `flow-in-producer` channel. This is a separate outgoing channel that publishes to the same `flow-in` Kafka topic that the Flow engine consumes. SmallRye Reactive Messaging doesn't allow the same channel name for both incoming and outgoing, so the producer uses a distinct channel name pointing to the same underlying topic. The engine picks the event up, matches it to the suspended workflow instance by `flowinstanceid`, and resumes execution.
+### TripPlannerResource (modified)
+
+The existing `TripPlannerResource` changes from calling `TripPlannerSystem` directly to publishing a CloudEvent that starts the workflow. It then waits for `TripPlanStore` to receive the plan and returns it, so from the UI's perspective the POST still behaves synchronously.
+
+==Replace the contents of `src/main/java/com/tripplanner/resource/TripPlannerResource.java`:==
+
+```java title="TripPlannerResource.java" hl_lines="28 30-31 36-40 45-46 49-71 74-88"
+--8<-- "../../section-3/step-03/src/main/java/com/tripplanner/resource/TripPlannerResource.java"
+```
 
 ---
 
-## Implementing the Event-Driven Workflow
+## Implementing `TripPlannerFlow`
 
-This is the file you write. A single class, five tasks, about 25 lines.
+With the supporting classes in place, you can now write the workflow itself. This is the central piece of this step.
 
 ==Create `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java`:==
 
@@ -158,97 +223,110 @@ This is the file you write. A single class, five tasks, about 25 lines.
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java"
 ```
 
-The class extends `io.quarkiverse.flow.Flow` and is discovered at build time by the engine. The five tasks form a linear chain: wait for a booking event, generate the plan, emit it for approval, suspend until approval arrives, then emit the confirmed plan.
+The workflow reads top to bottom as a sequence of tasks:
 
-The first `listen()` is event-started, meaning each incoming booking CloudEvent creates a new workflow instance. Note the `.outputAs()` call: `listen()` always returns a `Collection`, even for `toOne()`, so you need to unwrap it. The `function()` call runs the full multi-agent pipeline from Step 02 through the adapter.
-
-After the plan is generated, `emitJson()` publishes it as a `com.tripplanner.trip.approval.requested` CloudEvent on the `flow-out` channel. The engine automatically attaches a `flowinstanceid` extension to the event, identifying this specific workflow instance. Downstream consumers use this ID to route the response back.
-
-The second `listen()` is where the workflow suspends. Unlike the first one, this `listen()` is event-resumed: the workflow already exists and is waiting for a specific event correlated by `flowinstanceid`. Between this point and the eventual approval, no thread is held. The `.exportAs()` call here is important because by default the approval payload would replace the workflow context, overwriting the `TripPlan`. The lambda returns `wf.context().asJavaObject()` to preserve the current context (the trip plan) so the final `emitJson()` serializes the correct payload.
-
-!!! tip "Event-started vs. event-resumed"
-    The first `listen()` creates a new workflow instance per incoming event, no correlation needed. The second `listen()` routes the approval event to the correct suspended instance via `extensionByInstanceId("flowinstanceid")`. This distinction matters when multiple trip plans are in flight simultaneously.
+1. `schedule` registers a trigger: every time a `com.tripplanner.booking.confirmed` event arrives, a new workflow instance starts.
+2. `set(".[0].data")` unwraps the CloudEvent envelope and passes the `TripRequest` payload to the next task.
+3. `function("planTrip", ...)` calls the adapter, which runs the full multi-agent pipeline and returns a `TripPlan`.
+4. `emitJson` publishes the plan as a `com.tripplanner.trip.approval.requested` event on `flow-out`.
+5. `listen("waitApproval", ...)` suspends the workflow. It will resume only when a `com.tripplanner.trip.approval.done` event arrives whose `flowinstanceid` matches this instance.
+6. `switchWhenOrElse` inspects the approval status. If approved, execution continues to `finalizeBooking`. Otherwise the workflow ends immediately.
+7. `function("finalizeBooking", ...)` generates a `BookingConfirmation`, and the final `emitJson` publishes it as `com.tripplanner.booking.finalized`.
 
 ---
 
-## Running the Application
+## Running and Inspecting
 
-==Start the application in dev mode:==
+==Start the app in dev mode if it is not already running.==
 
-=== "Linux / macOS"
-    ```bash
-    cd section-3/step-03
-    ./mvnw quarkus:dev
-    ```
+Open the app at [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
-=== "Windows"
-    ```cmd
-    cd section-3\step-03
-    mvnw quarkus:dev
-    ```
+Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and notice the new Quarkus Flow and Kafka cards. 
 
-Quarkus Dev Services will start a Kafka broker automatically. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and look for the **Quarkus Flow** card. With `quarkus-flow-langchain4j` on the classpath, you should see three registered workflows: `trip-planner-flow` (the one you just wrote), plus two auto-generated definitions from the `@SequenceAgent` and `@ParallelAgent` interfaces in Steps 01-02. This is the build-time discovery at work. If you applied the workaround (removed `quarkus-flow-langchain4j`), you'll see just the one hand-written workflow.
+![Dev UI Extensions page showing the Flow card with 3 registered workflows](../images/step-03-devui-extensions.png)
+
+Click **Workflows** in the Flow card to see the three registered workflows: `trip-planner-flow` (the one you wrote), plus `research-phase` and `trip-planner-system` (generated by the LangChain4j Agentic extension for the agent pipeline).
+
+![Flow Workflows page listing trip-planner-flow, research-phase, and trip-planner-system](../images/step-03-flow-workflows.png)
+
+Click the eye icon next to `trip-planner-flow` to open the visual flow diagram. You can see each stage of the workflow rendered as a graph, matching the code you wrote in `TripPlannerFlow.java`:
+
+![Flow diagram showing set, call function, emit approval.requested, and listen stages](../images/step-03-flow-diagram.png)
 
 ---
 
 ## Try It Out
 
-!!! info "Workaround required for end-to-end execution"
-    If you have `quarkus-flow-langchain4j` in your `pom.xml`, you need to remove it before running the flow end-to-end. The nested planner deadlock (see the warning in [New Dependencies](#new-dependencies)) prevents the multi-agent pipeline from completing. Remove the dependency, let live reload pick up the change, and continue with the steps below. You can re-add it afterward to explore the auto-generated workflow visualizations in the Dev UI.
+==Fill in the trip form and click **Generate Trip Plan**.==
 
-### Trigger a booking event
+The form submits to the REST endpoint, which triggers the workflow and blocks until the plan is ready. While you wait, watch the terminal. The `TraceLoggerExecutionListener` prints a line for every task transition:
 
-This workflow is event-started: the first task is a `listen()` waiting for a CloudEvent on the `flow-in` Kafka topic. You trigger it by publishing a booking confirmation CloudEvent to that topic.
-
-Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and navigate to the **Kafka Dev UI** card. Select the `flow-in` topic and publish the following CloudEvent message:
-
-```json
-{
-  "specversion": "1.0",
-  "type": "com.tripplanner.booking.confirmed",
-  "source": "workshop/booking",
-  "id": "1",
-  "datacontenttype": "application/json",
-  "data": {
-    "destination": "California Coast",
-    "days": 5,
-    "tripType": "family",
-    "travelers": 4,
-    "budget": "$3000",
-    "preferences": "beach and scenic drives"
-  }
-}
+```
+Task 'set-0' started at ...           pos=do/0/set-0
+Task 'set-0' completed at ...
+Task 'planTrip' started at ...        pos=do/1/planTrip
+Task 'planTrip' completed at ...      output={...}
+Task 'emit-2' started at ...          pos=do/2/emit-2
+Flow: Publishing on channel flow-out  event={..."type":"com.tripplanner.trip.approval.requested"...}
+Task 'emit-2' completed at ...
+Task 'waitApproval' started at ...    pos=do/3/waitApproval
 ```
 
-Watch the terminal output. The multi-agent pipeline runs just as before: vehicle selection, itinerary planning, cost estimation, and tips generation. The workflow emits a `com.tripplanner.trip.approval.requested` event with the generated plan.
+Notice how the log stops at `waitApproval`. The workflow is now suspended in memory, waiting for an event. No thread is blocked and no CPU is consumed while it waits.
 
-### Check the suspended workflow
+When the workflow reaches the approval wait state, the generated plan appears with two buttons:
 
-==Open the Quarkus Flow Dev UI== and look at the workflow instances. You should see one instance in **suspended** state, waiting at the `waitApproval` task. The workflow is asleep. No thread is held.
+- **Approve Trip**
+- **Reject Trip**
 
-### Approve the trip
+### Approve path
 
-Copy the workflow instance ID from the Dev UI, then call the approval endpoint:
+==Click **Approve Trip**.==
 
-```bash
-curl -X PUT http://localhost:8080/trip/approve \
-  -H "Content-Type: application/json" \
-  -H "X-Flow-Instance-Id: <paste-instance-id>" \
-  -d '{"status": "approved", "feedback": ""}'
+The app sends an approval event with the current `flowinstanceid`. Back in the terminal, the workflow resumes from where it paused:
+
+```
+Task 'waitApproval' completed at ...
+Task 'switch-4' started at ...       pos=do/4/switch-4
+Task 'switch-4' completed at ...
+Task 'finalizeBooking' started at ... pos=do/5/finalizeBooking
+Task 'finalizeBooking' completed at ...
+Task 'emit-6' started at ...         pos=do/6/emit-6
+Flow: Publishing on channel flow-out  event={..."type":"com.tripplanner.booking.finalized"...}
+Task 'emit-6' completed at ...
+Workflow name=trip-planner-flow ...    completed
 ```
 
-The engine receives the approval CloudEvent, matches it to the suspended instance via `flowinstanceid`, and resumes execution. The workflow emits a `com.tripplanner.trip.confirmed` event and completes.
+The UI shows a booking reference once the `booking.finalized` event arrives.
 
-### See what happens on restart
+### Reject path
 
-==Trigger another workflow but don't approve it.== While the workflow is suspended, press `Ctrl+C` to stop the application, then start it again with `./mvnw quarkus:dev`. Check the Dev UI. The suspended workflow is gone. In-memory state doesn't survive restarts. In **Step 04**, you'll add a database to make everything persistent.
+==Generate another plan and click **Reject Trip**.==
+
+The workflow resumes from the same wait point and ends without booking finalization. The UI shows a cancellation message.
+
+### Check in Dev UI
+
+Open the Kafka topic browser in the Dev UI under **Apache Kafka Client > Topics**. In the `flow-in` topic, you should see the `com.tripplanner.booking.confirmed` CloudEvent that triggered the workflow, with the full `TripRequest` in its data field:
+
+![flow-in Kafka topic showing the booking.confirmed CloudEvent with the trip request data](../images/step-03-kafka-flow-in.png)
+
+In the `flow-out` topic, you should see the `com.tripplanner.trip.approval.requested` event containing the generated plan. Notice the `flowinstanceid` extension that correlates the approval back to the right workflow instance:
+
+![flow-out Kafka topic showing the approval.requested CloudEvent with the trip plan and flowinstanceid](../images/step-03-kafka-flow-out.png)
+
+After approval, `flow-in` will also contain the `com.tripplanner.trip.approval.done` event, and `flow-out` will contain `com.tripplanner.booking.finalized` (approve path only).
+
+In Quarkus Flow instances, you should see each workflow pause at `waitApproval`, then continue after approval or rejection.
 
 ---
 
-## What's Next?
+## Summary
 
-In this step you wrapped the trip planning pipeline in a Quarkus Flow workflow with a human-in-the-loop checkpoint. The workflow suspends when waiting for customer approval and resumes when the event arrives, without holding any threads. But as you saw, restarting the app loses suspended workflows and all conversation history.
+You now have a full event-driven path from UI to workflow. The UI starts the workflow by publishing an event, Flow emits a plan and waits, and the UI decision resumes the same workflow instance. Only approval performs the finalization step.
 
-In **Step 04**, you'll add a PostgreSQL database that makes two things persistent at once: a `DatabaseChatMemoryStore` so customers can continue planning the next day, and `quarkus-flow-jpa` so suspended workflows survive restarts with zero changes to the `TripPlannerFlow` class.
+This is the practical HITL pattern for event-driven orchestration in Quarkus Flow.
 
-[Continue to Step 04 - Persistent State](step-04.md)
+In **Step 04**, you will focus on voting and loop-based orchestration patterns.
+
+[Continue to Step 04 - Voting, Loops, and Adaptive Model Selection](step-04.md)

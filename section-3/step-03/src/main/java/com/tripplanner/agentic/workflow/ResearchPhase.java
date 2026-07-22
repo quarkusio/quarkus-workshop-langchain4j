@@ -14,9 +14,10 @@ public interface ResearchPhase {
             outputKey = "researchComplete",
             subAgents = { VehicleAdvisorAgent.class, ItineraryPlannerAgent.class })
     String research(String destination,
-                    int days,
+                    String startDate,
+                    String days,
                     String tripType,
-                    int travelers,
+                    String travelers,
                     String budget,
                     String preferences);
 

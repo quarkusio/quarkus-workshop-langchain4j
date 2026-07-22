@@ -16,7 +16,7 @@
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.6</surefire-plugin.version>
         <quarkus-langchain4j.version>1.12.0</quarkus-langchain4j.version>
-        <quarkus-flow.version>0.10.2</quarkus-flow.version>
+        <quarkus-flow.version>0.13.0</quarkus-flow.version>
     </properties>
 
     <dependencyManagement>
@@ -32,6 +32,13 @@
                 <groupId>io.quarkiverse.langchain4j</groupId>
                 <artifactId>quarkus-langchain4j-bom</artifactId>
                 <version>${quarkus-langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkiverse.flow</groupId>
+                <artifactId>quarkus-flow-bom</artifactId>
+                <version>${quarkus-flow.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -62,12 +69,10 @@
         <dependency>
             <groupId>io.quarkiverse.flow</groupId>
             <artifactId>quarkus-flow</artifactId>
-            <version>${quarkus-flow.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.flow</groupId>
             <artifactId>quarkus-flow-langchain4j</artifactId>
-            <version>${quarkus-flow.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
