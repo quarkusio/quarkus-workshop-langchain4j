@@ -1,6 +1,6 @@
 package com.tripplanner.agentic.flow;
 
-import static io.serverlessworkflow.fluent.func.dsl.FuncDSL.*;
+import static io.quarkiverse.flow.dsl.FlowDSL.*;
 
 import com.tripplanner.model.BookingConfirmation;
 import com.tripplanner.model.TripApproval;
@@ -9,7 +9,7 @@ import com.tripplanner.model.TripRequest;
 import io.quarkiverse.flow.Flow;
 import io.serverlessworkflow.api.types.FlowDirectiveEnum;
 import io.serverlessworkflow.api.types.Workflow;
-import io.serverlessworkflow.fluent.func.FuncWorkflowBuilder;
+import io.quarkiverse.flow.dsl.FlowWorkflowBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -21,7 +21,7 @@ public class TripPlannerFlow extends Flow {
 
     @Override
     public Workflow descriptor() {
-        return FuncWorkflowBuilder.workflow("trip-planner-flow")
+        return FlowWorkflowBuilder.workflow("trip-planner-flow")
                 .schedule(on(one("com.tripplanner.booking.confirmed")))
                 .tasks(
                         function("planTrip", (TripRequest req) -> adapter.planFromRequest(req)),
