@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.agentic.flow.TripPlanStore;
 import com.tripplanner.model.TripRequest;
 import com.tripplanner.model.TripRequestContext;
-import io.cloudevents.CloudEvent;
-import io.cloudevents.core.builder.CloudEventBuilder;
-import io.cloudevents.jackson.JsonFormat;
+import io.smallrye.reactive.messaging.ce.OutgoingCloudEventMetadata;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -18,6 +16,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Metadata;
 
 import java.net.URI;
 import java.util.UUID;
@@ -37,7 +37,7 @@ public class TripPlannerResource {
     TripPlanStore tripPlanStore;
 
     @Channel("flow-in-producer")
-    Emitter<byte[]> flowInProducer;
+    Emitter<String> flowInProducer;
 
     @POST
     @Path("/plan")
@@ -49,16 +49,15 @@ public class TripPlannerResource {
         String previousId = tripPlanStore.latest() != null
                 ? tripPlanStore.latest().instanceId() : null;
 
-        byte[] body = objectMapper.writeValueAsBytes(request);
-        CloudEvent event = CloudEventBuilder.v1()
+        String body = objectMapper.writeValueAsString(request);
+        OutgoingCloudEventMetadata<String> metadata = OutgoingCloudEventMetadata.<String>builder()
                 .withId(UUID.randomUUID().toString())
                 .withSource(URI.create("api:/trip/plan"))
                 .withType("com.tripplanner.booking.confirmed")
                 .withDataContentType("application/json")
-                .withData(body)
                 .build();
 
-        flowInProducer.send(new JsonFormat().serialize(event));
+        flowInProducer.send(Message.of(body, Metadata.of(metadata)));
 
         TripPlanStore.TripPlanStatus planStatus =
                 tripPlanStore.awaitNextPlan(previousId, PLAN_TIMEOUT_SECONDS);
