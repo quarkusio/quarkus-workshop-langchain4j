@@ -22,7 +22,7 @@ public class TripPlannerFlow extends Flow {
     @Override
     public Workflow descriptor() {
         return FlowWorkflowBuilder.workflow("trip-planner-flow")
-                .schedule(on(one("com.tripplanner.booking.confirmed")))
+                .schedule(on(one("com.tripplanner.booking.confirmed").first()))
                 .tasks(
                         function("planTrip", (TripRequest req) -> adapter.planFromRequest(req)),
 

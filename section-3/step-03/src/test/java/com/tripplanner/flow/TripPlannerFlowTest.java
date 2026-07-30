@@ -8,21 +8,18 @@ import com.tripplanner.model.TripPlan;
 import com.tripplanner.model.TripRequest;
 import com.tripplanner.resource.TripApprovalResource;
 import com.tripplanner.resource.TripPlannerResource;
-import io.cloudevents.CloudEvent;
-import io.cloudevents.core.format.EventFormat;
-import io.cloudevents.core.provider.EventFormatProvider;
-import io.cloudevents.jackson.JsonFormat;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.reactive.messaging.ce.CloudEventMetadata;
 import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import io.smallrye.reactive.messaging.memory.InMemorySink;
 import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -47,9 +44,6 @@ class TripPlannerFlowTest {
 
     @Inject
     ObjectMapper objectMapper;
-
-    private static final EventFormat CE_FORMAT = EventFormatProvider.getInstance()
-            .resolveFormat(JsonFormat.CONTENT_TYPE);
 
     @BeforeEach
     void setupMocks() {
@@ -79,19 +73,19 @@ class TripPlannerFlowTest {
         // Phase 1: wait for the approval-requested event on flow-out
         await().atMost(30, SECONDS).until(() ->
                 sink.received().stream().skip(baseline)
-                        .anyMatch(msg -> isType(msg.getPayload(), "com.tripplanner.trip.approval.requested")));
+                        .anyMatch(msg -> isType(msg, "com.tripplanner.trip.approval.requested")));
 
-        CloudEvent approvalRequestCe = sink.received().stream()
+        Message<String> approvalMsg = sink.received().stream()
                 .skip(baseline)
-                .map(msg -> deserialize(msg.getPayload()))
-                .filter(ce -> ce != null && "com.tripplanner.trip.approval.requested".equals(ce.getType()))
+                .filter(msg -> isType(msg, "com.tripplanner.trip.approval.requested"))
                 .findFirst()
                 .orElseThrow();
 
-        String flowInstanceId = (String) approvalRequestCe.getExtension("flowinstanceid");
+        CloudEventMetadata<?> approvalMeta = approvalMsg.getMetadata(CloudEventMetadata.class).orElseThrow();
+        String flowInstanceId = approvalMeta.<String>getExtension("flowinstanceid").orElse(null);
         assertNotNull(flowInstanceId, "flowinstanceid must be present on the emitted event");
 
-        TripPlan requestedPlan = objectMapper.readValue(approvalRequestCe.getData().toBytes(), TripPlan.class);
+        TripPlan requestedPlan = objectMapper.readValue(approvalMsg.getPayload(), TripPlan.class);
         assertNotNull(requestedPlan.vehicle(), "approval-requested event must contain a vehicle recommendation");
         assertNotNull(requestedPlan.itinerary(), "approval-requested event must contain an itinerary");
 
@@ -100,16 +94,15 @@ class TripPlannerFlowTest {
 
         await().atMost(15, SECONDS).until(() ->
                 sink.received().stream().skip(baseline)
-                        .anyMatch(msg -> isType(msg.getPayload(), "com.tripplanner.booking.finalized")));
+                        .anyMatch(msg -> isType(msg, "com.tripplanner.booking.finalized")));
 
-        CloudEvent finalizedCe = sink.received().stream()
+        Message<String> finalizedMsg = sink.received().stream()
                 .skip(baseline)
-                .map(msg -> deserialize(msg.getPayload()))
-                .filter(ce -> ce != null && "com.tripplanner.booking.finalized".equals(ce.getType()))
+                .filter(msg -> isType(msg, "com.tripplanner.booking.finalized"))
                 .findFirst()
                 .orElseThrow();
 
-        BookingConfirmation confirmation = objectMapper.readValue(finalizedCe.getData().toBytes(), BookingConfirmation.class);
+        BookingConfirmation confirmation = objectMapper.readValue(finalizedMsg.getPayload(), BookingConfirmation.class);
         assertNotNull(confirmation.bookingReference(), "booking finalization must include a booking reference");
         assertFalse(confirmation.bookingReference().isBlank(), "booking reference must not be blank");
     }
@@ -129,38 +122,30 @@ class TripPlannerFlowTest {
 
         await().atMost(30, SECONDS).until(() ->
                 sink.received().stream().skip(baseline)
-                        .anyMatch(msg -> isType(msg.getPayload(), "com.tripplanner.trip.approval.requested")));
+                        .anyMatch(msg -> isType(msg, "com.tripplanner.trip.approval.requested")));
 
-        CloudEvent approvalRequestCe = sink.received().stream()
+        Message<String> approvalMsg = sink.received().stream()
                 .skip(baseline)
-                .map(msg -> deserialize(msg.getPayload()))
-                .filter(ce -> ce != null && "com.tripplanner.trip.approval.requested".equals(ce.getType()))
+                .filter(msg -> isType(msg, "com.tripplanner.trip.approval.requested"))
                 .findFirst()
                 .orElseThrow();
 
-        String flowInstanceId = (String) approvalRequestCe.getExtension("flowinstanceid");
+        CloudEventMetadata<?> approvalMeta = approvalMsg.getMetadata(CloudEventMetadata.class).orElseThrow();
+        String flowInstanceId = approvalMeta.<String>getExtension("flowinstanceid").orElse(null);
         assertNotNull(flowInstanceId, "flowinstanceid must be present on the emitted event");
 
         tripApprovalResource.approveTrip(new TripApproval(flowInstanceId, "rejected", ""));
 
         await().during(3, SECONDS).atMost(5, SECONDS).until(() ->
                 sink.received().stream().skip(baseline)
-                        .noneMatch(msg -> isType(msg.getPayload(), "com.tripplanner.booking.finalized")));
+                        .noneMatch(msg -> isType(msg, "com.tripplanner.booking.finalized")));
     }
 
     // --- helpers ---
 
-    private boolean isType(String payload, String type) {
-        CloudEvent ce = deserialize(payload);
-        return ce != null && type.equals(ce.getType());
-    }
-
-    private CloudEvent deserialize(String payload) {
-        if (payload == null) return null;
-        try {
-            return CE_FORMAT.deserialize(payload.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            return null;
-        }
+    private boolean isType(Message<String> msg, String type) {
+        return msg.getMetadata(CloudEventMetadata.class)
+                .map(ce -> type.equals(ce.getType()))
+                .orElse(false);
     }
 }

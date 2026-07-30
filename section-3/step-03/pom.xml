@@ -16,7 +16,7 @@
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.6</surefire-plugin.version>
         <quarkus-langchain4j.version>1.12.0</quarkus-langchain4j.version>
-        <quarkus-flow.version>0.15.0</quarkus-flow.version>
+        <quarkus-flow.version>1.0.0-SNAPSHOT</quarkus-flow.version>
     </properties>
 
     <dependencyManagement>
@@ -69,6 +69,10 @@
         <dependency>
             <groupId>io.quarkiverse.flow</groupId>
             <artifactId>quarkus-flow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.flow</groupId>
+            <artifactId>quarkus-flow-messaging</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.flow</groupId>
