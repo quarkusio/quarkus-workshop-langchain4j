@@ -35,6 +35,30 @@ Write the same content as a paragraph instead.
 
 **Colon-separated label/description lists in prose.** Do not write `The left panel renders: vehicle recommendation, route overview, daily itinerary`. Write it as a sentence: `The left panel renders the vehicle recommendation, route overview, and daily itinerary.`
 
+**The sentence-then-colon explanation pattern.** Avoid setups like `For this step, the flow is simple:` or `The workflow does one thing:` followed by an explanation. This sounds synthetic even when the content is correct. Write it as normal prose instead.
+
+- Bad: `For this step, the flow is simple: start from an event, wait for approval, then continue.`
+- Better: `The flow starts from an event, waits for approval, and then continues.`
+
+**Vague framing around behavior.** Avoid empty scaffolding phrases such as `it does one simple thing`, `the flow is simple`, or `you start from`. Name the behavior directly.
+
+- Bad: `The workflow does one simple thing.`
+- Better: `The workflow takes a booking event, generates a trip plan, and waits for approval.`
+
+**Overly direct present-tense walkthrough voice for explanations.** In explanatory paragraphs, prefer describing how the system behaves over telling the reader `you start`, `you do`, or `you follow`. Reserve direct address for actual instructions marked with `==highlighted text==`.
+
+- Bad: `You start from an event with schedule and then wait with listen.`
+- Better: `The workflow starts from an event with schedule and then waits with listen.`
+
+**"That" as a sentence opener.** AI models frequently start follow-up sentences with "That works...", "That means...", "That way...". Use "This" instead, which sounds more natural in written English.
+
+- Bad: `The request comes in and the agents run. That works for immediate answers.`
+- Better: `The request comes in and the agents run. This works for immediate answers.`
+
+**Explain behavior first, API names second.** When introducing workflow steps, standards, or architecture, start with what happens in plain language. Then tie it back to the concrete API names or annotations.
+
+- Better: `The workflow waits for the approval response before continuing. In the code, that pause is handled by listen().`
+
 **Parallel bullet structure that sounds like a spec.** Instead of:
 ```
 - `CostEstimatorAgent` reads vehicle and itineraryResult from scope
@@ -69,6 +93,8 @@ Do not use action directives for passive observations ("Notice how...").
 ## Code Block Explanations
 
 After showing a code block, explain what matters in 2–4 sentences of prose. Focus on the one or two things that are new or non-obvious. Do not enumerate every field and method.
+
+When explaining a flow or architecture snippet, avoid restating every step as a mechanical list if one short paragraph will do the job more naturally.
 
 ## Section Structure
 

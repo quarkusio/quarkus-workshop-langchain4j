@@ -35,5 +35,6 @@
         <module>section-3/step-00</module>
         <module>section-3/step-01</module>
         <module>section-3/step-02</module>
+        <module>section-3/step-03</module>
     </modules>
 </project>

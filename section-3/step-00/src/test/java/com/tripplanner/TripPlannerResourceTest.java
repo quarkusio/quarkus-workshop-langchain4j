@@ -2,11 +2,13 @@ package com.tripplanner;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 @QuarkusTest
+@EnabledIfEnvironmentVariable(named = "OPENAI_API_KEY", matches = ".+")
 class TripPlannerResourceTest {
 
     @Test
@@ -16,6 +18,7 @@ class TripPlannerResourceTest {
                 .body("""
                         {
                             "destination": "Italian Riviera",
+                            "startDate": "2026-07-10",
                             "days": 5,
                             "tripType": "family",
                             "travelers": 4,

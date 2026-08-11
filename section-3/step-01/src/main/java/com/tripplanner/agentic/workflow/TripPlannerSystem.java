@@ -20,9 +20,10 @@ public interface TripPlannerSystem extends MonitoredAgent {
                     TipsGeneratorAgent.class
             })
     TripPlan planTrip(String destination,
-                      Integer days,
+                      String startDate,
+                      String days,
                       String tripType,
-                      Integer travelers,
+                      String travelers,
                       String budget,
                       String preferences);
 

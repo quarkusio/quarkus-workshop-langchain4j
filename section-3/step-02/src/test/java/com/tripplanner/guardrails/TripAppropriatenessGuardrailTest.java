@@ -22,7 +22,7 @@ class TripAppropriatenessGuardrailTest {
 
     @BeforeEach
     void setUp() {
-        tripRequestContext.set(new TripRequest("Italian Riviera", 5, "family", 4, "moderate (€1000-€2500)", "coastal towns"));
+        tripRequestContext.set(new TripRequest("Italian Riviera", "2026-07-10", 5, "family", 4, "moderate (€1000-€2500)", "coastal towns"));
     }
 
     @Test
@@ -45,7 +45,7 @@ class TripAppropriatenessGuardrailTest {
 
     @Test
     void luxuryVehicleOnEconomyBudgetShouldRetry() {
-        tripRequestContext.set(new TripRequest("Milan", 3, "business", 2, "economy (€500-€1000)", "meetings"));
+        tripRequestContext.set(new TripRequest("Milan", "2026-09-20", 3, "business", 2, "economy (€500-€1000)", "meetings"));
         String json = """
                 {"type": "Luxury Sedan", "model": "Ferrari Roma", "reasoning": "Impressive for clients"}
                 """;

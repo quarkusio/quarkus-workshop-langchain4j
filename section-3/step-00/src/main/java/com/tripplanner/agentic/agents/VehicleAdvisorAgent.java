@@ -21,7 +21,7 @@ public interface VehicleAdvisorAgent {
            outputKey = "vehicle")
     TripPlan.VehicleRecommendation recommendVehicle(String destination,
                                                     String tripType,
-                                                    Integer travelers,
+                                                    String travelers,
                                                     String budget,
                                                     String preferences);
 }

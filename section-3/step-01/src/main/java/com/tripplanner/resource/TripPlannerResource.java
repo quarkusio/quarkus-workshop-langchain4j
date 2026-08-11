@@ -23,9 +23,10 @@ public class TripPlannerResource {
     public TripPlan planTrip(TripRequest request) {
         return tripPlannerSystem.planTrip(
                 request.destination(),
-                request.days(),
+                request.startDate(),
+                String.valueOf(request.days()),
                 request.tripType(),
-                request.travelers(),
+                String.valueOf(request.travelers()),
                 request.budget(),
                 request.preferences()
         );
