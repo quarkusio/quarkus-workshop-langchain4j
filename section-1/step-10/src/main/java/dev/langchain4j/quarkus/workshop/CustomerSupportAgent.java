@@ -1,5 +1,6 @@
 package dev.langchain4j.quarkus.workshop;
 
+import dev.langchain4j.guardrail.InputGuardrailException;
 import dev.langchain4j.service.guardrail.InputGuardrails;
 import io.quarkiverse.langchain4j.mcp.runtime.McpToolBox;
 import jakarta.enterprise.context.SessionScoped;
@@ -35,8 +36,8 @@ public interface CustomerSupportAgent {
     @ToolBox(BookingRepository.class)
     @McpToolBox("weather")
     @Timeout(5000)
-    @Retry(maxRetries = 3, delay = 100)
-    @Fallback(CustomerSupportAgentFallback.class)
+    @Retry(maxRetries = 3, delay = 100, abortOn = InputGuardrailException.class)
+    @Fallback(value = CustomerSupportAgentFallback.class, skipOn = InputGuardrailException.class)
     String chat(String userMessage);
 
     public static class CustomerSupportAgentFallback implements FallbackHandler<String> {
