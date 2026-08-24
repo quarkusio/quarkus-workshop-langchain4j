@@ -7,6 +7,7 @@ let carsData = []; // Store the cars data globally for sorting
 let currentFilterText = '';
 let currentFilterField = 'all';
 let lastUpdatedCarId = null; // Track the last updated car for highlighting
+let processingCarIds = new Set(); // Track cars currently being processed
 
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -183,11 +184,12 @@ function populateFleetStatusTable(cars) {
         // Build action cell based on status
         let actionCell = '<td></td>';
         if (car.status === 'RENTED' || car.status === 'AT_CLEANING' || car.status === 'IN_MAINTENANCE') {
+            const isProcessing = processingCarIds.has(car.id);
             actionCell = `
                 <td>
                     <form onsubmit="processFeedback(event, ${car.id}, '${car.status}')">
-                        <input type="text" class="feedback-input" id="feedback-${car.id}" placeholder="Enter feedback">
-                        <button type="submit" class="return-button">Return</button>
+                        <input type="text" class="feedback-input" id="feedback-${car.id}" placeholder="Enter feedback" ${isProcessing ? 'disabled' : ''}>
+                        <button type="submit" class="return-button" ${isProcessing ? 'disabled' : ''}>${isProcessing ? 'Processing...' : 'Return'}</button>
                     </form>
                 </td>`;
         }
@@ -209,12 +211,15 @@ function populateFleetStatusTable(cars) {
 // Function to process feedback and return a car
 function processFeedback(event, carId, status) {
     event.preventDefault();
+
+    if (processingCarIds.has(carId)) return;
+
     const feedback = document.getElementById(`feedback-${carId}`).value;
     const button = event.target.querySelector('button');
 
+    processingCarIds.add(carId);
     button.disabled = true;
     button.classList.add('loading');
-    const originalText = button.textContent;
     button.textContent = 'Processing...';
 
     const statusLabels = {
@@ -229,6 +234,7 @@ function processFeedback(event, carId, status) {
         return response.text();
     })
     .then(data => {
+        processingCarIds.delete(carId);
         lastUpdatedCarId = carId;
         showNotification(`Car successfully returned from ${statusLabels[status]}`);
         loadAllCars();
@@ -236,9 +242,8 @@ function processFeedback(event, carId, status) {
     .catch(error => {
         console.error(`Error returning car from ${statusLabels[status]}:`, error);
         displayError(`Failed to process ${statusLabels[status]} return. Please try again.`);
-        button.disabled = false;
-        button.classList.remove('loading');
-        button.textContent = originalText;
+        processingCarIds.delete(carId);
+        loadAllCars();
     });
 }
 
