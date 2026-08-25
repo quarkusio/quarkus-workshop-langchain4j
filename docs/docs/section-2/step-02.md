@@ -510,7 +510,7 @@ Click **Return**.
 You should see both agents executing in sequential:
 
 ```
-🚗 CleaningTool result: Cleaning requested for Toyota Camry (2021), Car #4:
+🚗 CleaningTool result: Cleaning requested for 3-year-old Toyota Corolla, Car #6:
 - Interior cleaning
 - Exterior wash
 Additional notes: Fire damage requires thorough cleaning

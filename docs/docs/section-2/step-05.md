@@ -315,7 +315,7 @@ flowchart TD
 
     FW --> FSA["FleetSupervisorAgent<br/>Orchestration"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$18,000<br/>2020 Honda Civic"]
+    PA --> Value["Estimate: ~$18,000<br/>4-year-old Honda Civic"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|Yes| Proposal["DispositionProposalAgent<br/>Creates Proposal"]
@@ -367,7 +367,7 @@ flowchart TD
 
     FW --> FSA["FleetSupervisorAgent"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$25,000<br/>2021 Mercedes Benz"]
+    PA --> Value["Estimate: ~$25,000<br/>2-year-old Mercedes-Benz C-Class"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|Yes| Proposal["DispositionProposalAgent<br/>Creates Proposal"]
@@ -415,7 +415,7 @@ flowchart TD
 
     FW --> FSA["FleetSupervisorAgent"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$8,000<br/>2019 Ford F-150, totaled"]
+    PA --> Value["Estimate: ~$8,000<br/>2-year-old Ford F-150, totaled"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|No| Direct["DispositionAgent<br/>Direct Decision"]

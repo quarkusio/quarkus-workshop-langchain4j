@@ -462,7 +462,7 @@ flowchart TD
 
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
     FSA -->|"Disposition has highest priority"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $8,500<br/>2020 Honda Civic with severe damage"]
+    PA --> PV["Estimate: $8,500<br/>4-year-old Honda Civic with severe damage"]
     PV --> DA["Invoke DispositionAgent"]
     DA --> DD["Decision: SCRAP<br/>Repair cost > 50% of value"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP - severe damage"])
@@ -502,7 +502,7 @@ flowchart TD
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
     FSA -->|"Severe damage detected"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $12,000<br/>2014 Ford F-150, totaled"]
+    PA --> PV["Estimate: $12,000<br/>2-year-old Ford F-150, totaled"]
     PV --> DA["Invoke DispositionAgent"]
     DA --> DD["Decision: SCRAP or SELL<br/>Beyond economical repair"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled"])

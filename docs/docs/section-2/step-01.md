@@ -107,7 +107,7 @@ Click the **Return** button.
 Check your terminal logs (you may need to scroll up). You should see output like:
 
 ```
-🚗 CleaningTool result: Cleaning requested for Mercedes-Benz C-Class (2020), Car #6:
+🚗 CleaningTool result: Cleaning requested for 2-year-old Mercedes-Benz C-Class, Car #1:
 - Interior cleaning
 Additional notes: Interior cleaning required due to dog hair in back seat.
 ```
