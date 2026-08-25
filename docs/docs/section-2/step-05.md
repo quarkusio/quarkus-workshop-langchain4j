@@ -315,7 +315,7 @@ flowchart TD
 
     FW --> FSA["FleetSupervisorAgent<br/>Orchestration"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$18,000<br/>4-year-old Honda Civic"]
+    PA --> Value["Estimated value above $15,000<br/>4-year-old Honda Civic"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|Yes| Proposal["DispositionProposalAgent<br/>Creates Proposal"]
@@ -342,7 +342,7 @@ flowchart TD
 
 **Expected Result:**
 
-- PricingAgent estimates value at ~$18,000 (above threshold)
+- PricingAgent estimates a value above the approval threshold
 - DispositionProposalAgent creates SCRAP proposal
 - HumanApprovalAgent pauses the workflow (via `@HumanInTheLoop`) and waits for human input
 - Human reviews the proposal in the UI and clicks Approve or Reject
@@ -354,27 +354,27 @@ flowchart TD
 Enter the following text in the **Mercedes Benz** feedback field:
 
 ```text
-Minor fender bender, small dent in rear bumper
+The car was in a major collision with frame damage, but the engine still runs.
 ```
 
 **What happens:**
 
 ```mermaid
 flowchart TD
-    Start(["Input: Minor fender bender<br/>small dent"])
+    Start(["Input: Major collision<br/>frame damage"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Produces: FeedbackAnalysisResults"]
 
     FW --> FSA["FleetSupervisorAgent"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$25,000<br/>2-year-old Mercedes-Benz C-Class"]
+    PA --> Value["Estimated value above $15,000<br/>2-year-old Mercedes-Benz C-Class"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|Yes| Proposal["DispositionProposalAgent<br/>Creates Proposal"]
-    Proposal --> PropResult["Proposed: SELL or KEEP<br/>Minor damage"]
+    Proposal --> PropResult["Proposed: SCRAP or SELL<br/>Severe damage"]
 
     PropResult --> Human["HumanApprovalAgent<br/>@HumanInTheLoop pauses workflow"]
-    Human --> Decision["Decision: REJECTED<br/>Too valuable for minor damage"]
+    Human --> Decision["Decision: REJECTED<br/>Repair instead"]
 
     Decision --> Fallback["Route to Maintenance<br/>Repair instead"]
     Fallback --> Result(["Status: IN_MAINTENANCE<br/>Approval: REJECTED"])
@@ -390,32 +390,32 @@ flowchart TD
 
 **Expected Result:**
 
-- PricingAgent estimates value at ~$25,000 (high value)
-- DispositionProposalAgent suggests SELL or KEEP
-- HumanApprovalAgent pauses workflow, human REJECTS (too valuable for disposition with minor damage)
+- PricingAgent estimates a high value above the approval threshold
+- DispositionProposalAgent creates a disposition proposal
+- HumanApprovalAgent pauses workflow, human REJECTS the disposition proposal
 - Fallback: Routes to MaintenanceAgent instead
 - Status: `IN_MAINTENANCE`
 - Disposition status: `DISPOSITION_REJECTED` with reasoning
 
 #### Scenario 3: Low-Value Vehicle - No Approval Needed
 
-Enter the following text in the **Ford F-150** feedback field (status: In Maintenance) in the Fleet Status grid:
+Enter the following text in the **Ford Focus** feedback field in the Fleet Status grid:
 
 ```text
-The truck is totaled, completely inoperable, very old
+The car is totaled, completely inoperable, very old
 ```
 
 **What happens:**
 
 ```mermaid
 flowchart TD
-    Start(["Input: Totaled truck<br/>very old"])
+    Start(["Input: Totaled car<br/>very old"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Produces: FeedbackAnalysisResults"]
 
     FW --> FSA["FleetSupervisorAgent"]
     FSA --> PA["PricingAgent"]
-    PA --> Value["Estimate: ~$8,000<br/>2-year-old Ford F-150, totaled"]
+    PA --> Value["Estimated value below $15,000<br/>12-year-old Ford Focus, totaled"]
 
     Value --> Check{"Value > $15,000?"}
     Check -->|No| Direct["DispositionAgent<br/>Direct Decision"]
@@ -433,11 +433,11 @@ flowchart TD
 
 **Expected Result:**
 
-- PricingAgent estimates value at ~$8,000 (below threshold)
+- PricingAgent estimates a value below the approval threshold
 - Skips approval workflow entirely (low value)
 - DispositionAgent makes direct SCRAP decision
 - Status: `PENDING_DISPOSITION`
-- Disposition status: `DISPOSITION_NOT_REQUIRED`
+- Approval status: `NOT_REQUIRED`
 
 ### Check the Logs
 
