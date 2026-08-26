@@ -498,6 +498,6 @@ The system now:
 - **Step 5**: Human-in-the-Loop for safe, controlled autonomous decisions
 - **Step 6**: Multimodal image analysis for enriched feedback
 
-In **Step 07**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local PricingAgent into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
+In **Step 07**, you'll learn about **dynamic model selection** — automatically routing high-value vehicle decisions to a more capable LLM while keeping costs down for routine dispositions!
 
-[Continue to Step 07 - Using Remote Agents (A2A)](step-07.md)
+[Continue to Step 07 - Dynamic Model Selection](step-07.md)

@@ -2,7 +2,7 @@
 
 Congratulations! You've completed **Section 2: Agentic Systems** of the Quarkus LangChain4j workshop.
 
-Over the past seven steps — plus an optional bonus deployment step — you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight and multimodal capabilities.
+Over the past eight steps — plus an optional bonus deployment step — you've journeyed from simple AI agents to sophisticated distributed multi-agent systems with human oversight, multimodal capabilities, and adaptive model selection.
 Let's reflect on what you've built and why these patterns matter.
 
 ---
@@ -135,9 +135,31 @@ You added **multimodal capabilities** to the car return workflow, enabling the s
 
 ---
 
+### Step 07: Dynamic Model Selection
+
+You implemented **dynamic model selection** so the system automatically uses a more capable LLM for high-value vehicle decisions while keeping costs down for routine cases.
+
+**What you built:**
+
+- `DynamicModelSelector`: A CDI bean that chooses between a base and an advanced model based on the vehicle's estimated value
+- Named model configuration: Two models (`gpt-4o-mini` and `gpt-4o`) configured side-by-side in `application.properties`
+- `@ChatModelSupplier` on `DispositionProposalAgent`: Dynamic per-invocation model selection using runtime data
+
+**Key concepts:**
+
+- **Named models**: Configuring multiple LLM backends in a single application with `quarkus.langchain4j.openai.<modelName>.*`
+- **`@ModelName`**: Qualifier for injecting a specific named model into a CDI bean
+- **`@ChatModelSupplier`**: Static method on an agent interface that returns the `ChatModel` for each invocation
+- **`@CdiBean`**: Bridges CDI dependency injection into the static supplier method
+- **Parameter matching**: The supplier receives agent method parameters by type, enabling data-driven model selection
+
+**Why it matters:** Not all decisions carry equal risk. A scrapped $50,000 car is far more costly than a $3,000 one. Dynamic model selection lets you balance cost against quality — using a cheaper model for routine decisions and a stronger model when the stakes justify it. The pattern keeps model selection logic separate from agent prompts, so changes to the selection rule don't require touching any agent code.
+
+---
+
 ### Bonus Step: Deploying to Kubernetes
 
-If you completed the bonus step, you took the entire system built in steps 01–07 and deployed it to a real Kubernetes cluster.
+If you completed the bonus step, you took the entire system built in steps 01–08 and deployed it to a real Kubernetes cluster.
 
 **What you did:**
 - Packaged both Quarkus applications as container images using `quarkus:image-push`
@@ -155,7 +177,7 @@ If you completed the bonus step, you took the entire system built in steps 01–
 
 ---
 
-### Step 07: Distributed Agents with A2A
+### Step 08: Distributed Agents with A2A
 
 You extended beyond single-application boundaries to build **distributed multi-agent systems** using the A2A protocol.
 

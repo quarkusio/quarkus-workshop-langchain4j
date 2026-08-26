@@ -434,7 +434,7 @@ async function loadPendingApprovals() {
                 closeApprovalModal();
             }
         }
-        
+
         // Always keep modal content in sync with pending approvals.
         // Cards being decided are removed individually via animation in handleProposalDecision,
         // so we only add cards that aren't already rendered to avoid disrupting ones in-flight.
