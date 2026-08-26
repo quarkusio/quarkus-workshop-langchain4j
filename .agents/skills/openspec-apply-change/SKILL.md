@@ -12,7 +12,7 @@ metadata:
 
 Implement tasks from an OpenSpec change.
 
-**Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `schemas`, `view`). Once selected, treat `--store <id>` as sticky for the rest of the workflow. Every unscoped example of those commands below is shorthand: before running it, append the flag. For example, run `openspec status --change "<name>" --json --store "<id>"`, not the unscoped form shown below. Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.
+**Store selection:** If a store applies, run `openspec store list --json` to find its id, then pass `--store <id>` on every command that accepts it (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `schemas`, `view`). Treat it as sticky for the session. Without a store, commands act on the nearest local `openspec/` root.
 
 **Input**: Optionally specify a change name (e.g., `/opsx-apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -111,57 +111,6 @@ Implement tasks from an OpenSpec change.
    - Overall progress: "N/M tasks complete"
    - If all done: suggest archive
    - If paused: explain why and wait for guidance
-
-**Output During Implementation**
-
-```
-## Implementing: <change-name> (schema: <schema-name>)
-
-Working on task 3/7: <task description>
-[...implementation happening...]
-✓ Task complete
-
-Working on task 4/7: <task description>
-[...implementation happening...]
-✓ Task complete
-```
-
-**Output On Completion**
-
-```
-## Implementation Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 7/7 tasks complete ✓
-
-### Completed This Session
-- [x] Task 1
-- [x] Task 2
-...
-
-All tasks complete! You can archive this change with `/opsx-archive`.
-```
-
-**Output On Pause (Issue Encountered)**
-
-```
-## Implementation Paused
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 4/7 tasks complete
-
-### Issue Encountered
-<description of the issue>
-
-**Options:**
-1. <option 1>
-2. <option 2>
-3. Other approach
-
-What would you like to do?
-```
 
 **Guardrails**
 - Keep going through tasks until done or blocked
