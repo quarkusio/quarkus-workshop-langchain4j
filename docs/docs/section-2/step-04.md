@@ -442,14 +442,14 @@ Try these scenarios to see how the supervisor pattern autonomously orchestrates 
 Enter the following text in the feedback field for the **Honda Civic**:
 
 ```text
-The car is totaled after a serious collision. The frame is bent, the engine is damaged, airbags deployed, and the repair shop says repairs would exceed the vehicle value.
+The car is completely wrecked after a serious collision. The frame seems to be compromised and the engine is in pieces.
 ```
 
 **What happens:**
 
 ```mermaid
 flowchart TD
-    Start(["Input: Totaled after serious collision<br/>repairs exceed vehicle value"])
+    Start(["Input: Completely wrecked after serious collision<br/>frame compromised, engine in pieces"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> T1["FeedbackTask.cleaning()"]
