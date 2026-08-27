@@ -14,6 +14,7 @@
 
 ## 2. Add project directory and dependencies
 
+- [ ] 2.0 Remove the chat/memory code currently on disk in `section-3/step-04/src` that the revised spec excludes: `DatabaseChatMemoryStore`, `ChatMessageEntity`, `TripChatAgent`, `TripChatResource`, and the chat-triggered `TripPlannerTools.planTrip(...)`. Revert `index.html` / `app.js` to Step 03 scaffolding (keep `CHAT_ENABLED = false`), leaving only the instance-ID display from section 4 as the step-specific addition
 - [ ] 2.1 Copy `section-3/step-03/` to `section-3/step-04/` as the starting point (or scaffold from scratch) and verify it builds with `./mvnw clean package -DskipTests -pl section-3/step-04`
 - [ ] 2.2 Add `quarkus-flow-jpa` and `quarkus-jdbc-postgresql` to `section-3/step-04/pom.xml`; verify no version property change is needed (both are in the existing BOM)
 - [ ] 2.3 Confirm `quarkus-hibernate-orm-panache` arrives transitively (no explicit entry required) by checking the effective POM
@@ -25,35 +26,31 @@
 - [ ] 3.3 Add `"env": { "TESTCONTAINERS_REUSE_ENABLE": "true" }` to the project-root `devbox.json`
 - [ ] 3.4 Create `.envrc` at the project root with `export TESTCONTAINERS_REUSE_ENABLE=true`
 
-## 4. Starter code
+## 4. UI: display workflow instance ID
 
-- [ ] 4.1 Create `ChatMessageEntity` extending `PanacheEntity` with `memoryId` (String), `sequence` (int), and `message` (TEXT column); verify Hibernate creates its table on first boot
-- [ ] 4.2 Create `TripChatAgent` — `@RegisterAiService(tools = TripPlannerTools.class)` annotated `@ApplicationScoped` (not the default `@RequestScoped`); add a note-box reminder in the docs about scope
-- [ ] 4.3 Create `TripPlannerTools` bridging `TripChatAgent` to `TripPlannerFlowAdapter`
-- [ ] 4.4 Create `TripChatResource` at `/trip/chat` accepting a session id and message body
-- [ ] 4.5 Add a chat panel to `src/main/resources/META-INF/resources/index.html` alongside the existing plan form and results pages
+- [ ] 4.1 Confirm the `/trip/plan` response already includes `instanceId` (from Step 03) and that the frontend receives it in `app.js`
+- [ ] 4.2 Display the workflow instance ID on the results page, below the approve/reject action bar, with a short label explaining it identifies the persisted workflow instance
+- [ ] 4.3 Keep the scaffolding consistent with Steps 00–03: leave `CHAT_ENABLED = false` and the disabled chat section code untouched — the instance-ID display is the only step-specific UI addition
+- [ ] 4.4 Confirm no second trip-planning path is introduced; the form remains the single way to create a plan
 
-## 5. Participant code (`DatabaseChatMemoryStore`)
+## 5. Code consistency check (Steps 00–04)
 
-- [ ] 5.1 Verify exact method names (`ChatMessageSerializer.serialize` / `ChatMessageDeserializer.deserialize`) against langchain4j 1.13.0 JAR before writing
-- [ ] 5.2 Create a starter shell of `DatabaseChatMemoryStore` (class declaration, imports, empty method stubs with `@Transactional`) so participants fill in logic only
-- [ ] 5.3 Implement `getMessages`: query `ChatMessageEntity` by `memoryId` ordered by `sequence`, deserialize each row's payload, and return the list
-- [ ] 5.4 Implement `updateMessages`: delete all rows for the `memoryId`, then reinsert the full list with incrementing `sequence` values
-- [ ] 5.5 Implement `deleteMessages`: delete all rows for the `memoryId`
+- [x] 5.1 Confirm `TripPlannerTools` in `step-00` uses `int` for numeric parameters (`getBudgetInfo(String, int)`); ensure any tool numeric parameters remain `int` for consistency across steps
+- [x] 5.2 Verify `index.html` and `app.js` base scaffolding (form page, results page, approval polling, `CHAT_ENABLED=false` flag) are identical to Step 03 except for the instance-ID display
+- [x] 5.3 Document in the step which files are unchanged scaffolding vs. the step-specific additions (persistence config + instance-ID display)
 
 ## 6. Tests
 
-- [ ] 6.1 Write `DatabaseChatMemoryStoreTest` (`@QuarkusTest`): round-trip store/read/delete, ordering preserved across `sequence`, two `memoryId` values isolated, tool-execution message survives serialization
-- [ ] 6.2 Write `TripChatAgentMemoryTest` (`@QuarkusTest`): after one `/trip/chat` call, assert that `ChatMessageEntity` rows exist for that session id (assert on persistence, not model output)
-- [ ] 6.3 Attempt `FlowDurabilityRestoreTest` (`QuarkusDevModeTest`): trigger a reload via `modifyResourceFile`, send an approval event, assert workflow completes — fall back to asserting Flow instance rows exist while suspended if the combined test proves unstable, per design.md
+- [x] 6.1 Write a `@QuarkusTest` asserting Flow instance rows exist in the database while a workflow is suspended (proves persistence half)
+- [x] 6.2 Attempt `FlowDurabilityRestoreTest` (`QuarkusDevModeTest`): trigger a reload via `modifyResourceFile`, send an approval event, assert workflow completes — fall back to asserting Flow instance rows exist while suspended if the combined test proves unstable, per design.md
 
 ## 7. Documentation (`docs/docs/section-3/step-04.md`)
 
-- [ ] 7.1 Write narrative opening and concept section (two persistence concerns: chat memory + Flow state)
-- [ ] 7.2 Write Prerequisites tabs (covering devbox / direnv / manual env var / live-reload fallback)
-- [ ] 7.3 Write Dependencies section with the two new POM entries and an explanation of why Panache is transitive
-- [ ] 7.4 Write the code walk-through for `DatabaseChatMemoryStore` (highlight the three `@Transactional` methods, the delete-then-reinsert pattern, and `ChatMessageSerializer`)
-- [ ] 7.5 Write the configuration section covering `application.properties` snippets and the test isolation block
-- [ ] 7.6 Write the restart section: primary path (env var + Ctrl-C restart), verification check (`Restoring workflow instance:` log + Dev UI rows), fallback (live reload), and cleanup note for lingering containers
-- [ ] 7.7 Write the "Going further" section: convert `TripPlanStore` to Panache; mention `chatMemoryFlushStrategySupplier` with `IMMEDIATE`
-- [ ] 7.8 Verify the complete step runs end-to-end: start app, chat, submit a plan, restart, confirm workflow restore log, approve, confirm completion
+- [x] 7.1 Write narrative opening and concept section (single focus: Flow state survives a restart)
+- [x] 7.2 Write Prerequisites tabs (covering devbox / direnv / manual env var / live-reload fallback)
+- [x] 7.3 Write Dependencies section with the two new POM entries and an explanation of why Panache is transitive
+- [x] 7.4 Write the configuration section covering `application.properties` snippets and the test isolation block
+- [x] 7.5 Write the UI section: the instance-ID display and how to use it to verify restoration
+- [x] 7.6 Write the restart section: primary path (env var + Ctrl-C restart), verification check (note instance ID in UI → `Restoring workflow instance:` log → Dev UI row → approve completes), fallback (live reload), and cleanup note for lingering containers
+- [x] 7.7 Write the "Going further" section: tease workflow refinement loops as an upcoming orchestration topic
+- [x] 7.8 Verify the complete step runs end-to-end: start app, submit a plan (note the instance ID), restart, confirm the same instance ID in the restore log and Dev UI, approve, confirm completion

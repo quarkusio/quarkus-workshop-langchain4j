@@ -85,4 +85,20 @@ public class TripPlannerResource {
         }
         return Response.ok(status).build();
     }
+
+    /**
+     * Returns the most recent plan awaiting approval, if any.
+     * Used by the UI to restore the results page after a page reload.
+     * Returns 204 No Content when no awaiting plan exists.
+     */
+    @GET
+    @Path("/plan/latest")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response latestPlan() {
+        TripPlanStore.TripPlanStatus status = tripPlanStore.latest();
+        if (status == null || !"awaiting_approval".equals(status.status())) {
+            return Response.noContent().build();
+        }
+        return Response.ok(status).build();
+    }
 }

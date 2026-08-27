@@ -1,4 +1,4 @@
-# Step 03 - Event-Driven Workflows with Quarkus Flow
+# Step 03 - Event-Driven Agentic Workflows with Quarkus Flow
 
 ## From REST Calls to Suspendable Workflows
 
@@ -31,17 +31,19 @@ flowchart TD
 ```
 
 !!! note "In-memory state"
-    In this step, the workflow state will be kept in memory. This means that if you restart the app while a workflow is waiting for approval, that waiting instance is lost. In Step 04 we will introduce loop-oriented orchestration concepts and  advanced control flow patterns to address this scenario.
+    In this step, the workflow state will be kept in memory. This means that if you restart the app while a workflow is waiting for approval, that waiting instance is lost. In Step 04 you will add PostgreSQL persistence so the workflow survives a restart. Step 05 then introduces loop-oriented orchestration and advanced control flow patterns.
 
 ---
 
 ## Prerequisites
 
-=== "Option 1: Continue from Step 02"
+=== "Option 1: Continue from Step 02 and build the new features hands-on"
 
     Stay in the code you've built in the previous step(s) and apply the changes described in this page. You can continue to run Quarkus in Dev Mode.
 
-=== "Option 2: Use the completed Step 03 project"
+=== "Option 2: Use the completed Step 03 project and review the changes"
+
+    This option allows you to walk through the new code changes, but you won't have to make the changes yourself.
 
     ==Open `section-3/step-03` and start dev mode:==
 
@@ -76,7 +78,7 @@ flowchart TD
 ==Add the version property in `<properties>`:==
 
 ```xml
-<quarkus-flow.version>0.13.0</quarkus-flow.version>
+<quarkus-flow.version>1.0.0</quarkus-flow.version>
 ```
 
 ==Add these dependencies to `<dependencies>`:==
@@ -259,7 +261,15 @@ Click the eye icon next to `trip-planner-flow` to open the visual flow diagram. 
 
 ==Fill in the trip form and click **Generate Trip Plan**.==
 
-The form submits to the REST endpoint, which triggers the workflow and blocks until the plan is ready. While you wait, watch the terminal. The `TraceLoggerExecutionListener` prints a line for every task transition:
+Try a Swiss Alps business trip with a conference in Geneva, snowboarding in Verbier, and wine tasting in Valais.
+
+![The trip form filled in for a Swiss Alps business trip](../images/section-3-trip-form.png)
+
+The form submits to the REST endpoint, which triggers the workflow and blocks until the plan is ready. While the agents research the destination, select a vehicle, and estimate costs, the UI shows a wait screen:
+
+![Planning your trip wait screen](../images/section-3-planning.png)
+
+Watch the terminal at the same time. The `TraceLoggerExecutionListener` prints a line for every task transition:
 
 ```
 Task 'set-0' started at ...           pos=do/0/set-0
@@ -274,10 +284,11 @@ Task 'waitApproval' started at ...    pos=do/3/waitApproval
 
 Notice how the log stops at `waitApproval`. The workflow is now suspended in memory, waiting for an event. No thread is blocked and no CPU is consumed while it waits.
 
-When the workflow reaches the approval wait state, the generated plan appears with two buttons:
+When the workflow reaches the approval wait state, the generated plan appears with **Approve Trip** and **Reject Trip** buttons:
 
-- **Approve Trip**
-- **Reject Trip**
+![Trip plan waiting for approval](../images/section-3-trip-approval.png)
+
+The yellow banner shows that the workflow is suspended at `listen()`, waiting for a decision. The page shows the vehicle recommendation and route overview produced by the agents.
 
 ### Approve path
 
@@ -297,7 +308,9 @@ Task 'emit-6' completed at ...
 Workflow name=trip-planner-flow ...    completed
 ```
 
-The UI shows a booking reference once the `booking.finalized` event arrives.
+The UI shows a booking reference once the `booking.finalized` event arrives:
+
+![Trip confirmed with a Miles of Smiles booking reference](../images/section-3-booking-confirmed.png)
 
 ### Reject path
 
@@ -327,6 +340,6 @@ You now have a full event-driven path from UI to workflow. The UI starts the wor
 
 This is the practical HITL pattern for event-driven orchestration in Quarkus Flow.
 
-In **Step 04**, you will focus on voting and loop-based orchestration patterns.
+In **Step 04**, you will add PostgreSQL-backed persistence so the workflow survives a full restart.
 
-[Continue to Step 04 - Voting, Loops, and Adaptive Model Selection](step-04.md)
+[Continue to Step 04 - Persistent State with PostgreSQL](step-04.md)

@@ -5,19 +5,20 @@ Quarkus dev mode process is the only persistence boundary, so a restart loses ev
 `quarkus-flow-bom` at version `1.0.0` already includes `quarkus-flow-jpa`; the only missing piece
 is a PostgreSQL datasource, the correct Hibernate schema strategy, and a surviving container.
 
-Chat memory is held by `InMemoryChatMemoryStoreProducer`, which is a `@DefaultBean`. The
-`ChatMemoryProcessor` extension wires `ChatMemoryStore` → `ChatMemoryProvider` → AI service
-automatically, so replacing the store requires only one new bean.
-
 ## Goals / Non-Goals
 
 **Goals:**
-- Both chat history and Flow state survive a full Quarkus process restart.
-- Participants write one class (`DatabaseChatMemoryStore`, ~35–40 lines).
+- Flow state survives a full Quarkus process restart and resumes at the suspended task.
+- The restart effect is visible in the UI (workflow instance ID), not only in logs and the Dev UI.
 - `TripPlannerFlow` is byte-for-byte unchanged.
 - Tests are isolated from the dev container and cannot destroy persisted data.
 
 **Non-Goals:**
+- Chat memory persistence (`DatabaseChatMemoryStore`, `TripChatAgent`) — deferred to a later step
+  if still valuable; it does not add to the persistence demonstration the approval flow already
+  provides.
+- Plan refinement / workflow modification — a workflow-orchestration topic (loops, branching,
+  multiple event types) that belongs in the Voting/Loops step, not the persistence step.
 - Converting `TripPlanStore` to Panache (reserved for "Going further").
 - Kafka durability — the restored workflow waits for a fresh `approval.done` event.
 - Production-grade connection pooling or schema migration tooling (Flyway/Liquibase).
@@ -28,12 +29,6 @@ automatically, so replacing the store requires only one new bean.
 `quarkus-flow-jpa` is already in the BOM and provides automatic persistence with zero changes to
 the workflow definition. The alternative — externalising state manually — would require modifying
 `TripPlannerFlow`, which contradicts the teaching goal of the step.
-
-### One row per message in `ChatMessageEntity`, not a JSON blob per conversation
-One row per message makes the table observable in the Dev UI (attendees watch rows accumulate)
-and is a natural teaching artefact. A single JSON blob per conversation would be marginally
-simpler to implement but invisible at a glance. `PanacheEntity` arrives transitively via
-`quarkus-flow-jpa` → `quarkus-hibernate-orm-panache`, so no extra dependency is required.
 
 ### Testcontainers reuse via env var (`TESTCONTAINERS_REUSE_ENABLE=true`), not Compose Dev Services
 `quarkus.datasource.devservices.stop-services=false` (Compose V2) was the alternative. The env
@@ -47,25 +42,31 @@ The default under Dev Services is `drop-and-create`, which wipes every table on 
 `update` strategy preserves rows. The property was renamed in Quarkus 3.x; the legacy alias
 `quarkus.hibernate-orm.database.generation` used in older Flow docs must not appear in this step.
 
-### Starter code includes `TripChatAgent`, `TripPlannerTools`, `TripChatResource`, and `ChatMessageEntity`
-Participants only write the store. Everything else is pre-built to keep focus on the
-`ChatMemoryStore` pattern and avoid rebuilding unrelated plumbing.
+### Display the workflow instance ID in the UI for tangible verification
+The results page shows the workflow instance ID below the approve/reject buttons. The tutorial
+instructs participants to note the ID, restart the app, refresh the browser, and confirm the same
+ID appears — proving the workflow was restored from the database rather than freshly created. This
+gives immediate visual feedback that persistence worked, supplementing the developer-focused
+verification via the `Restoring workflow instance: <id>` log line and Dev UI database inspection.
+The instance ID is already returned by the `/trip/plan` endpoint in Step 03 (used for approval
+correlation), so surfacing it is a display-only change with no backend work.
 
-### `TripChatAgent` is `@ApplicationScoped`, not `@RequestScoped`
-AI services default to `@RequestScoped`. `@MemoryId` cannot span requests in that scope, so
-`@ApplicationScoped` is required. This is a gotcha worth a callout box in the docs, not silent
-starter code.
+### The form stays the single way to create a trip plan
+No chat agent, no second planning entry point. A second path (chat-triggered planning) was
+considered and rejected as confusing. The results-page UI adds only a read-only instance ID
+display; the approval controls and polling from Step 03 are unchanged.
 
 ## Risks / Trade-offs
 
 - **Env var fails silently** → Mitigated by a "did it work?" verification step in the docs:
-  look for `Restoring workflow instance: <id>` at DEBUG and confirm rows in the Dev UI.
+  look for `Restoring workflow instance: <id>` at DEBUG, confirm the same instance ID in the UI,
+  and confirm rows in the Dev UI.
 - **Reused containers persist across workshop steps and sessions** → A cleanup note
   (`docker rm -f` / `podman rm -f`) is required in the docs, not optional.
 - **`flowinstanceid` identity across restarts** → The approve-after-restart flow depends on the
-  restored instance keeping its original ID. `FlowPersistenceRestore.restoreInstances` keys off
-  the persisted definition, not a per-boot ID, but this needs empirical confirmation during
-  implementation.
+  restored instance keeping its original ID, and so does the UI instance-ID verification.
+  `FlowPersistenceRestore.restoreInstances` keys off the persisted definition, not a per-boot ID,
+  but this needs empirical confirmation during implementation.
 - **Test/dev container isolation** → If the distinct `db-name` strategy produces a second
   database inside the same container rather than a separate container, tests could still share
   state. Verify during implementation.
@@ -79,6 +80,5 @@ starter code.
 - Does `quarkus.datasource.devservices.db-name=tripplanner_test` in the test profile yield a
   separate Docker/Podman container, or just a separate database inside the reused container?
   Answer determines whether `devservices.reuse=false` is belt-and-braces or load-bearing.
-- Do the exact method names `ChatMessageSerializer.serialize` and `ChatMessageDeserializer.deserialize`
-  match langchain4j 1.13.0, or have they changed? Confirm against the JAR before writing
-  `DatabaseChatMemoryStore`.
+- Is the workflow instance ID stable across a restart (same value before and after), so the UI
+  comparison is a valid proof of restoration? Confirm alongside the `flowinstanceid` check.

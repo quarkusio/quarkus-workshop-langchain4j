@@ -33,6 +33,18 @@ the restart and SHALL complete the workflow when the matching event is received.
 - **WHEN** a trip approval event is sent after a restart using the original `flowinstanceid`
 - **THEN** the workflow transitions out of the `listen()` task and completes normally
 
+### Requirement: The workflow instance ID is displayed in the UI
+The results page SHALL display the workflow instance ID returned by the `/trip/plan` endpoint,
+below the approval controls. This gives the user a visible identifier to correlate against the
+`Restoring workflow instance: <id>` startup log and the Dev UI database row, making restoration
+observable rather than requiring the user to trust that it happened.
+
+#### Scenario: The displayed instance ID matches the restored instance
+- **WHEN** a plan is generated and the results page shows an instance ID, then the app is
+  restarted
+- **THEN** the startup log contains `Restoring workflow instance: <id>` with that same ID, and
+  the Dev UI shows a Flow instance row with that ID
+
 ### Requirement: Hibernate schema strategy must not drop tables on restart
 The application configuration SHALL set `quarkus.hibernate-orm.schema-management.strategy=update`.
 Using the default `drop-and-create` under Dev Services SHALL cause all persisted state to be
@@ -40,7 +52,7 @@ lost on every restart, which nullifies durability.
 
 #### Scenario: Data survives a restart when strategy is update
 - **WHEN** the application is restarted with `schema-management.strategy=update`
-- **THEN** chat message rows and Flow instance rows from before the restart are still present
+- **THEN** Flow instance rows from before the restart are still present
 
 ### Requirement: Container reuse is required for a full cold restart
 The PostgreSQL Dev Services container MUST survive the restart. This requires
