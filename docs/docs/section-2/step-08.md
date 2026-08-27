@@ -1,367 +1,835 @@
-# Bonus Step - Deploying to Kubernetes
+# Step 08 - Using Remote Agents (A2A)
 
-!!! tip "This step is optional"
-    This bonus step requires access to a Kubernetes or OpenShift cluster. If you don't have one available, you can get a free cluster in minutes using the [OpenShift Developer Sandbox](https://developers.redhat.com/developer-sandbox){target="_blank"} — no installation required, just sign in with a Red Hat account. If you'd rather skip this step entirely, head straight to the [conclusion](conclusion.md).
+## New Requirement: Distributing the Pricing Service
 
-Over the course of this section, you built a sophisticated distributed multi-agent system: a fleet management application with a supervisor, parallel workflows, human-in-the-loop approval, multimodal image analysis, and a remote pricing agent communicating over the A2A protocol. All of that ran on your local environment with `./mvnw quarkus:dev`.
+In the previous steps, you built a complete disposition system with the Supervisor Pattern (Step 4), Human-in-the-Loop approval (Step 5), and multimodal image analysis that enriches rental feedback with visual observations from car photos (Step 6). The system works well, but the Miles of Smiles management team has a new architectural requirement:
 
-This step takes that same system and deploys it to a real Kubernetes cluster. You'll see how to containerize both  Quarkus applications (the main agentic app and the A2A app), deploy them to the cluster, connect them through Kubernetes services and how secrets and ConfigMaps replace local properties. 
+**The vehicle pricing logic needs to be maintained by a separate team and run as an independent service.**
+
+This is a common real-world scenario where:
+
+1. **Different teams own different capabilities**: The pricing team has specialized expertise in vehicle valuations and wants to maintain their own service
+2. **The service needs to be reusable**: Multiple client applications (not just car management) might need pricing estimates
+3. **Independent scaling is required**: The pricing service might need different resources than the main application
+
+You'll learn how to convert the local `PricingAgent` into a remote service using the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"}.
 
 ---
 
 ## What You'll Learn
 
-- How to containerize the Agentic system
-- How to deploy a multi-application Quarkus system to Kubernetes/OpenShift
-- How Quarkus profiles (`%prod`) separate local and cluster configuration
-- How the A2A agent and main application discover each other in a cluster via Kubernetes service names
-- How to add configuration values through ConfigMaps and Secrets and enable access from the apps
-- How Quarkus SmallRye Health integrates with Kubernetes liveness, readiness, and startup probes
+In this step, you will:
+
+- Understand the [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} for distributed agent communication
+- **Convert** the local `PricingAgent` into a remote A2A service
+- Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
+- Create an **A2A server** that exposes an AI agent as a remote service
+- Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
+- Understand the difference between **Tasks** and **Messages** in A2A protocol
+- Run **multiple Quarkus applications** that communicate via A2A
+- See the architectural trade-offs: lose Supervisor Pattern sophistication, gain distribution benefits
+
+!!!note
+   
+    At the moment the A2A integration is quite low-level and requires some boilerplate code.
+    The Quarkus LangChain4j team is working on higher-level abstractions to simplify A2A usage in future releases.
 
 ---
 
-## Architecture in the Cluster
+## Understanding the A2A Protocol
 
-The deployment runs three components in a dedicated `miles-and-smiles` namespace:
+The [**Agent-to-Agent (A2A) protocol**](https://a2a-protocol.org/){target="_blank"} is an open protocol for AI agents to communicate across different systems and platforms.
+
+### Why A2A?
+
+- **Separation of concerns**: Different teams can develop specialized agents independently
+- **Scalability**: Distribute agent workload across multiple systems
+- **Reusability**: One agent can serve multiple client applications
+- **Technology independence**: Agents can be implemented in different languages/frameworks
+
+### A2A Architecture
+
+```mermaid
+graph LR
+    subgraph "Quarkus Runtime 1: Car Management System"
+        W["CarProcessingWorkflow"]
+        PA["PricingAgent<br/>@A2AClientAgent"]
+        W --> PA
+    end
+
+    subgraph "A2A Protocol Layer"
+        AP["JSON-RPC over HTTP"]
+    end
+
+    subgraph "Quarkus Runtime 2: Pricing Service"
+        AC["AgentCard<br/>Agent Metadata"]
+        AE["AgentExecutor<br/>Request Handler"]
+        PAI["PricingAgent<br/>AI Service"]
+
+        AC -.describes.-> PAI
+        AE --> PAI
+    end
+
+    PA -->|"A2A Request"| AP
+    AP -->|"A2A Response"| PA
+    AP <-->|"JSON-RPC"| AE
+
+```
+
+**The Flow:**
+
+1. **Client agent** (`PricingAgent` with `@A2AClientAgent`) sends a request to the remote agent
+2. **A2A Protocol Layer** ([JSON-RPC](https://www.jsonrpc.org/){target="_blank"}) transports the request over HTTP
+3. **AgentCard** describes the remote agent's capabilities (skills, inputs, outputs)
+4. **AgentExecutor** receives the request and orchestrates the execution
+5. **Remote AI agent** (`PricingAgent` AI service) processes the request
+6. Response flows back through the same path
+
+!!!info "Additional A2A Info"
+    For more information about the A2A protocol and the actors involved, see the [A2A documentation](https://a2a-protocol.org/latest/topics/key-concepts/#core-actors-in-a2a-interactions){target="_blank"}. 
+
+---
+
+## Understanding Tasks vs. Messages
+
+The A2A protocol distinguishes between [two types of interactions](https://a2a-protocol.org/latest/topics/life-of-a-task/){target="_blank"}:
+
+| Concept | Description | Use Case |
+|---------|-------------|----------|
+| **Task** | A long-running job with a defined goal and tracked state | "Estimate the market value of this vehicle" |
+| **Message** | A single conversational exchange with no tracked state | Chat messages, quick questions |
+
+In this step, we'll use **Tasks** because vehicle pricing is a discrete job with a clear objective.
+
+**Task Lifecycle:**
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Agent
+    participant Server as A2A Server
+    participant Executor as AgentExecutor
+    participant AI as AI Agent
+
+    Client->>Server: Create Task (POST /tasks)
+    Server->>Executor: Initialize TaskUpdater
+    Executor->>AI: Execute with input
+    AI->>AI: Process and use tools
+    AI->>Executor: Return result
+    Executor->>Server: Update task status
+    Server->>Client: Task result
+```
+
+---
+
+## What Are We Going to Build?
+
+We'll convert Step 5's architecture to use a remote pricing agent:
+
+1. **Keep all HITL features**: DispositionProposalAgent, HumanApprovalAgent, value-based routing, approval workflow — all carried forward from Step 5
+2. **Keep DispositionAgent local**: Disposition logic stays in the main application (same as Step 5)
+3. **Convert PricingAgent to A2A Client**: Changes from local agent to remote A2A client
+4. **Create Remote A2A Server**: A separate Quarkus application exposing the pricing service
+
+**The Complete Architecture:**
 
 ```mermaid
 graph TD
-    User["User Browser"]
-    Route["OpenShift Route\nor port-forward"]
-    Main["miles-and-smiles\nMain Application\nport 8080"]
-    A2A["miles-and-smiles-a2a\nRemote Pricing Agent\nport 8080"]
-    PG["PostgreSQL\nport 5432"]
+    subgraph "Main Application (localhost:8080)"
+        R["Rental/Cleaning/Maintenance Returns"]
+        FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+        FA["FeedbackAnalysisAgent"]
+        FSA["FleetSupervisorAgent<br/>Supervisor"]
+        PAC["PricingAgent<br/>@A2AClientAgent"]
+        DA["DispositionAgent<br/>Local"]
 
-    User -->|HTTPS| Route
-    Route -->|HTTP :80| Main
-    Main -->|A2A Protocol\nHTTP :80| A2A
-    Main -->|JDBC| PG
-    A2A -->|JDBC| PG
+        R --> FW
+        FW --> FA
+        FA --> FSA
+        FSA --> PAC
+        FSA --> DA
+    end
+
+    subgraph "Remote Pricing Service (localhost:8888)"
+        AC["AgentCard"]
+        AE["AgentExecutor"]
+        PAI["PricingAgent<br/>AI Service"]
+
+        AE --> PAI
+    end
+
+    PAC -->|"A2A Protocol"| AE
+
 ```
-
-The main application hosts the full multi-agent system — supervisor, workflows, HITL pattern, and multimodal agent — exactly as you built it in steps 01–07. The remote pricing agent runs as a separate Deployment, and the main application connects to it over HTTP using the Kubernetes internal service name `miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local`. PostgreSQL is deployed alongside both and shared via Kubernetes Secrets.
 
 ---
 
 ## Prerequisites
 
-You'll need a Kubernetes or OpenShift cluster with `kubectl` or `oc` cli configured to point at it, and your OpenAI API key. If you plan to build and push your own images rather than using the pre-built ones, you'll also need write access to a container registry such as Quay.io.
+Before starting:
 
-If you don't have a cluster, the [OpenShift Developer Sandbox](https://developers.redhat.com/developer-sandbox){target="_blank"} provides a free, hosted OpenShift environment. It runs OpenShift 4.x, supports Routes out of the box, and is the easiest way to follow this step without any local cluster setup.
+- **Completed [Step 07](step-07.md){target="_blank"}** - This step directly builds on Step 7's architecture
+- Application from Step 07 is stopped (Ctrl+C)
+- Ports 8080 and 8888 are available (you'll run two applications simultaneously)
+- Understanding of Step 7's dynamic model selection, Step 6's multimodal image analysis, Step 5's HITL Pattern, and Step 4's Supervisor Pattern (we keep the same patterns, just make PricingAgent remote)
 
----
+Before starting:
 
-## From Step 07 to Step 08: Adding Kubernetes Extensions
-
-The code in `section-2/step-08/` is the same two-application system you built in Step 07 — the multi-agent system and the remote A2A pricing agent — with three new extensions added to each `pom.xml` to make them cluster-ready.
-
-**`quarkus-kubernetes`** generates Kubernetes manifests (Deployment, Service, health probes, RBAC resources) automatically at build time into `target/kubernetes/`.
-
-**`quarkus-kubernetes-config`** allows the application to read configuration from Kubernetes ConfigMaps and Secrets at startup, without those values needing to be baked into the image or passed as individual environment variables. In `application.properties`, the `%prod.quarkus.kubernetes-config.*` properties tell each application which Secret and ConfigMap to read:
-
-```properties
-%prod.quarkus.kubernetes-config.enabled=true
-%prod.quarkus.kubernetes-config.secrets.enabled=true
-%prod.quarkus.kubernetes-config.secrets=miles-and-smiles
-%prod.quarkus.kubernetes-config.config-maps=miles-and-smiles-config
-%prod.quarkus.kubernetes.namespace=miles-and-smiles
-```
-
-**`quarkus-smallrye-health`** exposes the `/q/health/live`, `/q/health/ready`, and `/q/health/started` endpoints that Kubernetes uses for its liveness, readiness, and startup probes. Without this extension, Kubernetes has no way to know whether a pod has successfully initialized or is healthy enough to receive traffic.
-
-To add these extensions to an existing project, run:
-
-```bash
-./mvnw quarkus:add-extension \
-  -Dextensions="quarkus-kubernetes,quarkus-kubernetes-config,quarkus-smallrye-health"
-```
+- You have stopped (Ctrl+C) any running Quarkus instances
+- You are in the root project directory (not a `step-XX` subdirectory)
 
 ---
 
-## The Project Structure
+## Understanding the Project Structure
 
-The code for this step lives in `section-2/step-08/`. It contains two Quarkus modules and the deployment resources:
+The Step 08 code includes **two separate Quarkus applications**:
 
 ```
 section-2/step-08/
-├── multi-agent-system/     # Main application — supervisor, workflows, HITL, A2A client
-├── remote-a2a-agent/       # Remote pricing agent — A2A server
-├── kubernetes/             # Kubernetes manifests ready to apply
-│   ├── namespace.yaml
-│   ├── configmap.yaml
-│   ├── secret.yaml
-│   ├── postgresql.yaml
-│   ├── main-app.yaml
-│   ├── a2a-agent.yaml
-│   └── route.yaml
-└── deploy.java             # Convenience JBang script wrapping kubectl and Maven commands
+├── multi-agent-system/          # Main car management application (port 8080)
+│   ├── src/main/java/com/carmanagement/
+│   │   ├── agentic/
+│   │   │   ├── agents/
+│   │   │   │   ├── PricingAgent.java              # A2A client agent
+│   │   │   │   ├── DispositionAgent.java          # Local agent
+│   │   │   │   ├── DispositionProposalAgent.java  # Creates proposals
+│   │   │   │   ├── HumanApprovalAgent.java        # @HumanInTheLoop
+│   │   │   │   └── FeedbackAnalysisAgent.java     # Parameterized feedback analyzer
+│   │   │   └── workflow/
+│   │   │       ├── FeedbackAnalysisWorkflow.java  # Parallel mapper analysis
+│   │   │       └── CarProcessingWorkflow.java     # Main orchestrator
+│   │   ├── model/
+│   │   │   └── ApprovalProposal.java              # Approval entity
+│   │   ├── resource/
+│   │   │   └── ApprovalResource.java              # Approval REST endpoints
+│   │   └── service/
+│   │       └── ApprovalService.java               # Manages HITL workflow 
+│   └── pom.xml
+│
+└── remote-a2a-agent/            # Remote pricing service (port 8888)
+    ├── src/main/java/com/demo/
+    │   ├── PricingAgentCard.java          # Describes agent capabilities
+    │   ├── PricingAgentExecutor.java      # Handles A2A requests
+    │   └── PricingAgent.java              # AI service for vehicle pricing
+    └── pom.xml
 ```
 
-The manifests in `kubernetes/` were derived from the output of the `quarkus-kubernetes` extension. When you build either module with `./mvnw package`, Quarkus generates a `kubernetes.yml` file in `target/kubernetes/` that already contains a Deployment, Service, and health probes wired to the SmallRye Health endpoints. The files in the `kubernetes/` folder extend and combine that generated output with the additional resources needed for a full deployment: the namespace, PostgreSQL, the shared Secret and ConfigMap, and the OpenShift Route.
+**Why Two Applications?**
 
-
-## Building the Container Images (Optional)
-
-!!! tip "You can skip this section"
-    The workshop images are already built and published to `quay.io/kevindubois`. If you just want to see the system running, skip ahead to [Deploying the System](#deploying-the-system) and use those images directly.
-
-If you want to deploy your own changes, you need to build and push container images for both modules. Quarkus makes this straightforward — the same `src/main/docker/Dockerfile.jvm` files that a regular Docker build would use are also what the Quarkus image commands use under the hood.
-
-From inside each module directory, build the image locally with:
-
-```bash
-./mvnw quarkus:image-build
-```
-
-Or build and push to your registry in one step:
-
-```bash
-./mvnw quarkus:image-push -Dquarkus.container-image.push=true
-```
-
-Before pushing, update `quarkus.container-image.registry` and `quarkus.container-image.group` in each module's `application.properties` to point to your registry and username, and update the image references in `kubernetes/main-app.yaml` and `kubernetes/a2a-agent.yaml` to match.
-
-If you prefer to build with Docker or Podman directly, the Dockerfiles are in `src/main/docker/`. The JVM variant (`Dockerfile.jvm`) is the right choice for a standard deployment — build the JAR first, then the image:
-
-```bash
-# In multi-agent-system/
-./mvnw package -DskipTests
-docker build -f src/main/docker/Dockerfile.jvm -t your-registry/miles-and-smiles:latest .
-
-# In remote-a2a-agent/
-./mvnw package -DskipTests
-docker build -f src/main/docker/Dockerfile.jvm -t your-registry/miles-and-smiles-a2a:latest .
-```
-
-!!! Note "Natively compiled images"
-    Feel free to compile the app to a native binary and containerize it with the Dockerfile.native for a smaller container image that starts up even faster.
-    To do this, you just need to add the `-Dnative` flag to the maven commands above.
+- Simulates a real-world scenario where different teams maintain different agents
+- The pricing service could be reused by multiple client applications
+- Demonstrates cross-application agent communication via A2A
 
 ---
 
-## What Gets Deployed
+!!! warning "Warning: this chapter involves many steps"
+    In order to build out the solution, you will need to go through quite a few steps.
+    While it is entirely possible to make the code changes manually (or via copy/paste),
+    we recommend starting fresh from Step 08 with the changes already applied.
+    You will then be able to walk through this chapter and focus on the examples and suggested experiments at the end of this chapter.
 
-The manifests in `section-2/step-08/kubernetes/` create the following resources, all inside the `miles-and-smiles` namespace.
+=== "Option 1: Continue from Step 07"
 
-A **Namespace** named `miles-and-smiles` isolates every resource created by this deployment from the rest of your cluster.
+    If you want to continue building on top of Step-07 code, you'll need to restructure the directory and copy updated files:
+    
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-07
+        mkdir -p multi-agent-system
+        mv mvnw mvnw.cmd pom.xml src multi-agent-system/
+        cp ../step-08/multi-agent-system/pom.xml ./multi-agent-system/pom.xml
+        mkdir -p remote-a2a-agent/src/main/java/com/demo
+        mkdir -p remote-a2a-agent/src/main/resources
+        cp ../step-08/remote-a2a-agent/mvnw ./remote-a2a-agent/
+        cp ../step-08/remote-a2a-agent/mvnw.cmd ./remote-a2a-agent/
+        cp ../step-08/remote-a2a-agent/pom.xml ./remote-a2a-agent/
+        cp ../step-08/remote-a2a-agent/src/main/resources/application.properties ./remote-a2a-agent/src/main/resources/
+        ```
+    
+    === "Windows"
+        ```cmd
+        cd section-2\step-07
+        mkdir multi-agent-system
+        move mvnw multi-agent-system\
+        move mvnw.cmd multi-agent-system\
+        move pom.xml multi-agent-system\
+        move src multi-agent-system\
+        copy ..\step-08\multi-agent-system\pom.xml .\multi-agent-system\pom.xml
+        mkdir remote-a2a-agent\src\main\java\com\demo
+        mkdir remote-a2a-agent\src\main\resources
+        copy ..\step-08\remote-a2a-agent\mvnw .\remote-a2a-agent\
+        copy ..\step-08\remote-a2a-agent\mvnw.cmd .\remote-a2a-agent\
+        copy ..\step-08\remote-a2a-agent\pom.xml .\remote-a2a-agent\
+        copy ..\step-08\remote-a2a-agent\src\main\resources\application.properties .\remote-a2a-agent\src\main\resources\
+        ```
+    
+    **Note:** The `remote-a2a-agent` directory now contains the necessary infrastructure (pom.xml, mvnw, application.properties, and shared models). The `com/demo` directory is empty and ready for you to create the A2A agent files in Part 2. You'll update `PricingAgent.java` in the `multi-agent-system` in Part 1 below.
 
-A **ConfigMap** named `miles-and-smiles-config` holds non-sensitive configuration that both applications read. Before deploying, open `kubernetes/configmap.yaml` and adjust these values to match your environment:
+=== "Option 2: Follow along using the completed solution [Recommended]"
 
-```yaml
-data:
-  POSTGRES_HOST: "postgresql"
-  POSTGRES_PORT: "5432"
-  OPENAI_BASE_URL: "https://api.openai.com/v1"
-  OPENAI_MODEL_NAME: "gpt-4o"
-```
-
-If you're using a different model, a local LLM proxy, or a compatible API endpoint (such as Azure OpenAI or a self-hosted inference server), this is the place to set it — no image rebuild required.
-
-A **Secret** named `miles-and-smiles` holds the sensitive values injected at runtime: your `OPENAI_API_KEY`, the PostgreSQL username and password, and the database name. The secret is created with `kubectl create secret --dry-run=client -o yaml | kubectl apply -f -`, which makes re-running the deployment idempotent — it won't fail if the secret already exists.
-
-A **PostgreSQL Deployment and Service** provide the shared database. The Deployment uses the official `postgres:18` image with liveness and readiness probes (`pg_isready`), and the Service exposes it cluster-internally on port `5432` under the hostname `postgresql`.
-
-Two application **Deployments and Services** — `miles-and-smiles` for the main multi-agent system and `miles-and-smiles-a2a` for the remote pricing agent. Each has a ClusterIP Service on port 80 forwarding to container port 8080. Both include liveness, readiness, and startup health probes backed by the Quarkus SmallRye Health endpoints (`/q/health/live`, `/q/health/ready`, `/q/health/started`). Each pod also gets a ServiceAccount with a Role and RoleBinding granting read access to Secrets and ConfigMaps in the namespace, which is how Quarkus Kubernetes Config picks up runtime configuration.
-
-An **OpenShift Route** named `miles-and-smiles` provides external HTTPS access with edge TLS termination and automatic HTTP-to-HTTPS redirect. On vanilla Kubernetes without OpenShift, the main-app manifest also includes a Gateway API HTTPRoute as an alternative — see the [Accessing on Vanilla Kubernetes](#accessing-on-vanilla-kubernetes) section below.
-
----
-
-## Deploying the System
-
-You can deploy the system using standard `kubectl` (or `oc` on OpenShift) commands, applying the manifests in order and waiting for each component to become ready before proceeding to the next:
-
-```bash
-export OPENAI_API_KEY=your-key-here
-
-kubectl apply -f kubernetes/namespace.yaml
-kubectl apply -f kubernetes/configmap.yaml
-
-# Create the secret with your API key injected directly — never written to disk
-kubectl create secret generic miles-and-smiles \
-  --from-literal=OPENAI_API_KEY=$OPENAI_API_KEY \
-  --from-literal=POSTGRES_USER=milesandsmiles \
-  --from-literal=POSTGRES_PASSWORD=milesandsmiles123 \
-  --from-literal=POSTGRES_DB=milesandsmiles \
-  --namespace=miles-and-smiles \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-kubectl apply -f kubernetes/postgresql.yaml
-kubectl wait --for=condition=ready pod -l app=postgresql \
-  -n miles-and-smiles --timeout=120s
-
-kubectl apply -f kubernetes/a2a-agent.yaml
-kubectl wait --for=condition=ready pod \
-  -l app.kubernetes.io/name=miles-and-smiles-a2a \
-  -n miles-and-smiles --timeout=120s
-
-kubectl apply -f kubernetes/main-app.yaml
-kubectl apply -f kubernetes/route.yaml
-```
-
-Notice the secret creation pattern: the `--dry-run=client -o yaml | kubectl apply -f -` pipeline generates the secret manifest in memory and pipes it straight to the cluster. Your API key is never written to a file on disk.
-
-If you prefer not to run each command manually, a `deploy.java` JBang script in the same directory automates the exact sequence above, including the readiness waits. Set your API key and run:
-
-```bash
-./deploy.java deploy
-```
-
-Once everything is up, get your application URL:
-
-```bash
-./deploy.java get-route
-# or: kubectl get route miles-and-smiles -n miles-and-smiles -o jsonpath='{.spec.host}'
-```
-
-Open that URL in your browser and the full Miles and Smiles fleet management system is running on Kubernetes.
-
-If you made changes to the application code and want to deploy your own images, update `quarkus.container-image.group` in both `application.properties` files and the image references in the `kubernetes/` manifests, then run `./deploy.java all` to build, push, and deploy in one shot.
-
+    If you prefer to follow along (without making any code changes), navigate to the completed `section-2/step-08/remote-a2a-agent` directory:
+    
+    === "Linux / macOS"
+        ```bash
+        cd section-2/step-08/multi-agent-system
+        ```
+    
+    === "Windows"
+        ```cmd
+        cd section-2\step-08\multi-agent-system
+        ```
 
 ---
 
-## Accessing the Application
+## Part 1: Convert PricingAgent to A2A Client
 
-On OpenShift (including the Developer Sandbox), an OpenShift Route is created automatically during deployment. You can retrieve the generated hostname with:
+The only change needed in the main application is converting the `PricingAgent` from a local agent to an A2A client.
 
-```bash
-./deploy.java get-route
+### Step 1: Update the PricingAgent to A2A Client
+
+**This is the key change from Step 5!** The `PricingAgent` was a local agent with detailed pricing guidelines, depreciation tables, and an `@Output` post-processor. Now it becomes a simple client that delegates to the remote service.
+
+**Step 5 Version (Local):**
+
+- Had detailed `@SystemMessage` with pricing guidelines and depreciation tables
+- Had `@Output` method to normalize value format
+- Made decisions locally using AI
+
+**Step 8 Version (A2A Client):**
+
+- Uses `@A2AClientAgent` to connect to remote service
+- Delegates all pricing logic to the remote service
+- No `@Output` method needed — the remote service handles formatting
+
+Update `multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java`:
+
+```java title="PricingAgent.java"
+--8<-- "../../section-2/step-08/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java"
 ```
 
-The URL will look something like `https://miles-and-smiles.apps.your-cluster.example.com`. Open it in a browser to reach the car return form.
+**Let's break it down:**
 
-On vanilla Kubernetes without OpenShift, `kubernetes/main-app.yaml` includes a Gateway API `HTTPRoute`. Update the `hostnames` field with your cluster's domain and configure it with your Gateway controller (Istio, Envoy Gateway, or similar).
-
----
-
-## Dev vs Production Configuration
-
-When the applications run with `./mvnw quarkus:dev`, they use `localhost` URLs and local ports. In the cluster they need to talk to Kubernetes service names instead. Quarkus profiles make this switch automatic; any property prefixed with `%prod.` takes effect only when the application runs outside dev mode.
-
-The A2A agent's `application.properties` contains the key example of this pattern:
-
-```properties
-# Used in dev mode — A2A agent runs on port 8888 locally to avoid conflicts
-a2a.base-url=http://localhost:8888/
-
-# Overridden automatically in production — resolves to the Kubernetes service
-%prod.a2a.base-url=http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local/
-```
-
-The `PricingAgentCard` class in the remote A2A agent injects this `a2a.base-url` property and uses it to generate the URLs it advertises in its agent card. When the main application fetches the agent card at startup, it receives the Kubernetes-internal URL and uses that for all subsequent A2A calls.
-
-The main application's `@A2AClientAgent` annotation specifies the Kubernetes service URL directly so it knows where to fetch the agent card in production:
+#### `@A2AClientAgent` Annotation
 
 ```java
-@A2AClientAgent(
-    a2aServerUrl = "http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local",
-    ...
-)
+@A2AClientAgent(a2aServerUrl = "http://localhost:8888")
 ```
 
-PostgreSQL connectivity follows the same pattern: dev mode connects to `localhost`, while in production the `POSTGRES_HOST` environment variable is injected from the ConfigMap and resolves to the `postgresql` Kubernetes service.
+This annotation transforms the method into an **A2A client**:
+
+- **`a2aServerUrl`**: The URL of the remote A2A server
+
+#### The Method Signature
+
+```java
+String estimateValue(String carMake, String carModel, Integer carYear, String carCondition)
+```
+
+These parameters are sent to the remote agent as task inputs. The parameters match exactly what the remote PricingAgent expects (same as Step 5's local version).
+
+#### How It Works
+
+1. When this method is called, Quarkus LangChain4j:
+    1. Creates an A2A Task with the method parameters as inputs
+    2. Sends the task to the remote server via JSON-RPC
+    3. Waits for the remote agent to complete the task
+    4. Returns the result as a String
+
+2. No manual HTTP requests needed
+3. Type-safe: compile-time checking of parameters
+4. Automatic error handling and retries
 
 ---
 
-## Observing the Running System
+## Part 2: Build the Remote A2A Server
 
-Check the status of all pods in the namespace:
+Now let's build the remote pricing service that will handle A2A requests from the main application.
 
-```bash
-kubectl get pods -n miles-and-smiles
-```
-
-Stream logs from any component directly with `kubectl`, or use the convenience wrappers:
+Navigate to the remote-a2a-agent directory:
 
 ```bash
-kubectl logs -f -l app.kubernetes.io/name=miles-and-smiles -n miles-and-smiles
-kubectl logs -f -l app.kubernetes.io/name=miles-and-smiles-a2a -n miles-and-smiles
-kubectl logs -f -l app=postgresql -n miles-and-smiles
+cd remote-a2a-agent
 ```
 
-### Health Endpoints
+### Step 2: Create the PricingAgent (AI Service)
 
-Both Quarkus applications include the `quarkus-smallrye-health` extension, which exposes three standard health endpoints that Kubernetes uses to manage pod lifecycle:
+The AI agent that estimates vehicle market values — the same logic that was local in Step 5.
 
-| Endpoint | Kubernetes probe | Purpose |
-|---|---|---|
-| `/q/health/live` | Liveness | Is the process alive? If this fails, Kubernetes restarts the pod. |
-| `/q/health/ready` | Readiness | Is the application ready to serve traffic? If this fails, the pod is removed from the Service load balancer. |
-| `/q/health/started` | Startup | Has the application finished starting up? Kubernetes won't check liveness or readiness until this passes, giving the app time to initialize without triggering a premature restart. |
+In `src/main/java/com/demo`, create `PricingAgent.java`:
 
-The startup probe is particularly important here because the main application fetches the A2A agent card on startup — a network call that can take a few seconds. The startup probe is configured with a generous timeout (`failureThreshold: 30`, `periodSeconds: 10`, up to five minutes) so the pod isn't killed before it finishes initializing.
+```java title="PricingAgent.java"
+--8<-- "../../section-2/step-08/remote-a2a-agent/src/main/java/com/demo/PricingAgent.java"
+```
 
-Once the application is running, you can query the health endpoints directly using the OpenShift Route. First get your route hostname:
+**Key Points:**
+
+- **`@RegisterAiService`**: Registers this as an AI service
+- **System message**: Identical to step-05's local PricingAgent — same pricing guidelines and depreciation tables
+- **Parameters**: `carMake`, `carModel`, `carYear`, `carCondition` — exactly matching the client's method signature
+- **No tools needed**: Pricing is purely LLM-based, no tool invocation
+
+!!!note "AI Service vs. Agentic Agent"
+    Notice this is a **traditional AI service** (from Section 1), not an agentic workflow. 
+    The A2A server can expose both types.
+
+### Step 3: Create the AgentCard
+
+The **AgentCard** describes the agent's capabilities, skills, and interface.
+
+In `src/main/java/com/demo`, create `PricingAgentCard.java`:
+
+```java title="PricingAgentCard.java"
+--8<-- "../../section-2/step-08/remote-a2a-agent/src/main/java/com/demo/PricingAgentCard.java"
+```
+
+**Let's break it down:**
+
+#### `@PublicAgentCard` Annotation
+
+```java
+@Produces
+@PublicAgentCard
+public AgentCard agentCard();
+```
+
+This makes the AgentCard available at the `/.well-known/agent-card.json` endpoint. 
+Clients can query this endpoint to discover the agent's capabilities.
+
+#### AgentCard Components
+
+**Basic Information:**
+```java
+.name("Pricing Agent")
+.description("Estimates the market value of a vehicle based on make, model, year, and condition.")
+.url("http://localhost:8888/")
+.version("1.0.0")
+```
+
+**Capabilities:**
+```java
+.capabilities(new AgentCapabilities.Builder()
+        .streaming(true)
+        .pushNotifications(false)
+        .stateTransitionHistory(false)
+        .build())
+```
+
+**Skills:**
+```java
+.skills(List.of(new AgentSkill.Builder()
+    .id("pricing")
+    .name("Vehicle pricing")
+    .description("Estimates the market value of a vehicle based on make, model, year, and condition")
+    .tags(List.of("pricing", "valuation"))
+    .build()))
+```
+
+Skills describe what the agent can do. This helps clients discover appropriate agents for their needs.
+
+**Transport Protocol:**
+```java
+.preferredTransport(TransportProtocol.JSONRPC.asString())
+.additionalInterfaces(List.of(
+        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
+```
+
+Specifies that this agent communicates via JSON-RPC over HTTP.
+
+### Step 4: Create the AgentExecutor
+
+The **AgentExecutor** handles incoming A2A requests and orchestrates the AI agent.
+
+In `src/main/java/com/demo`, create `PricingAgentExecutor.java`:
+
+```java title="PricingAgentExecutor.java"
+--8<-- "../../section-2/step-08/remote-a2a-agent/src/main/java/com/demo/PricingAgentExecutor.java"
+```
+
+**Let's break it down:**
+
+#### CDI Bean with AgentExecutor Factory
+
+```java
+@ApplicationScoped
+public class PricingAgentExecutor {
+    @Produces
+    public AgentExecutor agentExecutor(PricingAgent pricingAgent)
+```
+
+Produces an `AgentExecutor` bean that Quarkus LangChain4j will use to handle A2A task requests.
+
+#### Task Processing
+
+The executor extracts the input parameters from the incoming message and calls the PricingAgent:
+
+```java
+String agentResponse = pricingAgent.estimateValue(
+        inputs.get(0),                      // carMake
+        inputs.get(1),                      // carModel
+        Integer.parseInt(inputs.get(2)),    // carYear
+        inputs.get(3));                     // carCondition
+```
+
+Extracts each parameter by index from the message parts. The order matches the client's method signature exactly.
+
+#### Return the Result
+
+```java
+TextPart responsePart = new TextPart(agentResponse, null);
+List<Part<?>> parts = List.of(responsePart);
+updater.addArtifact(parts, null, null, null);
+updater.complete();
+```
+
+Creates a text part with the agent's response and sends it back to the client via the `TaskUpdater`. This completes the A2A task.
+
+---
+
+## Try It Out
+
+You'll need to run **two applications simultaneously**.
+
+### Terminal 1: Start the Remote A2A Server
+
+=== "Linux / macOS"
+    ```bash
+    cd remote-a2a-agent
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    cd remote-a2a-agent
+    mvnw quarkus:dev
+    ```
+
+Wait for:
+```
+Listening on: http://localhost:8888
+```
+
+The remote service is now running and ready to accept A2A requests for pricing!
+
+### Terminal 2: Start the Main Application
+
+Open a **new terminal** and run:
+
+=== "Linux / macOS"
+    ```bash
+    cd multi-agent-system
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    cd multi-agent-system
+    mvnw quarkus:dev
+    ```
+
+Wait for:
+```
+Listening on: http://localhost:8080
+```
+
+### Test the Complete Flow
+
+Open your browser to [http://localhost:8080](http://localhost:8080){target=_blank}.
+
+You'll see the Fleet Status grid with inline feedback forms in the Action column and the approval notification button.
+
+![Fleet Status Grid](../images/agentic-UI-maintenance-returns-2.png){: .center}
+
+Find the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:
+
+```
+looks like this car hit a tree and is damaged beyond repair
+```
+
+Click **Return**.
+
+**What happens?**
+
+1. **Parallel Analysis** (`FeedbackAnalysisWorkflow`):
+    1. `FeedbackTask.disposition()` executed by `FeedbackAnalysisAgent`: "Disposition required — severe damage"
+    2. `FeedbackTask.maintenance()` executed by `FeedbackAnalysisAgent`: "Major repairs needed"
+    3. `FeedbackTask.cleaning()` executed by `FeedbackAnalysisAgent`: "Not applicable"
+
+2. **Supervisor Orchestration** (FleetSupervisorAgent):
+    1. Analyzes feedback and determines disposition is required
+    2. Invokes PricingAgent (remote via A2A) to estimate vehicle value
+    3. Invokes DispositionAgent (local) to determine disposition
+
+3. **A2A Communication** (for pricing):
+    1. Client sends task to `http://localhost:8888`
+    2. `AgentExecutor` receives and processes task
+    3. `PricingAgent` (AI service) estimates the vehicle value
+    4. Result flows back to client
+
+4. **Local Disposition**:
+    1. `DispositionAgent` determines action based on value and condition
+
+5. **UI Update**:
+    1. Car status → `DISPOSED`
+    2. Car status updates to `PENDING_DISPOSITION` in the Fleet Status grid
+
+### Check the Logs
+
+**Terminal 1 (Remote A2A Server):**
+```
+Remote A2A PricingAgent called
+```
+
+**Terminal 2 (Main Application):**
+```
+[FeedbackAnalysisAgent/disposition] DISPOSITION_REQUIRED - Severe structural damage, uneconomical to repair
+[FleetSupervisorAgent] Invoking PricingAgent for value estimation
+[PricingAgent @A2AClientAgent] Sending task to http://localhost:8888
+[PricingAgent @A2AClientAgent] Received result: Estimated Value: $12,500
+[FleetSupervisorAgent] Invoking DispositionAgent
+[DispositionAgent] Result: Car should be scrapped...
+```
+
+Notice the **cross-application communication** via A2A!
+
+---
+
+## How It All Works Together
+
+Let's trace the complete flow:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Service as CarManagementService
+    participant Workflow as CarProcessingWorkflow
+    participant FeedbackWF as FeedbackAnalysisWorkflow
+    participant Supervisor as FleetSupervisorAgent
+    participant PricingClient as PricingAgent<br/>@A2AClientAgent
+    participant A2A as A2A Protocol<br/>(JSON-RPC)
+    participant Executor as AgentExecutor
+    participant PricingRemote as PricingAgent<br/>AI Service
+    participant Disposition as DispositionAgent<br/>(Local)
+
+    User->>Service: Return car with severe damage
+    Service->>Workflow: processCarReturn(...)
+
+    rect rgb(255, 243, 205)
+    Note over Workflow,FeedbackWF: Parallel Analysis
+    Workflow->>FeedbackWF: Execute
+    par Concurrent Execution
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.cleaning()
+    and
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.maintenance()
+    and
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.disposition()<br/>Result: "DISPOSITION_REQUIRED"
+    end
+    end
+
+    rect rgb(212, 237, 218)
+    Note over PricingClient,PricingRemote: A2A Communication (Pricing)
+    Supervisor->>PricingClient: Estimate vehicle value
+    PricingClient->>A2A: Create Task with inputs
+    A2A->>Executor: POST /tasks
+    Executor->>PricingRemote: estimateValue(...)
+    PricingRemote->>Executor: Return valuation
+    Executor->>A2A: Update task status
+    A2A->>PricingClient: Return result
+    end
+
+    rect rgb(248, 215, 218)
+    Note over Supervisor,Disposition: Local Disposition
+    Supervisor->>Disposition: processDisposition(...)
+    Disposition->>Supervisor: Return recommendation
+    end
+
+    Supervisor->>Workflow: Return disposition result
+    Workflow->>Service: Return CarConditions
+    Service->>Service: Set status to DISPOSED
+    Service->>User: Update UI
+```
+
+---
+
+## Understanding the A2A Implementation
+
+### Client Side (`@A2AClientAgent`)
+
+The A2A client agent is remarkably simple:
+
+```java
+@A2AClientAgent(a2aServerUrl = "http://localhost:8888", ...)
+String estimateValue(...)      // PricingAgent
+```
+
+Quarkus LangChain4j handles:
+
+- Creating the A2A task
+- Serializing method parameters as task inputs
+- Sending the HTTP request via JSON-RPC
+- Waiting for the response
+- Deserializing the result
+- Error handling and retries
+
+### Server Side (AgentCard + AgentExecutor)
+
+The server requires more components:
+
+| Component | Purpose |
+|-----------|---------|
+| **AgentCard** | Describes agent capabilities, published at `/.well-known/agent-card.json` endpoint |
+| **AgentExecutor** | Receives and processes A2A task requests |
+| **TaskUpdater** | Updates task status and sends results back to client |
+| **AI Agent** | The actual AI service (PricingAgent) |
+
+This separation allows:
+- Agents to focus on business logic
+- A2A infrastructure to handle protocol details
+- **Remote agents to be reused** — any application can connect to the pricing service via A2A
+
+---
+
+## Key Takeaways
+
+- **A2A enables distributed agents**: Different teams can maintain specialized agents in separate systems
+- **`@A2AClientAgent` is powerful**: Simple annotation transforms a method into an A2A client
+- **AgentCard describes capabilities**: Clients can discover what remote agents can do
+- **AgentExecutor handles protocol**: Separates A2A infrastructure from agent logic
+- **Tasks vs. Messages**: A2A supports both task-based and conversational interactions
+- **Type-safe integration**: Method parameters automatically become task inputs
+- **Remote agents integrate seamlessly**: Works with existing workflows and local agents
+- **Two runtimes communicate**: Real-world simulation of distributed agent systems
+- **Selective distribution**: Not every agent needs to be remote — only distribute what benefits from it (e.g., the pricing service can be reused by other applications)
+- **Local + remote mix**: Combining local agents (DispositionAgent) with remote A2A agents (PricingAgent) in the same workflow
+
+---
+
+## Experiment Further
+
+### 1. Add Agent Discovery
+
+The AgentCard is published at `http://localhost:8888/.well-known/agent-card.json`. Try:
 
 ```bash
-./deploy.java get-route
+curl http://localhost:8888/.well-known/agent-card.json | jq
 ```
 
-Then query any of the health endpoints:
+You'll see the full agent description including the pricing skill, capabilities, and transport protocols.
 
-```bash
-export APP_URL=https://miles-and-smiles.apps.your-cluster.example.com
+### 2. Test Different Disposition Scenarios
 
-# Overall health summary
-curl $APP_URL/q/health
+Try these feedback examples:
 
-# Individual probes
-curl $APP_URL/q/health/live
-curl $APP_URL/q/health/ready
-curl $APP_URL/q/health/started
+**Scenario 1: Sell the car**
+```
+Minor engine issues, good body condition, low mileage. Repair cost: $800.
 ```
 
-Each response is a JSON document listing the overall status (`UP` or `DOWN`) and the result of every individual health check registered in the application. A healthy response looks like:
-
-```json
-{
-  "status": "UP",
-  "checks": [
-    {
-      "name": "Database connections health check",
-      "status": "UP"
-    }
-  ]
-}
+**Scenario 2: Donate the car**
+```
+Old car, high mileage, runs but needs work. Market value low.
 ```
 
-The SmallRye Health UI at `$APP_URL/q/health-ui` presents the same information in a readable browser dashboard — useful for a quick visual confirmation that all checks are green after a fresh deployment.
+**Scenario 3: Scrap the car**
+```
+Total loss from flood damage, electrical system destroyed.
+```
+
+Observe how the remote agent makes different decisions!
+
+### 3. Create Your Own A2A Agent
+
+What other specialized agents could be useful?
+
+- **Route Planner Agent**: Plans maintenance schedules for the fleet
+- **Insurance Agent**: Assesses insurance claims for damaged cars
+- **Inventory Agent**: Tracks fleet availability across locations
+
+Try creating a simple A2A server for one of these!
+
+### 4. Monitor A2A Communication
+
+Add logging to see the JSON-RPC messages:
+
+```properties
+# In application.properties
+quarkus.log.category."io.a2a".level=DEBUG
+```
+
+This shows the raw A2A protocol messages.
 
 ---
 
 ## Troubleshooting
 
-**Pods stuck in `Pending` or `ImagePullBackOff`** — the cluster can't reach the registry or the image name is wrong. Check pod events with `kubectl describe pod <pod-name> -n miles-and-smiles`. For `ImagePullBackOff`, verify the image names in the YAML manifests match what was pushed to your registry.
+??? warning "Connection refused to localhost:8888"
+    Make sure the remote A2A server is running in Terminal 1. Check for:
+    ```
+    Listening on: http://localhost:8888
+    ```
 
-**Main application fails to start** — the main application fetches the A2A agent card during initialization. If the A2A agent pod isn't fully ready at that point, the fetch will fail. The manifests are designed to be applied in order with readiness waits between them, so if you're applying them manually make sure to wait for the A2A agent first:
+    If you see "Port already in use", another application is using port 8888. You can change it in `remote-a2a-agent/src/main/resources/application.properties`:
+    ```properties
+    quarkus.http.port=8889
+    ```
 
-```bash
-kubectl wait --for=condition=ready pod \
-  -l app.kubernetes.io/name=miles-and-smiles-a2a \
-  -n miles-and-smiles --timeout=120s
-```
+    Then update the client's `a2aServerUrl` accordingly.
 
-**Route returns 503** — the main application may still be starting up. Its startup probe allows up to five minutes for initialization. Wait a moment and check pod status with `kubectl get pods -n miles-and-smiles`.
+??? warning "Task execution timeout"
+    If the remote agent takes too long to respond, you might see a timeout error. The default timeout is sufficient for most cases, but you can increase it if needed by configuring the A2A client.
 
-**Secret or ConfigMap not found** — if `OPENAI_API_KEY` wasn't set during deployment, the secret creation step will have failed. Set the variable and re-run `./deploy.java deploy`.
+??? warning "Parameter mismatch errors"
+    If you see errors about missing parameters, verify that:
+
+    - Client agent method parameter names match what AgentExecutor extracts
+    - The text parts are extracted in the correct order in the `AgentExecutor`
+    - All required parameters are being sent by the client
+
+??? warning "Both applications on same port"
+    If you see "Port already in use" on 8080:
+
+    - Make sure you stopped the application from Step 07
+    - Only run the main application from `multi-agent-system`, not from a previous step directory
+    - Check for zombie Java processes: `ps aux | grep java`
+
+---
+## Cleanup
+
+Before moving to the conclusion, let's clean up:
+
+1. **Stop both running servers**:
+    - In Terminal 1 (remote-a2a-agent): Press `Ctrl+C`
+    - In Terminal 2 (multi-agent-system): Press `Ctrl+C`
 
 ---
 
-## Cleaning Up
 
-To remove every resource created by this step from your cluster:
+## What's Next?
 
-```bash
-./deploy.java undeploy
-```
+You've successfully distributed the pricing service as a remote A2A agent while keeping the rest of the system local!
 
-This deletes the Route, both application Deployments and Services, PostgreSQL, the Secret, the ConfigMap, and finally the namespace itself.
+You learned how to:
+
+- Convert local agents to remote A2A services
+- Connect to remote agents using `@A2AClientAgent`
+- Build A2A servers with AgentCard and AgentExecutor
+- Integrate remote agents into complex workflows
+- Run multiple Quarkus applications that communicate via A2A
+- Understand the architectural trade-offs between local and distributed agents
+
+**Key Progression:**
+- **Step 4**: Sophisticated local orchestration with Supervisor Pattern
+- **Step 5**: Human-in-the-Loop for safe, controlled autonomous decisions
+- **Step 6**: Multimodal image analysis for enriched feedback
+- **Step 7**: Dynamic model selection for cost-effective, risk-aware decisions
+- **Step 8**: Distributed architecture with A2A protocol
+
+Congratulations on completing the final step of Section 2! Ready to wrap up? Head to the conclusion to review everything you've learned and see how these patterns apply to real-world scenarios!
+
+[Continue to Conclusion - Mastering Agentic Systems](conclusion.md)
 
 ---
 
-## What's Next
+## Additional Resources
 
-You've now seen a complete picture of the Miles and Smiles agentic system — from a single agent with a tool in Step 01, through compositional workflows, supervisor orchestration, human approval, multimodal analysis, and distributed A2A communication in Step 07, to a production cluster deployment here. Head to the [Mastering Agentic Systems](conclusion.md) conclusion to reflect on everything you've built and the patterns you can carry into your own projects.
-
-If you're continuing to **Section 3**, you'll take these foundations into enterprise territory: agent skills and dynamic discovery, persistent event-driven workflows with Quarkus Flow, adaptive model selection, and AI-powered evaluation.
+- [A2A Protocol Specification](https://a2a.dev)
+- [Quarkus LangChain4j Documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/)
+- [Quarkus LangChain4j Agentic Module](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agentic.html)

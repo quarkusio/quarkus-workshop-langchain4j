@@ -43,10 +43,11 @@ jobs:
           - section-2/step-04
           - section-2/step-05
           - section-2/step-06
-          - section-2/step-07/multi-agent-system
-          - section-2/step-07/remote-a2a-agent
+          - section-2/step-07
           - section-2/step-08/multi-agent-system
           - section-2/step-08/remote-a2a-agent
+          - section-2/step-09/multi-agent-system
+          - section-2/step-09/remote-a2a-agent
           - section-3/step-00
           - section-3/step-01
           - section-3/step-02
