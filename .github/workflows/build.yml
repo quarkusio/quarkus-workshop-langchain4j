@@ -51,6 +51,7 @@ jobs:
           - section-3/step-01
           - section-3/step-02
           - section-3/step-03
+          - section-3/step-04
 
     name: "Build ${{ matrix.app }}"
     steps:
