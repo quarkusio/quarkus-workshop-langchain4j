@@ -115,23 +115,25 @@ quarkus.log.category."io.serverlessworkflow".level=DEBUG
 # Kafka channels for Flow events
 mp.messaging.incoming.flow-in.connector=smallrye-kafka
 mp.messaging.incoming.flow-in.topic=flow-in
-mp.messaging.incoming.flow-in.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+mp.messaging.incoming.flow-in.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.flow-in.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 
 mp.messaging.outgoing.flow-out.connector=smallrye-kafka
 mp.messaging.outgoing.flow-out.topic=flow-out
-mp.messaging.outgoing.flow-out.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+mp.messaging.outgoing.flow-out.value.serializer=org.apache.kafka.common.serialization.StringSerializer
 mp.messaging.outgoing.flow-out.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+mp.messaging.outgoing.flow-out.cloud-events-mode=structured
 
 mp.messaging.outgoing.flow-in-producer.connector=smallrye-kafka
 mp.messaging.outgoing.flow-in-producer.topic=flow-in
-mp.messaging.outgoing.flow-in-producer.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+mp.messaging.outgoing.flow-in-producer.value.serializer=org.apache.kafka.common.serialization.StringSerializer
 mp.messaging.outgoing.flow-in-producer.key.serializer=org.apache.kafka.common.serialization.StringSerializer
 
 mp.messaging.incoming.flow-out-consumer.connector=smallrye-kafka
 mp.messaging.incoming.flow-out-consumer.topic=flow-out
-mp.messaging.incoming.flow-out-consumer.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+mp.messaging.incoming.flow-out-consumer.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.flow-out-consumer.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.flow-out-consumer.cloud-events-mode=structured
 ```
 
 Four channels make up the messaging layer:
