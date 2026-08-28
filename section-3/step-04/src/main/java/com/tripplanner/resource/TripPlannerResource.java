@@ -1,6 +1,5 @@
 package com.tripplanner.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.agentic.flow.TripPlanStore;
 import com.tripplanner.model.TripRequest;
 import com.tripplanner.model.TripRequestContext;
@@ -28,16 +27,13 @@ public class TripPlannerResource {
     private static final long PLAN_TIMEOUT_SECONDS = 120;
 
     @Inject
-    ObjectMapper objectMapper;
-
-    @Inject
     TripRequestContext tripRequestContext;
 
     @Inject
     TripPlanStore tripPlanStore;
 
     @Channel("flow-in-producer")
-    Emitter<String> flowInProducer;
+    Emitter<TripRequest> flowInProducer;
 
     @POST
     @Path("/plan")
@@ -49,15 +45,14 @@ public class TripPlannerResource {
         String previousId = tripPlanStore.latest() != null
                 ? tripPlanStore.latest().instanceId() : null;
 
-        String body = objectMapper.writeValueAsString(request);
-        OutgoingCloudEventMetadata<String> metadata = OutgoingCloudEventMetadata.<String>builder()
+        OutgoingCloudEventMetadata<TripRequest> metadata = OutgoingCloudEventMetadata.<TripRequest>builder()
                 .withId(UUID.randomUUID().toString())
                 .withSource(URI.create("api:/trip/plan"))
                 .withType("com.tripplanner.booking.confirmed")
                 .withDataContentType("application/json")
                 .build();
 
-        flowInProducer.send(Message.of(body, Metadata.of(metadata)));
+        flowInProducer.send(Message.of(request, Metadata.of(metadata)));
 
         TripPlanStore.TripPlanStatus planStatus =
                 tripPlanStore.awaitNextPlan(previousId, PLAN_TIMEOUT_SECONDS);

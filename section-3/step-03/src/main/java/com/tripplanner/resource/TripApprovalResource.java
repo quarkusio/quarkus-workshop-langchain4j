@@ -1,9 +1,7 @@
 package com.tripplanner.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.model.TripApproval;
 import io.smallrye.reactive.messaging.ce.OutgoingCloudEventMetadata;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -20,25 +18,20 @@ import java.util.UUID;
 @Path("/trip")
 public class TripApprovalResource {
 
-    @Inject
-    ObjectMapper objectMapper;
-
     @Channel("flow-in-producer")
-    Emitter<String> flowIn;
+    Emitter<TripApproval> flowIn;
 
     @PUT
     @Path("/approve")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response approveTrip(TripApproval approval) throws Exception {
+    public Response approveTrip(TripApproval approval) {
         if (approval.instanceId() == null || approval.instanceId().isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("instanceId is required")
                     .build();
         }
 
-        String body = objectMapper.writeValueAsString(approval);
-
-        OutgoingCloudEventMetadata<String> metadata = OutgoingCloudEventMetadata.<String>builder()
+        OutgoingCloudEventMetadata<TripApproval> metadata = OutgoingCloudEventMetadata.<TripApproval>builder()
                 .withId(UUID.randomUUID().toString())
                 .withSource(URI.create("api:/trip/approve"))
                 .withType("com.tripplanner.trip.approval.done")
@@ -46,7 +39,7 @@ public class TripApprovalResource {
                 .withExtension("flowinstanceid", approval.instanceId())
                 .build();
 
-        flowIn.send(Message.of(body, Metadata.of(metadata)));
+        flowIn.send(Message.of(approval, Metadata.of(metadata)));
         return Response.accepted().build();
     }
 }
