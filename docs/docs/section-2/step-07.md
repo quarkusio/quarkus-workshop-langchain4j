@@ -143,7 +143,7 @@ cd section-2/step-07
 
 ### Test with a Standard-Value Vehicle
 
-Find the Toyota Corolla in the Fleet Status grid and enter feedback describing severe damage:
+Find the Honda Civic in the Fleet Status grid and enter feedback describing severe damage:
 
 ```text
 The car was involved in a severe collision, with heavy front-end damage, rear bumper damage, and possible frame damage. It may not be safe to drive.
@@ -151,7 +151,7 @@ The car was involved in a severe collision, with heavy front-end damage, rear bu
 
 Click **Return**.
 
-This feedback is intentionally severe so the disposition analysis is activated. The Toyota Corolla should still be below the $30,000 advanced-model threshold, so the `DispositionProposalAgent` will use the default `gpt-4o-mini` model. Check the application logs. You should see the disposition proposal generated without the advanced model being invoked.
+This feedback is intentionally severe so the disposition analysis is activated. The Honda Civic should still be below the $30,000 advanced-model threshold, so the `DispositionProposalAgent` will use the default `gpt-4o-mini` model. Check the application logs. You should see the disposition proposal generated without the advanced model being invoked.
 
 ### Test with a High-Value Vehicle
 

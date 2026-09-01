@@ -21,6 +21,5 @@ INSERT INTO car_info (id, make, model, year, condition, status) VALUES
     
     -- Regular cars for testing cleaning/maintenance only
     (nextval('car_info_id_seq'), 'Toyota', 'Corolla', EXTRACT(YEAR FROM CURRENT_DATE) - 3, 'Like new, no issues', 'RENTED'),
-    (nextval('car_info_id_seq'), 'Honda', 'Civic', EXTRACT(YEAR FROM CURRENT_DATE) - 4, 'Good condition, minor wear and tear', 'RENTED'),
+    (nextval('car_info_id_seq'), 'Honda', 'Civic', EXTRACT(YEAR FROM CURRENT_DATE) - 8, 'Good condition, minor wear and tear', 'RENTED'),
     (nextval('car_info_id_seq'), 'Ford', 'F-150', EXTRACT(YEAR FROM CURRENT_DATE) - 2, 'Small scratch on rear bumper', 'IN_MAINTENANCE');
-
