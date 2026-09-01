@@ -73,4 +73,3 @@ public interface DispositionProposalAgent {
         return modelSelector.select(carValue);
     }
 }
-
