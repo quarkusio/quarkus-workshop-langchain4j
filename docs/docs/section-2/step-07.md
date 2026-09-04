@@ -141,24 +141,24 @@ cd section-2/step-07
 
 3. Open [http://localhost:8080](http://localhost:8080){target="_blank"}
 
-### Test with a Low-Value Vehicle
+### Test with a Standard-Value Vehicle
 
-Find a car in the Fleet Status grid and enter feedback describing damage to a lower-value vehicle:
+Find the Honda Civic in the Fleet Status grid and enter feedback describing severe damage:
 
 ```text
-Old economy car, high mileage, paint is faded and the engine makes a rattling noise
+The car was involved in a severe collision, with heavy front-end damage, rear bumper damage, and possible frame damage. It may not be safe to drive.
 ```
 
 Click **Return**.
 
-The `DispositionProposalAgent` will use the default `gpt-4o-mini` model. Check the application logs — you should see the disposition proposal generated without the advanced model being invoked.
+This feedback is intentionally severe so the disposition analysis is activated. The Honda Civic should still be below the $30,000 advanced-model threshold, so the `DispositionProposalAgent` will use the default `gpt-4o-mini` model. Check the application logs. You should see the disposition proposal generated without the advanced model being invoked.
 
 ### Test with a High-Value Vehicle
 
-Now try a scenario where the PricingAgent estimates a value above $30,000. Enter feedback for a newer, more valuable car:
+Now try a scenario where the PricingAgent estimates a value above $30,000. Find the Mercedes-Benz C-Class in the Fleet Status grid and enter feedback describing severe damage:
 
 ```text
-Minor cosmetic scratch on driver door, otherwise in excellent condition
+The car was involved in a severe multi-car rear-end collision, with heavy damage to both the front and rear bumpers and possible structural damage.
 ```
 
 Click **Return**.
