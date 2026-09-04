@@ -26,7 +26,20 @@ public interface DispositionAgent {
         - If car has low value (<$5,000) but functional: DONATE
         - If car is valuable and damage is minor: KEEP
 
-        Provide your recommendation with a clear explanation of the reasoning.
+        Your response must include:
+        1. Final Workflow Action with unique marker: __DISPOSE_CAR__ or __KEEP_CAR__
+        2. Disposition Recommendation with unique marker: __SCRAP__ or __SELL__ or __DONATE__ or __KEEP__
+        3. Reasoning: Clear explanation of your recommendation
+
+        Use __DISPOSE_CAR__ when the recommendation is __SCRAP__, __SELL__, or __DONATE__.
+        Use __KEEP_CAR__ when the recommendation is __KEEP__.
+
+        Format your response as:
+        Final Workflow Action: __[DISPOSE_CAR/KEEP_CAR]__
+        Disposition Recommendation: __[SCRAP/SELL/DONATE/KEEP]__
+        Reasoning: [Your detailed explanation]
+
+        CRITICAL: Use double underscores around both markers.
         """)
     @UserMessage("""
         Determine the disposition for this vehicle:
@@ -38,7 +51,7 @@ public interface DispositionAgent {
         - Estimated Value: {carValue}
         - Damage/Feedback: {feedback}
 
-        Provide your disposition recommendation (SCRAP/SELL/DONATE/KEEP) and explanation.
+        Provide your final workflow action, disposition recommendation, and explanation.
         """)
     @Agent(outputKey = "dispositionAction", description = "Car disposition specialist. Determines how to dispose of a car based on value and condition.")
     String processDisposition(

@@ -53,13 +53,19 @@ public interface FleetSupervisorAgent {
            
            1. Get value from PricingAgent (keep $ format)
            2. IF value > $15,000 (HIGH-VALUE):
-              - Invoke DispositionProposalAgent → HumanApprovalAgent (workflow pauses)
-              - APPROVED: Use AI recommendation → KEEP→"KEEP_CAR", DISPOSE→"DISPOSE_CAR"
-              - REJECTED: Opposite of AI → KEEP→"DISPOSE_CAR", DISPOSE→"KEEP_CAR"
+              - Invoke DispositionProposalAgent once
+              - Read its Final Workflow Action marker: __KEEP_CAR__ or __DISPOSE_CAR__
+              - Invoke HumanApprovalAgent once with the proposal (workflow pauses)
+              - APPROVED: Return the proposal's Final Workflow Action
+              - REJECTED: Return the opposite action
+              - Do not invoke DispositionAgent for high-value cars
            3. IF value ≤ $15,000 (LOW-VALUE):
-              - Invoke DispositionAgent directly
-              - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
+              - Invoke DispositionAgent once
+              - Read its Final Workflow Action marker: __KEEP_CAR__ or __DISPOSE_CAR__
+              - Return that Final Workflow Action
+              - Do not invoke DispositionAgent more than once for the same car
            4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed
+           5. IF "DISPOSE_CAR": Finish immediately
            
            CRITICAL: End with KEEP_CAR or DISPOSE_CAR
            """;
@@ -87,5 +93,3 @@ public interface FleetSupervisorAgent {
             Disposition Analysis: """ + (dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
-
-

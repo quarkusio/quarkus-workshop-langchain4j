@@ -139,11 +139,13 @@ Let's build the HITL system step by step.
 
 This agent creates disposition proposals that will be reviewed by humans.
 
-In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionProposalAgent.java`:
+==In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionProposalAgent.java`:==
 
-```java title="DispositionProposalAgent.java" hl_lines="14-29 38-48 51"
+```java title="DispositionProposalAgent.java" hl_lines="14-45 46-58"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java"
 ```
+
+The proposal now contains a final workflow marker alongside the domain recommendation. `__KEEP_CAR__` and `__DISPOSE_CAR__` give the supervisor an unambiguous terminal result, while `__SCRAP__`, `__SELL__`, `__DONATE__`, and `__KEEP__` preserve the specific recommendation for human review. The double underscores make both markers easy for the supervisor to identify reliably.
 
 !!! note "Why two disposition agents?"
     You might wonder why we have both DispositionProposalAgent and DispositionAgent. They serve different purposes: DispositionProposalAgent creates recommendations for human review on high-value vehicles (>$15K), while DispositionAgent makes autonomous decisions on lower-value vehicles. 
@@ -230,11 +232,13 @@ In `src/main/java/com/carmanagement/resource`, create `ApprovalResource.java`:
 
 Now we need to modify the supervisor to implement the new value-based routing with the approval workflow.
 
-Update `src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java`:
+==Update `src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java`:==
 
-```java title="FleetSupervisorAgent.java" hl_lines="10 24-35 40-46 49-51"
+```java title="FleetSupervisorAgent.java" hl_lines="15-31 33-47 49-71"
 --8<-- "../../section-2/step-05/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java"
 ```
+
+The supervisor invokes each disposition agent once and reads its final workflow marker. A low-value result returns immediately after `DispositionAgent` produces `KEEP_CAR` or `DISPOSE_CAR`, preventing the supervisor from calling the same agent repeatedly. The high-value path keeps the proposal and human approval sequence introduced in this step.
 
 ### Update the CarConditions Model
 

@@ -32,14 +32,19 @@ public interface DispositionProposalAgent {
         - If car is valuable and damage is minor: KEEP
         
         Your response must include:
-        1. Proposed Action with unique marker: __SCRAP__ or __SELL__ or __DONATE__ or __KEEP__
-        2. Reasoning: Clear explanation of your recommendation
+        1. Final Workflow Action with unique marker: __DISPOSE_CAR__ or __KEEP_CAR__
+        2. Proposed Action with unique marker: __SCRAP__ or __SELL__ or __DONATE__ or __KEEP__
+        3. Reasoning: Clear explanation of your recommendation
+        
+        Use __DISPOSE_CAR__ when the proposed action is __SCRAP__, __SELL__, or __DONATE__.
+        Use __KEEP_CAR__ when the proposed action is __KEEP__.
         
         Format your response as:
+        Final Workflow Action: __[DISPOSE_CAR/KEEP_CAR]__
         Proposed Action: __[SCRAP/SELL/DONATE/KEEP]__
         Reasoning: [Your detailed explanation]
         
-        CRITICAL: Use double underscores around the action (e.g., __KEEP__ not KEEP)
+        CRITICAL: Use double underscores around both markers.
         """)
     @UserMessage("""
         Create a disposition proposal for this vehicle:
@@ -68,5 +73,3 @@ public interface DispositionProposalAgent {
         return modelSelector.select(carValue);
     }
 }
-
-
