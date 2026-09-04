@@ -1,10 +1,10 @@
-# Step 06 - MCP Integration
+# Step 06 - Custom Orchestration with PlannerAgent
 
-## Connecting to External Services
+## Goal-Oriented Planning
 
-The trip planner needs live data — current weather at the destination, road conditions, points of interest along the route. These come from external MCP services. External data must be validated before showing to customers: a weather service reporting "severe storm warning" should trigger a route change suggestion, not just a footnote.
+"Plan a 7-day California coast road trip for a family of 4, budget $3000." The PlannerAgent breaks this into legs, suggests stops, and estimates costs per segment. When the customer says "actually, skip San Francisco and add a beach day," the planner adapts the remaining plan dynamically.
 
-In this step, you'll connect your trip planner to an MCP server providing weather and POI tools, and apply guardrails to validate external data before it reaches the customer.
+In this step, you'll implement a custom `Planner` with `init`, `firstAction`, and `nextAction` methods — the most powerful orchestration pattern available, giving you fully custom control flow with goal-oriented reasoning.
 
 !!! note "Coming soon"
     This step is under development. Check back for the full hands-on instructions.

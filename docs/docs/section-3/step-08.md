@@ -1,10 +1,10 @@
-# Step 08 - Testing and Evaluation
+# Step 08 - A2A Communication
 
-## Verifying AI Quality at Scale
+## Booking Through Partner Agents
 
-Before going live, verify the trip planner actually helps people. Feed it sample requests and evaluate whether the generated plans are reasonable, vehicle selections match stated needs, and route suggestions are geographically sensible.
+Time to actually book things. A hotel booking agent (run by a partner organization) handles reservations. The trip planner negotiates availability, handles counter-offers, and confirms bookings through multi-turn A2A conversations.
 
-In this step, you'll use `@AiScorer` with `SemanticSimilarityStrategy` and `AiJudgeStrategy` to evaluate LLM output quality — because non-deterministic outputs need evaluation frameworks, not traditional assertions.
+In this step, you'll connect an A2A client agent to a partner hotel booking service and handle multi-turn conversations for real-world negotiation patterns.
 
 !!! note "Coming soon"
     This step is under development. Check back for the full hands-on instructions.
