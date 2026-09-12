@@ -685,6 +685,15 @@ This separation allows:
 - A2A infrastructure to handle protocol details
 - **Remote agents to be reused** — any application can connect to the pricing service via A2A
 
+!!!note "Disabling A2A Authorization"
+    Starting from A2A SDK version 1.3.1, authorization is **required by default** on A2A servers. Since this workshop does not configure any authentication mechanism (e.g., API keys or OAuth), the remote agent's `application.properties` includes:
+
+    ```properties
+    a2a.authorization.required=false
+    ```
+
+    This explicitly disables the authorization check so the server accepts unauthenticated requests. In a production environment, you would configure proper authorization instead of disabling it.
+
 ---
 
 ## Key Takeaways
