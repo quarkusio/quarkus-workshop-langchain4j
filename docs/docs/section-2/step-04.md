@@ -442,14 +442,14 @@ Try these scenarios to see how the supervisor pattern autonomously orchestrates 
 Enter the following text in the feedback field for the **Honda Civic**:
 
 ```text
-The car was in a serious collision. Front end is completely destroyed and airbags deployed.
+The car is completely wrecked after a serious collision. The frame seems to be compromised and the engine is in pieces.
 ```
 
 **What happens:**
 
 ```mermaid
 flowchart TD
-    Start(["Input: Car was in serious collision<br/>Front end destroyed, airbags deployed"])
+    Start(["Input: Completely wrecked after serious collision<br/>frame compromised, engine in pieces"])
 
     Start --> FW["FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     FW --> T1["FeedbackTask.cleaning()"]
@@ -462,9 +462,9 @@ flowchart TD
 
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
     FSA -->|"Disposition has highest priority"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $8,500<br/>2020 Honda Civic with severe damage"]
+    PA --> PV["Estimated value<br/>4-year-old Honda Civic with severe damage"]
     PV --> DA["Invoke DispositionAgent"]
-    DA --> DD["Decision: SCRAP<br/>Repair cost > 50% of value"]
+    DA --> DD["Decision: SCRAP<br/>Repair cost exceeds value"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP - severe damage"])
 
     style FW fill:#e8d5b5,stroke:#333,stroke-width:2,color:#333
@@ -502,7 +502,7 @@ flowchart TD
     Results --> FSA{"FleetSupervisorAgent<br/>Autonomous Orchestration"}
 
     FSA -->|"Severe damage detected"| PA["Invoke PricingAgent"]
-    PA --> PV["Estimate: $12,000<br/>2014 Ford F-150, totaled"]
+    PA --> PV["Estimated value<br/>2-year-old Ford F-150, totaled"]
     PV --> DA["Invoke DispositionAgent"]
     DA --> DD["Decision: SCRAP or SELL<br/>Beyond economical repair"]
     DD --> Result(["Result: PENDING_DISPOSITION<br/>Condition: SCRAP/SELL - totaled"])

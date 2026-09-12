@@ -2,21 +2,16 @@ package com.demo;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import io.quarkus.logging.Log;
-
-import java.util.List;
-
 import org.a2aproject.sdk.server.agentexecution.AgentExecutor;
 import org.a2aproject.sdk.server.agentexecution.RequestContext;
 import org.a2aproject.sdk.server.tasks.AgentEmitter;
 import org.a2aproject.sdk.spec.A2AError;
 import org.a2aproject.sdk.spec.TaskNotCancelableError;
 import org.a2aproject.sdk.spec.TextPart;
+import io.quarkus.logging.Log;
 
-/**
- * Executor for the PricingAgent.
- * Handles the integration between the A2A framework and the PricingAgent.
- */
+import java.util.List;
+
 @ApplicationScoped
 public class PricingAgentExecutor {
 
@@ -35,7 +30,7 @@ public class PricingAgentExecutor {
                 String[] inputs = context.getUserInput("\n").split("\n");
 
                 Log.debugf("Estimating value for %s %s %s",
-                        inputs[0], inputs[1], inputs[2]);
+                    inputs[0], inputs[1], inputs[2]);
 
                 String agentResponse = pricingAgent.estimateValue(
                         inputs[0],                      // carMake
