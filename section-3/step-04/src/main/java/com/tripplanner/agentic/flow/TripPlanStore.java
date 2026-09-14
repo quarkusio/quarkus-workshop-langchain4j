@@ -8,6 +8,7 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.model.BookingConfirmation;
 import com.tripplanner.model.TripPlan;
+import com.tripplanner.model.TripPlanEntity;
 import com.tripplanner.model.TripRequest;
 import com.tripplanner.model.TripRequestContext;
 import io.smallrye.reactive.messaging.ce.CloudEventMetadata;
