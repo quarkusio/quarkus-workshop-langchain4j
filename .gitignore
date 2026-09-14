@@ -52,3 +52,13 @@ __pycache__/
 .claude 
 .continue
 .bob
+
+# OpenSpec planning artifacts (local only)
+openspec/
+.agents/skills/.openspec-target
+.agents/skills/openspec-apply-change/
+.agents/skills/openspec-archive-change/
+.agents/skills/openspec-explore/
+.agents/skills/openspec-propose/
+.agents/skills/openspec-sync-specs/
+.agents/skills/openspec-update-change/

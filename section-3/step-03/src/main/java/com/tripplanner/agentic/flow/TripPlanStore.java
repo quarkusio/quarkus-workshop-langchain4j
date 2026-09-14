@@ -33,9 +33,10 @@ public class TripPlanStore {
         String instanceId = (String) event.getExtension("flowinstanceid").orElse(null);
         if (instanceId == null || instanceId.isBlank()) return message.ack();
 
+        String data = message.getPayload();
         switch (event.getType()) {
-            case "com.tripplanner.trip.approval.requested" -> handleApprovalRequested(event, instanceId);
-            case "com.tripplanner.booking.finalized" -> handleBookingFinalized(event, instanceId);
+            case "com.tripplanner.trip.approval.requested" -> handleApprovalRequested(data, instanceId);
+            case "com.tripplanner.booking.finalized" -> handleBookingFinalized(data, instanceId);
             default -> {
             }
         }
@@ -75,9 +76,9 @@ public class TripPlanStore {
         return plansByInstanceId.get(instanceId);
     }
 
-    private void handleApprovalRequested(CloudEventMetadata<?> event, String instanceId) {
+    private void handleApprovalRequested(String data, String instanceId) {
         try {
-            TripPlan plan = objectMapper.readValue(event.getData().toString(), TripPlan.class);
+            TripPlan plan = objectMapper.readValue(data, TripPlan.class);
             plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_AWAITING_APPROVAL, plan, null));
             latestInstanceId.set(instanceId);
         } catch (Exception e) {
@@ -85,9 +86,9 @@ public class TripPlanStore {
         }
     }
 
-    private void handleBookingFinalized(CloudEventMetadata<?> event, String instanceId) {
+    private void handleBookingFinalized(String data, String instanceId) {
         try {
-            BookingConfirmation confirmation = objectMapper.readValue(event.getData().toString(), BookingConfirmation.class);
+            BookingConfirmation confirmation = objectMapper.readValue(data, BookingConfirmation.class);
             TripPlanStatus previous = plansByInstanceId.get(instanceId);
             TripPlan plan = previous == null ? null : previous.plan();
             plansByInstanceId.put(instanceId, new TripPlanStatus(instanceId, STATUS_CONFIRMED, plan, confirmation));

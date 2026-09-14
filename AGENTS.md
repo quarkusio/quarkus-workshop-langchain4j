@@ -91,7 +91,7 @@ Section 1 uses a simpler package structure and focuses on single-agent patterns,
 
 ## Documentation Writing Guidelines
 
-A detailed style guide for workshop documentation is maintained at `.agent/skills/workshop-docs-style.md`. Read it before writing or editing any file under `docs/docs/`. The key points are summarised here.
+A detailed style guide for workshop documentation is maintained at `.agents/skills/workshop-docs-style/SKILL.md`. Read it before writing or editing any file under `docs/docs/`. The key points are summarised here.
 
 Write natural, flowing prose rather than the AI pattern of bullet points followed by colon-separated descriptions. The reference voice is Section 1 of the workshop, which was written by the project owner.
 

@@ -174,7 +174,12 @@ You'll also notice each prompt explicitly tells the LLM to activate a skill befo
 
 Once started, open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
 
-The application has a two-panel layout. The left panel is the trip form with fields for destination, duration, number of travelers, trip type, budget range, and any additional preferences. The right panel renders the generated plan with the vehicle recommendation, route overview, daily itinerary, cost estimates, and practical tips. At the bottom there's a **Refine** drawer where you can send follow-up adjustments.
+The application opens on a trip form with fields for destination, duration, number of travelers, trip type, budget range, and any additional preferences.
+
+![The Plan a New Trip form](../images/step-04-trip-form.png)
+
+!!! tip "Click to enlarge"
+    Screenshots in these docs open fullscreen when you click them, so you can read the form fields and results more easily.
 
 ---
 
@@ -192,6 +197,10 @@ The application has a two-panel layout. The left panel is the trip form with fie
 - **Preferences**: `We love coastal towns and good food`
 
 ==Click **Generate Trip Plan**.==
+
+While the agents work, the UI shows a wait screen:
+
+![Planning your trip wait screen](../images/section-3-planning.png)
 
 `ResearchPhase` runs `VehicleAdvisorAgent` and `ItineraryPlannerAgent` in parallel. `VehicleAdvisorAgent` activates the `vehicle-selection` skill and picks a vehicle suited for a family of four. `ItineraryPlannerAgent` activates the `family-trip` skill and builds a paced, kid-friendly itinerary. `CostEstimatorAgent` then reads both results from the `AgenticScope` to produce cost estimates, and `TipsGeneratorAgent` reads everything to generate relevant tips. The `@Output` method assembles all of it into a `TripPlan` without an extra LLM call.
 

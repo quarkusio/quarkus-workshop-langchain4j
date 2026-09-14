@@ -8,6 +8,10 @@ img {
     max-width: 80% !important;
 }
 
+.md-typeset img {
+    cursor: zoom-in;
+}
+
 body[data-md-color-scheme="slate"] main img {
     border-radius: 1rem;
     padding: 1rem;
