@@ -1,12 +1,12 @@
 # Step 05 - Voting, Loops, and Adaptive Model Selection
 
-## Iterative Plan Refinement
+## Parallel evaluation and iterative agent workflows
 
-Step 03 asked "should we finalize this plan?" and waited for a single human approval. This step introduces iterative convergence: multiple evaluator agents assess the plan in parallel, vote on whether it meets quality thresholds, and the workflow loops back to refine until the evaluators agree — or a maximum iteration guard fires.
+The customer can return to a saved trip after Step 04, but approval still depends on their own review. A plan might fit the budget while leaving too little time between stops, so Miles of Smiles wants to check its quality before asking the customer to decide.
 
-Alongside the voting loop, adaptive model selection routes simple requests through a faster, cheaper model and escalates to a stronger model when complexity or late-loop refinement demands it.
+The planned exercise adds evaluator agents that review the plan in parallel and vote on whether it needs another pass. Their feedback will guide a refinement loop, with an iteration limit to stop repeated revisions. Adaptive model selection will use a faster, cheaper model for straightforward requests and a more capable model when the request or refinement needs it.
 
-In this step, you'll implement parallel evaluator agents, a vote-aggregation structure, a loop condition with a max-iteration safety guard, and a model supplier that routes based on request complexity.
+The intended check is to follow a plan through evaluation and revision, then inspect whether the loop stopped because the quality threshold was met or the iteration limit was reached.
 
 !!! note "Coming soon"
-    This step is under development. Check back for the full hands-on instructions.
+    This step is under development. The hands-on instructions and verification exercise are not yet available.

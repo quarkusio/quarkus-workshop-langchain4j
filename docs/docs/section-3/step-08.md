@@ -1,10 +1,10 @@
 # Step 08 - A2A Communication
 
-## Booking Through Partner Agents
+## Multi-turn communication with remote A2A agents
 
-Time to actually book things. A hotel booking agent (run by a partner organization) handles reservations. The trip planner negotiates availability, handles counter-offers, and confirms bookings through multi-turn A2A conversations.
+The customer has a route and suggested stops, but a recommended hotel is not a reservation. If the hotel is full, Miles of Smiles needs a way to discuss alternatives with the partner that manages bookings.
 
-In this step, you'll connect an A2A client agent to a partner hotel booking service and handle multi-turn conversations for real-world negotiation patterns.
+The planned exercise connects the trip planner to a partner hotel agent through Agent-to-Agent (A2A) communication. We'll follow a conversation across several turns as the agents check availability and respond to a counter-offer, ending with a confirmed booking or a decision that still needs the customer's input.
 
 !!! note "Coming soon"
-    This step is under development. Check back for the full hands-on instructions.
+    This step is under development. The hands-on instructions and verification exercise are not yet available.

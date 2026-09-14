@@ -1,10 +1,10 @@
 # Step 07 - MCP Integration
 
-## Connecting to External Services
+## Remote tools through Model Context Protocol
 
-The trip planner needs live data — current weather at the destination, road conditions, points of interest along the route. These come from external MCP services. External data must be validated before showing to customers: a weather service reporting "severe storm warning" should trigger a route change suggestion, not just a footnote.
+A route can look reasonable until a storm makes one of its stops unsuitable. The planner needs current information about the destination before it can suggest a change; the model's existing knowledge is not enough to check today's conditions.
 
-In this step, you'll connect your trip planner to an MCP server providing weather and POI tools, and apply guardrails to validate external data before it reaches the customer.
+The planned exercise connects the trip planner to weather and points-of-interest tools through Model Context Protocol (MCP). We'll check the external responses before using them in recommendations, then follow how a severe-weather warning affects the proposed route.
 
 !!! note "Coming soon"
-    This step is under development. Check back for the full hands-on instructions.
+    This step is under development. The hands-on instructions and verification exercise are not yet available.

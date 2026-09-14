@@ -1,476 +1,231 @@
 # Step 02 - Guardrails and Compliance
 
-## Ensuring Safe and Honest Recommendations
+A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. The skills added in Step 01 guide the agents' choices; they cannot ensure that every response follows those instructions. Before passing recommendations to the rest of the planning pipeline, the application needs checks of its own.
 
-In Step 01, you built a multi-agent Trip Planner that splits planning across specialized agents. But what happens when a vehicle agent recommends a 2-seat sports car to a family of 5? Or an itinerary agent suggests a route through a dangerous area?
+We'll attach output guardrails to the vehicle and itinerary agents so they can request another response or rewrite part of a recommendation. By the end, you'll be able to inspect those decisions in the terminal and see how a rejected response differs from one corrected in code.
 
-In production systems, you can't trust LLM output blindly. **Guardrails** are programmatic checks that validate, reject, or rewrite agent output before it reaches the user. They enforce business rules that the LLM alone might not follow consistently.
+These are demonstration rules, not a safety or compliance guarantee. Keyword matching cannot establish whether a route is safe, and changing a vehicle's type does not verify its seating capacity. The exercise makes those checks observable so their limits can be tested.
 
-In this step, you'll add output guardrails to individual agents in the Trip Planner pipeline, ensuring every recommendation is **safe** and **appropriate** regardless of what the LLM generates.
+## Per-agent output guardrails
 
----
-
-## In This Step
-
-In this step, you will:
-
-- Implement `OutputGuardrail` classes that validate LLM-generated trip plans
-- Use `retry()` and `reprompt()` to ask the LLM to **regenerate** output that fails safety or appropriateness checks
-- Use `successWith()` to **rewrite** output that has minor appropriateness issues
-- Build an **audit trail** that logs every guardrail decision for compliance
-- Handle guardrail failures gracefully with a JAX-RS `ExceptionMapper`
-- Bridge request context to guardrails using an `@ApplicationScoped` CDI bean
-
----
-
-## Build Overview
-
-We'll add four new components to the multi-agent Trip Planner from Step 01, applying guardrails to individual agents in the pipeline:
-
-1. **TripSafetyGuardrail**: Applied to `ItineraryPlannerAgent`. Validates hard safety rules (dangerous routes, empty itineraries). Uses `retry()` on failure.
-2. **TripAppropriatenessGuardrail**: Applied to `VehicleAdvisorAgent`. Validates soft appropriateness rules (vehicle/traveler mismatch, budget coherence). Uses `successWith()` to rewrite minor issues.
-3. **GuardrailAuditLog**: Logs every guardrail decision (`PASS`, `RETRY`, `REWRITE`) for compliance.
-4. **TripRequestContext**: An `@ApplicationScoped` CDI bean that bridges trip parameters from the REST endpoint to the guardrails.
-
-**The Flow:**
+An output guardrail checks the model's response before the caller receives it. Here, the itinerary check looks for missing days and a short list of dangerous-area phrases, while the vehicle check compares the recommendation with the customer's request. Both run within the parallel research phase from Step 01; costs and tips have no guardrails in this exercise.
 
 ```mermaid
-sequenceDiagram
-    participant User as Web UI
-    participant REST as TripPlannerResource
-    participant Context as TripRequestContext
-    participant Seq as TripPlannerSystem
-    participant VA as VehicleAdvisorAgent
-    participant IP as ItineraryPlannerAgent
-    participant LLM as OpenAI LLM
-    participant G1 as TripSafetyGuardrail
-    participant G2 as TripAppropriatenessGuardrail
-    participant Audit as GuardrailAuditLog
-    participant CE as CostEstimatorAgent
-    participant TG as TipsGeneratorAgent
-
-    User->>REST: POST /trip/plan (TripRequest)
-    REST->>Context: Store trip parameters
-    REST->>Seq: planTrip(...)
-
-    par Vehicle & Itinerary in parallel
-        VA->>LLM: Recommend vehicle
-        LLM-->>VA: VehicleRecommendation JSON
-        VA->>G2: validate(AiMessage)
-        G2->>Context: Read trip parameters
-        G2->>Audit: Log decision
-        alt Vehicle too small
-            G2-->>VA: successWith(rewritten JSON)
-        else Luxury on economy
-            G2-->>VA: reprompt("Use affordable vehicle", stricter prompt)
-            VA->>LLM: Regenerate with new system prompt + feedback
-        else All checks pass
-            G2-->>VA: success()
-        end
-    and
-        IP->>LLM: Plan itinerary
-        LLM-->>IP: ItineraryResult JSON
-        IP->>G1: validate(AiMessage)
-        G1->>Audit: Log decision
-        alt Safety check fails
-            G1-->>IP: retry("Fix dangerous route...")
-            IP->>LLM: Regenerate with feedback
-        else Safety check passes
-            G1-->>IP: success()
-        end
-    end
-
-    Seq->>CE: estimateCosts(vehicle, itineraryResult, ...)
-    CE-->>Seq: CostEstimate
-
-    Seq->>TG: generateTips(vehicle, itineraryResult, costs, ...)
-    TG-->>Seq: List of tips
-
-    Note over Seq: @Output assembles TripPlan (no LLM)
-    Seq-->>REST: TripPlan
-    REST-->>User: JSON response
+flowchart TD
+    I[Itinerary response] --> S[Itinerary checks]
+    V[Vehicle response] --> A[Vehicle checks]
+    C[Shared trip request] -.-> A
+    S --> L[Decision log]
+    A --> L
 ```
 
----
+When the response passes, `success()` lets it continue. A failed check can ask the model to try again with `retry(feedback)`, or use `reprompt(feedback, newSystemPrompt)` to supply a replacement system prompt as well. Both consume the retry allowance configured on the agent. For a correction that can be made in Java, `successWith(AiMessage)` accepts rewritten output without another model call.
 
-## Understanding Output Guardrails
+The [input guardrails from Section 1](../section-1/step-09.md) check what goes into the model. Output guardrails check what comes back, but only for the rules they implement.
 
-An `OutputGuardrail` is a class that intercepts the LLM's response **before** it's returned to the caller. It can:
+## Preparing the working copy
 
-| Action | Method | When to Use |
-|--------|--------|-------------|
-| **Accept** | `success()` | Output passes all checks |
-| **Retry** | `retry(feedback)` | Output has serious issues, ask the LLM to regenerate with feedback |
-| **Reprompt** | `reprompt(feedback, newSystemPrompt)` | Like retry, but also replaces the system prompt for stricter instructions |
-| **Rewrite** | `successWith(AiMessage)` | Output has minor issues, fix them in code and accept |
-| **Reject** | `failure(message)` | Output is fatally flawed, stop processing |
+==Continue in your working copy of Step 01, or open `section-3/step-02` to follow along with the completed solution.== The existing dependencies and configuration already support this exercise, so no changes to `pom.xml` or `application.properties` are needed.
 
-Multiple guardrails can be chained with `@OutputGuardrails`. They run in order: if the first guardrail triggers a `retry()`, the LLM regenerates and **all** guardrails run again against the new response. The `maxRetries` parameter caps the number of retry attempts.
+## Logging guardrail decisions
 
-!!! note "Input vs. Output Guardrails"
-    In [Section 1](../section-1/step-09.md){target="_blank"}, you used an `InputGuardrail` to detect prompt injection **before** the LLM processes the request. Output guardrails work on the other side and validate the LLM's **response** before it reaches the user. Both are critical for production systems.
-
----
-
-## Prerequisites
-
-=== "Option 1: Continue from Step 01"
-
-    If you want to continue building on top of Step 01 code, stay in the `section-3/step-01` directory. You'll add the guardrail classes and wire them to the existing agents as described below.
-
-=== "Option 2: Follow along using the completed solution"
-
-    If you prefer to follow along (without making any code changes), navigate to the completed `section-3/step-02` directory:
-
-    === "Linux / macOS"
-        ```bash
-        cd section-3/step-02
-        ./mvnw quarkus:dev
-        ```
-
-    === "Windows"
-        ```cmd
-        cd section-3\step-02
-        mvnw quarkus:dev
-        ```
-
----
-
-## Component 1: The Audit Log
-
-Before building the guardrails, let's create the audit trail service that both guardrails will use.
-
-In `src/main/java/com/tripplanner/guardrails`, create `GuardrailAuditLog.java`:
+Both guardrails need a place to record why they accepted, retried, or rewrote a response. ==Create `src/main/java/com/tripplanner/guardrails/GuardrailAuditLog.java`:==
 
 ```java title="GuardrailAuditLog.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/GuardrailAuditLog.java"
 ```
 
-`@ApplicationScoped` gives you a single instance shared across all requests. Each audit entry records a timestamp, the guardrail name, the decision (`PASS`, `RETRY`, `REWRITE`), and a reason. Entries are stored in a `ConcurrentLinkedDeque` (capped at 100) for thread safety. The component also logs to the JBoss logger at INFO level, so you can watch guardrail decisions in the terminal while you test.
+The logger writes decisions at INFO level and keeps a recent in-memory history, trimming it to 100 entries. This lets us follow the checks in the terminal during the exercise. The history disappears on restart, so a production audit trail would need durable storage and a way to associate decisions with each request.
 
----
+## Sharing request context with CDI
 
-## Component 2: The TripRequestContext
+The vehicle check needs the original traveler count and budget. Its `validate(AiMessage)` implementation reads these from an `@ApplicationScoped` bean populated by the REST endpoint before planning begins.
 
-The `TripAppropriatenessGuardrail` needs to know the original trip parameters (how many travelers, what budget, what trip type) to validate the LLM's response. Since the `OutputGuardrail.validate()` method only receives the `AiMessage`, we use a `@RequestScoped` CDI bean to bridge the data.
-
-In `src/main/java/com/tripplanner/model`, create `TripRequestContext.java`:
+==Create `src/main/java/com/tripplanner/model/TripRequestContext.java`:==
 
 ```java title="TripRequestContext.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/model/TripRequestContext.java"
 ```
 
-`@ApplicationScoped` gives you one shared instance that persists across requests. The field is `volatile` so updates remain visible across the parallel threads used by `@ParallelAgent`. The REST endpoint populates the context before calling the agent, and the guardrail reads it during validation. This is why `@ApplicationScoped` is used instead of `@RequestScoped`, since request context is not propagated to those parallel agent threads.
+!!! warning "One request at a time"
+    ==Wait for each planning request to finish before submitting another, including from another browser tab or client.== This bean holds one shared request for the whole application. `volatile` makes updates visible to the parallel agent threads; it does not provide multi-user isolation. A concurrent request can overwrite the trip details while a guardrail is reading them.
 
----
+??? info "Why use application scope here?"
+    This workshop bean makes the request available across the parallel research tasks without relying on a request-scoped CDI context being active on those threads. It is `@ApplicationScoped`, not `@RequestScoped`, and retains the last request until overwritten or the application stops. A multi-user implementation needs context tied to each agent invocation before this pattern can be used beyond the exercise.
 
-## Component 3: The Safety Guardrail
+## Validating structured output with `retry()`
 
-This guardrail enforces **hard rules** — violations that require the LLM to regenerate its response. It is applied to `ItineraryPlannerAgent`, validating the itinerary and route for safety.
+The itinerary guardrail parses the response as JSON and requests another attempt when the itinerary is missing, empty, or contains a configured phrase in the route overview or a day's description.
 
-In `src/main/java/com/tripplanner/guardrails`, create `TripSafetyGuardrail.java`:
+==Create `src/main/java/com/tripplanner/guardrails/TripSafetyGuardrail.java`:==
 
 ```java title="TripSafetyGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripSafetyGuardrail.java"
 ```
 
-Here is what this guardrail does:
+The agent returns an `ItineraryResult`, which the guardrail checks before it becomes part of the final plan. The helper extracts a JSON object from surrounding text such as Markdown fences, and invalid JSON triggers a retry with feedback for the model.
 
-### Handling Structured Output
+??? info "What does an itinerary PASS mean?"
+    The phrase check scans only the route overview and each day's description. It misses titles and hazards expressed in other words, and can reject a warning such as "avoid the conflict area." Null or blank text also returns success without checking an itinerary; the code assumes tool-call structured output in that case but does not inspect tool calls.
 
-The guardrail receives the raw `AiMessage` that the framework will parse into a `TripPlan` record. Depending on the LLM and configuration, the response may arrive as plain JSON text, as JSON wrapped in markdown code blocks (`` ```json...``` ``), or even as `null` text when the framework uses tool calls for structured output.
+    A `PASS` therefore does not establish that a route is safe. The invalid-JSON feedback also refers to "TripPlan format," although this agent produces an `ItineraryResult`.
 
-The guardrail handles all these cases:
+The following sequence illustrates a retry whose second response passes the implemented checks. The messages are descriptions of the interaction, not captured logs.
 
-- **Null or blank text**: The framework is using tool calls for structured output — the guardrail returns `success()` and lets the framework handle deserialization
-- **JSON in markdown**: The `extractJson()` helper strips any surrounding text and extracts the JSON object
-- **Malformed JSON**: The guardrail calls `retry()` — giving the LLM another chance to produce valid output
-
-### Safety Checks
-
-The guardrail validates two rules:
-
-1. **Completeness** — the itinerary must not be empty (a trip plan without days is useless)
-2. **Route safety** — the route overview and itinerary descriptions are scanned for dangerous-area keywords
-
-Each failed check calls `retry(feedback)`, which sends the feedback to the LLM and asks it to regenerate. The LLM gets up to `maxRetries` attempts configured on the annotation.
-
-### Audit Logging
-
-Every decision, pass or retry, is logged to the `GuardrailAuditLog`:
-
-```java
-auditLog.log("TripSafetyGuardrail", "RETRY", "Total cost estimate is missing");
+```mermaid
+sequenceDiagram
+    participant A as Itinerary agent
+    participant M as Model
+    participant G as Itinerary guardrail
+    A->>M: Request itinerary
+    M-->>A: JSON containing a flagged phrase
+    A->>G: Validate response
+    G-->>A: Retry with feedback
+    A->>M: Regenerate with feedback
+    M-->>A: JSON passing the checks
+    A->>G: Validate response
+    G-->>A: Accept
+    Note over A: Deserialize as ItineraryResult
 ```
 
----
+## Rewriting and reprompting with `successWith()` and `reprompt()`
 
-## Component 4: The Appropriateness Guardrail
+A vehicle recommendation needs a different kind of check because its suitability depends on who is traveling. The next guardrail rewrites a small-vehicle type for groups of four or more. If that branch does not apply, it checks for listed luxury brands on an economy budget and asks the model to reconsider with a stricter system prompt.
 
-This guardrail enforces **soft rules**. These are violations you can fix by **rewriting** the JSON in code, without asking the LLM to regenerate. It is applied to `VehicleAdvisorAgent`, validating vehicle recommendations against the trip context.
-
-In `src/main/java/com/tripplanner/guardrails`, create `TripAppropriatenessGuardrail.java`:
+==Create `src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java`:==
 
 ```java title="TripAppropriatenessGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java"
 ```
 
-Here is what this guardrail does:
+The rewrite changes the vehicle type and reasoning before deserialization into `TripPlan.VehicleRecommendation`. It selects an SUV for adventure trips, an Estate for business trips, and an MPV otherwise. This demonstrates accepting a correction in Java, while the economy-budget branch demonstrates asking the model for a new response.
 
-### Context-Aware Validation
+??? info "Limits of the vehicle check"
+    The rewrite leaves the model name unchanged and returns before checking the budget, so a corrected type can still accompany a two-seat or luxury model. Its keyword list does not catch every small vehicle.
 
-The guardrail injects `TripRequestContext` to access the original trip parameters:
+    Blank text, JSON parsing failures, and missing request context are accepted without checking suitability. Only the missing-context path logs that it skipped the checks. These paths need attention before using the sample to enforce rental policy.
 
-```java
-TripRequest request = tripRequestContext.get();
-```
+## Registering guardrails with `@OutputGuardrails`
 
-This enables checks like "is this vehicle appropriate for the number of travelers?" The guardrail can only answer that by comparing the LLM's recommendation against the original request.
+==Open `src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java` and add the highlighted imports and annotation:==
 
-### Vehicle/Traveler Mismatch — Rewriting
-
-When the LLM recommends a sports car for 4+ travelers, the guardrail doesn't ask the LLM to try again. Instead, it **rewrites the JSON directly**:
-
-```java
-vehicle.put("type", replacement);
-vehicle.put("reasoning", "Vehicle upgraded by guardrail: ...");
-return successWith(AiMessage.from(root.toString()));
-```
-
-The `successWith(AiMessage)` method replaces the LLM's response with the corrected version. The framework then deserializes the modified JSON into the `TripPlan` record as usual.
-
-### Budget Coherence — Reprompt
-
-When the mismatch is too significant to fix in code (luxury brand on economy budget), the guardrail calls `reprompt()`. Unlike `retry()`, which only sends feedback, `reprompt()` also **replaces the system prompt** — giving the LLM stricter instructions for the retry attempt:
-
-```java
-return reprompt("The vehicle recommendation is a luxury vehicle but the budget is economy. "
-        + "Please recommend an affordable, budget-friendly vehicle instead.",
-        "You are a vehicle advisor for road trips. You MUST recommend only budget-friendly, "
-        + "affordable vehicles. Never suggest luxury, premium, or sports brands.");
-```
-
----
-
-## Component 5: Wiring Guardrails to Agents
-
-In the multi-agent system from Step 01, each agent has a focused responsibility. Guardrails are applied to individual agents — each guardrail validates the specific output of the agent it's attached to.
-
-### ItineraryPlannerAgent with Safety Guardrail
-
-```java hl_lines="3 10 30" title="ItineraryPlannerAgent.java"
+```java hl_lines="3 7 27" title="ItineraryPlannerAgent.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java"
 ```
 
-The `@OutputGuardrails` annotation on `planItinerary()` runs `TripSafetyGuardrail` against the `ItineraryResult` JSON before it's deserialized. If the guardrail calls `retry()`, the LLM regenerates and the guardrail runs again (up to `maxRetries = 3`).
+==Make the corresponding additions in `src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java`:==
 
-### VehicleAdvisorAgent with Appropriateness Guardrail
-
-```java hl_lines="3 10 28" title="VehicleAdvisorAgent.java"
+```java hl_lines="3 7 26" title="VehicleAdvisorAgent.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java"
 ```
 
-The `@OutputGuardrails` annotation on `recommendVehicle()` runs `TripAppropriatenessGuardrail` against the `VehicleRecommendation` JSON. If the vehicle is too small, the guardrail rewrites it in place via `successWith()`. If it's a luxury brand on economy budget, it calls `retry()`.
+Each annotation applies to that agent's response before deserialization. `maxRetries = 3` allows up to three retries after the initial response, with validation running again on each regenerated response. The vehicle guardrail's economy-budget branch uses `reprompt()`, while its rewrite branch accepts the modified JSON immediately. The existing prompts, skills, and workflow composition stay unchanged.
 
-Guardrails are applied per agent. The safety guardrail checks itinerary content and the appropriateness guardrail checks vehicle suitability. With `maxRetries = 3`, each agent gets up to three chances to fix output when a guardrail triggers a retry. Both agents run in parallel inside `ResearchPhase`, and each guardrail runs independently on its own agent output.
+## Initializing guardrail context in the REST endpoint
 
----
+Step 01 already calls `TripPlannerSystem` from the REST resource. The only changes here are importing and injecting the context bean, then storing the request before that call. No existing imports, fields, or methods need to be removed.
 
-## Component 6: Updated REST Endpoint
+==In `src/main/java/com/tripplanner/resource/TripPlannerResource.java`, add the highlighted import:==
 
-Update `TripPlannerResource.java` to use `TripPlannerSystem` (the multi-agent pipeline) and populate the `TripRequestContext`:
-
-```java title="TripPlannerResource.java"
---8<-- "../../section-3/step-02/src/main/java/com/tripplanner/resource/TripPlannerResource.java"
+```java hl_lines="4" title="TripPlannerResource.java imports"
+--8<-- "../../section-3/step-02/src/main/java/com/tripplanner/resource/TripPlannerResource.java:3:12"
 ```
 
-The important line is:
+==Add the context injection below the existing workflow injection:==
 
-```java
-tripRequestContext.set(request);
+```java hl_lines="4 5" title="TripPlannerResource.java fields"
+--8<-- "../../section-3/step-02/src/main/java/com/tripplanner/resource/TripPlannerResource.java:17:21"
 ```
 
-It runs **before** calling the agent, so the context is available when the guardrails execute.
+==Set the context at the start of `planTrip()`, keeping the existing workflow call and its arguments unchanged:==
 
----
+```java hl_lines="6" title="TripPlannerResource.java planTrip()"
+--8<-- "../../section-3/step-02/src/main/java/com/tripplanner/resource/TripPlannerResource.java:23:38"
+```
 
-## Component 7: Guardrail Exception Mapper
+## Mapping guardrail exceptions to HTTP responses
 
-When the LLM exhausts all retries and the guardrails still fail, an `AgentInvocationException` is thrown (wrapping the underlying `OutputGuardrailException`). Without proper handling, this surfaces as a raw HTTP 500 error.
+If an agent cannot produce output that passes within its retry allowance, planning fails. The endpoint needs to translate the wrapped guardrail exception into a response the client can inspect.
 
-In `src/main/java/com/tripplanner/resource`, create `GuardrailExceptionMapper.java`:
+==Create `src/main/java/com/tripplanner/resource/GuardrailExceptionMapper.java`:==
 
 ```java title="GuardrailExceptionMapper.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/resource/GuardrailExceptionMapper.java"
 ```
 
-`@Provider` registers the mapper with JAX-RS automatically, with no extra configuration. The mapper walks the exception cause chain to find the underlying `GuardrailException` and returns a structured HTTP 422 response with a JSON body instead of a raw 500 error.
+The mapper searches the exception's cause chain for a guardrail failure and returns HTTP 422 with `error` and `message` fields. The UI displays a generic error, while the JSON details are available in the browser's network panel. The troubleshooting section below covers the mapper's handling of other agent failures.
 
----
+## Inspecting guardrail execution
 
-## Running the Application
-
-Start the application:
+==If the application is not already running, start it from the project directory you chose above:==
 
 === "Linux / macOS"
     ```bash
-    cd section-3/step-02
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
-    cd section-3\step-02
     mvnw quarkus:dev
     ```
 
-Open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
+==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and fill in the form:==
 
----
+- Destination: `Italian Riviera`
+- Start date: a future date
+- Duration: `5` days
+- Travelers: `4`
+- Trip Type: `Family Vacation`
+- Budget: `Moderate (€1,000–€2,500)`
 
-## Try It Out
+==Click **Generate Trip Plan**, wait for it to finish, and check the terminal for guardrail decisions.== When both responses reach the final success branch, the message portions of the INFO logs are as follows. Their order can vary because the agents run in parallel; these are source-derived examples, not a captured run.
 
-### Test 1: Normal Trip (Guardrails Pass)
-
-Fill in the form:
-
-- **Destination**: `Italian Riviera`
-- **Duration**: `5` days
-- **Travelers**: `4`
-- **Trip Type**: `Family Vacation`
-- **Budget**: `Moderate (€1,000–€2,500)`
-
-Click **Generate Trip Plan**.
-
-**What happens?**
-
-The multi-agent pipeline runs: `ResearchPhase` (parallel vehicle + itinerary), then `CostEstimatorAgent`, then `TipsGeneratorAgent`. The guardrails run on individual agents. Check your terminal logs — you should see:
-
-```
+```text
 🛡️ [TripSafetyGuardrail] PASS — All safety checks passed
 🛡️ [TripAppropriatenessGuardrail] PASS — All appropriateness checks passed
 ```
 
-Both guardrails ran and approved their respective agent's output.
+==For another request, change the destination to `Swiss Alps`, travelers to `6`, and trip type to `Adventure Trip`, then generate a plan.== If the returned vehicle type is `Sports car`, the rewrite message is:
 
-### Test 2: Vehicle Rewrite
-
-Try a trip with many travelers and an adventure type (which sometimes triggers a small vehicle recommendation):
-
-- **Travelers**: `6`
-- **Trip Type**: `Adventure Trip`
-- **Destination**: `Swiss Alps`
-
-If the LLM recommends a compact or sporty vehicle, you'll see:
-
-```
+```text
 🛡️ [TripAppropriatenessGuardrail] REWRITE — Vehicle type 'sports car' is too small for 6 travelers
 ```
 
-The vehicle recommendation in the response will show the guardrail-corrected type (SUV) with a note about the upgrade.
+The displayed type will be SUV with revised reasoning, but the original model will remain. A compact car does not trigger this rule unless its type contains one of the listed keywords. Model output varies, so neither this form input nor a normal trip guarantees a particular guardrail branch.
 
-### Test 3: Observe Audit Trail
+## Unit testing output guardrails
 
-After running a few requests, check your terminal for the full audit trail. Each guardrail decision is logged with a timestamp, the guardrail name, the decision, and the reason.
+The completed solution has `TripSafetyGuardrailTest` and `TripAppropriatenessGuardrailTest` under `src/test/java/com/tripplanner/guardrails`. They call the guardrails with fixed `AiMessage` payloads, avoiding reliance on the model to generate a bad recommendation. The tests cover invalid JSON, empty itineraries, flagged phrases, and vehicle decisions; they do not exercise the full retry loop or HTTP exception mapping.
 
----
+==If you are continuing from Step 01, copy both test classes from `section-3/step-02/src/test/java/com/tripplanner/guardrails` into the same package in your working copy. Then run them from your project directory:==
 
-## How It All Works Together
+=== "Linux / macOS"
+    ```bash
+    ./mvnw test -Dtest=TripSafetyGuardrailTest,TripAppropriatenessGuardrailTest
+    ```
 
-Let's trace through a scenario where the itinerary agent includes a dangerous route:
+=== "Windows"
+    ```cmd
+    mvnw test -Dtest=TripSafetyGuardrailTest,TripAppropriatenessGuardrailTest
+    ```
 
-```mermaid
-sequenceDiagram
-    participant IP as ItineraryPlannerAgent
-    participant LLM as OpenAI GPT-4o
-    participant G1 as TripSafetyGuardrail
-    participant Audit as GuardrailAuditLog
+For an optional extension, ==add a test with a dangerous phrase only in an itinerary title, then extend `findDangerousContent()` to check titles.== This exposes a gap in the current checks without depending on a live model response.
 
-    IP->>LLM: Plan itinerary
-    LLM-->>IP: ItineraryResult JSON (route through conflict area)
-
-    Note over IP: Safety guardrail runs
-
-    IP->>G1: validate(AiMessage)
-    G1->>G1: Parse JSON ✓
-    G1->>G1: Check itinerary ✓
-    G1->>G1: Check route safety ✗ (dangerous keyword!)
-    G1->>Audit: log("RETRY", "Dangerous content detected")
-    G1-->>IP: retry("Avoid dangerous areas, suggest safe alternatives")
-
-    Note over IP: Retry #1
-
-    IP->>LLM: Regenerate with feedback
-    LLM-->>IP: ItineraryResult JSON (safe route)
-
-    IP->>G1: validate(AiMessage)
-    G1->>G1: All checks ✓
-    G1->>Audit: log("PASS", "All safety checks passed")
-    G1-->>IP: success()
-
-    IP-->>IP: Deserialize JSON → ItineraryResult
-```
-
----
-
-## Summary
-
-- **Output guardrails validate LLM responses** before they reach the user, which is critical for production systems
-- **`retry()` asks the LLM to regenerate** with feedback, useful for hard safety violations; **`reprompt()` also replaces the system prompt** for stricter control
-- **`successWith()` rewrites the response in code**, useful for minor fixups without another LLM call
-- **Guardrails are per-agent**: in a multi-agent system, each guardrail validates the output of the specific agent it is attached to
-- **Audit trails** log every guardrail decision, enabling compliance and debugging
-- **`@ApplicationScoped` context** bridges request parameters to guardrails, using `volatile` for thread-safe access across parallel agent threads
-
----
-
-## Experiment Further
-
-### 1. Add a Tips Guardrail
-
-Create a `TipsAppropriatenessGuardrail` that filters family-inappropriate content (nightclubs, casinos, bar hopping) from the tips generated by `TipsGeneratorAgent`. Apply it with `@OutputGuardrails` on `TipsGeneratorAgent.generateTips()`. Hint: the LLM response is a JSON array of strings — iterate over the array and remove inappropriate entries using `successWith()`.
-
-### 2. Try Different `reprompt()` Strategies
-
-The `TripAppropriatenessGuardrail` already uses `reprompt()` to replace the system prompt when a luxury vehicle is recommended on an economy budget. Try varying the replacement system prompt — for example, add constraints about vehicle age or fuel efficiency — and observe how the LLM's retry output changes compared to a plain `retry()` with just feedback.
-
-### 3. Test Guardrail Exhaustion
-
-Set `maxRetries = 0` on the `@OutputGuardrails` annotation and trigger a retry scenario. Observe how the `GuardrailExceptionMapper` returns an HTTP 422 error.
-
-### 4. Write a Custom Unit Test
-
-Add a test case to `TripSafetyGuardrailTest` with a JSON payload that contains a dangerous keyword in the itinerary title (not just the description). Does the guardrail catch it? If not, extend the `findDangerousContent` method.
-
----
+To explore retry exhaustion, ==temporarily set `maxRetries = 0` on the itinerary agent and submit a request whose response triggers a retry. Inspect `POST /trip/plan` in the browser's network panel, then restore `maxRetries = 3`.== A rejected first response should produce HTTP 422 through the mapper, but setting the allowance to zero will not fail a response that already passes.
 
 ## Troubleshooting
 
-??? warning "Error: OPENAI_API_KEY not set"
-    Make sure you've exported the environment variable:
+??? warning "The guardrail never triggers"
+    The model may already produce output that passes these rules. ==Run the fixed-payload tests above to check specific branches, and inspect the terminal logs for skipped validation.== A `PASS` for blank text or missing context does not mean the recommendation was checked.
 
-    ```bash
-    export OPENAI_API_KEY=sk-your-key-here
-    ```
+??? warning "Planning fails after retries"
+    ==Check the audit messages for the rejected content and inspect the HTTP response in the browser's network panel.== The mapper labels all wrapped agent invocation failures as `guardrail_violation`, so the underlying exception and logs matter when diagnosing the cause.
 
-    Then restart the application.
+??? warning "OPENAI_API_KEY is not set"
+    ==Set `OPENAI_API_KEY` in the shell used to start the application, then restart it.== Keep the same model configuration used in Step 01.
 
-??? warning "Guardrail never triggers"
-    The LLM usually generates reasonable output. To test guardrails reliably, use the unit tests (`TripSafetyGuardrailTest`, `TripAppropriatenessGuardrailTest`) which construct specific JSON payloads that trigger each rule. In the multi-agent system, each guardrail runs on its respective agent — check the terminal logs for guardrail decisions from both `VehicleAdvisorAgent` and `ItineraryPlannerAgent`.
+## What's next?
 
-??? warning "GuardrailException thrown unexpectedly"
-    This means all retries were exhausted and the guardrails still failed. Check:
-
-    - The `maxRetries` value on `@OutputGuardrails` (default is 2, we set it to 3)
-    - The terminal logs for audit trail entries showing what failed
-    - Whether your retry feedback is clear enough for the LLM to fix the issue
-
----
-
-## What's Next?
-
-In this step you added output guardrails to individual agents in the multi-agent pipeline. You saw how `retry()` asks the LLM to regenerate, how `successWith()` rewrites output in code, how guardrails are distributed across agents in a parallel pipeline, and how an audit trail logs every decision for compliance.
-
-In **Step 03**, you'll wrap the trip planning pipeline in an event-driven Quarkus Flow workflow with Kafka and CloudEvents, adding a human-in-the-loop approval checkpoint that suspends execution without holding any threads.
+The planner now has per-agent checks with retry feedback and in-code rewrites, along with logs that help explain their decisions. In Step 03, we'll wrap planning in an event-driven Quarkus Flow workflow with Kafka and CloudEvents so the customer can approve or reject a proposed trip.
 
 [Continue to Step 03 - Event-Driven Workflows with Quarkus Flow](step-03.md)

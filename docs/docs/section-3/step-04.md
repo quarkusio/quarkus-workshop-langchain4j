@@ -1,6 +1,6 @@
 # Step 04 - Resilient Agentic Workflows with Persistence
 
-## Workflows that survive a restart
+## Durable workflows with Quarkus Flow persistence
 
 The Miles of Smiles team has been trying out the approval flow from Step 03, and everything works well until the application needs to restart. A customer who was still reading their itinerary comes back to an empty form, with no way to approve the trip they had just generated. Although the agents had finished their work, the plan and its pending approval were only held in memory.
 
@@ -8,7 +8,7 @@ We'll address this by saving enough information for the customer to continue whe
 
 The exercise ends with a full application restart while a trip is awaiting approval. When the application is running again, the customer should be able to open the same plan and approve it without asking the agents to generate another one.
 
-### What needs to survive?
+### Workflow state and application state
 
 For this to work, the application needs to remember both where it paused and what it was showing the customer. These are saved separately in the same database, so the workflow can continue waiting for approval while the browser retrieves the trip details.
 
@@ -44,9 +44,12 @@ Quarkus Flow handles the workflow side through its persistence extension, while 
 
 PostgreSQL will run through Dev Services, so a container runtime such as Docker or Podman must be running. The model provider configuration from Step 03 is still needed to generate a plan.
 
+!!! note "Dependency versions"
+    The completed Step 04 project currently uses older Quarkus, LangChain4j, and Flow versions than Step 03. Continuing from Step 03 retains its versions; the two starting options are not identical. Consult each project's `pom.xml` when comparing behavior or logs.
+
 ---
 
-## Preparing the database
+## Configuring PostgreSQL Dev Services
 
 Quarkus can start PostgreSQL for us through Dev Services, so there is no separate database installation to work through. We do need to add the driver and the Flow persistence extension, then make sure the database is kept when the application stops.
 
@@ -75,13 +78,13 @@ quarkus.datasource.db-kind=postgresql
 quarkus.hibernate-orm.schema-management.strategy=update
 ```
 
-The important change here is `update`: Hibernate can create the tables we need without discarding their contents on the next startup. Its usual Dev Services setting, `drop-and-create`, would leave us with an empty database every time we restarted. For a production application, controlled schema migrations would be a better choice than letting Hibernate update the schema automatically.
+With `update`, Hibernate can create the tables we need without discarding their contents on the next startup. Its usual Dev Services setting, `drop-and-create`, would leave us with an empty database every time we restarted. For a production application, controlled schema migrations would be a better choice than letting Hibernate update the schema automatically.
 
-### Keeping the database between runs
+### Enabling Testcontainers reuse
 
 Keeping the tables is only useful if the next run connects to the same database. We also need to enable container reuse so that Testcontainers, which Dev Services uses to run PostgreSQL, keeps the database container available across application restarts.
 
-==Choose one of the following ways to enable container reuse before (re-)starting dev mode.==
+==Choose one of the following ways to enable container reuse before starting or restarting dev mode.==
 
 === "Bash / Zsh"
     ==Set the variable in the shell you are using to run the app:==
@@ -123,9 +126,9 @@ Keeping the tables is only useful if the next run connects to the same database.
     ==Enter a `devbox shell` in the project directory.== The environment variable is available inside that shell.
 
 !!! warning "Keep the same database"
-    Keep the datasource settings unchanged between runs and leave the PostgreSQL container running until the exercise is complete. If the application starts with a fresh container, the tables will be empty even if the previous run saved its data correctly.
+    ==Keep the datasource settings unchanged between runs and leave the PostgreSQL container running until the exercise is complete.== If the application starts with a fresh container, the tables will be empty even if the previous run saved its data correctly.
 
-### Keeping tests separate
+### Isolating test databases with Dev Services
 
 Tests need a clean database, but clearing the one used by dev mode would erase the trip we're trying to restore. Giving tests their own database configuration keeps the two runs separate, including when Quarkus runs tests during development.
 
@@ -145,11 +148,11 @@ quarkus.datasource.devservices.reuse=false
 quarkus.hibernate-orm.schema-management.strategy=drop-and-create
 ```
 
-With a different database name and container reuse disabled for tests, Dev Services starts a separate test container. The existing in-memory messaging configuration stays in place, so these tests do not need a Kafka broker.
+With a different database name and container reuse disabled for tests, Dev Services starts a separate test container. The existing in-memory messaging configuration stays in place for capturing outgoing events, but the incoming booking and approval channels still use Kafka.
 
 ---
 
-## Saving workflow progress
+## Persisting and restoring Quarkus Flow instances
 
 With the database ready, Flow can save a waiting workflow and restore it when the application starts again. The persistence extension handles this without changes to the workflow definition, so the approval process we built in Step 03 remains intact.
 
@@ -167,7 +170,7 @@ Automatic restoration is already enabled by default, but making the setting expl
 
     Saving that scope would be a separate feature, with its own serialization and recovery logic. We therefore do not need `AgenticScopeSerializer` or its deserialization-package registration here, and this example does not demonstrate recovery in the middle of an agent's execution.
 
-## Saving the trip plan
+## Persisting application state with Hibernate ORM and Panache
 
 Flow now knows how to resume the approval process, but the browser still needs a plan to display. In Step 03, the application kept that plan in an in-memory store, so we'll give it a database-backed implementation that can answer the same requests after a restart.
 
@@ -179,7 +182,7 @@ Flow now knows how to resume the approval process, but the browser still needs a
 
     Recovering those trip details would not, by itself, restore the workflow waiting for approval, because the event is not a complete workflow checkpoint. Since our Flow persistence extension already uses PostgreSQL for that purpose, storing the trip records in the same database lets us focus on the restart exercise without introducing a second recovery mechanism.
 
-### Adding the plan entity
+### Defining a Panache entity
 
 ==Create `src/main/java/com/tripplanner/model/TripPlanEntity.java`:==
 
@@ -191,7 +194,7 @@ Each row holds one trip's details and approval status, linked to the workflow th
 
 We store the plan and confirmation as JSON because the application reads them as complete documents; it does not need to query individual itinerary entries. Keeping the original request alongside them also allows the browser to restore the destination and trip details in its page header. For more about mapping entities and querying them, see the [Hibernate ORM with Panache guide](https://quarkus.io/guides/hibernate-orm-panache){target="_blank"}.
 
-### Updating the plan store
+### Adding transactional persistence and queries
 
 The store will continue receiving the same events and answering the same browser requests, so most of the surrounding application can stay unchanged. The edits below move its reads and writes into the database, with the changed lines highlighted in each excerpt.
 
@@ -244,7 +247,7 @@ These queries return database entities, but the browser still expects the trip r
 
 ---
 
-## Showing the restored trip
+## Displaying restored state and workflow identifiers
 
 The browser already checks for a pending trip when the page loads, so saving the plan in the database is enough for it to reappear after a restart. We'll also display the workflow's identifier below the approval buttons, which gives us a way to check that we're continuing the original trip rather than creating a new one.
 
@@ -275,7 +278,7 @@ The identifier remains visible after approval, allowing us to follow the same wo
 
 ---
 
-## Restarting and approving the trip
+## Verifying workflow recovery after a restart
 
 We're ready to try the customer journey that prompted this change, using one trip and leaving it awaiting approval while we restart the application. The agents generate the plan before shutdown; afterward, the application restores what it saved and continues with the customer's decision.
 
@@ -304,10 +307,10 @@ sequenceDiagram
     App-->>Customer: Show confirmation
 ```
 
-??? info "Limits of the sample"
-    The sample looks up a pending plan without filtering by customer or sorting the results, and it shares one request context across the application. Supporting several customers at once would require customer-specific lookups and request data associated with each workflow.
+==Use one pending trip for this exercise and approve it after the restart. Do not submit requests from other clients while working through the check.== Rejection ends the workflow but does not update the saved plan's status, so a rejected trip can reappear after a page refresh.
 
-    Rejection also ends the workflow without updating the stored plan's status, so a rejected plan can reappear after a page refresh. The exercise uses approval to demonstrate persistence without introducing those additional changes.
+??? info "Why use only one pending trip?"
+    The sample looks up a pending plan without filtering by customer or sorting the results, and it shares one request context across the application. Supporting several customers at once would require customer-specific lookups and request data associated with each workflow.
 
 ==Start dev mode from your project directory, in the shell where container reuse is enabled:==
 
@@ -331,7 +334,7 @@ Once the plan is ready, the results page should show its workflow identifier bel
 
 ==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and navigate to **Datasources**. Inspect the `workflow_instance` and `trip_plan_status` tables.==
 
-The workflow table should contain a row with status `WAITING`, while the trip-plan table should hold the generated plan with status `awaiting_approval`. Both should refer to the identifier shown in the browser, so we can check that the workflow's progress and the customer's trip details have each been saved.
+The workflow table should contain the saved instance, while the trip-plan table should hold the generated plan with status `awaiting_approval`. Both should refer to the identifier shown in the browser, so we can check that the workflow's progress and the customer's trip details have each been saved. The Flow execution view should show that the instance has reached `waitApproval`.
 
 ??? tip "More detail in the Flow logs"
     ==Add this to `application.properties` if you need more detail in the Flow logs:==
@@ -339,7 +342,7 @@ The workflow table should contain a row with status `WAITING`, while the trip-pl
     quarkus.log.category."io.quarkiverse.flow".level=DEBUG
     ```
 
-### Continuing after a restart
+### Resuming a persisted workflow
 
 ==Stop the application with Ctrl-C.==
 
@@ -359,6 +362,8 @@ The workflow table should contain a row with status `WAITING`, while the trip-pl
 
 ![Startup log restoring pending workflow instances at waitApproval](../images/step-04-restore-log.png)
 
+This capture contains two saved instances. Each is logged as `PENDING` during restoration and then enters `waitApproval`; the relevant check is that the identifier from your trip appears and resumes that wait.
+
 ==Refresh the browser, check that the same plan and workflow identifier appear, then click **Approve Trip**.==
 
 The restored workflow can now process the approval and complete the booking, even though it began in the previous application run. The confirmation should appear alongside the same identifier, with no need to generate another plan.
@@ -368,12 +373,12 @@ The restored workflow can now process the approval and complete the booking, eve
 ==Check `trip_plan_status` again in the Dev UI.== Its row should now have status `confirmed` and a booking confirmation in `confirmationJson`, recording the outcome of the restored workflow.
 
 ??? warning "The pending trip did not come back"
-    Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that the application uses `schema-management.strategy=update`, not the test configuration's `drop-and-create` setting. Both tables should still contain their rows after the restart. If the rows remain but the restore log is missing, enable Flow debug logging and check the startup log for errors.
+    ==Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that the application uses `schema-management.strategy=update`, not the test configuration's `drop-and-create` setting.== Both tables should still contain their rows after the restart. ==If the rows remain but the restore log is missing, enable Flow debug logging and check the startup log for errors.==
 
 ??? info "Trying restoration without a full shutdown"
     ==Press `s` in the dev mode terminal to force a runtime restart without stopping the process.== This keeps the Dev Services container running and lets you try workflow restoration without container reuse. It does not replace the full shutdown-and-restart check above.
 
-### Removing the workshop database
+### Removing the reused PostgreSQL container
 
 Because we enabled reuse, the database container remains available after the application stops. ==When you no longer need the saved trips, stop the application and identify the workshop's PostgreSQL container before removing it with the commands below.== Removing it also deletes the data used in this exercise.
 
