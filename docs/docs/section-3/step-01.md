@@ -51,6 +51,7 @@ sequenceDiagram
 
     User->>REST: POST /trip/plan (TripRequest)
     REST->>Seq: planTrip(destination, days, tripType, ...)
+    Seq->>RP: research(destination, days, tripType, ...)
 
     rect rgb(230, 245, 255)
         Note over RP: Parallel Phase
