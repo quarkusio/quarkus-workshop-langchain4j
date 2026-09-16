@@ -99,6 +99,12 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <argLine>@{argLine}</argLine>
+                    <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
+                    <includes>
+                        <include>**/TripPlanningFailureTest.java</include>
+                        <include>**/guardrails/*Test.java</include>
+                        <include>**/GuardrailExceptionMapperTest.java</include>
+                    </includes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>

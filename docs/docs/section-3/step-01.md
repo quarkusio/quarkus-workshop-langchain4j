@@ -1,90 +1,107 @@
-# Step 01 - Multi-Agent Trip Planner with Skills
+# Step 01 - Agent Skills with Quarkus LangChain4j
 
 ## Welcome to Section 3: Enterprise Agentic Patterns
 
-Section 3 introduces a brand-new scenario and a set of enterprise-grade agentic patterns built on top of everything covered in Sections 1 and 2. If you're not yet comfortable with AI Services, RAG, or the basics of multi-agent workflows, it's worth going back and reviewing those sections first — we'll build on all of it here.
+This section builds on Sections 1 and 2 with a new scenario and a set of enterprise agentic patterns. If AI Services or multi-agent workflows are still unfamiliar, review those sections first.
 
-The new scenario we're going to work on in this section is a **Customer Trip Planner**. Miles of Smiles wants to offer a trip planner to their customers, helping with decisions on where they want to go, for how long, and what kind of trip they have in mind. The system then picks the right vehicle, plans the route, estimates costs, and generates practical tips.
+## A new scenario
 
-The main new concept we're covering in this step is **Skills**. Skills let you inject domain expertise into agents at runtime from plain Markdown files.
+Miles of Smiles wants a **Customer Trip Planner** that helps customers choose a destination, duration, and trip style, then returns a vehicle recommendation, route, and cost estimate.
 
-!!!note
-    Two code directories accompany this step. `section-3/step-00` contains the initial multi-agent trip planner without any skills integration. The agents are wired up and the app runs, but the skills extension and its annotations are not yet added. `section-3/step-01` is the completed version for this step. If you want to implement skills yourself as you read, start from `step-00`. If you'd rather follow along in a working codebase, use `step-01`.
+A family of four on the Italian Riviera needs space for luggage, regular breaks, and child-friendly stops, while a customer combining a Geneva meeting with snowboarding in Verbier has different priorities entirely. The planner needs to handle these different scenarios, with different guidance for each.
 
----
+As a car rental agency, Miles of Smiles also wants to suggest useful rental extras. A family traveling with a young child may need a suitable child seat, while a winter mountain trip might call for compatible snow chains. Some of these extras will (conveniently for Miles of Smiles) be paid extras, while others like child seats are legally required and can't be considered upsells. 
 
-## The System
 
-The multi-agent system is already built using the agentic patterns from Section 2. Here's the shape of it:
 
-```
-TripPlannerSystem (@SequenceAgent)
-│
-├─ ResearchPhase (@ParallelAgent)
-│   ├── VehicleAdvisorAgent    → recommends a vehicle
-│   └── ItineraryPlannerAgent  → plans day-by-day itinerary
-│
-├─ CostEstimatorAgent          → estimates costs
-│
-├─ TipsGeneratorAgent          → generates practical tips
-│
-└─ @Output                     → assembles the final TripPlan
-```
-
-The `VehicleAdvisorAgent` and `ItineraryPlannerAgent` are independent, so they run in parallel inside `ResearchPhase`. The `CostEstimatorAgent` needs the vehicle and itinerary to produce realistic numbers, so it runs after. `TipsGeneratorAgent` runs last with the full context available. The `@Output` method on `TripPlannerSystem` then assembles the final `TripPlan` from scope values using pure Java without an extra LLM call.
-
-The LangChain4j Agentic card in the Quarkus DevUI gives you an interactive topology view of the entire agent system:
-
-![Agentic System Topology](../images/section-3-topology.png)
-
-Here's an overview of the flow: 
 ```mermaid
-sequenceDiagram
-    participant User as Web UI
-    participant REST as TripPlannerResource
-    participant Seq as TripPlannerSystem
-    participant RP as ResearchPhase
-    participant VA as VehicleAdvisorAgent
-    participant IP as ItineraryPlannerAgent
-    participant CE as CostEstimatorAgent
-    participant TG as TipsGeneratorAgent
+flowchart LR
+    Family[Family vacation\nItalian Riviera] --> Planner[Trip planner]
+    Adventure[Adventure trip\nSwiss Alps] --> Planner
+    Business[Business travel\nmeetings + leisure] --> Planner
+    Planner --> Vehicle[Vehicle]
+    Planner --> Route[Route & itinerary]
+    Planner --> Costs[Cost estimate]
+```
 
-    User->>REST: POST /trip/plan (TripRequest)
-    REST->>Seq: planTrip(destination, days, tripType, ...)
+## What are we building?
 
-    rect rgb(230, 245, 255)
-        Note over RP: Parallel Phase
-        par Vehicle & Itinerary in parallel
-            RP->>VA: recommendVehicle(...)
-            VA-->>RP: VehicleRecommendation → scope["vehicle"]
-        and
-            RP->>IP: planItinerary(...)
-            IP-->>RP: ItineraryResult → scope["itineraryResult"]
-        end
+To keep the focus on the new concepts of this step, the workshop provides starter code in `section-3/step-00` with all the UI components already built. This starter code also has an existing set of agents to plan a basic trip. These Agents recommend a vehicle, plan a route, and estimate costs, but they rely on **general instructions** baked into their prompts. There is no separate guidance for family holidays, adventure trips, or business travel yet.
+
+<figure markdown="span">
+  ![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](../images/section-3-trip-form.png){ width="400" }
+</figure>
+
+In this step, we're going to add **skills**: Markdown files that agents can request at runtime through a built-in `activate_skill` tool. Unlike the fixed prompts we've seen in the previous chapters which are passed to the model on every request, the full skill content is added to the conversation **only after activation**.
+
+```mermaid
+flowchart TD
+    subgraph fixed [Sent on every request]
+        Prompt["@UserMessage prompt in Java"]
     end
 
-    Seq->>CE: estimateCosts(vehicle, itineraryResult, ...)
-    CE-->>Seq: CostEstimate → scope["costs"]
+    subgraph ondemand [Sent after activation]
+        Skills["SKILL.md files\nvehicle-selection, family-trip, ..."]
+    end
 
-    Seq->>TG: generateTips(vehicle, itineraryResult, costs, ...)
-    TG-->>Seq: List of String → scope["tips"]
-
-    Note over Seq: @Output assembles TripPlan (no LLM)
-    Seq-->>REST: TripPlan
-    REST-->>User: JSON response → rendered in UI
+    Prompt --> Agent[Agent]
+    Agent -->|"activate_skill"| Skills
+    Skills -->|"injected into conversation"| Agent
+    Agent --> Result[Tailored recommendation]
 ```
 
----
+Keeping specific skills, like travel expertise, outside the fixed prompts lets Miles of Smiles update its advice without rewriting the agents and only load specific guidance if the model deems it useful to its response. 
 
-## Skills
 
-In Sections 1 and 2, agents got their behavior and instructions from `@SystemMessage` and `@UserMessage` annotations. Those messages are static and the entire content is sent to the LLM regardless of the context.
+## Preparing a working copy
 
-Skills solve this by externalizing domain knowledge into Markdown files that are loaded and injected at runtime. Each skill lives in its own subdirectory under `src/main/resources/skills/` as a file named `SKILL.md`. The file starts with a YAML frontmatter block containing a `name` and a `description`, followed by the actual expert content in plain Markdown.
+!!!note "Build Hands-on or review"
+    You have the option to build the new features hands-on by working from the starter code, or if you prefer to just review you can go directly to the completed step 01 project. If you're going with option 1 and something doesn't end up working, you can also compare your code with the step 01 solution to see what you've missed.
 
-### Adding the extension
+=== "Option 1: Build it hands-on"
 
-The `quarkus-langchain4j-skills` extension handles skill discovery and injection. ==Add it to your `pom.xml`:==
+    ==Copy `section-3/step-00` to a working directory outside the step folders and open that copy in your IDE.== All paths and commands below refer to this working project, including when it's time to run the application.
+
+=== "Option 2: Use the completed Step 01 project"
+
+    The completed project already contains the changes below.
+
+    ==Open `section-3/step-01` and start dev mode:==
+
+    === "Linux / macOS"
+        ```bash
+        cd section-3/step-01
+        ./mvnw quarkus:dev
+        ```
+
+    === "Windows"
+        ```cmd
+        cd section-3\step-01
+        mvnw quarkus:dev
+        ```
+
+!!! info "How the starter workflow is structured"
+
+    Vehicle selection and itinerary planning run in parallel, then cost estimation runs once both are done. The outputs are assembled into the final trip plan in Java.
+
+    ```mermaid
+    flowchart TD
+        Request[Customer's trip request] --> Vehicle[Recommend a vehicle]
+        Request --> Itinerary[Plan the itinerary]
+        Vehicle --> Costs[Estimate costs]
+        Itinerary --> Costs
+        Costs --> Plan[Assemble the trip plan in Java]
+    ```
+
+
+
+## Dynamic skill discovery and activation
+
+You've already seen how system and user prompts work through the `@SystemMessage` and `@UserMessage` annotations. These are very useful to provide context and instructions to a model, however this guidance is sent on **every invocation**. Skills on the other hand keep domain guidance in separate Markdown files so an agent can request **only the content relevant** to the current trip.
+
+### Adding skills to Quarkus LangChain4j
+
+To be able to handle skill discovery and injection in Quarkus LangChain4j, you need to add the `quarkus-langchain4j-skills` extension. ==Add it to your `pom.xml`:==
 
 ```xml
 <dependency>
@@ -93,17 +110,23 @@ The `quarkus-langchain4j-skills` extension handles skill discovery and injection
 </dependency>
 ```
 
-==Then add the following line to `application.properties` to tell the extension where to find skill files:==
+==Then add the following line to `src/main/resources/application.properties` to tell the extension where to find skill files:==
 
 ```properties
 quarkus.langchain4j.skills.directories=classpath:skills
 ```
 
-This points the extension at the `src/main/resources/skills/` directory on the classpath. You can also point it at filesystem paths for skills you want to manage outside the project. See the [Skills extension documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/skills.html#_configuration){target="_blank"} for all configuration options. In dev mode, Quarkus picks up changes to skill files automatically without a restart.
+This points the extension at the `src/main/resources/skills/` directory on the classpath. You can also point it at filesystem paths for skills you want to manage outside the project.
 
-### Creating the skill files
+??? "Create skills from other sources?"
+    Skills do not have to be file-system based. You can also create them from any other source — a database, a remote API, generated at runtime — using the upstream [LangChain4j builder API](https://docs.langchain4j.dev/tutorials/skills/#programmatically).
 
-This step uses four skills split along two purposes. The `vehicle-selection` skill contains guidance on picking the right vehicle category and applies regardless of trip type. The `family-trip`, `adventure-trip`, and `business-trip` skills each contain itinerary and route planning conventions for their respective trip type.
+
+### Defining skills
+
+We're going to add four skills split along two purposes. A `vehicle-selection` skill contains guidance on picking the right vehicle category and applies regardless of trip type. Then we'll add 3 additional skills containing itinerary and route planning conventions based on what kind of trip the customer will take: `family-trip`, `adventure-trip`, and `business-trip`.
+
+Skills live in their own subdirectory under `src/main/resources/skills/` as a file named `SKILL.md`. A YAML frontmatter block (a block of metadata that sits at the top of a Markdown file) supplies its `name` and `description`, followed by the guidance in Markdown. See the [Skills extension documentation](https://docs.quarkiverse.io/quarkus-langchain4j/dev/skills.html#_configuration){target="_blank"} for all configuration options.
 
 ==Create `src/main/resources/skills/vehicle-selection/SKILL.md` with the following content:==
 
@@ -129,118 +152,90 @@ This step uses four skills split along two purposes. The `vehicle-selection` ski
 --8<-- "../../section-3/step-01/src/main/resources/skills/business-trip/SKILL.md"
 ```
 
-The `name` and `description` fields in the frontmatter are what the skills extension presents to the LLM. When an agent annotated with `@Skills` is invoked, the framework exposes an `activate_skill` tool listing the names and descriptions of the skills that agent has access to. The LLM picks the one that fits the current request, calls the tool, and the full Markdown content is injected into its context before it generates a response.
+The extension presents the skill names and descriptions to the LLM and exposes an `activate_skill` tool for agents.
 
-### Annotating the agents
+### Controlling skill access with `@Skills`
 
-Only two of the four agents need skills. ==Open `VehicleAdvisorAgent.java` and add the `@Skills` annotation and its import:==
+Only the vehicle and itinerary agents need direct access to these skills. You can control which agents have access to all or some skills by using the `@Skills` annotation. When the model requests to activate a skill, the framework automatically adds the requested Markdown content to the conversation. Note that making a skill available does not guarantee that the model will use it, so we'll also add prompt instructions and check the tool calls when testing.
 
-```java title="VehicleAdvisorAgent.java"
+ ==Open `src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java` and update the highlighted lines, including the import, prompt, and annotation:==
+
+```java title="VehicleAdvisorAgent.java" hl_lines="6 12-13 24"
 --8<-- "../../section-3/step-01/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java"
 ```
 
-==Do the same for `ItineraryPlannerAgent.java`:==
+==In the same directory, update the highlighted lines in `ItineraryPlannerAgent.java`:==
 
-```java title="ItineraryPlannerAgent.java"
+```java title="ItineraryPlannerAgent.java" hl_lines="6 12 25"
 --8<-- "../../section-3/step-01/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java"
 ```
 
-The two agents use `@Skills` differently. `VehicleAdvisorAgent` gets `@Skills({"vehicle-selection"})` because it only ever needs vehicle guidance, regardless of trip type. `ItineraryPlannerAgent` gets `@Skills({"family-trip", "adventure-trip", "business-trip"})` and picks the right one based on what the customer described. When you pass skill names explicitly, each agent only sees the skills you listed. If a name doesn't match any loaded skill, the application fails at startup with a clear error listing what's available.
+The vehicle advisor has access **only** to vehicle-selection guidance, which applies across trip types. The itinerary planner can choose from the three trip-specific skills.
 
-You'll also notice each prompt explicitly tells the LLM to activate a skill before answering. `VehicleAdvisorAgent` says `Before answering, activate the vehicle-selection skill.` since there's only one and it should always be used. `ItineraryPlannerAgent` says `Before answering, activate the skill that matches the trip type.` so the LLM picks the right one from the three available. Without these instructions, the LLM may skip the tool call entirely and answer from its own knowledge, defeating the purpose of injecting the skill in the first place.
-
-`CostEstimatorAgent` and `TipsGeneratorAgent` need no `@Skills` annotation. They work from the structured vehicle and itinerary data already in scope and don't need anything injected at runtime.
+The highlighted prompt changes ask the model to activate a skill before answering. Be aware that these instructions encourage tool use, but the model can still skip the call and answer from its own knowledge.
 
 !!!note
-    If you want to load all available skills to an agent, you can just annotate it a bare `@Skills` without parameters.
+    A bare `@Skills` annotation, without parameters, gives an agent access to *all* available skills. With the explicit lists used here, adding a new skill also requires updating the relevant annotation.
 
----
+## Running the working project
 
-## Running the Application
-
-==Navigate to the `section-3/step-01` directory and start the application:==
+==From the root of your working copy, start the application in a terminal where your `OPENAI_API_KEY` is set:==
 
 === "Linux / macOS"
     ```bash
-    cd section-3/step-01
     ./mvnw quarkus:dev
     ```
 
 === "Windows"
     ```cmd
-    cd section-3\step-01
-    mvnw quarkus:dev
+    .\mvnw.cmd quarkus:dev
     ```
 
-Once started, open your browser to [http://localhost:8080](http://localhost:8080){target="_blank"}.
+==Once started, open [http://localhost:8080](http://localhost:8080){target="_blank"} in your browser.== The trip form shown at the top of this page is where you will enter each test request.
 
-The application opens on a trip form with fields for destination, duration, number of travelers, trip type, budget range, and any additional preferences.
-
-![The Plan a New Trip form](../images/step-04-trip-form.png)
-
-!!! tip "Click to enlarge"
-    Screenshots in these docs open fullscreen when you click them, so you can read the form fields and results more easily.
-
----
-
-## Try It Out
-
-### Family Beach Vacation
+## Planning a family beach vacation
 
 ==Fill in the form with:==
 
-- **Destination**: `Italian Riviera`
-- **Duration**: `5` days
-- **Travelers**: `4`
-- **Trip Type**: `Family Vacation`
-- **Budget**: `Moderate (€1,000–€2,500)`
-- **Preferences**: `We love coastal towns and good food`
+- Destination: `Italian Riviera`
+- Start date: a future date of your choice
+- Duration: `7` days
+- Travelers: `4`
+- Trip type: `Family Vacation`
+- Budget: `Moderate (€1,000–€2,500)`
+- Preferences: `We love coastal towns and good food`
 
-==Click **Generate Trip Plan**.==
+==Click **Generate Trip Plan**.== The family skill asks for rest days on a week-long trip, along with driving-time estimates and regular breaks.
 
-While the agents work, the UI shows a wait screen:
+While the agents work, the UI shows a wait screen.
 
 ![Planning your trip wait screen](../images/section-3-planning.png)
 
-`ResearchPhase` runs `VehicleAdvisorAgent` and `ItineraryPlannerAgent` in parallel. `VehicleAdvisorAgent` activates the `vehicle-selection` skill and picks a vehicle suited for a family of four. `ItineraryPlannerAgent` activates the `family-trip` skill and builds a paced, kid-friendly itinerary. `CostEstimatorAgent` then reads both results from the `AgenticScope` to produce cost estimates, and `TipsGeneratorAgent` reads everything to generate relevant tips. The `@Output` method assembles all of it into a `TripPlan` without an extra LLM call.
+==Read the vehicle recommendation and daily itinerary.== Look for family-friendly choices such as luggage space, regular breaks, and days without driving. Driving times are model-generated estimates, not verified routing data.
 
-### Adventure Trip
+## Inspecting skill tool calls in the Dev UI
 
-==Now try a different trip type:==
+The model can produce family travel advice from its own knowledge while ignoring the skill instructions. The execution history and logs let us check whether it requested the skill and received its content before judging the itinerary.
 
-- **Destination**: `Swiss Alps`
-- **Trip Type**: `Adventure Trip`
-- **Preferences**: `We want hiking and mountain passes`
+==Open the Quarkus Dev UI at [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui){target="_blank"} (or press the letter `d` from your terminal).== The extensions page lists a LangChain4j Agentic card alongside the other installed extensions.
 
-`VehicleAdvisorAgent` activates `vehicle-selection` and recommends a 4WD vehicle for the Alpine terrain. `ItineraryPlannerAgent` activates `adventure-trip` and routes the itinerary through passes like Furka. Each agent uses a different skill for a different job.
+![Dev UI Extensions page with the LangChain4j Agentic card showing Agents, Topology, Executions, and Testing](../images/section-3-step-01-devui-extensions.png)
 
-### Refine the Plan
+==Click **Executions** in the LangChain4j Agentic card.== Because the planner extends `MonitoredAgent`, this view records agent invocations with their durations, token usage, inputs, and outputs.
 
-With a plan displayed, ==use the **Refine** input at the bottom:==
+==Expand the family run and inspect the `activate_skill` calls and their results under the vehicle and itinerary agents.== Look for `vehicle-selection` and `family-trip`. A successful family activation returns the Markdown headed `# Family Road Trip Planning`.
 
-```
-Skip the first day in Zermatt and add a day in Verbier instead
-```
+![Execution history for planTrip showing parallel research agents and activate_skill tool calls](../images/section-3-step-01-devui-executions.png)
 
-The entire pipeline re-runs with your refinement incorporated.
+The terminal logs provide another way to check discovery and activation. ==Check the startup logs for the skill count, then scroll through the request and response logs after generating a trip plan.== The starter already enables `log-requests` and `log-responses` in `application.properties`.
 
----
+At startup, the skills extension reports how many files it found:
 
-## Looking at the Execution
-
-Since `TripPlannerSystem` extends `MonitoredAgent`, the Quarkus DevUI gives you a full execution trace showing every agent invocation with its duration, token usage, and inputs/outputs:
-
-![Agentic System Execution](../images/section-3-execution.png)
-
-Notice how `recommendVehicle` and `planItinerary` run in parallel with overlapping timelines, each firing an `activate_skill` tool call before generating a response. The entire pipeline completes in roughly 13 seconds across 4 LLM calls, 2 parallel and 2 sequential.
-
-You can also confirm skills are working directly from the terminal logs. At startup, the skills extension logs how many skill files it found:
-
-```
+```text
 INFO  [io.quarkiverse.langchain4j.skills.runtime.SkillsRecorder] Loaded 4 skill(s) from directory: classpath:skills
 ```
 
-For each agent request, the outgoing JSON includes `activate_skill` in the `tools` array, which is how the framework exposes available skills to the LLM:
+When an agent with skills enabled makes its first request, the outgoing body includes the `activate_skill` tool definition in the `tools` array. That only means the tool is available to the model, not that it was called:
 
 ```json
 "tools" : [ {
@@ -255,82 +250,109 @@ For each agent request, the outgoing JSON includes `activate_skill` in the `tool
           "type" : "string",
           "description" : "The name of the skill to activate"
         }
-      }
+      },
+      "required" : [ "skill_name" ]
     }
   }
 } ]
 ```
 
-When the LLM decides to use a skill, it responds with a tool call for `activate_skill` before generating its final answer. The framework then injects the full skill content into the conversation and the LLM proceeds with that context. If you don't see the tool call in the logs for a given request, the LLM judged that none of the available skills were relevant enough to activate.
+The evidence that the model actually called the tool is in the **Response** log. Look for a `tool_calls` entry with `activate_skill` and the skill name in the arguments:
 
----
-
-## Experiment Further
-
-### Add a New Skill
-
-==Create a new skill file at `src/main/resources/skills/romantic-trip/SKILL.md`:==
-
-```markdown
----
-name: romantic-trip
-description: Itinerary planning guidance for romantic road trips — scenic pacing, atmosphere, and accommodation.
----
-
-# Romantic Road Trip Planning
-
-## Pacing
-- Prioritize slow travel over coverage. Two or three meaningful stops are better than six rushed ones.
-- Build in unplanned time. A spontaneous vineyard visit or a sunset on a cliff is the point of a romantic trip.
-- Avoid motorways when a scenic alternative exists and the time difference is under 45 minutes.
-
-## What to Include in the Itinerary
-- Anchor each overnight stop at a place with atmosphere: a hilltop village, a harbour town, a vineyard estate.
-- Include one quiet moment per day where the itinerary has no scheduled activity.
-- Coastal routes (Amalfi, Cinque Terre, Algarve) are reliably atmospheric but very busy in peak season; flag this.
-
-## Accommodation
-- Boutique hotels and agriturismos over chains. Atmosphere matters more than loyalty points on a romantic trip.
-- For stays of 3+ nights in one place, look for a room with a terrace or private garden.
+```json
+"tool_calls" : [ {
+  "id" : "call_GvYO3PDO7EnJCU0v7Ix28zXp",
+  "type" : "function",
+  "function" : {
+    "name" : "activate_skill",
+    "arguments" : "{\"skill_name\":\"vehicle-selection\"}"
+  }
+} ]
 ```
 
-Quarkus dev mode will pick it up automatically. Try a trip with the **Romantic Getaway** type and watch `ItineraryPlannerAgent` activate the new skill. `VehicleAdvisorAgent` is unaffected because it only has access to `vehicle-selection`.
+Once a call succeeds, the next request log includes a `tool` message with the full skill content. This excerpt is from the vehicle advisor after `vehicle-selection` was activated:
 
-### Compare Trip Types
+```json
+{
+  "role" : "tool",
+  "tool_call_id" : "call_GvYO3PDO7EnJCU0v7Ix28zXp",
+  "content" : "# Vehicle Selection Guidance\n\n## By Trip Type\n- **Family:** Prioritize space over style. An MPV or 7-seat SUV fits car seats, luggage, and restless passengers...\n- **Adventure:** Ground clearance matters more than engine power. A compact SUV handles most classified mountain roads..."
+}
+```
 
-Plan a trip to the **Swiss Alps** three times as `Family Vacation`, `Adventure Trip`, and `Business Travel`. The vehicle recommendation stays in a similar category each time because `VehicleAdvisorAgent` always uses `vehicle-selection`. The itinerary and pacing change for each because `ItineraryPlannerAgent` activates a different skill each time.
+==Find the corresponding `family-trip` call and its returned content.== Match `tool_call_id` to the call's `id` to avoid confusing an earlier result in the conversation with the current activation. If the Dev UI does not show the full content, use the terminal logs.
 
-### Inspect Parallel Execution
+## Updating the travel guidance
 
-With `log-requests` and `log-responses` enabled in `application.properties`, check your terminal logs. You should see two overlapping LLM calls from `VehicleAdvisorAgent` and `ItineraryPlannerAgent`, confirming they ran in parallel.
+Suppose Miles of Smiles wants to recommend more rest days for week-long family trips. You can change that advice in the skill without editing the Agent prompts.
 
----
+First, to make our dev mode testing smoother, ==add this dev-mode setting to `application.properties` so edits to the family skill trigger an application reload:==
+
+```properties
+%dev.quarkus.live-reload.watched-resources=skills/family-trip/SKILL.md
+```
+
+??? "Why add this watched-resources property?"
+    The extension keeps skill content in memory, so edits need an application reload to take effect. This setting makes Quarkus reload on the next HTTP request after the file changes. Paths are relative to `src/main/resources/`, and additional files can be listed with commas.
+
+Notice how many rest days were mentioned in the original trip plan (there should be one), then ==open `src/main/resources/skills/family-trip/SKILL.md` and change "exactly one rest day" to "exactly two rest days".== Leave dev mode running. The watched-resource setting reloads the application on the next request, which also clears its in-memory execution history.
+
+==Click **Plan Another Trip** and generate a plan with the same form values.== Then inspect the new `family-trip` tool result for the updated rest-day instruction and compare the itineraries. Does the new plan include two rest days without driving?
+
+==Restore "exactly one rest day" before continuing.==
+
+## Comparing family and adventure skill selection
+
+The itinerary planner also has guidance for other trip types. Let's see which skill it chooses for an adventure trip.
+
+==Click **Plan Another Trip**, keep the remaining family form values, and change these fields:==
+
+- Destination: `Swiss Alps`
+- Trip type: `Adventure Trip`
+- Preferences: `We want hiking and mountain passes`
+
+==Click **Generate Trip Plan**, then inspect the new execution for a successful `adventure-trip` activation and its returned content. Compare the recommendations with the family trip.== The vehicle advisor still uses `vehicle-selection`, while the itinerary planner can select guidance for hiking and mountain routes.
+
+## Taking it further
+
+For more practice with skills, try adding child-seat guidance to `family-trip/SKILL.md`. Ask the itinerary agent to include the advice in the route overview and request any missing age, height, or weight details before suggesting a specific seat. Selecting **Family Vacation** alone is not enough to determine what restraint a child needs. Compare a request to rent a child seat with one whose preferences say "We are bringing our own child seat", checking both the activated skill content and the recommendation. Leave vehicle compatibility, availability, and price for Miles of Smiles to confirm.
+
+The trip form also includes a **Romantic Getaway** option with no matching skill yet. You could add a `romantic-trip/SKILL.md` file, register it on the itinerary agent's `@Skills` list, and check the execution trace for an `activate_skill` call when you select that trip type.
+
+The exercises above used family and adventure trips. Run the same destination as **Business Travel** and confirm the `business-trip` skill is activated instead. Planning one destination three or four times with different trip types is a quick way to see how much the itinerary changes when only the skill selection differs.
+
+==Try a bare `@Skills` annotation on one agent to give it access to every discovered skill, then compare which skills the model picks when the list is not restricted.==
 
 ## Troubleshooting
 
 ??? warning "Error: OPENAI_API_KEY not set"
-    Make sure you've exported the environment variable:
+    ==Set the environment variable in the terminal used to run the application.== For Linux or macOS:
 
     ```bash
     export OPENAI_API_KEY=sk-your-key-here
     ```
 
-    Then restart the application.
+    ==Then restart the application from your working copy.==
 
 ??? warning "Response takes too long or times out"
-    The pipeline makes 4 LLM calls (2 in parallel + 2 sequential). If you're hitting timeouts, check the `quarkus.langchain4j.openai.timeout` value in `application.properties` (default is 120 seconds per call) and try a shorter trip duration.
+    The Step 01 workflow invokes three agents, with vehicle selection and itinerary planning running in parallel before cost estimation. Skill activation can add model requests within an agent invocation. ==Check `quarkus.langchain4j.openai.timeout` in `application.properties` and try a shorter trip duration.== The starter configures a 120-second timeout.
 
 ??? warning "Skills not being activated"
-    - Check that `quarkus.langchain4j.skills.directories=classpath:skills` is set in `application.properties`
-    - Skill files must be named `SKILL.md` (case-sensitive) and placed in subdirectories under `src/main/resources/skills/`
-    - Each `SKILL.md` must have valid YAML frontmatter with both `name` and `description` fields
+    ==Check the following before generating another plan:==
 
----
+    - `quarkus.langchain4j.skills.directories=classpath:skills` is set in `application.properties`.
+    - Skill files are named `SKILL.md` (case-sensitive) and placed in subdirectories under `src/main/resources/skills/`.
+    - Each file has valid YAML frontmatter with both `name` and `description` fields.
+    - The skill's name appears in the agent's explicit `@Skills` list.
+    - The prompt asks the model to activate a skill, and the model supports tool calling.
 
-## What's Next?
+??? warning "An activation returns the old skill content"
+    ==Check that `%dev.quarkus.live-reload.watched-resources` includes the edited skill file, then refresh the application page.== The completed Step 01 project watches only `skills/family-trip/SKILL.md`. The terminal should show fresh `Loaded 4 skill(s)` and `Live reload total time` messages before the next generation.
 
-In this step you saw how Skills let you externalize domain expertise into Markdown files and inject it into agents dynamically at runtime. You don't need to recompile or change any Java code. Drop in a new `SKILL.md` and the LLM picks it up automatically.
+## What's next?
 
-In **Step 02**, you'll add guardrails and compliance checks to make sure trip recommendations are safe and appropriate before they reach the customer.
+The planner now has travel guidance in Markdown files, with each agent's access controlled by its skill list. You can update that guidance independently of the Java prompts and use tool results to check what the model received.
+
+In Step 02, you'll add guardrails and compliance checks to catch unsuitable trip recommendations before they reach the customer.
 
 [Continue to Step 02 - Guardrails and Compliance](step-02.md)

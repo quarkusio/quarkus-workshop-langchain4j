@@ -5,9 +5,10 @@ document.getElementById("startDate").value = tomorrow.toISOString().split("T")[0
 let currentRequest = null;
 let currentInstanceId = null;
 let pollingHandle = null;
+const PLAN_ERROR_FALLBACK = "Could not generate the trip plan. Please try again later.";
 
 // Restore a pending plan if the app was restarted while a workflow was awaiting approval.
-// In steps without a persisted store (00-03), this returns 204 and the form is shown normally.
+// The optional latest-plan endpoint is unavailable in steps 00-02; leave the form visible.
 (async function restoreLatestPlan() {
     try {
         const res = await fetch("/trip/plan/latest");
@@ -70,7 +71,10 @@ async function planTrip() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(currentRequest)
         });
-        if (!res.ok) throw new Error("Could not generate trip plan");
+        if (!res.ok) {
+            renderError(await readFailureMessage(res));
+            return;
+        }
         const data = await res.json();
 
         // Step 03: Response includes instanceId and status for workflow
@@ -82,7 +86,7 @@ async function planTrip() {
             renderPlan(data);
         }
     } catch (e) {
-        renderError(e.message);
+        renderError(PLAN_ERROR_FALLBACK);
     }
 }
 
@@ -90,7 +94,6 @@ function renderPlan(plan, status, confirmation) {
     const v = plan.vehicle || {};
     const costs = plan.costs || {};
     const itinerary = plan.itinerary || [];
-    const tips = plan.tips || [];
     const isAwaiting = status === "awaiting_approval";
     const isConfirmed = status === "confirmed";
 
@@ -157,12 +160,6 @@ function renderPlan(plan, status, confirmation) {
                 ${costs.total ? `<div class="cost-item total"><span>Total</span><span>${costs.total}</span></div>` : ""}
             </div>
         </div>
-
-        ${tips.length ? `
-            <div class="plan-section">
-                <h3>&#x1F4A1; Practical Tips</h3>
-                <div class="card"><ul>${tips.map(t => `<li>${t}</li>`).join("")}</ul></div>
-            </div>` : ""}
 
     `;
 }
@@ -238,15 +235,32 @@ function renderCancelled() {
     `;
 }
 
+async function readFailureMessage(response) {
+    try {
+        const failure = await response.json();
+        if ((response.status === 422 && failure?.error === "guardrail_violation")
+                || (response.status === 500 && failure?.error === "planning_failed")) {
+            if (typeof failure.message === "string" && failure.message.trim()) {
+                return failure.message.trim();
+            }
+        }
+    } catch (e) {
+        // Non-JSON error pages and empty responses use the same safe fallback.
+    }
+    return PLAN_ERROR_FALLBACK;
+}
+
 function renderError(message) {
     document.getElementById("results").innerHTML = `
         <div class="top-bar">
             <button class="btn-back" onclick="goBackToForm()">&#8592; Plan Another Trip</button>
         </div>
         <div class="spinner">
-            <p>Error: ${message}</p>
+            <p id="planError" role="alert"></p>
         </div>
     `;
+    document.getElementById("planError").textContent = "Error: "
+            + (typeof message === "string" && message.trim() ? message : PLAN_ERROR_FALLBACK);
 }
 
 function capitalize(s) {

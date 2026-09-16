@@ -1,10 +1,10 @@
 # Step 06 - Custom Orchestration with PlannerAgent
 
-## Goal-Oriented Planning
+## Custom control flow with the `Planner` API
 
-"Plan a 7-day California coast road trip for a family of 4, budget $3000." The PlannerAgent breaks this into legs, suggests stops, and estimates costs per segment. When the customer says "actually, skip San Francisco and add a beach day," the planner adapts the remaining plan dynamically.
+The evaluation loop from Step 05 can revise a plan, but a customer's next request may affect only part of it. After reviewing a family trip, the customer says, "Keep the route, but remove the child-seat rental. We're bringing our own." The planner needs to remove the rental charge without generating another itinerary, while retaining the advice to confirm that the family's seat suits the child and vehicle.
 
-In this step, you'll implement a custom `Planner` with `init`, `firstAction`, and `nextAction` methods — the most powerful orchestration pattern available, giving you fully custom control flow with goal-oriented reasoning.
+A custom planner can choose the next action from the trip goal and the results already available. The `Planner` lifecycle methods control these decisions, allowing an extras-only change to reuse the route while a changed destination calls for a new itinerary. The execution trace shows which agents ran again and which earlier results were reused.
 
 !!! note "Coming soon"
-    This step is under development. Check back for the full hands-on instructions.
+    This step is under development.

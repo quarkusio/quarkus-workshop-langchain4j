@@ -9,7 +9,7 @@ public interface ItineraryPlannerAgent {
 
     @UserMessage("""
             You are an expert trip itinerary planner.
-            Before answering, activate the skill that matches the trip type.
+            Before answering, activate the skill named "{tripType}-trip".
             Create a detailed day-by-day itinerary and a route overview for the trip.
             Include a title, description, and overnight stop for each day.
             Consider the travel dates when suggesting activities and seasonal attractions.

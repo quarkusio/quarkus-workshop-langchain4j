@@ -29,7 +29,7 @@ public class TripSafetyGuardrail implements OutputGuardrail {
     public OutputGuardrailResult validate(AiMessage responseFromLLM) {
         String text = responseFromLLM.text();
         if (text == null || text.isBlank()) {
-            auditLog.log("TripSafetyGuardrail", "PASS", "No text content to validate (structured output via tool calls)");
+            auditLog.log("TripSafetyGuardrail", "SKIP", "No text content; tool-call content was not validated");
             return success();
         }
 
@@ -38,11 +38,11 @@ public class TripSafetyGuardrail implements OutputGuardrail {
             root = objectMapper.readTree(extractJson(text));
         } catch (Exception e) {
             auditLog.log("TripSafetyGuardrail", "RETRY", "Response is not valid JSON");
-            return retry("The response is not valid JSON. Please return a valid JSON object matching the TripPlan format.");
+            return retry("The response is not valid JSON. Please return a valid JSON object matching the ItineraryResult format.");
         }
 
-        JsonNode itinerary = root.path("itinerary");
-        if (!itinerary.isArray() || itinerary.isEmpty()) {
+        JsonNode itinerary = root == null ? null : root.path("itinerary");
+        if (itinerary == null || !itinerary.isArray() || itinerary.isEmpty()) {
             auditLog.log("TripSafetyGuardrail", "RETRY", "Itinerary is missing or empty");
             return retry("The trip plan must include a day-by-day itinerary. Please provide at least one day.");
         }
@@ -55,7 +55,7 @@ public class TripSafetyGuardrail implements OutputGuardrail {
                     + "). Please regenerate the plan avoiding these areas and suggesting safe alternatives.");
         }
 
-        auditLog.log("TripSafetyGuardrail", "PASS", "All safety checks passed");
+        auditLog.log("TripSafetyGuardrail", "PASS", "Nonempty itinerary; no configured phrases in route overview or day descriptions");
         return success();
     }
 

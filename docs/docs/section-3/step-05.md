@@ -1,12 +1,12 @@
 # Step 05 - Voting, Loops, and Adaptive Model Selection
 
-## Iterative Plan Refinement
+## Parallel evaluation and iterative agent workflows
 
-Step 03 asked "should we finalize this plan?" and waited for a single human approval. This step introduces iterative convergence: multiple evaluator agents assess the plan in parallel, vote on whether it meets quality thresholds, and the workflow loops back to refine until the evaluators agree — or a maximum iteration guard fires.
+The customer can return to a saved trip after Step 04, but approval still depends on their own review. Miles of Smiles wants to check whether its recommendations are worth the customer's money, including the rental extras it proposes. A convenience evaluator might favor a beach umbrella for several beach days, while a budget evaluator questions the expense for a single short stop.
 
-Alongside the voting loop, adaptive model selection routes simple requests through a faster, cheaper model and escalates to a stronger model when complexity or late-loop refinement demands it.
+Evaluator agents can review the plan in parallel, assessing the extras against the itinerary, customer preferences, and rental prices before voting on whether it needs another pass. Their feedback guides a refinement loop that stops when the plan meets a quality threshold or reaches an iteration limit. Adaptive model selection allows straightforward requests to use a faster, cheaper model while more demanding revisions use a more capable one.
 
-In this step, you'll implement parallel evaluator agents, a vote-aggregation structure, a loop condition with a max-iteration safety guard, and a model supplier that routes based on request complexity.
+An unnecessary umbrella rental gives the evaluators a concrete reason to request a revision. Safety requirements, such as a suitable child restraint or equipment required for a particular road, cannot be overridden by a vote about cost or convenience.
 
 !!! note "Coming soon"
-    This step is under development. Check back for the full hands-on instructions.
+    This step is under development.

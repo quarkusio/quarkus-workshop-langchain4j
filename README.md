@@ -17,3 +17,5 @@ You can quickly jump to the final state of a step by navigating to the correspon
 ```
 
 The application runs on [http://localhost:8080](http://localhost:8080).
+
+Section 3 progresses from `section-3/step-00` through the implemented Step 04. See [section-3/README.md](section-3/README.md) for how steps build on each other and how tests are scoped per lesson.

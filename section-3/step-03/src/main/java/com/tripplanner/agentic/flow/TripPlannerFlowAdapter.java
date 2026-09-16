@@ -30,6 +30,6 @@ public class TripPlannerFlowAdapter {
     public BookingConfirmation finalizeBooking(TripApproval approval) {
         return new BookingConfirmation(
                 "MOS-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-                "Your trip is confirmed. Vehicle reserved.");
+                "Simulated booking confirmed. No vehicle has been reserved.");
     }
 }
