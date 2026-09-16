@@ -18,7 +18,7 @@ class TripPlannerResourceTest {
                 .body("""
                         {
                             "destination": "Italian Riviera",
-                            "startDate": "2026-07-10",
+                            "startDate": "2027-07-10",
                             "days": 5,
                             "tripType": "family",
                             "travelers": 4,

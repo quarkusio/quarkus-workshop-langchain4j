@@ -6,8 +6,7 @@ public record TripPlan(
         VehicleRecommendation vehicle,
         String routeOverview,
         List<DayItinerary> itinerary,
-        CostEstimate costs,
-        List<String> tips
+        CostEstimate costs
 ) {
     public record VehicleRecommendation(
             String type,

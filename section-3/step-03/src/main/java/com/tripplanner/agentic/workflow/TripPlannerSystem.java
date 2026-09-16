@@ -31,7 +31,6 @@ public interface TripPlannerSystem extends MonitoredAgent {
                 vehicle,
                 itineraryResult.routeOverview(),
                 itineraryResult.itinerary(),
-                costs,
-                itineraryResult.tips());
+                costs);
     }
 }

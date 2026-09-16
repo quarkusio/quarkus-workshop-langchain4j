@@ -17,3 +17,10 @@ You can quickly jump to the final state of a step by navigating to the correspon
 ```
 
 The application runs on [http://localhost:8080](http://localhost:8080).
+
+Section 3 progresses from `section-3/step-00` through the implemented Step 04. Its [maintenance guide](section-3/README.md) describes the lesson-by-lesson consistency checks:
+
+```shell
+python3 section-3/check-progression.py
+python3 -m unittest discover -s section-3 -p 'test_check_progression.py'
+```
