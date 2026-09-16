@@ -18,7 +18,9 @@ This is a multi-module Maven project organized into three sections. The first se
 
 The second section contains 9 steps dedicated to agentic systems, exploring agentic workflows, multi-agent collaboration, supervisor patterns, and Agent-to-Agent (A2A) communication. Steps 01–07 are located in `section-2/step-XX/` directories. Step 09 is a bonus Kubernetes/OpenShift deployment step (`section-2/step-09/`) that uses a JBang script rather than a Maven module — it deploys the Section 2 multi-agent system and remote A2A agent to a cluster with a single command.
 
-The third section contains 9 steps dedicated to enterprise agentic AI patterns, built around the Customer Trip Planner narrative. Topics include agent skills and dynamic discovery, guardrails and compliance, event-driven workflows (Quarkus Flow + Kafka), persistence, voting and loop patterns with adaptive model selection, custom orchestration with `PlannerAgent`, MCP integration, A2A communication, and AI-powered testing and evaluation. The starter and steps 01-04 are implemented in `section-3/step-XX/`. Steps 05-09 are placeholders.
+The third section contains 8 steps dedicated to enterprise agentic AI patterns, built around the Customer Trip Planner narrative. Topics include agent skills and dynamic discovery, guardrails and compliance, persistent state with event-driven workflows (Quarkus Flow + Kafka), voting and loop patterns with adaptive model selection, custom orchestration with `PlannerAgent`, MCP integration, A2A communication, and AI-powered testing and evaluation. These steps are located in `section-3/step-XX/` directories. Steps `00`–`04` are implemented; later steps may be scaffolded.
+
+When editing Section 3, read `section-3/README.md`. Each step builds on the previous one. Change only what that lesson introduces, propagate fixes forward through later steps, and keep each step's Maven tests scoped to that lesson (do not duplicate earlier test suites into later steps).
 
 The documentation lives in the `docs/` directory and can be served locally at http://127.0.0.1:8000/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.
 
@@ -47,8 +49,6 @@ LLM configuration is handled in `application.properties`, and each step may have
 Each step builds incrementally on the previous one, and the step directories contain the final state of that step. Participants can start from any step by copying or opening that directory directly. When working with the workshop, make changes in a working copy rather than directly in the step directories.
 
 The workshop is designed for progressive learning, with earlier steps being simpler and later steps introducing more advanced concepts. When helping with workshop content, always check the corresponding documentation in `docs/docs/section-X/step-XX.md` for context and instructions.
-
-For Section 3, keep successive steps byte-identical except for the additions and edits taught in that chapter. Carry fixes forward through every later implemented step, and put shared baseline fixes in the starter too. Do not remove prior features, change dependency versions, or refactor unrelated code between lessons. The starter must not contain features that disappear in Step 01. Run `python3 section-3/check-progression.py` and `python3 -m unittest discover -s section-3 -p 'test_check_progression.py'` after changes. Update the checker's explicit lesson deltas only when the teaching material changes, not to silence unintended drift.
 
 ## Key Architectural Patterns
 

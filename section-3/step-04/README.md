@@ -47,11 +47,11 @@ The inherited browser error handling checks recognized error-code and HTTP-statu
 ./mvnw test -Dquarkus.http.test-port=0
 ```
 
-The default suite uses isolated PostgreSQL Dev Services with container reuse disabled and a fresh schema. All four messaging channels use the inherited in-memory connectors; Kafka Dev Services is disabled. Tests need no real API key or live model. `TripPlannerFlowTest` uses a class-scoped mocked adapter, while `TripPlanningFailureTest` exercises the real adapter and agent pipeline with a scripted chat model. There is no global mock adapter.
+The default Surefire suite runs only Step 04 persistence tests. Flow, guardrail, and HTTP failure coverage stays in Step 03 so each tutorial step tests what it introduces. The default run uses isolated PostgreSQL Dev Services with container reuse disabled and a fresh schema. Tests need no real API key or live model.
 
-`PersistentTripPlanStoreTest` reads through new transactions and new store objects. It covers registration before binding, active planning exclusion, decisions, every terminal status, replay/identity/transition guards, safe failure, deterministic ordering, and failed database commits without acknowledgement. The lifecycle suite uses a persistence-aware fixture while retaining the inherited assertions. Store recreation alone is not an application-restart test.
+`PersistentTripPlanStoreTest` reads through new transactions and new store objects. It covers registration before binding, active planning exclusion, decisions, every terminal status, replay/identity/transition guards, safe failure, deterministic ordering, and failed database commits without acknowledgement. `TripPlanStoreLifecycleTest` uses the same persistence-aware fixture for lifecycle-event handling. Store recreation alone is not an application-restart test.
 
-The inherited browser checks serve their own HTML/JS and intercept API responses. With Playwright installed in the working copy:
+The browser checks from earlier steps still apply to this UI. They serve their own HTML/JS and intercept API responses. With Playwright installed in the working copy:
 
 ```bash
 node --test src/test/frontend/app.test.cjs
@@ -61,7 +61,7 @@ Use `BROWSER_CHANNEL=chrome` for installed Chrome, or install Playwright Chromiu
 
 ## Restart probe
 
-`FlowRestartProbe` replaces the old misleading `FlowDurabilityRestoreIT`. It is opt-in and is not selected by default Surefire naming patterns. Each command below starts and stops a separate Quarkus test JVM. The probe uses the real Flow definition, JPA checkpoints, REST approval resource, and store, with an isolated scripted adapter and in-memory messaging. It never calls a model.
+`FlowRestartProbe` is opt-in and excluded from the default Surefire suite. Each command below starts and stops a separate Quarkus test JVM. The probe uses the real Flow definition, JPA checkpoints, REST approval resource, and store, with an isolated scripted adapter and in-memory messaging. It never calls a model.
 
 Start a dedicated PostgreSQL container. The credentials below are only for this disposable local test database. Choose a free host port if 55434 is occupied. Substitute `podman` for `docker` when using Podman.
 

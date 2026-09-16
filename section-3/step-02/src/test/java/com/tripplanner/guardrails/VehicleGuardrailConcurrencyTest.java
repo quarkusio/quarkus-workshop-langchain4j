@@ -14,6 +14,7 @@ import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
+@Timeout(30)
 @TestProfile(VehicleGuardrailConcurrencyTest.ConcurrentProfile.class)
 class VehicleGuardrailConcurrencyTest {
     @Inject

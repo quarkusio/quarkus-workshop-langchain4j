@@ -26,19 +26,17 @@ The completed project retains Step 01's family-skill driving descriptions and de
 
 ## Test
 
-Run the deterministic contract and guardrail suite without a model call:
+Run the Step 02 guardrail suite without a model call:
 
 ```bash
-./mvnw test "-Dtest=TripPlanContractTest,*GuardrailTest,VehicleGuardrailConcurrencyTest,GuardrailExceptionMapperTest,TripPlanningFailureTest"
+./mvnw test
 ```
+
+The default Surefire configuration runs guardrail unit tests, `TripPlanningFailureTest`, and `GuardrailExceptionMapperTest` only. Baseline contract checks stay in Step 00.
 
 The test configuration supplies a dummy API-key fallback. The suite checks output guardrail decisions, tool-argument rejection through Quarkus's execution pipeline, exact rental calculations, and a scripted invalid-call/corrected-call conversation through the production cost agent. Rejected calls must not enter the tool body. The scripted conversation does not predict live-model recovery.
 
 `TripPlanningFailureTest` calls the production REST endpoint and pipeline with a test-profile chat model. It checks corrected vehicle fields over HTTP, exhausted itinerary retries and vehicle reprompts, and an unrelated agent failure. The current dependency counts `maxRetries = 3` as three total responses, including the initial answer; the exhaustion tests assert that count. No retry annotation is changed for testing.
-
-The separate `TripPlannerResourceTest` is enabled when `OPENAI_API_KEY` is set and calls the real model. It is excluded by the command above.
-
-`TripPlanContractTest` is identical to the baseline test in Steps 00 and 01. It checks the three-agent composition, direct output assembly, the HTTP JSON contract, and the absence of a chat endpoint with fixed model responses. Run `./mvnw test` with `OPENAI_API_KEY` unset to run all deterministic Java tests while skipping the live-model test.
 
 For the supplied browser checks, keep the app running and install test-only tooling in your working copy:
 

@@ -146,6 +146,12 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <argLine>@{argLine}</argLine>
+                    <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
+                    <!-- Step 04 adds persistence only; flow/guardrail coverage lives in step 03. -->
+                    <includes>
+                        <include>**/PersistentTripPlanStoreTest.java</include>
+                        <include>**/TripPlanStoreLifecycleTest.java</include>
+                    </includes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>

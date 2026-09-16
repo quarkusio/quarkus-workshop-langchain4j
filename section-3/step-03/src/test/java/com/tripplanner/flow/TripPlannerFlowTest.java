@@ -9,7 +9,9 @@ import com.tripplanner.model.TripPlanStatus;
 import com.tripplanner.model.TripRequest;
 import dev.langchain4j.agentic.agent.AgentInvocationException;
 import dev.langchain4j.guardrail.OutputGuardrailException;
+import com.tripplanner.testsupport.InMemoryMessagingTestResource;
 import io.quarkus.test.InjectMock;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.mockito.InjectSpy;
 import io.quarkiverse.flow.messaging.FlowDomainEventsPublisher;
 import io.cloudevents.CloudEvent;
@@ -27,6 +29,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Metadata;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -46,7 +49,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@Order(1)
 @QuarkusTest
+@QuarkusTestResource(InMemoryMessagingTestResource.class)
 @TestProfile(TripPlannerFlowTest.PublicationProfile.class)
 class TripPlannerFlowTest {
     private static final TripRequest REQUEST = new TripRequest(
@@ -378,7 +383,7 @@ class TripPlannerFlowTest {
         TripPlanStatus timedOut;
         CompletableFuture<Response> concurrent;
         try {
-            Response http = response.get(7, SECONDS);
+            Response http = response.get(5, SECONDS);
             http.then().statusCode(504).body("error", equalTo("planning_timeout"))
                     .body("message", containsString("may still complete"));
             timedOut = http.as(TripPlanStatus.class);

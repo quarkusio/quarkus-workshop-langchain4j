@@ -66,23 +66,19 @@ The browser displays server messages only for recognized error-code and HTTP-sta
 
 ## Verification
 
-Run the controlled Flow and scripted agent-pipeline suites:
+Run the default Step 03 suite:
 
 ```bash
-./mvnw test "-Dtest=TripPlannerFlowTest,TripPlanningFailureTest,TripPlanStoreLifecycleTest"
+./mvnw test
 ```
+
+Surefire runs `TripPlannerFlowTest`, flow-adapted `TripPlanningFailureTest`, and `TripPlanStoreLifecycleTest` only. Guardrail unit tests stay in Step 02.
 
 `TripPlannerFlowTest` uses the real Flow definition, store, and REST resources with a mocked adapter. All four messaging channels use in-memory connectors, and Kafka Dev Services is disabled in test configuration. It checks event-to-store-to-REST transitions, original-request restoration, rejection without finalization, safe planning/finalization failures, invalid and duplicate decisions, mismatched decision envelopes, unrelated planning results, and bounded planning waits that can still complete later. It requires neither a live model nor a Kafka broker. Its short `PT3S` planning timeout is test-only.
 
 `TripPlanningFailureTest` uses the real Flow, adapter, agent pipeline, store, and REST endpoint with a scripted chat model and in-memory messaging. It checks corrected vehicle fields, actual vehicle-reprompt and itinerary-retry exhaustion returning HTTP 422, and an unrelated agent failure returning safe HTTP 500. The exhaustion tests assert three total responses, including the initial answer, with the current guardrail executor. This test profile allows `PT15S` for planning. It returns a fixed cost response, so pricing-tool execution remains covered by the separate pricing-agent script.
 
 The Flow suite also fails the actual outcome publisher through a profile-local spy. It checks the lifecycle fallback for approval requests, confirmations, rejections, and failure events. `TripPlanStoreLifecycleTest` checks that unrelated instances and nonterminal notifications cannot report a false failure.
-
-Run the inherited checks separately, since the mocked adapter bypasses the real agents and pricing tool:
-
-```bash
-./mvnw test "-Dtest=*GuardrailTest,GuardrailExceptionMapperTest"
-```
 
 For the supplied frontend tests, install test-only tooling in your working copy:
 

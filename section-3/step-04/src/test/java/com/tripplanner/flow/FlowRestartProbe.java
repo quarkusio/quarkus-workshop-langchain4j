@@ -9,6 +9,8 @@ import com.tripplanner.model.TripPlanStatus;
 import com.tripplanner.model.TripRequest;
 import io.quarkiverse.flow.persistence.jpa.WorkflowInstanceRepository;
 import io.quarkus.narayana.jta.QuarkusTransaction;
+import com.tripplanner.testsupport.InMemoryMessagingTestResource;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
@@ -36,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Opt-in, separate JVM phases; see README. Not selected by the default Surefire test patterns. */
 @QuarkusTest
+@QuarkusTestResource(InMemoryMessagingTestResource.class)
 @TestProfile(FlowRestartProbe.RestartProfile.class)
 class FlowRestartProbe {
     private static final TripRequest REQUEST = new TripRequest("Restart coast", "2027-07-10", 5, "family", 4, "economy", "Short drives");

@@ -99,6 +99,8 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <argLine>@{argLine}</argLine>
+                    <!-- Step 01 adds skills only; automated tests start in step 02. -->
+                    <failIfNoTests>false</failIfNoTests>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>

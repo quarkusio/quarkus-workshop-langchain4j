@@ -7,6 +7,8 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.response.ChatResponse;
+import com.tripplanner.testsupport.InMemoryMessagingTestResource;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
@@ -18,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -26,12 +29,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.restassured.RestAssured.given;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Order(3)
 @QuarkusTest
+@QuarkusTestResource(InMemoryMessagingTestResource.class)
 @TestProfile(TripPlanningFailureTest.ScriptedProfile.class)
 class TripPlanningFailureTest {
 
@@ -106,7 +112,8 @@ class TripPlanningFailureTest {
         assertEquals("com.tripplanner.trip.requested", input.getMetadata(CloudEventMetadata.class).orElseThrow().getType());
         connector.<Message<String>>source("flow-in").send(Message.of(
                 objectMapper.writeValueAsString(input.getPayload()), input.getMetadata()));
-        await().atMost(10, SECONDS).until(() -> !connector.sink("flow-out").received().isEmpty());
+        await().pollInterval(50, MILLISECONDS).atMost(5, SECONDS)
+                .until(() -> !connector.sink("flow-out").received().isEmpty());
         Message<String> output = connector.<String>sink("flow-out").received().getFirst();
         connector.<Message<String>>source("flow-out-consumer").send(Message.of(output.getPayload(), output.getMetadata()));
         var http = response.get(5, SECONDS);

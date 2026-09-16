@@ -10,7 +10,7 @@ The family skill starts with exactly one rest day for trips of seven or more day
 
 ## Test
 
-Run `./mvnw test -Dtest=TripPlanContractTest` for the same deterministic model, workflow, and HTTP contract checks as Step 00. These fixed responses verify plan assembly and the JSON contract, not skill activation or model adherence. Run `./mvnw test` with `OPENAI_API_KEY` unset to skip the existing live-model `TripPlannerResourceTest`. Do not run `clean` while dev mode is running.
+Step 01 adds skills only; it has no automated tests. Run `./mvnw test` to confirm the build (Surefire is configured with `failIfNoTests=false`). Contract and workflow checks stay in Step 00; guardrail tests start in Step 02. Validate skill activation through the dev UI and the family-trip exercise in the workshop chapter.
 
 The investigation below records earlier runs with a minimum-rest-day instruction. The current exercise uses exactly one rest day, changed to exactly two; the historical observations are retained as recorded.
 
