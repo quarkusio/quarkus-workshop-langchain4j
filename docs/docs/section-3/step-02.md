@@ -349,17 +349,7 @@ The browser would still show a 45-day trip plan because the itinerary agent rece
 
     **Guardrail unit tests** — `*GuardrailTest` covers the output guardrails (rewrite, reprompt, retry decisions) and the rental pricing input guardrail (invalid arguments blocked, valid arguments reaching the calculation). An invalid duration is rejected with `Input guardrail failed for tool estimateRental: Set days to a whole number from 1 to 30.` A valid five-day SUV call logs `Rental calculation executed: category=suv, days=5, total=400 EUR`.
 
-    === "Linux / macOS"
-        ```bash
-        ./mvnw test "-Dtest=*GuardrailTest"
-        ```
-
-    === "Windows"
-        ```cmd
-        .\mvnw.cmd test "-Dtest=*GuardrailTest"
-        ```
-
-    **HTTP contract tests** — `TripPlanningFailureTest` and `VehicleGuardrailConcurrencyTest` call the real `POST /trip/plan` endpoint with scripted model responses. They check that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. The exhausted-check cases assert this response body:
+    **HTTP failure tests** — `TripPlanningFailureTest` and `VehicleGuardrailConcurrencyTest` call the real `POST /trip/plan` endpoint with scripted model responses. They check that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. The exhausted-check cases assert this response body:
 
     ```json
     {
@@ -368,15 +358,19 @@ The browser would still show a 45-day trip plan because the itinerary agent rece
     }
     ```
 
+    ==Run the Step 02 test suite:==
+
     === "Linux / macOS"
         ```bash
-        ./mvnw test "-Dtest=*GuardrailTest,VehicleGuardrailConcurrencyTest,GuardrailExceptionMapperTest,TripPlanningFailureTest"
+        ./mvnw test
         ```
 
     === "Windows"
         ```cmd
-        .\mvnw.cmd test "-Dtest=*GuardrailTest,VehicleGuardrailConcurrencyTest,GuardrailExceptionMapperTest,TripPlanningFailureTest"
+        .\mvnw.cmd test
         ```
+
+    The default Surefire configuration runs guardrail unit tests, `TripPlanningFailureTest`, and `GuardrailExceptionMapperTest`. Baseline contract checks stay in Step 00.
 
     **Browser test** — The Playwright test displays a family vehicle correction and error responses at desktop and mobile widths using intercepted responses, without model calls. Node.js and npm are needed; they are not application dependencies.
 

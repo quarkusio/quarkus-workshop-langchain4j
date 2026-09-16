@@ -53,7 +53,7 @@ The exercise changes the Flow definition. The frontend, event store, REST resour
 
     The supplied agents retain the completed Step 02 pipeline. Their `days` and `travelers` parameters use `Integer` instead of `String` because the Flow adapter passes numeric values from `TripRequest` directly. The cost agent keeps both parameters, its `@ToolBox(RentalPricingTool.class)` annotation, and its rental-tool instructions. The supplied pricing test uses the corresponding numeric arguments too; no participant agent refactor is needed.
 
-    ==Remove `src/test/java/com/tripplanner/TripPlannerResourceTest.java` and `src/test/java/com/tripplanner/TripPlanContractTest.java` from this working copy. Keep the Step 03 replacement of `src/test/java/com/tripplanner/TripPlanningFailureTest.java` copied above. If you previously copied an older Step 03, also remove `src/test/java/com/tripplanner/flow/MockTripPlannerFlowAdapter.java`.== The old HTTP tests called a synchronous agent pipeline and expected the old response contract. The updated failure test runs the real Flow and agent pipeline with scripted model responses, while the separate guardrail and pricing-tool tests retain their coverage.
+    ==Remove `src/test/java/com/tripplanner/TripPlannerResourceTest.java` and `src/test/java/com/tripplanner/TripPlanContractTest.java` from this working copy. Keep the Step 03 replacement of `src/test/java/com/tripplanner/TripPlanningFailureTest.java` copied above. If you previously copied an older Step 03, also remove `src/test/java/com/tripplanner/flow/MockTripPlannerFlowAdapter.java`.== The old HTTP tests called a synchronous agent pipeline and expected the old response contract. The updated failure test runs the real Flow and agent pipeline with scripted model responses. Guardrail and pricing-tool coverage stays in Step 02.
 
     ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
 
@@ -192,31 +192,25 @@ The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real 
 --8<-- "../../section-3/step-03/src/test/resources/application.properties"
 ```
 
-==Run the controlled workflow tests from your working project:==
+==Run the Step 03 test suite from your working project:==
 
 === "Linux / macOS"
     ```bash
-    ./mvnw test "-Dtest=TripPlannerFlowTest,TripPlanningFailureTest,TripPlanStoreLifecycleTest"
+    ./mvnw test
     ```
 
 === "Windows"
     ```cmd
-    mvnw.cmd test "-Dtest=TripPlannerFlowTest,TripPlanningFailureTest,TripPlanStoreLifecycleTest"
+    mvnw.cmd test
     ```
+
+The default Surefire configuration runs `TripPlannerFlowTest`, flow-adapted `TripPlanningFailureTest`, and `TripPlanStoreLifecycleTest` only. Each CI job for a step covers that lesson's additions, so guardrail unit tests remain in Step 02.
 
 The tests check that submission leaves the trip at `decision_submitted` until the store consumes an outcome, and that approval, rejection, and failure belong to the expected instance. They also check original-request restoration, wrong-instance decisions, unrelated planning events, invalid and repeated decisions, and a planning timeout followed by eventual completion. Controlled finalization failures must preserve the reviewed plan, while rejection must never call finalization.
 
 The Flow suite also makes the real publisher fail when sending each kind of outcome, checking that the lifecycle fallback records the failure and permits subsequent planning. The store lifecycle tests check that unrelated instances and nonterminal notifications cannot trigger that fallback.
 
-The scripted pipeline test checks that corrected vehicle fields reach the HTTP response through Flow. It also exhausts the vehicle reprompts and itinerary retries, asserting HTTP 422 after three total responses, including the initial answer, with the current guardrail executor. An unrelated agent failure must instead return a safe HTTP 500. These outcomes pass through the workflow event, store, and REST response; they are not simulated by throwing directly from a mocked adapter.
-
-==Run the inherited Step 02 guardrail and pricing-tool tests as well:==
-
-```bash
-./mvnw test "-Dtest=*GuardrailTest,GuardrailExceptionMapperTest"
-```
-
-The adapter-mocked suite bypasses these capabilities, and the scripted pipeline test returns a fixed cost response without calling the pricing tool. The separate pricing tests check tool execution and correction with controlled responses. Passing the workflow tests alone therefore does not establish pricing-tool behavior, and live-model behavior remains a separate observation.
+The scripted pipeline test checks that corrected vehicle fields reach the HTTP response through Flow. It also exhausts the vehicle reprompts and itinerary retries, asserting HTTP 422 after three total responses, including the initial answer, with the current guardrail executor. An unrelated agent failure must instead return a safe HTTP 500. These outcomes pass through the workflow event, store, and REST response; they are not simulated by throwing directly from a mocked adapter. The scripted pipeline test returns a fixed cost response without calling the pricing tool, so pricing-tool execution remains covered in Step 02.
 
 The supplied browser tests in `src/test/frontend/` exercise status rendering and network failure paths with intercepted API responses. Their setup and command are in the [Step 03 README](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-03#verification){target="_blank"}. These tests do not establish Kafka delivery or live-model output quality.
 

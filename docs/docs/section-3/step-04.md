@@ -283,23 +283,23 @@ The lifecycle assertions from Step 03 still apply, but their store now needs Qua
 
 ==Copy `src/test/java/com/tripplanner/agentic/flow/PersistentTripPlanStoreTest.java` from the completed `section-3/step-04` project to the same path in your working copy.== It checks fresh database reads, accepted decisions, terminal outcomes and replay guards, as well as a failed commit that must not acknowledge its event.
 
-==Also copy `src/test/java/com/tripplanner/flow/FlowRestartProbe.java` from Step 04 to the same path. Keep the inherited `TripPlannerFlowTest`, `TripPlanningFailureTest`, guardrail tests, and browser tests unchanged.== The probe is an opt-in check using separate JVMs against a dedicated disposable database. Its [setup and phase commands](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#restart-probe){target="_blank"} are available if you want to automate the restart check with a fixed plan instead of a live model.
+==Also copy `src/test/java/com/tripplanner/flow/FlowRestartProbe.java` from Step 04 to the same path.== The probe is an opt-in check using separate JVMs against a dedicated disposable database. Its [setup and phase commands](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#restart-probe){target="_blank"} are available if you want to automate the restart check with a fixed plan instead of a live model. Flow, guardrail, and HTTP failure coverage stays in Step 03; browser tests from earlier steps still apply unchanged.
 
 ## Checking persistence without a model
 
-Both starting routes now have the same persistence tests and configuration. ==Run the store and workflow tests from your working project with Docker or Podman running:==
+Both starting routes now have the same persistence tests and configuration. ==Run the Step 04 test suite from your working project with Docker or Podman running:==
 
 === "Linux / macOS"
     ```bash
-    ./mvnw test "-Dtest=PersistentTripPlanStoreTest,TripPlanStoreLifecycleTest,TripPlannerFlowTest,TripPlanningFailureTest"
+    ./mvnw test
     ```
 
 === "Windows"
     ```cmd
-    mvnw.cmd test "-Dtest=PersistentTripPlanStoreTest,TripPlanStoreLifecycleTest,TripPlannerFlowTest,TripPlanningFailureTest"
+    mvnw.cmd test
     ```
 
-The tests check that the original request survives store recreation, that a decision cannot be submitted twice, and that confirmed, rejected, and failed records retain the reviewed plan when late events arrive. They also check request ordering and the transaction boundary before acknowledgement. Reading from another store object establishes database persistence, but a full application restart is still needed to check that Flow restores its waiting execution.
+The default Surefire configuration runs `PersistentTripPlanStoreTest` and persistence-aware `TripPlanStoreLifecycleTest` only. The tests check that the original request survives store recreation, that a decision cannot be submitted twice, and that confirmed, rejected, and failed records retain the reviewed plan when late events arrive. They also check request ordering and the transaction boundary before acknowledgement. Reading from another store object establishes database persistence, but a full application restart is still needed to check that Flow restores its waiting execution.
 
 ---
 
