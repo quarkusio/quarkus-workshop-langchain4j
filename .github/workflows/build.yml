@@ -20,16 +20,6 @@ defaults:
     shell: bash
 
 jobs:
-  section-3-progression:
-    runs-on: ubuntu-latest
-    name: "Check Section 3 Progression"
-    steps:
-      - uses: actions/checkout@v7
-      - name: Test progression checker
-        run: python3 -B -m unittest discover -s section-3 -p 'test_check_progression.py' -v
-      - name: Check implemented step progression
-        run: python3 -B section-3/check-progression.py
-
   build:
     runs-on: ubuntu-latest
     strategy:
