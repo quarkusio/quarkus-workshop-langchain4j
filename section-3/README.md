@@ -23,7 +23,7 @@ Each step's default `./mvnw test` suite covers **only what that step adds**. Ear
 | **00** | `TripPlanContractTest`, `TripPlannerResourceTest` (live endpoint needs `OPENAI_API_KEY`) |
 | **01** | None (skills are validated manually and in later steps) |
 | **02** | Guardrail unit tests, `TripPlanningFailureTest`, `GuardrailExceptionMapperTest` |
-| **03** | `TripPlannerFlowTest`, `TripPlanStoreLifecycleTest`, flow-adapted `TripPlanningFailureTest` |
+| **03** | `TripPlannerFlowTest` (smoke), `TripPlanStoreLifecycleTest` |
 | **04** | `PersistentTripPlanStoreTest`, `TripPlanStoreLifecycleTest` (persistence-aware) |
 
 Opt-in tests (not in the default suite):

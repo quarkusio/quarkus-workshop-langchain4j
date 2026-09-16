@@ -72,13 +72,9 @@ Run the default Step 03 suite:
 ./mvnw test
 ```
 
-Surefire runs `TripPlannerFlowTest`, flow-adapted `TripPlanningFailureTest`, and `TripPlanStoreLifecycleTest` only. Guardrail unit tests stay in Step 02.
+Surefire runs a slim `TripPlannerFlowTest` smoke suite and `TripPlanStoreLifecycleTest` only. Guardrail and HTTP failure coverage stays in Step 02.
 
-`TripPlannerFlowTest` uses the real Flow definition, store, and REST resources with a mocked adapter. All four messaging channels use in-memory connectors, and Kafka Dev Services is disabled in test configuration. It checks event-to-store-to-REST transitions, original-request restoration, rejection without finalization, safe planning/finalization failures, invalid and duplicate decisions, mismatched decision envelopes, unrelated planning results, and bounded planning waits that can still complete later. It requires neither a live model nor a Kafka broker. Its short `PT3S` planning timeout is test-only.
-
-`TripPlanningFailureTest` uses the real Flow, adapter, agent pipeline, store, and REST endpoint with a scripted chat model and in-memory messaging. It checks corrected vehicle fields, actual vehicle-reprompt and itinerary-retry exhaustion returning HTTP 422, and an unrelated agent failure returning safe HTTP 500. The exhaustion tests assert three total responses, including the initial answer, with the current guardrail executor. This test profile allows `PT15S` for planning. It returns a fixed cost response, so pricing-tool execution remains covered by the separate pricing-agent script.
-
-The Flow suite also fails the actual outcome publisher through a profile-local spy. It checks the lifecycle fallback for approval requests, confirmations, rejections, and failure events. `TripPlanStoreLifecycleTest` checks that unrelated instances and nonterminal notifications cannot report a false failure.
+`TripPlannerFlowTest` uses the real Flow definition, store, and REST resources with a mocked adapter. In-memory messaging connectors replace Kafka for the test run. The three smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when planning fails. `TripPlanStoreLifecycleTest` checks that unrelated instances and nonterminal notifications cannot report a false failure.
 
 For the supplied frontend tests, install test-only tooling in your working copy:
 
@@ -92,17 +88,11 @@ The suite starts its own local server for the supplied HTML and JavaScript, so Q
 
 For a live check, generate a trip and record its identifier. Confirm the planning HTTP request has finished while Flow waits, then refresh without restarting the application and compare the plan, identifier, and original request. Approve it and follow the matching decision event to the simulated confirmation. Generate another trip, reject it, and refresh to verify it remains rejected with no booking-finalized event for that instance. Inspect the cost agent's pricing-tool call and run the predecessor's controlled checks separately.
 
-Verification on September 14, 2026 passed all 70 Java tests, including the publication-failure cases, and all 25 controlled frontend tests. The real Kafka/model/browser journey also passed for approval and rejection. Both planning HTTP requests returned 200 while the workflow remained awaiting approval, and browser refresh restored the same identifier and original inputs. Approval for `01M2GBRNCV8X3E3KAB02E0KW42` reached simulated confirmation. Rejection for `01M2GBT1KZHM88P2Z76MDNKWM1` remained rejected after refresh, with a null confirmation and no booking-finalized event for that instance.
-
-Dev UI execution reports showed two successful `estimateRental` calls with category `suv` and duration seven days, returning fictional rates of EUR 80/day and EUR 560 total. The configured `gpt-4o` model successfully activated `vehicle-selection` and `family-trip`; one nonexistent skill-name attempt failed before family activation succeeded. These observations do not establish final-price correctness or consistent model adherence. Controlled tests cover failures without depending on live-model mistakes.
-
-Fresh awaiting-approval, confirmed, and rejected captures from that run are in `docs/docs/images/section-3-step-03-*.png` and appear in the chapter. Desktop and mobile layouts were checked. The documentation check separately rebuilt MkDocs and rendered both chapter diagrams; those checks do not establish application behavior.
-
-The scripted exhausted-guardrail tests exposed a dependency worker waiting during test shutdown, adding approximately 60 seconds to shutdown despite passing client-response assertions. No dependency workaround was added. An earlier live run was interrupted by dev-process availability; the complete rerun above passed. Neither a stopped test client nor a missing response is evidence that a workflow was cancelled.
+`./mvnw test` runs six Java tests (three Flow smoke cases and three store lifecycle checks) in about ten seconds with in-memory messaging and no live model.
 
 ## Participation routes
 
-The [Step 03 tutorial](../../docs/docs/section-3/step-03.md) supplies the copy list for participants continuing from Step 02. Use this step's frontend, store, resources, payload models, Flow helpers, and tests together. Keep the complete supplied `TripPlannerFlow` class, including its injected `ObjectMapper` and `matchesDecision()` helper, when editing the descriptor. Keep the Step 03 replacement of `TripPlanningFailureTest` as well, and remove the earlier bare-response `TripPlannerResourceTest` and `TripPlanContractTest`. The supplied agents retain the predecessor's pricing tool and corrected guardrails, with `days` and `travelers` parameters changed to `Integer` for numeric Flow scope values. The cost agent keeps its duration and tool instructions. The participant edit is the Flow descriptor, not frontend or storage implementation.
+The [Step 03 tutorial](../../docs/docs/section-3/step-03.md) supplies the copy list for participants continuing from Step 02. Use this step's frontend, store, resources, payload models, Flow helpers, and tests together. Keep the complete supplied `TripPlannerFlow` class, including its injected `ObjectMapper` and `matchesDecision()` helper, when editing the descriptor. Remove the earlier bare-response `TripPlannerResourceTest` and `TripPlanContractTest`. The supplied agents retain the predecessor's pricing tool and corrected guardrails, with `days` and `travelers` parameters changed to `Integer` for numeric Flow scope values. The cost agent keeps its duration and tool instructions. The participant edit is the Flow descriptor, not frontend or storage implementation.
 
 Participants opening the completed step use the same supplied files and verification sequence. Neither route introduces persistence or real booking integration.
 
