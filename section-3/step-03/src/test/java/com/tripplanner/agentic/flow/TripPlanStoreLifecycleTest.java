@@ -15,7 +15,6 @@ import io.serverlessworkflow.impl.lifecycle.WorkflowSuspendedEvent;
 import io.smallrye.reactive.messaging.ce.OutgoingCloudEventMetadata;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Metadata;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -25,7 +24,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@Order(2)
 class TripPlanStoreLifecycleTest {
     private final TripPlanStore store = new TripPlanStore();
     private final TripRequest request = new TripRequest("Coast", "2027-07-10", 5, "family", 4, "economy", "");

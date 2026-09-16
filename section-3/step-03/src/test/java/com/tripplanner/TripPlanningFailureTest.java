@@ -20,7 +20,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -35,7 +34,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Order(3)
 @QuarkusTest
 @QuarkusTestResource(InMemoryMessagingTestResource.class)
 @TestProfile(TripPlanningFailureTest.ScriptedProfile.class)
@@ -103,18 +101,21 @@ class TripPlanningFailureTest {
     }
 
     private io.restassured.response.ValidatableResponse plan() throws Exception {
+        int producerBaseline = connector.sink("flow-in-producer").received().size();
+        int outBaseline = connector.sink("flow-out").received().size();
         var response = CompletableFuture.supplyAsync(() -> given().contentType("application/json").body("""
                 {"destination":"Italian Riviera","startDate":"2027-07-10","days":5,
                  "tripType":"family","travelers":4,"budget":"economy","preferences":"coastal towns"}
                 """).post("/trip/plan"));
-        await().atMost(5, SECONDS).until(() -> !connector.sink("flow-in-producer").received().isEmpty());
-        Message<?> input = connector.sink("flow-in-producer").received().getFirst();
+        await().pollInterval(50, MILLISECONDS).atMost(10, SECONDS)
+                .until(() -> connector.sink("flow-in-producer").received().size() > producerBaseline);
+        Message<?> input = connector.sink("flow-in-producer").received().get(producerBaseline);
         assertEquals("com.tripplanner.trip.requested", input.getMetadata(CloudEventMetadata.class).orElseThrow().getType());
         connector.<Message<String>>source("flow-in").send(Message.of(
                 objectMapper.writeValueAsString(input.getPayload()), input.getMetadata()));
-        await().pollInterval(50, MILLISECONDS).atMost(5, SECONDS)
-                .until(() -> !connector.sink("flow-out").received().isEmpty());
-        Message<String> output = connector.<String>sink("flow-out").received().getFirst();
+        await().pollInterval(50, MILLISECONDS).atMost(10, SECONDS)
+                .until(() -> connector.sink("flow-out").received().size() > outBaseline);
+        Message<String> output = connector.<String>sink("flow-out").received().get(outBaseline);
         connector.<Message<String>>source("flow-out-consumer").send(Message.of(output.getPayload(), output.getMetadata()));
         var http = response.get(5, SECONDS);
         var status = http.as(TripPlanStatus.class);

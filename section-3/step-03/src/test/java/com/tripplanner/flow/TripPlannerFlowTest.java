@@ -29,7 +29,6 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Metadata;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -49,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@Order(1)
 @QuarkusTest
 @QuarkusTestResource(InMemoryMessagingTestResource.class)
 @TestProfile(TripPlannerFlowTest.PublicationProfile.class)

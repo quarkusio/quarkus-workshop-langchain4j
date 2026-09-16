@@ -137,18 +137,51 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>@{argLine}</argLine>
-                    <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
-                    <includes>
-                        <include>**/TripPlannerFlowTest.java</include>
-                        <include>**/TripPlanStoreLifecycleTest.java</include>
-                        <include>**/TripPlanningFailureTest.java</include>
-                    </includes>
-                    <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                        <maven.home>${maven.home}</maven.home>
-                    </systemPropertyVariables>
+                    <skip>true</skip>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>flow-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <argLine>@{argLine}</argLine>
+                            <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
+                            <reuseForks>false</reuseForks>
+                            <includes>
+                                <include>**/TripPlannerFlowTest.java</include>
+                                <include>**/TripPlanStoreLifecycleTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <maven.home>${maven.home}</maven.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>failure-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <argLine>@{argLine}</argLine>
+                            <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
+                            <reuseForks>false</reuseForks>
+                            <includes>
+                                <include>**/TripPlanningFailureTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <maven.home>${maven.home}</maven.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
