@@ -74,7 +74,7 @@ Run the default Step 03 suite:
 
 Surefire runs a slim `TripPlannerFlowTest` smoke suite and `TripPlanStoreLifecycleTest` only. Guardrail and HTTP failure coverage stays in Step 02.
 
-`TripPlannerFlowTest` uses the real Flow definition, store, and REST resources with a mocked adapter. In-memory messaging connectors replace Kafka for the test run. The three smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when planning fails. `TripPlanStoreLifecycleTest` checks that unrelated instances and nonterminal notifications cannot report a false failure.
+`TripPlannerFlowTest` uses the real Flow definition, store, and REST resources with a mocked adapter. In-memory messaging connectors replace Kafka for the test run. The three smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when planning fails. `TripPlanStoreLifecycleTest` checks unrelated instances, nonterminal notifications, workflow failure while awaiting approval, and duplicate failure events.
 
 For the supplied frontend tests, install test-only tooling in your working copy:
 

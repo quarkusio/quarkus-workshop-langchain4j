@@ -283,7 +283,7 @@ The lifecycle assertions from Step 03 still apply, but their store now needs Qua
 
 ==Copy `src/test/java/com/tripplanner/agentic/flow/PersistentTripPlanStoreTest.java` from the completed `section-3/step-04` project to the same path in your working copy.== It checks fresh database reads, accepted decisions, terminal outcomes and replay guards, as well as a failed commit that must not acknowledge its event.
 
-==Also copy `src/test/java/com/tripplanner/flow/FlowRestartProbe.java` from Step 04 to the same path.== The probe is an opt-in check using separate JVMs against a dedicated disposable database. Its [setup and phase commands](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#restart-probe){target="_blank"} are available if you want to automate the restart check with a fixed plan instead of a live model. Flow, guardrail, and HTTP failure coverage stays in Step 03; browser tests from earlier steps still apply unchanged.
+==Also copy `src/test/java/com/tripplanner/flow/FlowRestartProbe.java` from Step 04 to the same path.== The probe is an opt-in check using separate JVMs against a dedicated disposable database. Its [setup and phase commands](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#restart-probe){target="_blank"} are available if you want to automate the restart check with a fixed plan instead of a live model. Guardrail and HTTP failure coverage stays in Step 02; Flow smoke tests stay in Step 03. Browser tests from earlier steps still apply unchanged.
 
 ## Checking persistence without a model
 

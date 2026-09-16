@@ -47,7 +47,7 @@ The inherited browser error handling checks recognized error-code and HTTP-statu
 ./mvnw test -Dquarkus.http.test-port=0
 ```
 
-The default Surefire suite runs only Step 04 persistence tests. Flow, guardrail, and HTTP failure coverage stays in Step 03 so each tutorial step tests what it introduces. The default run uses isolated PostgreSQL Dev Services with container reuse disabled and a fresh schema. Tests need no real API key or live model.
+The default Surefire suite runs only Step 04 persistence tests. Guardrail and HTTP failure coverage stays in Step 02; Flow smoke tests stay in Step 03. The default run uses isolated PostgreSQL Dev Services with container reuse disabled and a fresh schema. Tests need no real API key or live model.
 
 `PersistentTripPlanStoreTest` reads through new transactions and new store objects. It covers registration before binding, active planning exclusion, decisions, every terminal status, replay/identity/transition guards, safe failure, deterministic ordering, and failed database commits without acknowledgement. `TripPlanStoreLifecycleTest` uses the same persistence-aware fixture for lifecycle-event handling. Store recreation alone is not an application-restart test.
 

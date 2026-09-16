@@ -47,11 +47,11 @@ The exercise changes the Flow definition. The frontend, event store, REST resour
     - `src/main/java/com/tripplanner/` (the retained agents and guardrails, plus the new Flow, store, resources, and models)
     - `src/main/resources/META-INF/resources/` (both `index.html` and `app.js`)
     - `src/main/resources/skills/family-trip/SKILL.md` (the Step 01 baseline with driving-time and break guidance)
-    - `src/test/java/com/tripplanner/` (the Flow suite and carried-forward guardrail and pricing tests)
+    - `src/test/java/com/tripplanner/` (the Flow smoke suite and store lifecycle tests)
     - `src/test/resources/application.properties`
     - `src/test/frontend/`
 
-    The supplied agents retain the completed Step 02 pipeline. Their `days` and `travelers` parameters use `Integer` instead of `String` because the Flow adapter passes numeric values from `TripRequest` directly. The cost agent keeps both parameters, its `@ToolBox(RentalPricingTool.class)` annotation, and its rental-tool instructions. The supplied pricing test uses the corresponding numeric arguments too; no participant agent refactor is needed.
+    The supplied agents retain the completed Step 02 pipeline. Their `days` and `travelers` parameters use `Integer` instead of `String` because the Flow adapter passes numeric values from `TripRequest` directly. The cost agent keeps both parameters, its `@ToolBox(RentalPricingTool.class)` annotation, and its rental-tool instructions. No participant agent refactor is needed.
 
     ==Remove `src/test/java/com/tripplanner/TripPlannerResourceTest.java` and `src/test/java/com/tripplanner/TripPlanContractTest.java` from this working copy. If you previously copied an older Step 03, also remove `src/test/java/com/tripplanner/flow/MockTripPlannerFlowAdapter.java` and any copied `TripPlanningFailureTest.java`.== The old HTTP tests called a synchronous agent pipeline and expected the old response contract. Step 03 keeps a small Flow smoke suite only; guardrail and pricing-tool coverage stays in Step 02.
 
@@ -186,7 +186,7 @@ For a planning failure received during the HTTP wait, actual guardrail failures 
 
 ## Checking the event boundary without a model
 
-The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real workflow, store, and REST resources. Its in-memory messaging connectors let the tests relay each event deliberately and check the state before and after consumption. Neither suite uses a Kafka broker or live model.
+The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real workflow, store, and REST resources. Its in-memory messaging connectors let the tests relay each event deliberately and check the state before and after consumption. The tests use no Kafka broker or live model.
 
 ```properties title="src/test/resources/application.properties"
 --8<-- "../../section-3/step-03/src/test/resources/application.properties"
@@ -206,7 +206,7 @@ The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real 
 
 The default Surefire configuration runs the slim `TripPlannerFlowTest` smoke suite and `TripPlanStoreLifecycleTest` only. Each CI job for a step covers that lesson's additions, so guardrail unit tests remain in Step 02.
 
-The Flow smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when the mocked adapter fails. The store lifecycle tests check that unrelated instances and nonterminal notifications cannot report a false failure.
+The Flow smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when the mocked adapter fails during planning. The store lifecycle tests check unrelated instances, nonterminal notifications, workflow failure while awaiting approval, and duplicate failure events.
 
 The supplied browser tests in `src/test/frontend/` exercise status rendering and network failure paths with intercepted API responses. Their setup and command are in the [Step 03 README](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-03#verification){target="_blank"}. These tests do not establish Kafka delivery or live-model output quality.
 
@@ -242,7 +242,7 @@ The supplied browser tests in `src/test/frontend/` exercise status rendering and
 
 ### Checking failures without guessing at model behavior
 
-==Use the controlled workflow tests for planning and finalization failures, and the supplied browser tests for failed responses, network errors, and polling timeouts.== A finalization failure produces `com.tripplanner.trip.failed` and retains the reviewed plan. A client timeout leaves the outcome uncertain until a later status read; it is not proof of cancellation.
+==Use the Flow smoke tests for planning failures, the supplied browser tests for failed responses, network errors, and polling timeouts, and the Step 02 guardrail tests for synchronous pipeline behavior.== A finalization failure produces `com.tripplanner.trip.failed` and retains the reviewed plan. A client timeout leaves the outcome uncertain until a later status read; it is not proof of cancellation.
 
 ==During a live run, inspect the cost agent's pricing-tool call in the LangChain4j execution view and compare its category and duration with the request. Recheck the Step 02 correction and guardrail tests before treating the predecessor behavior as carried forward.== Successful event handling does not establish model adherence, real-world price accuracy, or vehicle availability.
 

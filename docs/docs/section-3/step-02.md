@@ -349,7 +349,7 @@ The browser would still show a 45-day trip plan because the itinerary agent rece
 
     **Guardrail unit tests** — `*GuardrailTest` covers the output guardrails (rewrite, reprompt, retry decisions) and the rental pricing input guardrail (invalid arguments blocked, valid arguments reaching the calculation). An invalid duration is rejected with `Input guardrail failed for tool estimateRental: Set days to a whole number from 1 to 30.` A valid five-day SUV call logs `Rental calculation executed: category=suv, days=5, total=400 EUR`.
 
-    **HTTP failure tests** — `TripPlanningFailureTest` and `VehicleGuardrailConcurrencyTest` call the real `POST /trip/plan` endpoint with scripted model responses. They check that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. The exhausted-check cases assert this response body:
+    **HTTP failure tests** — `TripPlanningFailureTest` calls the real `POST /trip/plan` endpoint with scripted model responses. It checks that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. `VehicleGuardrailConcurrencyTest` exercises concurrent planning through the agent pipeline with scripted model responses. The exhausted-check cases assert this response body:
 
     ```json
     {
