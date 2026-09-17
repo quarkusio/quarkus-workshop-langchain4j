@@ -14,7 +14,7 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.39.3</quarkus.platform.version>
         <skipITs>true</skipITs>
-        <surefire-plugin.version>3.5.6</surefire-plugin.version>
+        <surefire-plugin.version>3.6.0</surefire-plugin.version>
         <quarkus-langchain4j.version>1.14.0.CR3</quarkus-langchain4j.version>
         <quarkus-flow.version>1.1.0</quarkus-flow.version>
     </properties>
@@ -79,14 +79,6 @@
             <artifactId>quarkus-flow-langchain4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.flow</groupId>
-            <artifactId>quarkus-flow-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-messaging-kafka</artifactId>
         </dependency>
@@ -146,10 +138,9 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <argLine>@{argLine}</argLine>
-                    <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
-                    <!-- Step 04 adds persistence only; flow/guardrail coverage lives in step 03. -->
+                    <forkedProcessTimeoutInSeconds>120</forkedProcessTimeoutInSeconds>
                     <includes>
-                        <include>**/PersistentTripPlanStoreTest.java</include>
+                        <include>**/TripPlannerFlowTest.java</include>
                         <include>**/TripPlanStoreLifecycleTest.java</include>
                     </includes>
                     <systemPropertyVariables>

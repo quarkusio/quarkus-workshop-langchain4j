@@ -16,11 +16,6 @@ import io.smallrye.reactive.messaging.ce.OutgoingCloudEventMetadata;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Metadata;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.narayana.jta.QuarkusTransaction;
-import com.tripplanner.model.TripPlanEntity;
-import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.time.Duration;
@@ -29,17 +24,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@QuarkusTest
 class TripPlanStoreLifecycleTest {
-    @Inject
-    TripPlanStore store;
+    private final TripPlanStore store = new TripPlanStore();
     private final TripRequest request = new TripRequest("Coast", "2027-07-10", 5, "family", 4, "economy", "");
     private final TripPlan plan = new TripPlan(null, "Local route", List.of(), null);
-
-    @BeforeEach
-    void clearTrips() {
-        QuarkusTransaction.requiringNew().run(() -> TripPlanEntity.deleteAll());
-    }
 
     @Test
     void unrelatedAndNonterminalLifecycleEventsDoNotFailPlanning() throws Exception {

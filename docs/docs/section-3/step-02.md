@@ -402,7 +402,7 @@ To explore tool output guardrails instead, add a fictional internal sales note t
 
 You can also add a test with a flagged phrase only in an itinerary title, then extend `findDangerousContent()` to check titles. Another useful case is a warning such as "avoid the conflict area": the current phrase matching rejects it even though it advises the customer to stay away.
 
-These experiments are optional. Since Step 03 continues from the original guardrail rules and retry allowance, keep any experimental rule changes in a separate working copy if you want to follow that baseline.
+These experiments are optional. Since Step 04 continues from the original guardrail rules and retry allowance, keep any experimental rule changes in a separate working copy if you want to follow that baseline.
 
 ## Troubleshooting
 
@@ -425,9 +425,6 @@ These experiments are optional. Since Step 03 continues from the original guardr
 
 ## What's next?
 
-The planner now checks its research recommendations and can calculate rental prices through a tool that rejects invalid arguments before execution. In Step 03, we'll wrap planning in an event-driven Quarkus Flow workflow with Kafka and CloudEvents so the customer can approve or reject a proposed trip.
+The planner now checks its research recommendations and can calculate rental prices through a tool that rejects invalid arguments before execution. In Step 03, we'll add evaluator agents that vote on the vehicle recommendation, an iterative refinement loop, and adaptive model selection that picks a more capable model as the recommendation improves.
 
-!!! note "Keeping the pricing tool when continuing"
-    Keep the pricing tool, its guardrail, and the cost agent's tool prompt and annotation in your working copy. If Step 03 converts numeric agent parameters to `Integer`, change both `days` and `travelers` in `CostEstimatorAgent` to `Integer`; do not drop `days`. Carry the corrected vehicle behavior and safe error contract across the workflow boundary too. An exception mapper only handles failures that reach the HTTP request, so a background workflow must record and return its own failure outcome to the client.
-
-[Continue to Step 03 - Event-Driven Workflows with Quarkus Flow](step-03.md)
+[Continue to Step 03 - Voting, Loops, and Adaptive Model Selection](step-03.md)

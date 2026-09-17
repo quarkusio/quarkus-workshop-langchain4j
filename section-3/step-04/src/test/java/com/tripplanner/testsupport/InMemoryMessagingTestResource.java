@@ -21,6 +21,8 @@ public class InMemoryMessagingTestResource implements QuarkusTestResourceLifecyc
         props.put("quarkus.kafka.devservices.enabled", "false");
         props.put("mp.messaging.incoming.flow-in.smallrye-in-memory.run-on-vertx-context", "true");
         props.put("mp.messaging.incoming.flow-out-consumer.smallrye-in-memory.run-on-vertx-context", "true");
+        props.put("mp.messaging.outgoing.flow-out.smallrye-in-memory.run-on-vertx-context", "true");
+        props.put("mp.messaging.outgoing.flow-in-producer.smallrye-in-memory.run-on-vertx-context", "true");
         return props;
     }
 

@@ -33,7 +33,7 @@ public interface CostEstimatorAgent {
            outputKey = "costs")
     TripPlan.CostEstimate estimateCosts(TripPlan.VehicleRecommendation vehicle,
                                         ItineraryResult itineraryResult,
-                                        Integer days,
-                                        Integer travelers,
+                                        String days,
+                                        String travelers,
                                         String budget);
 }
