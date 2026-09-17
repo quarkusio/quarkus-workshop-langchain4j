@@ -1,12 +1,14 @@
 # Step 03 - Voting, Loops, and Adaptive Model Selection
 
-The guardrails from Step 02 catch obviously unsuitable recommendations — a sports car for a family of five — but they cannot tell us whether the accepted vehicle is actually the *best* choice. Is it comfortable enough for a long road trip? Does it fit the budget? Is it fuel-efficient for the planned route?
+The guardrails from Step 02 catch obviously unsuitable recommendations, like suggesting a sports car for a family of five. They cannot however tell us whether the accepted vehicle is actually the *best* choice. E.g. is it comfortable enough for a long road trip? Does it fit the budget? Is it fuel-efficient for the planned route?
 
-In this step we'll add three evaluator agents that independently assess the vehicle recommendation, aggregate their scores with a custom **voting pattern**, and feed the result into a **refinement loop** that lets a reviser agent improve the recommendation until it meets a quality threshold. We'll also introduce **adaptive model selection** so that the reviser starts with a lightweight model and switches to a more capable one as the recommendation improves.
+In this step we'll add three evaluator agents that independently assess the vehicle recommendation, aggregate their scores with a custom **voting pattern**, and feed the result into a **refinement loop** that lets a reviser agent improve the recommendation until it meets a quality threshold. We'll also add an **adaptive model selection** so that the reviser starts with a lightweight model and switches to a more capable one as the recommendation improves.
 
 ## Parallel assessment with the Voting pattern
 
-The voting pattern dispatches multiple agents in parallel, collects their independent assessments, and aggregates the results into a single decision. Unlike a simple parallel fan-out that merges structured outputs, voting applies a **strategy** to the collected responses — averaging scores, taking a majority, or applying any custom aggregation logic.
+The voting pattern dispatches multiple agents in parallel, collects their independent assessments, and aggregates the results into a single decision. Unlike a simple parallel fan-out that merges structured outputs, voting applies a **strategy** to the collected responses, such as averaging scores, taking a majority, or applying any custom aggregation logic.
+
+In production systems, voting is valuable because it distributes responsibility across agents that each have a narrow, well-defined scope. An agent focused entirely on cost will catch cost problems that a general-purpose evaluator might trade away against other concerns. The aggregation step makes those individual judgements visible, which also makes the system's behaviour auditable, since you can inspect each agent's score independently to understand why the overall result came out the way it did.
 
 ```mermaid
 flowchart LR
@@ -30,7 +32,7 @@ We'll implement this with a custom `VotingPlanner` that implements the `Planner`
 
 ## Iterative refinement with @LoopAgent
 
-A single evaluation pass tells us how good the recommendation is, but it doesn't improve it. We need a **loop** that runs the evaluators, checks whether the score meets our threshold, and if not, asks a reviser agent to improve the recommendation before evaluating again.
+A single evaluation pass tells us how good the recommendation is, but it doesn't improve it. We need a loop that runs the evaluators, checks whether the score meets our threshold, and if not, asks a reviser agent to improve the recommendation before evaluating again. A numeric score and an explicit exit condition also make quality verifiable, because you can write a test that asserts the system meets a defined standard rather than relying on manual review of every output.
 
 ```mermaid
 flowchart TD
@@ -53,20 +55,20 @@ The `@LoopAgent` annotation wraps this cycle with a configurable maximum number 
 
 ## Adaptive model selection with @ChatModelSupplier
 
-Not every iteration needs the same model. Early iterations — where the recommendation is still rough — can use a lightweight, cost-effective model. As the score improves and the reviser needs to make finer adjustments, we switch to a more capable model.
+Not every iteration needs the same model. When the output is still rough, a smaller model can make broad improvements just as effectively as a larger one, at a fraction of the cost. Only once the score is already close to the threshold, and the reviser is making fine adjustments, does a more capable model justify the extra expense. This pattern is particularly relevant in systems that run quality loops at scale, where the cost difference between early and late iterations adds up quickly.
 
 The `@ChatModelSupplier` annotation on the reviser agent delegates model selection to a `DynamicModelSelector` CDI bean. This bean injects both the base model (`gpt-4o-mini`) and an enhanced model (`gpt-4o`) and chooses between them based on the current evaluation score.
 
 | Evaluation score | Model selected | Rationale |
 |---|---|---|
-| ≤ 6.0 | `gpt-4o-mini` (base) | Broad improvements still needed — a lighter model suffices |
+| ≤ 6.0 | `gpt-4o-mini` (base) | Broad improvements still needed, so a lighter model suffices |
 | > 6.0 | `gpt-4o` (enhanced) | Fine-tuning a near-ready recommendation benefits from more capability |
 
 This pattern is identical to the one used in [Section 2 Step 07](../section-2/step-07.md) for dynamic model selection based on car value.
 
-## Preparing the working copy
+## Prepare the working copy
 
-Keep the model configuration from Step 02 and make sure `OPENAI_API_KEY` is set. The tests do not call a live model.
+As always, you have the option to keep working from the previous step, or work directly with the solution:
 
 === "Option 1: Continue from Step 02"
 
@@ -76,21 +78,21 @@ Keep the model configuration from Step 02 and make sure `OPENAI_API_KEY` is set.
 
     The completed project already contains the changes below. You can read through the implementation without editing, then join the exercise at [Inspecting the voting loop](#inspecting-the-voting-loop).
 
-    ==Open `section-3/step-03` and start dev mode:==
+Start dev mode if it is not already running:
 
-    === "Linux / macOS"
-        ```bash
-        cd section-3/step-03
-        ./mvnw quarkus:dev
+=== "Linux / macOS"
+    ```bash
+    cd section-3/step-03
+    ./mvnw quarkus:dev
+    ```
+
+=== "Windows"
+    ```cmd
+    cd section-3\step-03
+    .\mvnw.cmd quarkus:dev
         ```
 
-    === "Windows"
-        ```cmd
-        cd section-3\step-03
-        .\mvnw.cmd quarkus:dev
-        ```
-
-## Adding the vehicle evaluation model
+## Add the vehicle evaluation model
 
 The evaluator agents need a shared return type to represent their assessment.
 
@@ -102,7 +104,7 @@ The evaluator agents need a shared return type to represent their assessment.
 
 Each evaluator will return a score between 1 and 10, along with textual suggestions for improvement. The voting strategy will average the scores and concatenate the suggestions.
 
-## Creating the evaluator agents
+## Create the evaluator agents
 
 Each evaluator assesses the vehicle recommendation from a different perspective.
 
@@ -124,13 +126,11 @@ Each evaluator assesses the vehicle recommendation from a different perspective.
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/FuelEfficiencyEvaluator.java"
 ```
 
-### What to notice
-
 - Each evaluator uses `@Agent` with a unique `outputKey` so the voting planner can read their individual results from the workflow scope.
 - The evaluators take the current `vehicle` recommendation from the scope, plus trip context parameters for their specific assessment dimension.
-- All three return `VehicleEvaluation` — the same record type — so the aggregation strategy can process them uniformly.
+- All three return `VehicleEvaluation`, the same record type, so the aggregation strategy can process them uniformly.
 
-## Implementing the VotingPlanner
+## Implement the VotingPlanner
 
 The `VotingPlanner` is a custom `Planner` implementation that dispatches evaluators in parallel and aggregates their results.
 
@@ -146,16 +146,14 @@ The `VotingPlanner` is a custom `Planner` implementation that dispatches evaluat
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/voting/VotingPlanner.java"
 ```
 
-### What to notice
-
-- `VotingStrategy` is a functional interface — any lambda or method reference that takes a collection of votes and returns an aggregate can serve as the strategy.
+- `VotingStrategy` is a **functional interface**, so any lambda or method reference that takes a collection of votes and returns an aggregate can serve as the strategy.
 - `init()` saves the subagents list from the `InitPlanningContext` for later use.
 - `firstAction()` dispatches all evaluator subagents in parallel using `call(subagents)`.
 - `nextAction()` reads each evaluator's output from the workflow scope using its `outputKey`, collects them into a list, and passes them to the strategy. The aggregated result is returned via `done(result)`.
 - `topology()` returns `PARALLEL` so the Dev UI renders the evaluators as parallel branches.
 - Neither `VotingPlanner` nor `VotingStrategy` are library classes — they are custom implementations specific to this application. You can adapt the strategy for any aggregation logic: majority vote, weighted average, or consensus.
 
-## Wiring evaluators with @PlannerAgent
+## Wire evaluators with @PlannerAgent
 
 The `@PlannerAgent` annotation connects the evaluator subagents to our custom planner through a `@PlannerSupplier` method.
 
@@ -165,13 +163,11 @@ The `@PlannerAgent` annotation connects the evaluator subagents to our custom pl
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleEvaluators.java"
 ```
 
-### What to notice
-
 - `@PlannerAgent` lists the three evaluator interfaces as `subAgents` and sets `outputKey = "evaluation"` so the aggregated score is available to the exit condition and reviser.
 - `@PlannerSupplier` returns a new `VotingPlanner` instance with the aggregation strategy. The `aggregateVotes` method averages the scores and concatenates non-blank suggestions separated by semicolons.
 - The method signature includes the trip context parameters that the individual evaluators need — the framework propagates them through the workflow scope.
 
-## Adding the vehicle reviser with @ChatModelSupplier
+## Add the vehicle reviser with @ChatModelSupplier
 
 The reviser agent takes the current recommendation and evaluation feedback and produces an improved recommendation. It uses adaptive model selection to pick the right model for the current quality level.
 
@@ -187,13 +183,11 @@ The reviser agent takes the current recommendation and evaluation feedback and p
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/VehicleReviser.java"
 ```
 
-### What to notice
-
 - `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model. The `select()` method compares the evaluation score against a threshold.
 - The reviser's `@ChatModelSupplier` static method uses `@CdiBean` to inject the `DynamicModelSelector` and receives the current `VehicleEvaluation` from the workflow scope. This is the same pattern used in [Section 2 Step 07](../section-2/step-07.md).
 - The reviser's `outputKey = "vehicle"` overwrites the original vehicle recommendation in the workflow scope. Downstream agents (like the cost estimator) automatically receive the refined version.
 
-## Wrapping the review cycle with @LoopAgent
+## Wrap the review cycle with @LoopAgent
 
 The loop wraps the evaluators and reviser into an iterative cycle with an exit condition.
 
@@ -203,14 +197,12 @@ The loop wraps the evaluators and reviser into an iterative cycle with an exit c
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleReviewLoop.java"
 ```
 
-### What to notice
-
 - `@LoopAgent` lists `VehicleEvaluators` and `VehicleReviser` as subagents. Each iteration runs both: first the evaluators vote, then the reviser refines.
 - `maxIterations = 3` prevents runaway loops if the score never reaches the threshold.
 - `@ExitCondition(testExitAtLoopEnd = true)` checks the condition after each complete iteration. The `shouldExit` method receives the `VehicleEvaluation` from the scope and returns `true` when the average score reaches 7.5.
 - The loop's `outputKey = "vehicle"` means it writes the final refined vehicle back to the scope, overwriting the original from the research phase.
 
-## Updating the main workflow
+## Update the main workflow
 
 ==Open `src/main/java/com/tripplanner/agentic/workflow/TripPlannerSystem.java` and add `VehicleReviewLoop.class` to the `subAgents` array, between `ResearchPhase` and `CostEstimatorAgent`:==
 
@@ -218,9 +210,9 @@ The loop wraps the evaluators and reviser into an iterative cycle with an exit c
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/TripPlannerSystem.java"
 ```
 
-The sequence now runs: parallel research → voting evaluation loop → cost estimation. The `@Output` method is unchanged because it still assembles the final `TripPlan` from `vehicle`, `itineraryResult`, and `costs` — the loop simply refines which vehicle reaches the cost estimator.
+The sequence now runs: parallel research → voting evaluation loop → cost estimation. The `@Output` method is unchanged because it still assembles the final `TripPlan` from `vehicle`, `itineraryResult`, and `costs`. The loop simply refines which vehicle reaches the cost estimator.
 
-## Configuring adaptive model selection
+## Configure adaptive model selection
 
 ==Update `src/main/resources/application.properties` to add the enhanced model configuration:==
 
@@ -228,9 +220,7 @@ The sequence now runs: parallel research → voting evaluation loop → cost est
 --8<-- "../../section-3/step-03/src/main/resources/application.properties"
 ```
 
-### What to notice
-
-- The base model is now `gpt-4o-mini` — a cost-effective model for most agents.
+- The base model is now `gpt-4o-mini`, which is cost-effective for most agents.
 - The `enhancedModel` is configured as a separate named model using `gpt-4o`. The `@ModelName("enhancedModel")` qualifier in `DynamicModelSelector` resolves to this configuration.
 - Both models share the same `OPENAI_API_KEY`. The enhanced model has its own temperature and timeout settings.
 
@@ -265,7 +255,7 @@ Score 6.3 > 6.0 — switching to enhanced model for final refinement
 
 This indicates the `DynamicModelSelector` chose the enhanced model for that iteration's revision. The evaluator scores and the loop iteration count appear in the agentic execution log.
 
-==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"} and select **Topology** on the LangChain4j Agentic card.== The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node — rendered as a parallel fan-out with the three evaluators — and the `vehicleReviser`.
+==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"} and select **Topology** on the LangChain4j Agentic card.== The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node, rendered as a parallel fan-out with the three evaluators, and the `vehicleReviser`.
 
 ![The Dev UI topology view showing the planTrip sequence with the research phase, vehicleReviewLoop containing three parallel evaluators and a reviser, and estimateCosts](../images/section-3-step-03-devui-topology.png)
 
@@ -273,7 +263,7 @@ This indicates the `DynamicModelSelector` chose the enhanced model for that iter
 
 ![The Dev UI execution view showing a completed trip plan](../images/section-3-step-03-devui-executions.png)
 
-==Compare the vehicle recommendation before and after the loop by inspecting the scope values== — the initial recommendation from the research phase should differ from the refined one produced by the reviser.
+==Compare the vehicle recommendation before and after the loop by inspecting the scope values.== The initial recommendation from the research phase should differ from the refined one produced by the reviser.
 
 ??? info "Verifying with tests"
     The supplied tests verify the voting aggregation, pipeline assembly, and end-to-end HTTP contract without calling a live model.

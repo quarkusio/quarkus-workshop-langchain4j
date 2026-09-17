@@ -115,8 +115,6 @@ The itinerary guardrail asks the model to try again when its response has invali
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripSafetyGuardrail.java"
 ```
 
-### What to notice
-
 - `extractJson()` finds the JSON inside a response, including one wrapped in Markdown fences.
 - `validate()` checks for an itinerary, then scans the route overview and daily descriptions for the configured phrases.
 - `retry()` requests another response. Its error message records the problem but is not sent to the model as corrective guidance.
@@ -157,8 +155,6 @@ It checks the economy-budget rule first, then corrects small-vehicle recommendat
 ```java title="TripAppropriatenessGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java"
 ```
-
-### What to notice
 
 - `requestParams().variables()` supplies the trip details for this agent call, so each recommendation is checked against the right group size and budget, including on retries.
 - `reprompt()` asks the model for an affordable vehicle when a listed luxury brand conflicts with an economy budget.
@@ -227,8 +223,6 @@ The model supplies the tool's arguments, so we need to check the category and du
 ```java title="RentalEstimateInputGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/RentalEstimateInputGuardrail.java"
 ```
-
-#### What to notice
 
 - `validate()` checks the raw JSON before Quarkus converts it to Java arguments. Categories must be exactly `compact`, `estate`, `suv`, or `mpv`, and days must be an integer from 1 to 30.
 - `failure()` blocks the calculation and returns the reason to the model as a tool error, giving it a chance to correct its request.
