@@ -1,10 +1,12 @@
-# Step 06 - Custom Orchestration with PlannerAgent
+# Step 06 - MCP Integration
 
-## Custom control flow with the `Planner` API
+## Remote tools through Model Context Protocol
 
-The evaluation loop from Step 05 can revise a plan, but a customer's next request may affect only part of it. After reviewing a family trip, the customer says, "Keep the route, but remove the child-seat rental. We're bringing our own." The planner needs to remove the rental charge without generating another itinerary, while retaining the advice to confirm that the family's seat suits the child and vehicle.
+Choosing which parts of a plan to revise is only useful if the planner has reliable information. For an upcoming winter trip to the Swiss Alps, Miles of Smiles needs current conditions and its rental catalog to check whether snow chains are a suitable extra and available for the selected vehicle.
 
-A custom planner can choose the next action from the trip goal and the results already available. The `Planner` lifecycle methods control these decisions, allowing an extras-only change to reuse the route while a changed destination calls for a new itinerary. The execution trace shows which agents ran again and which earlier results were reused.
+Model Context Protocol (MCP) gives the planner access to remote weather and rental-equipment tools. Their responses can supply conditions, vehicle compatibility, availability, and prices to support a recommendation. For a family trip, the same catalog can supply child-seat specifications to compare with the child's age and measurements. A catalog quote gives the customer an offer to consider, but does not reserve the equipment.
+
+A severe-weather response should still prompt reconsideration of the route. Snow chains do not make a closed road usable, and a forecast alone cannot establish local equipment requirements.
 
 !!! note "Coming soon"
     This step is under development.

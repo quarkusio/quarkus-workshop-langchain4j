@@ -28,7 +28,7 @@ public interface ItineraryPlannerAgent {
     @Skills({"family-trip", "adventure-trip", "business-trip"})
     ItineraryResult planItinerary(String destination,
                                   String startDate,
-                                  Integer days,
+                                  String days,
                                   String tripType,
                                   String preferences);
 }

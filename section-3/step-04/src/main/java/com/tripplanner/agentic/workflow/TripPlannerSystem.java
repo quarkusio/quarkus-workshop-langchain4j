@@ -13,13 +13,14 @@ public interface TripPlannerSystem extends MonitoredAgent {
             outputKey = "tripPlan",
             subAgents = {
                     ResearchPhase.class,
+                    VehicleReviewLoop.class,
                     CostEstimatorAgent.class
             })
     TripPlan planTrip(String destination,
                       String startDate,
-                      Integer days,
+                      String days,
                       String tripType,
-                      Integer travelers,
+                      String travelers,
                       String budget,
                       String preferences);
 

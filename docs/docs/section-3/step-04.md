@@ -1,293 +1,198 @@
-# Step 04 - Resilient Agentic Workflows with Persistence
+# Step 04 - Event-Driven Agentic Workflows with Quarkus Flow
 
-## Durable workflows with Quarkus Flow persistence
+The trip planner can now generate recommendations and check them before returning a response, but a customer may need time to read the itinerary before agreeing to a booking. Keeping the planning request open while they decide would tie approval to a long-lived HTTP connection.
 
-The Miles of Smiles team has been trying out the approval flow from Step 03, and everything works well until the application needs to restart. A customer who was still reading their itinerary comes back to an empty form, with no way to approve the trip they had just generated. Although the agents had finished their work, the plan and its pending approval were only held in memory.
+[Quarkus Flow](https://quarkiverse.github.io/quarkiverse-docs/quarkus-flow/dev/index.html){target="_blank"} lets the workflow pause after generating a plan without holding a thread while the customer decides. Kafka carries the request and decision as [CloudEvents](https://cloudevents.io/){target="_blank"}, so approval can arrive in a separate HTTP request and resume the matching workflow.
 
-We'll address this by saving enough information for the customer to continue where they left off. Along the way, we'll see how Quarkus Flow restores a waiting workflow and how Hibernate ORM with Panache stores the trip data that the browser needs, using PostgreSQL for both.
+By the end of the exercise, the customer can refresh the browser, return to the same pending trip with its original request details, and approve or reject it. Approval produces a simulated booking reference; rejection ends the workflow without booking finalization. No vehicle is reserved, and no inventory or booking service is called.
 
-The exercise ends with a full application restart while a trip is awaiting approval. When the application is running again, the customer should be able to open the same plan and approve it without asking the agents to generate another one.
+## Separating planning from the customer decision
 
-### Workflow state and application state
-
-For this to work, the application needs to remember both where it paused and what it was showing the customer. These are saved separately in the same database, so the workflow can continue waiting for approval while the browser retrieves the trip details.
+The workflow starts when a trip request arrives, runs the existing planning pipeline, and publishes the plan for approval. Its wait matches a decision to the workflow instance that requested it. Failures and rejection also produce events, so the browser can learn the outcome instead of waiting indefinitely for a confirmation that will never arrive.
 
 ```mermaid
 flowchart TD
-    workflow["Approval workflow"]
-    store["Trip plan store"]
-    browser["Results page"]
-
-    subgraph database["PostgreSQL"]
-        progress[("Workflow progress")]
-        trip[("Trip details")]
-    end
-
-    workflow -->|Saves and restores| progress
-    store -->|Saves and reads| trip
-    browser -->|Requests the plan| store
+    request[Trip requested] --> planning[Generate trip plan]
+    planning -->|Plan ready| publish[Publish plan for approval]
+    planning -->|Failure| failed[Publish failure]
+    publish --> wait[Wait for matching decision]
+    wait --> decision{Approved?}
+    decision -->|Yes| booking[Simulate booking]
+    decision -->|No| rejected[Publish rejection]
+    booking -->|Success| confirmed[Publish simulated confirmation]
+    booking -->|Failure| failed
 ```
 
-Quarkus Flow handles the workflow side through its persistence extension, while our application uses Panache for the trip records. Neither change requires rewriting the agents or the approval process.
+Quarkus Flow expresses these tasks in Java using the [CNCF Serverless Workflow specification](https://serverlessworkflow.io/){target="_blank"}. CloudEvents supplies the envelope, including `type`, `source`, `id`, and `data`; Kafka transports those events between the application and the workflow.
 
----
+The initial planning HTTP request still waits for a generated plan or a failure. Once that request finishes, the workflow remains at the approval wait without keeping an HTTP connection open. This separation is the pattern we'll implement here; a fully asynchronous planning API is outside this exercise.
 
-## Prerequisites
+!!! note "Browser refresh is not application recovery"
+    Both the workflow and the trip store live in memory. Refreshing the browser while the application remains running restores the saved trip, but restarting the application loses it and its waiting workflow. Kafka event retention does not restore this in-memory state. Step 05 introduces persistence.
 
-=== "Option 1: Continue from Step 03"
+## Preparing the working project
 
-    ==Stop dev mode in your Step 03 working project and apply the changes below.== Keep your existing model-provider settings and dependencies.
+Kafka runs through Dev Services, so Docker or Podman must be running for the live exercise. Keep the model-provider configuration from Step 02, including your API key environment variable.
 
-=== "Option 2: Use the completed Step 04 project"
+The exercise changes the Flow definition. The frontend, event store, REST resources, payload models, and tests are supplied so we can concentrate on starting, suspending, and resuming a workflow instead of implementing HTTP and browser plumbing.
 
-    ==Copy `section-3/step-04` to a working directory and open that copy. Apply your Step 03 model-provider settings, keeping the supplied persistence configuration.== The code changes below are already included. Configure container reuse before starting the application, then join the hands-on route at [Checking persistence without a model](#checking-persistence-without-a-model).
+=== "Option 1: Continue from Step 03 and build the new features hands-on"
 
-PostgreSQL will run through Dev Services, so a container runtime such as Docker or Podman must be running. The model provider configuration from Step 03 is still needed to generate a plan.
+    ==Stop dev mode in your Step 03 working copy before updating the dependencies and supplied files.==
 
-!!! warning "If you used an older Step 04 database"
-    ==Stop the application and reset only that disposable workshop database before continuing, removing both the old trip tables and Flow checkpoints by recreating the database.== The old schema and checkpoints are not compatible with this definition. This deletes its saved trips, so do not use a database containing data you need to keep.
+    ==Copy `pom.xml` from `section-3/step-04` into your working copy. Keep any local model-provider dependencies you added in Step 02.== This supplies the Flow BOM, Flow messaging and LangChain4j integration, Kafka connector, and test dependencies together with their compatible build configuration. Versions are maintained in that file.
 
----
+    ==Copy these supplied paths from `section-3/step-04` to the same paths in your working copy, replacing matching files:==
 
-## Configuring PostgreSQL Dev Services
+    - `src/main/java/com/tripplanner/` (the retained agents and guardrails, plus the new Flow, store, resources, and models)
+    - `src/main/resources/META-INF/resources/` (both `index.html` and `app.js`)
+    - `src/main/resources/skills/family-trip/SKILL.md` (the Step 01 baseline with driving-time and break guidance)
+    - `src/test/java/com/tripplanner/` (the Flow smoke suite and store lifecycle tests)
+    - `src/test/resources/application.properties`
+    - `src/test/frontend/`
 
-Quarkus can start PostgreSQL for us through Dev Services, so there is no separate database installation to work through. We do need to add the driver and the Flow persistence extension, then make sure the database is kept when the application stops.
+    The supplied agents retain the completed Step 02 pipeline. Their `days` and `travelers` parameters use `Integer` instead of `String` because the Flow adapter passes numeric values from `TripRequest` directly. The cost agent keeps both parameters, its `@ToolBox(RentalPricingTool.class)` annotation, and its rental-tool instructions. No participant agent refactor is needed.
 
-==Open `pom.xml` and add these two dependencies:==
+    ==Remove `src/test/java/com/tripplanner/TripPlannerResourceTest.java` and `src/test/java/com/tripplanner/TripPlanContractTest.java` from this working copy. If you previously copied an older Step 04, also remove `src/test/java/com/tripplanner/flow/MockTripPlannerFlowAdapter.java` and any copied `TripPlanningFailureTest.java`.== The old HTTP tests called a synchronous agent pipeline and expected the old response contract. Step 04 keeps a small Flow smoke suite only; guardrail and pricing-tool coverage stays in Step 02.
 
-```xml title="pom.xml (new persistence dependencies)"
---8<-- "../../section-3/step-04/pom.xml:81:88"
+    ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
+
+=== "Option 2: Use the completed Step 04 project and review the changes"
+
+    ==Copy `section-3/step-04` to a working directory and open that copy.== It supplies the Flow definition and the matching frontend, store, resources, models, and tests. Keep the supplied frontend for this step; the Step 02 frontend expects a bare plan and cannot handle the approval status envelope.
+
+    ==Apply your Step 02 model-provider settings to `src/main/resources/application.properties`, keeping the supplied Flow and Kafka settings.== If you use a different provider extension, keep its dependency as well.
+
+    ==Read the Flow definition and correlation explanation below, then run the same tests and browser verification as the hands-on route.== No frontend implementation is required for either route.
+
+The planning pipeline remains parallel vehicle and itinerary research, followed by cost estimation. The Step 02 pricing tool and input guardrail still provide fictional rental estimates, and its recommendation corrections and audit distinctions remain applicable. These checks do not establish real availability, complete route safety, or a correct final price.
+
+Each planning request has its own identifier and workflow instance, so several trips can be planned or awaiting a decision at once. The refresh exercise still assumes a single workshop user because `/trip/plan/latest` returns the latest trip across the application, without identifying the customer.
+
+### Connecting Flow to Kafka
+
+The supplied POM includes the Flow extensions and Kafka connector:
+
+```xml title="pom.xml (Flow and Kafka dependencies)"
+--8<-- "../../section-3/step-04/pom.xml:69:84"
 ```
 
-The BOMs already imported in Step 03 manage both dependency versions. The Flow extension also brings in Hibernate ORM with Panache, which we'll use to save the trip plan without adding another dependency.
+The messaging channels carry trip requests to Flow and bring plans and outcomes back to the application.
 
-==Add the following to `src/main/resources/application.properties`:==
+==For the hands-on route, append the following settings to `src/main/resources/application.properties`, keeping your existing model and skills configuration:==
 
-```properties title="application.properties (database settings)"
---8<-- "../../section-3/step-04/src/main/resources/application.properties:44:48"
+```properties title="application.properties (Flow and messaging)"
+--8<-- "../../section-3/step-04/src/main/resources/application.properties:15:42"
 ```
 
-With `%dev` set to `update`, Hibernate can create the tables we need without discarding their contents on the next dev-mode startup. Its usual Dev Services setting, `drop-and-create`, would leave us with an empty database every time we restarted. The JSON format setting keeps Hibernate's record serialization independent of the application's REST and CloudEvent mapper customizations. For a production application, an explicitly configured datasource and controlled schema migrations would be a better choice than letting Hibernate update the schema automatically.
+The application sends requests and decisions through `flow-in-producer` to the `flow-in` topic, where Flow reads them. Plans and final outcomes travel back through `flow-out` to the application's `flow-out-consumer`, which records them for the browser.
 
-### Enabling Testcontainers reuse
+==Keep `%dev.quarkus.live-reload.watched-resources=skills/family-trip/SKILL.md` from Step 01, adding it if your working copy lacks it.== Editing that skill automatically reloads the application. Finish any pending approval exercise before editing code, configuration, or watched skills, because a reload loses this chapter's in-memory trips and workflow waits.
 
-Keeping the tables is only useful if the next run connects to the same database. We also need to enable container reuse so that Testcontainers, which Dev Services uses to run PostgreSQL, keeps the database container available across application restarts.
+## Starting and resuming the workflow
 
-==Choose one of the following ways to enable container reuse before starting or restarting dev mode.==
+The supplied adapter calls the same trip-planning pipeline as before. Its booking method only creates a sample reference and a message identifying the result as simulated.
 
-=== "Bash / Zsh"
-    ==Set the variable in the shell you are using to run the app:==
-    ```bash
-    export TESTCONTAINERS_REUSE_ENABLE=true
+```java title="TripPlannerFlowAdapter.java (adapter methods)"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java:19:34"
+```
+
+The workflow will publish the generated plan and wait for the customer's decision before continuing.
+
+==Open `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java`. For the hands-on route, update `descriptor()` to match the following definition. Keep the supplied imports, injections, and the `plan()`, `resolveDecision()`, and `matchesDecision()` helpers unchanged:==
+
+```java title="TripPlannerFlow.java (workflow definition)" hl_lines="4 6-24"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java:32:57"
+```
+
+### What to notice
+
+- `schedule()` starts a workflow for each `com.tripplanner.trip.requested` event. `withInstanceId()` supplies the workflow identifier so the planning task can attach it to the original request before calling the agents.
+- `switchWhenOrElse()` sends planning failures straight to `publishFailure`, skipping approval.
+- `emitJson()` publishes the plan for approval, and `listen()` pauses until a matching `com.tripplanner.trip.approval.done` event arrives.
+- `.envelope(this::matchesDecision)` checks the event's `flowinstanceid` and the decision accepted by the store. A wrong identifier, mismatched decision, or unreadable payload leaves the workflow waiting.
+- The final branch publishes confirmation, rejection, or failure. `END` prevents confirmation and rejection from continuing into another outcome task, and rejection never calls the booking adapter.
+
+??? info "Complete supplied Flow class"
+    The complete source includes the imports and injected adapter, store, and `ObjectMapper`, as well as all three helper methods. These are supplied for both participation routes; only the workflow definition is the participant edit.
+
+    ```java title="TripPlannerFlow.java"
+    --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java"
     ```
 
-=== "PowerShell"
-    ==Set the variable in the shell you are using to run the app:==
-    ```powershell
-    $env:TESTCONTAINERS_REUSE_ENABLE = "true"
-    ```
+    The supplied `matchesDecision()` helper reads the instance extension and deserializes the decision with the injected mapper before checking the store. It keeps both checks in a single envelope predicate. Adding `dataAs()` after an instance-envelope filter would replace that predicate in this DSL instead of combining the checks.
 
-=== "direnv"
-    ==Add this line to `.envrc` in the project directory:==
-    ```bash
-    export TESTCONTAINERS_REUSE_ENABLE=true
-    ```
-    ==Run `direnv allow` to activate it.==
+    Agent exceptions now occur outside the REST call, so the Step 02 exception mapper cannot return them directly. These helpers turn planning or finalization exceptions into a failed status, which the workflow publishes as an event. The error model checks the cause chain for an actual guardrail exception and returns a safe message; unrelated failures are server errors. A finalization failure keeps the plan the customer reviewed.
 
-=== "~/.testcontainers.properties"
-    ==Add this line to `.testcontainers.properties` in your home directory, creating the file if needed:==
-    ```properties
-    testcontainers.reuse.enable=true
-    ```
+## Keeping the result attached to its request
 
+There are two identifiers because the HTTP request exists before Flow creates its instance. The REST resource registers a `requestId` and publishes it with the original `TripRequest` in `com.tripplanner.trip.requested`. The workflow then binds the actual `instanceId` to that registered request. Waiting for this explicit request avoids confusing a different trip's result with the one the browser submitted.
 
-=== "devbox"
-    ==Add the `env` setting to your project's `devbox.json`, preserving any existing packages and settings:==
-    ```json
-    {
-      "packages": [],
-      "env": {
-        "TESTCONTAINERS_REUSE_ENABLE": "true"
-      }
-    }
-    ```
+The supplied `TripPlanStatus` record carries the trip details and current outcome in both API responses and workflow events.
 
-    ==Enter a `devbox shell` in the project directory.== The environment variable is available inside that shell.
+```java title="TripPlanStatus.java"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/model/TripPlanStatus.java"
+```
 
-!!! warning "Keep the same database"
-    ==Keep the datasource settings unchanged between runs and leave the PostgreSQL container running until the exercise is complete.== If the application starts with a fresh container, the tables will be empty even if the previous run saved its data correctly.
+Alongside both identifiers, the record keeps the original `request` and generated `plan` so the browser can restore the trip after a refresh. Its `status` describes the current state, with a `confirmation` for a completed booking or an `error` and `message` for a failure. Calling `failed()` retains any generated plan.
 
-### Isolating test databases with Dev Services
+### Checking incoming outcomes
 
-Tests need a clean database, but clearing the one used by dev mode would erase the trip we're trying to restore. Disabling reuse in the test configuration gives the tests disposable PostgreSQL storage separate from the reused development database.
+The store checks the event's workflow identifier against the payload, then verifies the registered request and its details before accepting an outcome. It also checks the current state, so an old approval-request event cannot reopen a rejected trip.
 
-==Update `src/test/resources/application.properties` with the following settings, keeping any other test-specific configuration:==
+An outcome event cannot report its own publication failure. The supplied store therefore also listens for Flow's `WorkflowFailedEvent` through `onWorkflowFailed()`. If execution actually fails, it records a safe failure against that workflow's request and retains any reviewed plan. This fallback does not treat a task notification, suspended workflow, missing event, or HTTP timeout as proof of workflow failure.
 
-```properties hl_lines="10-12" title="src/test/resources/application.properties"
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant API as REST and in-memory store
+    participant Flow as Flow via Kafka
+    Browser->>API: POST trip details
+    API->>Flow: Trip requested with request ID
+    Flow->>Flow: Bind instance ID and generate plan
+    Flow-->>API: Approval requested with both IDs and plan
+    API-->>Browser: Plan and instance ID
+    Note over Browser,Flow: HTTP request finished, workflow waiting
+    Browser->>API: Refresh and GET latest
+    API-->>Browser: Same request, plan and instance ID
+    Browser->>API: PUT decision for instance ID
+    API->>Flow: Decision event with instance extension
+    API-->>Browser: 202 decision_submitted
+    Flow-->>API: Confirmed, rejected or failed event
+    Browser->>API: GET status for instance ID
+    API-->>Browser: Recorded outcome with reviewed plan
+```
+
+The browser displays the workflow identifier so it can be compared with the CloudEvents. After either decision, HTTP 202 means submission was accepted, not that booking or rejection has finished. The page shows `decision_submitted` while it checks `GET /trip/plan/status`; only a backend status of `confirmed`, `rejected`, or `failed` establishes a terminal outcome. This also applies after refreshing a page while a decision is in progress.
+
+### Validation and bounded waits
+
+`PUT /trip/approve` accepts a nonblank `instanceId` and exactly `approved` or `rejected` as the decision's `status`. A missing identifier or invalid decision returns HTTP 400, an unknown trip returns 404, and a trip that is no longer awaiting approval returns 409. This rejects duplicate submissions and decisions for completed trips before publishing an event.
+
+Planning waits up to `trip.planning.timeout`, which defaults to `PT120S`. HTTP 504 with `planning_timeout` means that wait expired, not that the workflow was cancelled or failed. The response retains the request identifier and any bound instance identifier, so status can be checked even if the initial HTTP request timed out. Other trips can continue planning while this workflow waits for an outcome. A timeout leaves its status unchanged until an outcome arrives, event submission fails, or Flow reports an actual workflow failure.
+
+The supplied frontend also bounds status polling and individual network waits. When polling times out or a status request fails, it preserves the reviewed plan and identifiers with an understandable message. It must not label the trip confirmed, rejected, or failed just because polling stopped, or discard the plan because a decision could not be submitted. Refreshing while the application remains running can retrieve a later outcome.
+
+For a planning failure received during the HTTP wait, actual guardrail failures return HTTP 422 `guardrail_violation`; unrelated failures return HTTP 500 `planning_failed`. An unrelated failure during simulated booking uses `finalization_failed`. Status reads return HTTP 200 for a known record even when its `status` is `failed`, so the frontend inspects the envelope rather than treating every successful GET as a successful booking. Messages exclude raw exception details and model output. These are demonstration checks and safe failure reporting, not comprehensive request validation or a production booking protocol.
+
+??? info "Supplied API reference"
+    `POST /trip/plan` accepts a `TripRequest` and normally returns HTTP 200 with an `awaiting_approval` envelope. A null request returns 400, overlapping planning returns 409, and planning failures or timeouts use the responses described above.
+
+    `PUT /trip/approve` accepts `TripApproval` and returns HTTP 202 with `decision_submitted`. Both approval and rejection use this endpoint. Event-send failures are recorded as failed statuses; submission acceptance alone does not prove event processing completed.
+
+    `GET /trip/plan/status?instanceId=...` returns one trip's envelope. `requestId=...` can be used before an instance identifier is available. If both are supplied, `instanceId` takes precedence. Missing identifiers return 400; an unknown identifier returns 404.
+
+    `GET /trip/plan/latest` returns the latest registered trip, including its original request and any terminal outcome. It returns HTTP 204 only when no trip is stored. It is used for browser refresh, not for correlating a planning response or choosing an older customer's trip.
+
+## Checking the event boundary without a model
+
+The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real workflow, store, and REST resources. Its in-memory messaging connectors let the tests relay each event deliberately and check the state before and after consumption. The tests use no Kafka broker or live model.
+
+```properties title="src/test/resources/application.properties"
 --8<-- "../../section-3/step-04/src/test/resources/application.properties"
 ```
 
-All four messaging channels keep Step 03's in-memory connectors, and Kafka Dev Services stays disabled for tests. PostgreSQL is real, so the tests can check committed data without a Kafka broker or live model. ==Keep test datasource overrides pointed at disposable test storage, never at the development database.== The test schema is dropped and recreated on startup.
-
----
-
-## Persisting and restoring Quarkus Flow instances
-
-With the database ready, Flow can save a waiting workflow and restore it when the application starts again. The persistence extension handles this without changes to the workflow definition, so the approval process we built in Step 03 remains intact.
-
-==Add the following to `src/main/resources/application.properties`:==
-
-```properties title="application.properties (workflow restoration)"
---8<-- "../../section-3/step-04/src/main/resources/application.properties:49:49"
-```
-
-Automatic restoration is already enabled by default, but making the setting explicit helps explain what will happen during the restart exercise. Flow will reload the saved workflow and wait for the customer's decision, rather than generating the trip again.
-
-??? info "Does this also save the agents' working state?"
-    The restart exercise begins after the agents have generated the plan, while the workflow is waiting for approval. At that point, restoring the workflow and its completed plan is enough to continue to simulated booking without restoring LangChain4j's shared `AgenticScope`.
-
-    Saving that scope would be a separate feature, with its own serialization and recovery logic. We therefore do not need `AgenticScopeSerializer` or its deserialization-package registration here, and this example does not demonstrate recovery in the middle of an agent's execution.
-
-## Persisting application state with Hibernate ORM and Panache
-
-Flow now knows how to resume the approval process, but the browser still needs a plan to display. In Step 03, the application kept that plan in an in-memory store, so we'll give it a database-backed implementation that can answer the same requests after a restart.
-
-??? info "Why not read the plan back from Kafka?"
-
-    The workflow already publishes the generated plan to Kafka when it requests approval, and Kafka can retain that event after the application stops. However, a consumer normally resumes from its committed offset when it restarts, so it does not automatically reread earlier events to rebuild the application's in-memory store. The [Kafka guide's discussion of commit strategies](https://quarkus.io/guides/kafka#commit-strategies){target="_blank"} explains how those offsets track processing progress.
-
-    The outcome events already contain the original request and plan in the status envelope. We could rebuild a view by replaying retained events, but we would need to manage that replay and preserve the identity and transition checks from Step 03. A compacted topic or a Kafka Streams state store could support such a design.
-
-    Recovering those trip details would not, by itself, restore the workflow waiting for approval, because the event is not a complete workflow checkpoint. Since our Flow persistence extension already uses PostgreSQL for that purpose, storing the trip records in the same database lets us focus on the restart exercise without introducing a second recovery mechanism.
-
-### Defining a Panache entity
-
-Each trip needs a database row that keeps the customer's request and plan available after a restart.
-
-==Create `src/main/java/com/tripplanner/model/TripPlanEntity.java`:==
-
-```java title="TripPlanEntity.java"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/model/TripPlanEntity.java"
-```
-
-#### What to notice
-
-- `requestId` identifies the trip before Flow starts. The same row gains an `instanceId` when the workflow is created, followed by the plan, accepted decision, and outcome.
-- `@JdbcTypeCode(SqlTypes.JSON)` stores the request, plan, confirmation, and decision as JSON while keeping them typed Java fields. The saved request lets the browser restore the form and page header.
-- `PanacheEntityBase` provides persistence operations while allowing an explicit ID definition. `allocationSize = 1` avoids reserving separate ID blocks per application instance, preserving the ordering used to find the latest request.
-
-The [Hibernate ORM with Panache guide](https://quarkus.io/guides/hibernate-orm-panache){target="_blank"} has more about entity mapping and queries.
-
-### Adding transactional persistence and queries
-
-The store will continue receiving the same events and returning the same `TripPlanStatus` envelope, including both identifiers and the original request. The edits below move its reads and writes into the database, with changed lines highlighted. The agents, Flow definition, REST resources, and browser need no changes.
-
-==Open `src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java`. Remove the `requests`, `instances`, and `decisions` maps, the `latestRequestId` field, and the `HashMap` and `Map` imports. Update the imports as highlighted below, keeping the logger and injected `ObjectMapper`:==
-
-```java hl_lines="16 21 25-26 30" title="TripPlanStore.java (imports and fields)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:3:39"
-```
-
-The in-memory implementation used synchronized methods to protect those maps. Database transactions and locks will now protect the records, including when more than one application instance connects to the same database.
-
-==Replace `register()` and `bind()` with the following versions, removing their `synchronized` modifiers:==
-
-```java hl_lines="1-8 11-17 20-21" title="TripPlanStore.java (saving the request before planning)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:41:62"
-```
-
-`register()` commits the request before the REST resource publishes the planning event. When Flow starts, `bind()` locks that trip's row to check the request and attach its workflow identifier before the agents run. Other trips have separate rows, so they can be planned at the same time.
-
-### Committing outcomes before acknowledging events
-
-An event must not be acknowledged before its database update has committed. Otherwise, a failed commit could lose the plan even though Kafka considers the event processed.
-
-==Add `@Blocking` to `consume()` and the highlighted comment, keeping its event names, dispatch, and exception handling unchanged:==
-
-```java hl_lines="2 20" title="TripPlanStore.java (outcome consumer)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:64:85"
-```
-
-==Replace the private synchronized `accept()` method with this public transactional version:==
-
-```java hl_lines="1-2 4-8 10 14-18" title="TripPlanStore.java (saving a correlated outcome)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:87:105"
-```
-
-#### What to notice
-
-- `@Blocking` moves database work off the messaging event loop.
-- `@Transactional(REQUIRES_NEW)` commits `accept()` before `message.ack()` acknowledges the event. Quarkus applies the transaction even though the call comes from the same bean.
-- The row lock prevents concurrent updates from overwriting each other. Hibernate saves the entity's changes when the transaction commits.
-- Only JSON decoding errors are caught as malformed input. Database failures reach the messaging failure handler, so an unsuccessful save is not acknowledged.
-
-`accept()` keeps Step 03's identity and state checks. An old approval event cannot reopen a completed trip, and a final outcome adds its confirmation or error without replacing the plan the customer reviewed.
-
-### Keeping the decision and failure outcome
-
-The workflow checks a decision against the one accepted by the REST resource before resuming. Saving that accepted decision alongside the trip lets this check continue to work after the in-memory maps are gone.
-
-==Replace `submitDecision()` and `matchesDecision()` with these database-backed versions:==
-
-```java hl_lines="1-6 9-14 17-21" title="TripPlanStore.java (persisting the accepted decision)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:107:128"
-```
-
-Locking the row while accepting a decision ensures that two concurrent submissions cannot both see `awaiting_approval`. The first moves it to `decision_submitted`, and a later submission receives the same conflict response as before. The eventual confirmed, rejected, or failed outcome is still recorded only when it arrives.
-
-==Replace `submissionFailed()` and `onWorkflowFailed()` with the following versions, removing their `synchronized` modifiers and the old map updates and `notifyAll()` call:==
-
-```java hl_lines="1-11 15 18" title="TripPlanStore.java (persisting failures)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:130:148"
-```
-
-The lifecycle fallback still handles an actual workflow failure when publishing an outcome fails. It now saves the safe error in the database while retaining the original request and any reviewed plan. A late failure cannot overwrite an existing terminal outcome.
-
-### Reading saved trips without holding a transaction open
-
-The planning HTTP request still waits for its own result, but it must not keep a database connection occupied while the agents run. Each status lookup gets a short transaction, with the polling delay outside it.
-
-==Update `awaitPlan()` as highlighted. Remove `synchronized` and replace the map read and `timedWait()` call, without adding a transaction around this method:==
-
-```java hl_lines="1 4 8-9" title="TripPlanStore.java (bounded waiting)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:150:160"
-```
-
-==Replace `byRequestId()`, `byInstanceId()`, and `latest()`, removing their `synchronized` modifiers, and add `toStatus()`. Keep the existing `error()` helper and the separate `TripPlanStatus` record unchanged:==
-
-```java hl_lines="1-3 6-8 11-14 17-19" title="TripPlanStore.java (queries and response conversion)"
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:162:181"
-```
-
-Each lookup runs in a short transaction, leaving `awaitPlan()` free to pause between reads without holding a database connection. The `latest()` query orders by sequence ID, so updating an older trip cannot make it the latest request, even after a restart. `toStatus()` returns the existing response format from the entity's typed fields for the browser to display.
-
-??? info "Complete updated TripPlanStore.java"
-    The complete file is included here for comparison with the focused edits above.
-
-    ```java title="TripPlanStore.java"
-    --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java"
-    ```
-
-??? info "Does this make database writes and Kafka sends atomic?"
-    The database transactions cover only the store operations. Model calls, event publication, and polling delays do not hold those transactions open. A process crash between saving a request or decision and sending its event can still leave a record with no corresponding event. Closing that gap would require a delivery design such as a transactional outbox. The restart exercise checks a saved approval wait with an unchanged workflow definition, not recovery from every possible crash point.
-
-### Updating the persistence tests
-
-The lifecycle assertions from Step 03 still apply, but their store now needs Quarkus injection and a database transaction. Constructing it directly in the old fixture would bypass that setup.
-
-==Open `src/test/java/com/tripplanner/agentic/flow/TripPlanStoreLifecycleTest.java`. Remove `private final TripPlanStore store = new TripPlanStore();`, then add the highlighted imports, annotations, injected field, and database cleanup. Keep the test methods and helpers unchanged:==
-
-```java hl_lines="4-8 17 19-20 24-27" title="TripPlanStoreLifecycleTest.java (persistence-aware fixture)"
---8<-- "../../section-3/step-04/src/test/java/com/tripplanner/agentic/flow/TripPlanStoreLifecycleTest.java:16:42"
-```
-
-==Copy `src/test/java/com/tripplanner/agentic/flow/PersistentTripPlanStoreTest.java` from the completed `section-3/step-04` project to the same path in your working copy.== It checks fresh database reads, accepted decisions, terminal outcomes and replay guards, as well as a failed commit that must not acknowledge its event.
-
-==Also copy `src/test/java/com/tripplanner/flow/FlowRestartProbe.java` from Step 04 to the same path.== The probe is an opt-in check using separate JVMs against a dedicated disposable database. Its [setup and phase commands](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#restart-probe){target="_blank"} are available if you want to automate the restart check with a fixed plan instead of a live model. Guardrail and HTTP failure coverage stays in Step 02; Flow smoke tests stay in Step 03. Browser tests from earlier steps still apply unchanged.
-
-## Checking persistence without a model
-
-Both starting routes now have the same persistence tests and configuration. ==Run the Step 04 test suite from your working project with Docker or Podman running:==
+==Run the Step 04 test suite from your working project:==
 
 === "Linux / macOS"
     ```bash
@@ -299,130 +204,50 @@ Both starting routes now have the same persistence tests and configuration. ==Ru
     mvnw.cmd test
     ```
 
-The default Surefire configuration runs `PersistentTripPlanStoreTest` and persistence-aware `TripPlanStoreLifecycleTest` only. The tests check that the original request survives store recreation, that a decision cannot be submitted twice, and that confirmed, rejected, and failed records retain the reviewed plan when late events arrive. They also check request ordering and the transaction boundary before acknowledgement. Reading from another store object establishes database persistence, but a full application restart is still needed to check that Flow restores its waiting execution.
+The default Surefire configuration runs the slim `TripPlannerFlowTest` smoke suite and `TripPlanStoreLifecycleTest` only. Each CI job for a step covers that lesson's additions, so guardrail unit tests remain in Step 02.
 
----
+The Flow smoke tests check approval through to confirmation, rejection without finalization, and safe HTTP 422/500 responses when the mocked adapter fails during planning. The store lifecycle tests check unrelated instances, nonterminal notifications, workflow failure while awaiting approval, and duplicate failure events.
 
-## Verifying workflow recovery after a restart
+The supplied browser tests in `src/test/frontend/` exercise status rendering and network failure paths with intercepted API responses. Their setup and command are in the [Step 04 README](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#verification){target="_blank"}. These tests do not establish Kafka delivery or live-model output quality.
 
-We're ready to try the customer journey that prompted this change, using one trip and leaving it awaiting approval while we restart the application. The agents generate the plan before shutdown, and afterward the application restores what it saved and continues with the customer's decision. The existing results page already displays both identifiers and restores the latest trip, so there is no UI edit to make.
+## Following a trip through the running application
 
-```mermaid
-sequenceDiagram
-    actor Customer
-    participant App as Application
-    participant DB as PostgreSQL
+==Start dev mode from your working project with `./mvnw quarkus:dev` (`mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080){target="_blank"}.== If another step uses that port, add `-Dquarkus.http.port=8083` and use the corresponding URLs below. Do not run Maven `clean` while dev mode is running.
 
-    Customer->>App: Request a trip
-    App->>App: Agents generate the plan
-    App->>DB: Save trip details and<br/>workflow progress
-    App-->>Customer: Show plan for approval
+==Generate a trip with a future start date and note its workflow identifier.== A family trip to the California coast for seven days and four travelers is a useful comparison with the previous chapters.
 
-    Note over App,DB: Application restarts<br/>Database remains
+==Check the browser's Network panel to confirm that `POST /trip/plan` has finished while the page is awaiting approval. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"}, select **Workflows** on the Quarkus Flow card, and inspect `trip-planner-flow`.== Its diagram contains the planning task, approval publication, matching wait, and outcome branches. The task-transition logs can also locate `waitApproval`; the customer decision does not keep the planning HTTP request open.
 
-    App->>DB: Load workflow progress
-    DB-->>App: Waiting for approval
-    Customer->>App: Refresh results page
-    App->>DB: Read saved trip details
-    DB-->>App: Original plan
-    App-->>Customer: Show the same trip
-    Customer->>App: Approve trip
-    App->>App: Simulate booking
-    App->>DB: Save booking confirmation
-    App-->>Customer: Show confirmation
-```
+==Refresh the browser without restarting the application. Compare the restored workflow identifier and plan with the ones you noted, and check the original destination, start date, duration, travelers, budget, and preferences in the restored form or `/trip/plan/latest` response.== The same pending trip should return without another model call. A new identifier would not demonstrate recovery of the same trip.
 
-==Keep this trip as the latest request until its restart checks are complete, and avoid submitting trips from other clients during the exercise.== The latest-trip lookup is ordered by registration, but it is application-wide rather than customer-specific.
+![A generated seven-day trip awaiting approval, with its workflow identifier above the itinerary](../images/section-3-step-04-awaiting-approval.png)
 
-==Start dev mode from your project directory, in the shell where container reuse is enabled:==
+### Approving the pending trip
 
-=== "Linux / macOS"
-    ```bash
-    ./mvnw quarkus:dev
-    ```
+==Click **Approve Trip** and follow the status requests in the Network panel.== The decision response is HTTP 202 `decision_submitted`; the page keeps the plan visible while finalization is in progress. A later GET reports `confirmed` with a simulated `MOS-...` booking reference and the message that no vehicle has been reserved.
 
-=== "Windows"
-    ```cmd
-    mvnw.cmd quarkus:dev
-    ```
+==In the Dev UI, open **Apache Kafka Client > Topics** and inspect `flow-in`.== The initiating event is `com.tripplanner.trip.requested`, with the planning request identifier and original trip details in its payload. The decision event is `com.tripplanner.trip.approval.done`, with the workflow identifier in its `flowinstanceid` extension and in its decision payload.
 
-==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a trip plan with a future start date. Leave it awaiting approval.==
+==Inspect `flow-out` and compare the `flowinstanceid` on `com.tripplanner.trip.approval.requested` and `com.tripplanner.booking.finalized` with the identifier displayed in the browser.== They should identify the same instance. The approval-request payload contains the status envelope, including the plan and original request, not a bare `TripPlan`.
 
-Once the plan is ready, the results page shows the workflow and request identifiers above the approval buttons, just as in Step 03.
+![The same workflow after approval, showing a simulated booking reference and no vehicle reservation](../images/section-3-step-04-confirmed.png)
 
-![The Step 03 results page, with workflow and request identifiers above the approval buttons](../images/section-3-step-03-awaiting-approval.png)
+### Rejecting a different trip
 
-==Note both identifiers and inspect [the latest-trip response](http://localhost:8080/trip/plan/latest){target="_blank"} so you can compare the original request and plan after restarting.==
+==Generate another trip, note its new workflow identifier, and click **Reject Trip**.== Rejection also passes through `decision_submitted`. It becomes final only after `GET /trip/plan/status` reports `rejected` from the recorded `com.tripplanner.trip.rejected` event.
 
-==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and navigate to **Datasources**. Inspect the `workflow_instance` and `trip_plan_status` tables.==
+==Refresh the browser, then inspect this instance's status and events.== The trip must remain rejected instead of returning to awaiting approval. There must be no `com.tripplanner.booking.finalized` event for this instance, and no call to the booking adapter on the rejection path.
 
-The workflow table should contain the saved instance, while the trip-plan table should hold the original request and generated plan with status `awaiting_approval`. Both should refer to the workflow identifier shown in the browser, so we can check that the workflow's progress and the customer's trip details have each been saved.
+![A different workflow with its rejection recorded and the reviewed plan still visible](../images/section-3-step-04-rejected.png)
 
-==Select **Workflows** on the Quarkus Flow card and inspect `trip-planner-flow`. Check the task-transition logs for your instance reaching `waitApproval` before stopping the application.== The Flow debug logging from Step 03 remains enabled. ==Keep the workflow definition and configuration unchanged during the restart check.==
+### Checking failures without guessing at model behavior
 
-!!! warning "Wait for approval before restarting"
-    ==Restart only after the trip reports `awaiting_approval`, before submitting its decision.== Stopping during planning or between saving a decision and sending its event can leave a record without a matching event. An interrupted `planning` record also blocks new requests until it is reconciled or the disposable database is reset.
+==Use the Flow smoke tests for planning failures, the supplied browser tests for failed responses, network errors, and polling timeouts, and the Step 02 guardrail tests for synchronous pipeline behavior.== A finalization failure produces `com.tripplanner.trip.failed` and retains the reviewed plan. A client timeout leaves the outcome uncertain until a later status read; it is not proof of cancellation.
 
-### Resuming a persisted workflow
+==During a live run, inspect the cost agent's pricing-tool call in the LangChain4j execution view and compare its category and duration with the request. Recheck the Step 02 correction and guardrail tests before treating the predecessor behavior as carried forward.== Successful event handling does not establish model adherence, real-world price accuracy, or vehicle availability.
 
-==Stop the application with Ctrl-C.==
+## What's next?
 
-==Start it again:==
+The customer can now leave a plan awaiting approval and return after a browser refresh, with a decision event resuming the matching workflow. In Step 05, we'll persist workflow and trip state so the same journey can continue after an application restart.
 
-=== "Linux / macOS"
-    ```bash
-    ./mvnw quarkus:dev
-    ```
-
-=== "Windows"
-    ```cmd
-    mvnw.cmd quarkus:dev
-    ```
-
-==Check the startup log for `Restoring workflow instance:` and compare its identifier with the one from the results page.== The matching identifier shows that Flow has loaded the saved workflow and is waiting for the customer's decision again.
-
-The log excerpt below illustrates the restoration messages. ==Find your own trip's identifier and confirm it resumes `waitApproval`.==
-
-![Example startup log restoring pending workflow instances at waitApproval](../images/step-04-restore-log.png)
-
-==Refresh the browser and compare both identifiers, the original request, and the plan with the saved response. Check that no new planning call appears in the logs, then click **Approve Trip**.==
-
-The restored workflow can now process the approval and complete the simulated booking, even though it began in the previous application run. As in Step 03, HTTP 202 reports `decision_submitted`, and the browser waits for a status read reporting `confirmed`. The confirmation should appear alongside the same identifiers, with no need to generate another plan. No vehicle has been reserved.
-
-==Check `trip_plan_status` again in the Dev UI.== Its row should now have status `confirmed` and a booking confirmation in the JSON `confirmation` field, while `request`, `plan`, and `acceptedDecision` remain available.
-
-==Stop and start the application once more, then refresh the browser without generating a new trip.== The same confirmed trip, reviewed plan, and simulated booking reference should return. This checks that the final outcome survives a restart too, rather than only the approval wait.
-
-### Keeping a rejected trip after restart
-
-==Click **Plan Another Trip**, generate a new plan, and note its identifiers. Click **Reject Trip** and wait for `/trip/plan/status` to report `rejected`, then refresh the page.== The rejected banner and reviewed plan should remain visible, with no confirmation or approval buttons.
-
-==Stop and start the application again, then refresh the page and inspect `/trip/plan/latest`.== The same request and workflow identifiers should return with `status: "rejected"`, the original request, and the reviewed plan. Its `confirmation` must remain null, and the database row should retain the accepted rejection. A rejected trip must not return to awaiting approval or produce a `com.tripplanner.booking.finalized` event for that instance.
-
-??? warning "The pending trip did not come back"
-    ==Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that dev mode uses `%dev.quarkus.hibernate-orm.schema-management.strategy=update`, not the test configuration's `drop-and-create` setting.== The pending workflow checkpoint and trip row should still exist after the restart. ==If the rows remain but the restore log is missing, check the Flow debug log for startup errors.==
-
-??? info "Trying restoration without a full shutdown"
-    ==Press `s` in the dev mode terminal to force a runtime restart without stopping the process.== This keeps the Dev Services container running and lets you try workflow restoration without container reuse. It does not replace the full shutdown-and-restart check above.
-
-### Removing the reused PostgreSQL container
-
-Because we enabled reuse, the database container remains available after the application stops. ==When you no longer need the saved trips, stop the application and identify the workshop's PostgreSQL container before removing it with the commands below.== Removing it also deletes the data used in this exercise.
-
-```bash
-docker ps | grep postgres
-docker rm -f <container-id>
-```
-
-==Use the equivalent commands if you run Podman:==
-
-```bash
-podman ps | grep postgres
-podman rm -f <container-id>
-```
-
----
-
-The customer can now return to a pending trip after an application restart, but the decision is still limited to approving or rejecting the plan. In Step 05, we'll explore how evaluator agents can review a plan and request another pass when it needs improvement, using voting and refinement loops.
-
-[Continue to Step 05 - Voting, Loops, and Adaptive Model Selection](step-05.md)
+[Continue to Step 05 - Persistent State with PostgreSQL](step-05.md)

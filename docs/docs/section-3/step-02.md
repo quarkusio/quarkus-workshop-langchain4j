@@ -115,8 +115,6 @@ The itinerary guardrail asks the model to try again when its response has invali
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripSafetyGuardrail.java"
 ```
 
-### What to notice
-
 - `extractJson()` finds the JSON inside a response, including one wrapped in Markdown fences.
 - `validate()` checks for an itinerary, then scans the route overview and daily descriptions for the configured phrases.
 - `retry()` requests another response. Its error message records the problem but is not sent to the model as corrective guidance.
@@ -157,8 +155,6 @@ It checks the economy-budget rule first, then corrects small-vehicle recommendat
 ```java title="TripAppropriatenessGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java"
 ```
-
-### What to notice
 
 - `requestParams().variables()` supplies the trip details for this agent call, so each recommendation is checked against the right group size and budget, including on retries.
 - `reprompt()` asks the model for an affordable vehicle when a listed luxury brand conflicts with an economy budget.
@@ -227,8 +223,6 @@ The model supplies the tool's arguments, so we need to check the category and du
 ```java title="RentalEstimateInputGuardrail.java"
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/RentalEstimateInputGuardrail.java"
 ```
-
-#### What to notice
 
 - `validate()` checks the raw JSON before Quarkus converts it to Java arguments. Categories must be exactly `compact`, `estate`, `suv`, or `mpv`, and days must be an integer from 1 to 30.
 - `failure()` blocks the calculation and returns the reason to the model as a tool error, giving it a chance to correct its request.
@@ -402,7 +396,7 @@ To explore tool output guardrails instead, add a fictional internal sales note t
 
 You can also add a test with a flagged phrase only in an itinerary title, then extend `findDangerousContent()` to check titles. Another useful case is a warning such as "avoid the conflict area": the current phrase matching rejects it even though it advises the customer to stay away.
 
-These experiments are optional. Since Step 03 continues from the original guardrail rules and retry allowance, keep any experimental rule changes in a separate working copy if you want to follow that baseline.
+These experiments are optional. Since Step 04 continues from the original guardrail rules and retry allowance, keep any experimental rule changes in a separate working copy if you want to follow that baseline.
 
 ## Troubleshooting
 
@@ -425,9 +419,6 @@ These experiments are optional. Since Step 03 continues from the original guardr
 
 ## What's next?
 
-The planner now checks its research recommendations and can calculate rental prices through a tool that rejects invalid arguments before execution. In Step 03, we'll wrap planning in an event-driven Quarkus Flow workflow with Kafka and CloudEvents so the customer can approve or reject a proposed trip.
+The planner now checks its research recommendations and can calculate rental prices through a tool that rejects invalid arguments before execution. In Step 03, we'll add evaluator agents that vote on the vehicle recommendation, an iterative refinement loop, and adaptive model selection that picks a more capable model as the recommendation improves.
 
-!!! note "Keeping the pricing tool when continuing"
-    Keep the pricing tool, its guardrail, and the cost agent's tool prompt and annotation in your working copy. If Step 03 converts numeric agent parameters to `Integer`, change both `days` and `travelers` in `CostEstimatorAgent` to `Integer`; do not drop `days`. Carry the corrected vehicle behavior and safe error contract across the workflow boundary too. An exception mapper only handles failures that reach the HTTP request, so a background workflow must record and return its own failure outcome to the client.
-
-[Continue to Step 03 - Event-Driven Workflows with Quarkus Flow](step-03.md)
+[Continue to Step 03 - Voting, Loops, and Adaptive Model Selection](step-03.md)

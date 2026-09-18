@@ -15,9 +15,9 @@ public interface ResearchPhase {
             subAgents = { VehicleAdvisorAgent.class, ItineraryPlannerAgent.class })
     String research(String destination,
                     String startDate,
-                    Integer days,
+                    String days,
                     String tripType,
-                    Integer travelers,
+                    String travelers,
                     String budget,
                     String preferences);
 

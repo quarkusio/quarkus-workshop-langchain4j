@@ -1,12 +1,12 @@
-# Step 07 - MCP Integration
+# Step 07 - A2A Communication
 
-## Remote tools through Model Context Protocol
+## Multi-turn communication with remote A2A agents
 
-Choosing which parts of a plan to revise is only useful if the planner has reliable information. For an upcoming winter trip to the Swiss Alps, Miles of Smiles needs current conditions and its rental catalog to check whether snow chains are a suitable extra and available for the selected vehicle.
+The MCP tools can return an equipment offer, but a quote is not a reservation. If Miles of Smiles has no suitable child seat at the customer's pickup branch, it could ask a local equipment-rental partner. The partner might offer another model that meets the child's requirements and fits the vehicle, or arrange delivery from a different branch for an extra fee.
 
-Model Context Protocol (MCP) gives the planner access to remote weather and rental-equipment tools. Their responses can supply conditions, vehicle compatibility, availability, and prices to support a recommendation. For a family trip, the same catalog can supply child-seat specifications to compare with the child's age and measurements. A catalog quote gives the customer an offer to consider, but does not reserve the equipment.
+Agent-to-Agent (A2A) communication allows the planner and the partner's agent to discuss the rental dates, seat requirements, and counter-offers over several turns. If no suitable seat is available, the planner needs to report that instead of accepting an unsuitable substitute. An equipment reservation needs the customer's explicit approval of its price and pickup terms, even if they already approved the trip plan. Changed terms need renewed approval.
 
-A severe-weather response should still prompt reconsideration of the route. Snow chains do not make a closed road usable, and a forecast alone cannot establish local equipment requirements.
+A stock lookup returns availability for a specific request. Discussing alternatives requires the agents to carry context from one exchange to the next.
 
 !!! note "Coming soon"
     This step is under development.
