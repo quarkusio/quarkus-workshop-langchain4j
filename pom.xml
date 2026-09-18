@@ -39,5 +39,7 @@
         <module>section-3/step-03</module>
         <module>section-3/step-04</module>
         <module>section-3/step-05</module>
+        <module>section-3/step-06/mcp-server</module>
+        <module>section-3/step-06/trip-planner</module>
     </modules>
 </project>
