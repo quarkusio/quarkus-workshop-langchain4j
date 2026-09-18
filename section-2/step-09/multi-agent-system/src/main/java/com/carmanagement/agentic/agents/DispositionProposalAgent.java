@@ -1,8 +1,11 @@
 package com.carmanagement.agentic.agents;
 
 import dev.langchain4j.agentic.Agent;
+import dev.langchain4j.agentic.declarative.ChatModelSupplier;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import io.quarkiverse.langchain4j.agentic.runtime.CdiBean;
 
 /**
  * Agent that creates disposition proposals for vehicles requiring disposition.
@@ -59,6 +62,11 @@ public interface DispositionProposalAgent {
             String carCondition,
             String carValue,
             String feedback);
+
+    @ChatModelSupplier
+    static ChatModel chatModel(@CdiBean DynamicModelSelector modelSelector, String carValue) {
+        return modelSelector.select(carValue);
+    }
 }
 
 
