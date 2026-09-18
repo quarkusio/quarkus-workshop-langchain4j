@@ -86,6 +86,8 @@ Introduce details where the reader will use them. Explain the purpose of a skill
 - Avoid: `handleApprovalRequested() writes planJson and sets status to awaiting_approval. handleBookingFinalized() updates confirmationJson.`
 - Prefer: `When the plan is ready for approval, the store saves it together with the original request. Once booking finishes, it adds the confirmation to the same record, so the browser can retrieve the outcome after a restart.`
 
+**Preemptive reassurance.** Do not add sentences that address a concern the reader hasn't raised, such as "The tests do not call a live model", "No external services are required", or "This will not affect your existing configuration." If something genuinely requires a prerequisite or has a limitation, state it as a concrete instruction beside the relevant action. A floating reassurance in isolation adds noise without helping anyone complete the exercise.
+
 **Parallel bullet structure that sounds like a spec.** Instead of:
 ```
 - `CostEstimatorAgent` reads vehicle and itineraryResult from scope
@@ -93,6 +95,11 @@ Introduce details where the reader will use them. Explain the purpose of a skill
 - No skills needed
 ```
 Explain the behavior introduced by a method or annotation in connected prose. Use short, complete bullets when several independent points are easier to scan as a list.
+
+**Metaphor as shorthand for a concrete explanation.** Avoid vague figurative phrases like "different lenses", "wearing different hats", or "from different angles" when describing what agents or components do. These are unclear to non-native speakers and substitute a metaphor for the actual explanation. Name what the agent or component specifically does instead.
+
+- Bad: `Each evaluator approaches the vehicle from a different angle.`
+- Good: `Each evaluator is given a single concern — comfort, cost, or fuel efficiency — and scores the vehicle against that concern only.`
 
 ## When Lists Are Fine
 
@@ -130,9 +137,9 @@ Optional practice suggestions can stay in ordinary prose when clearly introduced
 
 Explain why a file or change is needed before the highlighted action directive and code. Afterward, default to a short, connected paragraph about the new behavior. Related snippets, such as adding the same annotation to two agents, can share one explanation after both blocks.
 
-Reserve "What to notice" for larger changes with several independent ideas that benefit from a list. Good candidates include a branching workflow, an entity with unfamiliar mappings, or transaction and event-acknowledgement boundaries. Small annotation changes, simple helpers, and most test excerpts usually need only a paragraph.
+After a code block, if the change has several independent ideas worth calling out, use a short bullet list. Do not add a "What to notice" heading above it — just start the bullets directly. Reserve the list for genuinely independent points that are easier to scan than to connect in prose. Small annotation changes, simple helpers, and most test excerpts need only a paragraph, not a list at all.
 
-When using the list, place its heading one level below the surrounding section and tie each short bullet to a relevant method, annotation, or assertion. Focus on behavior the reader could miss. Do not apply the heading to every file or code block, or list every field and method just to fill the pattern.
+When using the list, tie each short bullet to a relevant method, annotation, or assertion. Focus on behavior the reader could miss. Do not list every field and method just to fill the pattern, and do not repeat what the preceding prose already said.
 
 For example, the audit logger needs only: "Calling `log()` writes the guardrail's name, decision, and reason to the terminal. It also keeps the latest 100 entries in memory for tests to inspect through `getRecentEntries()`, until the application restarts."
 
@@ -162,9 +169,25 @@ Give these ideas a clear progression in flowing paragraphs rather than separate 
 
 When starter and completed projects are available, provide clearly labeled MkDocs tabs for building hands-on or reviewing the completed solution. Explain that the solution is also a comparison point if a participant gets stuck. Identify the working directory for each route and where the routes rejoin for running and testing, so reviewers do not repeat edits already present in their project. Keep prerequisites such as API keys visible for both routes and use platform tabs where commands differ.
 
+### Introducing a pattern
+
+When a heading introduces an architectural or agentic pattern — voting, loops, adaptive model selection, or similar — the opening prose must do two things. First, explain what the pattern does mechanically. Then follow with a separate sentence or short paragraph explaining why you would reach for it in a real production system: what problem it solves that simpler approaches cannot, or what property it gives the system that matters at scale.
+
+This second part must stay at the level of the pattern itself, not the workshop scenario. It should be true regardless of whether the system is recommending cars, reviewing documents, or pricing insurance claims. If you find yourself writing about vehicles, trip types, or budget tiers in the "why it matters" sentence, you have drifted back into the scenario. Rewrite it in general terms.
+
+- Bad: `Using three evaluators means a vehicle that scores 9 on comfort but 4 on cost still gets caught.`
+- Good: `Distributing evaluation across narrowly-scoped agents means no single concern can be silently traded away against another during aggregation.`
+
+Also avoid explaining the pattern's value by restating how it works. The "why" should add something the mechanical description does not already cover.
+
+- Bad: `The loop keeps running until the score reaches the threshold, which ensures the output meets the standard.`
+- Good: `A numeric score and an explicit exit condition make quality verifiable — you can write a test that asserts the system meets a defined standard rather than relying on manual review.`
+
 ### Organizing the exercise
 
 Avoid artificial numbering within a page ("Step 1", "Part 2"). Use descriptive headings. The MkDocs table of contents provides navigation structure already.
+
+Use imperative verb forms for headings that describe an action the reader takes: "Create the evaluator agents", "Configure adaptive model selection", "Update the main workflow". Reserve noun or gerund forms for conceptual or navigational sections that describe a topic rather than a task: "Parallel assessment with the Voting pattern", "Troubleshooting", "What's next?".
 
 Prefer headings that describe what the work accomplishes, such as "Saving workflow progress" or "Showing the restored trip", over a series of generic "Dependencies", "Configuration", and "Implementation" sections. Keep setup details near the work they enable, and avoid repeating the same overview in requirements, objectives, and architecture sections.
 
