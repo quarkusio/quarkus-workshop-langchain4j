@@ -1,23 +1,17 @@
 package com.tripplanner.mcp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripplanner.mcp.model.PointOfInterest;
 import com.tripplanner.mcp.model.WeatherForecast;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TripIntelligenceTools {
 
-    @Inject
-    ObjectMapper objectMapper;
-
     @Tool(description = "Get weather forecast for a trip destination and date range")
-    String getWeatherForecast(
+    WeatherForecast getWeatherForecast(
             @ToolArg(description = "Trip destination city or region") String destination,
             @ToolArg(description = "Trip start date in yyyy-MM-dd format") String startDate,
             @ToolArg(description = "Trip duration in days") int days) {
@@ -52,17 +46,15 @@ public class TripIntelligenceTools {
         String summary = "%d-day forecast for %s starting %s: %.0f°C average, %s".formatted(
                 days, destination, startDate, baseTemp, conditions.toLowerCase());
 
-        WeatherForecast forecast = new WeatherForecast(
-                destination, summary, baseTemp, conditions, warnings);
-        return toJson(forecast);
+        return new WeatherForecast(destination, summary, baseTemp, conditions, warnings);
     }
 
     @Tool(description = "Get points of interest for a destination matching a trip type")
-    String getPointsOfInterest(
+    List<PointOfInterest> getPointsOfInterest(
             @ToolArg(description = "Trip destination city or region") String destination,
             @ToolArg(description = "Trip type: family, adventure, or business") String tripType) {
 
-        return toJson(generatePois(destination, tripType));
+        return generatePois(destination, tripType);
     }
 
     private List<PointOfInterest> generatePois(String destination, String tripType) {
@@ -100,13 +92,5 @@ public class TripIntelligenceTools {
                     new PointOfInterest(destination + " Botanical Garden", "nature",
                             "Scenic gardens with native and exotic plants", 4.4));
         };
-    }
-
-    private String toJson(Object value) {
-        try {
-            return objectMapper.writeValueAsString(value);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize MCP tool result", e);
-        }
     }
 }

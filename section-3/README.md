@@ -28,7 +28,7 @@ Each step's default `./mvnw test` suite covers **only what that step adds**. Ear
 | **03** | `VehicleEvaluationAggregatorTest` (aggregation), `TripPlanContractTest` (pipeline with loop), `TripPlanningFailureTest`, guardrail tests |
 | **04** | `TripPlannerFlowTest` (smoke), `TripPlanStoreLifecycleTest` |
 | **05** | `PersistentTripPlanStoreTest`, `TripPlanStoreLifecycleTest` (persistence-aware) |
-| **06** | `McpAgentTest` (MCP agent unit test), `PersistentTripPlanStoreTest`, `TripPlanStoreLifecycleTest` (inherited) |
+| **06** | `McpAgentTest` (MCP agent declaration test) |
 
 Opt-in tests (not in the default suite):
 

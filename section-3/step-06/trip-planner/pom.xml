@@ -92,26 +92,6 @@
             <artifactId>quarkus-junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit5-mockito</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -145,8 +125,6 @@
                     <argLine>@{argLine}</argLine>
                     <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
                     <includes>
-                        <include>**/PersistentTripPlanStoreTest.java</include>
-                        <include>**/TripPlanStoreLifecycleTest.java</include>
                         <include>**/McpAgentTest.java</include>
                     </includes>
                     <systemPropertyVariables>

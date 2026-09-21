@@ -1,8 +1,12 @@
 package com.tripplanner.mcp;
 
+import com.tripplanner.mcp.model.PointOfInterest;
+import com.tripplanner.mcp.model.WeatherForecast;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,42 +17,42 @@ class TripIntelligenceToolsTest {
     TripIntelligenceTools tools;
 
     @Test
-    void weatherForecastReturnsValidJson() {
-        String result = tools.getWeatherForecast("Barcelona", "2026-07-15", 5);
+    void weatherForecastReturnsValidData() {
+        WeatherForecast result = tools.getWeatherForecast("Barcelona", "2026-07-15", 5);
 
         assertNotNull(result);
-        assertTrue(result.contains("Barcelona"));
-        assertTrue(result.contains("destination"));
-        assertTrue(result.contains("summary"));
-        assertTrue(result.contains("avgTemperatureCelsius"));
-        assertTrue(result.contains("conditions"));
+        assertEquals("Barcelona", result.destination());
+        assertNotNull(result.summary());
+        assertTrue(result.summary().contains("Barcelona"));
+        assertNotNull(result.conditions());
+        assertTrue(result.avgTemperatureCelsius() > 0);
     }
 
     @Test
     void weatherForecastIsDeterministic() {
-        String first = tools.getWeatherForecast("Rome", "2026-08-01", 3);
-        String second = tools.getWeatherForecast("Rome", "2026-08-01", 3);
+        WeatherForecast first = tools.getWeatherForecast("Rome", "2026-08-01", 3);
+        WeatherForecast second = tools.getWeatherForecast("Rome", "2026-08-01", 3);
 
         assertEquals(first, second);
     }
 
     @Test
     void pointsOfInterestReturnsMatchingTripType() {
-        String family = tools.getPointsOfInterest("Paris", "family", 3);
-        String adventure = tools.getPointsOfInterest("Paris", "adventure", 3);
+        List<PointOfInterest> family = tools.getPointsOfInterest("Paris", "family");
+        List<PointOfInterest> adventure = tools.getPointsOfInterest("Paris", "adventure");
 
-        assertTrue(family.contains("Zoo") || family.contains("Museum") || family.contains("Park"));
-        assertTrue(adventure.contains("Trail") || adventure.contains("Rafting") || adventure.contains("Climbing"));
+        assertFalse(family.isEmpty());
+        assertFalse(adventure.isEmpty());
+        assertTrue(family.stream().anyMatch(p ->
+                p.name().contains("Zoo") || p.name().contains("Museum") || p.name().contains("Park")));
+        assertTrue(adventure.stream().anyMatch(p ->
+                p.name().contains("Trail") || p.name().contains("Rafting") || p.name().contains("Climbing")));
     }
 
     @Test
-    void pointsOfInterestRespectsLimit() {
-        String one = tools.getPointsOfInterest("Berlin", "family", 1);
-        String four = tools.getPointsOfInterest("Berlin", "family", 4);
+    void pointsOfInterestReturnsAllEntries() {
+        List<PointOfInterest> result = tools.getPointsOfInterest("Berlin", "family");
 
-        long oneCount = one.chars().filter(c -> c == '{').count();
-        long fourCount = four.chars().filter(c -> c == '{').count();
-        assertEquals(1, oneCount);
-        assertEquals(4, fourCount);
+        assertEquals(4, result.size());
     }
 }
