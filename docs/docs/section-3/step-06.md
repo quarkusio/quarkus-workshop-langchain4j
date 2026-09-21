@@ -147,7 +147,7 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 ### What to notice
 
 - **`@McpClientAgent`** declares the MCP tool to call. The `toolName` matches the tool exposed by the MCP server. Method parameters become the tool's input keys automatically.
-- **`@McpClientSupplier`** provides the `McpClient` instance. The `@CdiBean` annotation tells Quarkus to resolve the parameter from CDI, and `@McpClientName("tripIntelligence")` selects the named client configured in `application.properties`.
+- **`@McpClientSupplier`** provides the `McpClient` instance. `@McpClientName("tripIntelligence")` is a CDI qualifier that selects the named client configured in `application.properties`. The framework detects the qualifier and resolves the parameter from CDI automatically.
 - **`outputKey`** determines the scope key where the result is stored. Downstream agents read `weather` and `pointsOfInterest` from the scope automatically.
 - No `@ApplicationScoped`, no manual `ToolExecutionRequest` construction, no JSON wiring — the framework handles it all.
 
