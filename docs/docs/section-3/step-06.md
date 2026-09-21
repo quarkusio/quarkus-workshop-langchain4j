@@ -91,7 +91,19 @@ This mirrors the structure used in `section-2/step-08` for the A2A remote agent.
 
 ## Building the MCP server
 
-The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`. Both return deterministic stub data based on the destination, so no external API key is needed.
+The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`. Weather data is computed deterministically from the destination name. Points of interest are stored in a **PostgreSQL database** (provided automatically by Dev Services) and loaded from `import.sql` at startup. No external API key is needed.
+
+### The PointOfInterest entity
+
+Points of interest are modeled as a JPA entity using Panache:
+
+```java title="PointOfInterest.java"
+--8<-- "../../section-3/step-06/mcp-server/src/main/java/com/tripplanner/mcp/model/PointOfInterest.java"
+```
+
+The `import.sql` file seeds the database with POI data for several cities (Rome, Barcelona, Florence, Madrid, Paris, Antwerp), each with entries for family, adventure, and business trip types.
+
+### The tool class
 
 ==Create the tool class at `mcp-server/src/main/java/com/tripplanner/mcp/TripIntelligenceTools.java`:==
 
@@ -102,8 +114,9 @@ The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`
 ### What to notice
 
 - **`@Tool` and `@ToolArg`** are MCP server annotations from `quarkus-mcp-server-http`. They describe the tool for any MCP client that connects.
-- The tools return **JSON strings**, which is the standard MCP tool result format. The trip planner agents receive these strings and pass them to the AI agents as prompt context.
-- The data is **deterministic** — the same destination always produces the same forecast. This makes the workshop reproducible without an external weather API.
+- **`getPointsOfInterest` queries the database** using Panache's `list()` method, filtering by destination and trip type. The framework automatically serializes the entity list to JSON.
+- **`getWeatherForecast` returns a `WeatherForecast` record** — the MCP server framework serializes non-String return types to JSON automatically via its built-in `JsonTextContentEncoder`, so no manual `ObjectMapper` wiring is needed.
+- The weather data is **deterministic** — the same destination always produces the same forecast. This makes the workshop reproducible without an external weather API.
 
 ==Configure the server at `mcp-server/src/main/resources/application.properties`:==
 
@@ -111,7 +124,7 @@ The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`
 --8<-- "../../section-3/step-06/mcp-server/src/main/resources/application.properties"
 ```
 
-Port 8085 avoids conflicts with the trip planner (8080).
+Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatically provisions a PostgreSQL container for the MCP server, separate from the trip planner's database.
 
 ---
 
@@ -182,6 +195,8 @@ With weather and POI data now in the scope, the AI agents can reference it.
 
 ## Configuring the MCP client
 
+The MCP server's `pom.xml` includes `quarkus-hibernate-orm-panache` and `quarkus-jdbc-postgresql` for database access. Dev Services starts a PostgreSQL container automatically — no manual database setup required.
+
 ==Add the MCP client dependency to `trip-planner/pom.xml`:==
 
 ```xml title="pom.xml (MCP client dependency)"
@@ -225,14 +240,14 @@ Open the trip planner UI at `http://localhost:8080` and submit a trip plan. In t
 
 ??? info "Verifying with tests"
 
-    The MCP server has its own test suite:
+    The MCP server has its own test suite that verifies both weather computation and database-backed POI queries:
 
     ```bash
     cd section-3/step-06/mcp-server
     ./mvnw test
     ```
 
-    The trip planner tests include a unit test validating the `@McpClientAgent` declarations alongside the existing persistence tests:
+    The trip planner tests validate the `@McpClientAgent` interface declarations:
 
     ```bash
     cd section-3/step-06/trip-planner

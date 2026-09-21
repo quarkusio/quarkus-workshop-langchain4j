@@ -15,6 +15,6 @@ public interface DestinationIntelligence {
 
     @Output
     static String output(String weather, String pointsOfInterest) {
-        return "Intelligence gathered: weather forecast and points of interest retrieved";
+        return "Weather: " + weather + "\nPoints of interest: " + pointsOfInterest;
     }
 }

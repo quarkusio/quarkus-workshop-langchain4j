@@ -38,21 +38,28 @@ class TripIntelligenceToolsTest {
 
     @Test
     void pointsOfInterestReturnsMatchingTripType() {
-        List<PointOfInterest> family = tools.getPointsOfInterest("Paris", "family");
-        List<PointOfInterest> adventure = tools.getPointsOfInterest("Paris", "adventure");
+        List<PointOfInterest> family = tools.getPointsOfInterest("Rome", "family");
+        List<PointOfInterest> adventure = tools.getPointsOfInterest("Rome", "adventure");
 
         assertFalse(family.isEmpty());
         assertFalse(adventure.isEmpty());
         assertTrue(family.stream().anyMatch(p ->
-                p.name().contains("Zoo") || p.name().contains("Museum") || p.name().contains("Park")));
+                p.name.contains("Zoo") || p.name.contains("Museum") || p.name.contains("Park")));
         assertTrue(adventure.stream().anyMatch(p ->
-                p.name().contains("Trail") || p.name().contains("Rafting") || p.name().contains("Climbing")));
+                p.name.contains("Trail") || p.name.contains("Rafting") || p.name.contains("Climbing")));
     }
 
     @Test
     void pointsOfInterestReturnsAllEntries() {
-        List<PointOfInterest> result = tools.getPointsOfInterest("Berlin", "family");
+        List<PointOfInterest> result = tools.getPointsOfInterest("Barcelona", "family");
 
         assertEquals(4, result.size());
+    }
+
+    @Test
+    void pointsOfInterestReturnsEmptyForUnknownDestination() {
+        List<PointOfInterest> result = tools.getPointsOfInterest("Atlantis", "family");
+
+        assertTrue(result.isEmpty());
     }
 }

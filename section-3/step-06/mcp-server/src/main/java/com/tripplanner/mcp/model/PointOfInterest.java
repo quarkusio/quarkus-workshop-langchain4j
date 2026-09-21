@@ -1,8 +1,15 @@
 package com.tripplanner.mcp.model;
 
-public record PointOfInterest(
-        String name,
-        String category,
-        String description,
-        double rating
-) {}
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Entity;
+
+@Entity
+public class PointOfInterest extends PanacheEntity {
+
+    public String destination;
+    public String tripType;
+    public String name;
+    public String category;
+    public String description;
+    public double rating;
+}

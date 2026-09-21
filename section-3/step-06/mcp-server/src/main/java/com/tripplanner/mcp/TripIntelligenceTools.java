@@ -54,43 +54,6 @@ public class TripIntelligenceTools {
             @ToolArg(description = "Trip destination city or region") String destination,
             @ToolArg(description = "Trip type: family, adventure, or business") String tripType) {
 
-        return generatePois(destination, tripType);
-    }
-
-    private List<PointOfInterest> generatePois(String destination, String tripType) {
-        return switch (tripType.toLowerCase()) {
-            case "family" -> List.of(
-                    new PointOfInterest(destination + " Zoo & Aquarium", "attraction",
-                            "Family-friendly zoo with interactive exhibits and aquarium", 4.5),
-                    new PointOfInterest(destination + " Science Museum", "museum",
-                            "Hands-on science exhibits for all ages", 4.3),
-                    new PointOfInterest(destination + " Central Park", "nature",
-                            "Large urban park with playgrounds and picnic areas", 4.7),
-                    new PointOfInterest(destination + " Children's Theater", "entertainment",
-                            "Live performances for young audiences", 4.2));
-            case "adventure" -> List.of(
-                    new PointOfInterest(destination + " Mountain Trails", "outdoor",
-                            "Network of hiking and mountain biking trails", 4.8),
-                    new PointOfInterest(destination + " River Rafting Center", "outdoor",
-                            "Guided whitewater rafting expeditions", 4.6),
-                    new PointOfInterest(destination + " Rock Climbing Park", "outdoor",
-                            "Indoor and outdoor climbing walls for all levels", 4.4),
-                    new PointOfInterest(destination + " Zip Line Adventure", "outdoor",
-                            "Canopy zip line tour through forest", 4.5));
-            case "business" -> List.of(
-                    new PointOfInterest(destination + " Convention Center", "venue",
-                            "Modern conference and exhibition facilities", 4.1),
-                    new PointOfInterest(destination + " Business Lounge", "service",
-                            "Premium co-working space with meeting rooms", 4.3),
-                    new PointOfInterest(destination + " Fine Dining Quarter", "dining",
-                            "Upscale restaurants ideal for business dinners", 4.6),
-                    new PointOfInterest(destination + " Historic District", "culture",
-                            "Walking tour of historic landmarks and architecture", 4.4));
-            default -> List.of(
-                    new PointOfInterest(destination + " Old Town", "culture",
-                            "Historic city center with local shops and cafes", 4.5),
-                    new PointOfInterest(destination + " Botanical Garden", "nature",
-                            "Scenic gardens with native and exotic plants", 4.4));
-        };
+        return PointOfInterest.list("destination = ?1 and tripType = ?2", destination, tripType.toLowerCase());
     }
 }
