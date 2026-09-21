@@ -23,7 +23,7 @@
         <surefire-plugin.version>3.5.6</surefire-plugin.version>
         <quarkus-langchain4j.version>1.14.0.CR3</quarkus-langchain4j.version>
         <quarkus-flow.version>1.2.0.CR1</quarkus-flow.version>
-        <quarkus-mcp-server.version>1.13.0</quarkus-mcp-server.version>
+        <quarkus-mcp-server.version>2.0.1</quarkus-mcp-server.version>
     </properties>
 
     <dependencyManagement>
