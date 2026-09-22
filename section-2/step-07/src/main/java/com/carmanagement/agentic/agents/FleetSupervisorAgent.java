@@ -60,6 +60,7 @@ public interface FleetSupervisorAgent {
               - Invoke DispositionAgent directly
               - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
            4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed
+           5. IF "DISPOSE_CAR": Finish immediately
            
            CRITICAL: End with KEEP_CAR or DISPOSE_CAR
            """;
@@ -87,5 +88,4 @@ public interface FleetSupervisorAgent {
             Disposition Analysis: """ + (dispositionRequired ? dispositionMessage : noDispositionMessage);
     }
 }
-
 
