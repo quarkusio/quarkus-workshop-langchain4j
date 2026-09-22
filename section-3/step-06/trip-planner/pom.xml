@@ -16,24 +16,9 @@
             <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>io.quarkiverse.langchain4j</groupId>-->
-<!--            <artifactId>quarkus-langchain4j-agentic</artifactId>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>io.quarkiverse.langchain4j</groupId>
             <artifactId>quarkus-langchain4j-agentic</artifactId>
-            <version>999-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-agentic</artifactId>
-            <version>999-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-agentic-deployment</artifactId>
             <version>999-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -126,6 +111,7 @@
                     <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
                     <includes>
                         <include>**/McpAgentTest.java</include>
+                        <include>**/DestinationEvidenceTest.java</include>
                     </includes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
