@@ -91,7 +91,7 @@ This mirrors the structure used in `section-2/step-08` for the A2A remote agent.
 
 ## Building the MCP server
 
-The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`. Weather data is computed deterministically from the destination name. Points of interest are stored in a **PostgreSQL database** (provided automatically by Dev Services) and loaded from `import.sql` at startup. No external API key is needed.
+The MCP server exposes two tools: `getWeatherForecast` and `getPointsOfInterest`. Points of interest are stored in a PostgreSQL database provided automatically by Dev Services and loaded from `import.sql` at startup. The weather tool returns fixed scenario-based data rather than a live forecast, which keeps the workshop reproducible without an external API dependency.
 
 ### The PointOfInterest entity
 
@@ -111,12 +111,10 @@ The `import.sql` file seeds the database with POI data for several cities (Rome,
 --8<-- "../../section-3/step-06/mcp-server/src/main/java/com/tripplanner/mcp/TripIntelligenceTools.java"
 ```
 
-### What to notice
-
-- **`@Tool` and `@ToolArg`** are MCP server annotations from `quarkus-mcp-server-http`. They describe the tool for any MCP client that connects.
-- **`getPointsOfInterest` queries the database** using Panache's `list()` method, filtering by destination and trip type. The framework automatically serializes the entity list to JSON.
-- **`getWeatherForecast` returns a `WeatherForecast` record** — the MCP server framework serializes non-String return types to JSON automatically via its built-in `JsonTextContentEncoder`, so no manual `ObjectMapper` wiring is needed.
-- The weather data is **deterministic** — the same destination always produces the same forecast. This makes the workshop reproducible without an external weather API.
+- `@Tool` and `@ToolArg` are MCP server annotations from `quarkus-mcp-server-http`. They describe the tool for any MCP client that connects.
+- `getWeatherForecast` selects its response from a configurable scenario (`sunny` by default) driven by `@ConfigProperty`. The available scenarios — `sunny`, `severe-weather`, `empty-poi`, `malformed-response`, and `timeout` — can be activated by starting the server with `-Dquarkus.profile=<name>`, which makes it straightforward to test how the trip planner behaves under each condition.
+- `getPointsOfInterest` queries the database using Panache's `list()` method, filtering by destination and trip type, and wraps the result in a `PoiCatalog` record. The MCP server framework serializes non-String return types to JSON automatically via its built-in `JsonTextContentEncoder`, so no manual `ObjectMapper` wiring is needed.
+- Both tools validate their inputs and throw `IllegalArgumentException` on out-of-range or blank values, so the MCP client receives a well-formed error rather than a silent bad result.
 
 ==Configure the server at `mcp-server/src/main/resources/application.properties`:==
 
@@ -144,12 +142,9 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/agents/PointsOfInterestAgent.java"
 ```
 
-### What to notice
-
-- **`@McpClientAgent`** declares the MCP tool to call. The `toolName` matches the tool exposed by the MCP server. Method parameters become the tool's input keys automatically.
-- **`@McpClientSupplier`** provides the `McpClient` instance. `@McpClientName("tripIntelligence")` is a CDI qualifier that selects the named client configured in `application.properties`. The framework detects the qualifier and resolves the parameter from CDI automatically.
-- **`outputKey`** determines the scope key where the result is stored. Downstream agents read `weather` and `pointsOfInterest` from the scope automatically.
-- No `@ApplicationScoped`, no manual `ToolExecutionRequest` construction, no JSON wiring — the framework handles it all.
+- `@McpClientAgent` declares the MCP tool to call. The `toolName` matches the tool exposed by the MCP server, and method parameters become the tool's input keys automatically.
+- `@McpClientSupplier` provides the `McpClient` instance. `@McpClientName("tripIntelligence")` is a CDI qualifier that selects the named client configured in `application.properties`. The framework detects the qualifier and resolves the parameter from CDI automatically.
+- `outputKey` determines the scope key where the result is stored. Downstream agents read `weather` and `pointsOfInterest` from the scope without any additional wiring.
 
 ---
 
@@ -159,6 +154,14 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 
 ```java title="DestinationIntelligence.java"
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationIntelligence.java"
+```
+
+The `@Output` method calls `DestinationEvidence.validate()` before assembling the combined string. This validates the JSON returned by the MCP server — checking required fields, numeric ranges, and that the destination in the response matches the one that was requested — and throws `TripIntelligenceException` if anything is malformed. That exception maps to a 502 with error code `intelligence_unavailable` so the frontend can show a distinct message rather than a generic planning failure.
+
+==Create `trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationEvidence.java`:==
+
+```java title="DestinationEvidence.java"
+--8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationEvidence.java"
 ```
 
 ==Update `TripPlannerSystem.java` to insert `DestinationIntelligence` as the first step:==
@@ -212,6 +215,7 @@ The MCP server's `pom.xml` includes `quarkus-hibernate-orm-panache` and `quarkus
 # MCP client — Trip Intelligence Service
 quarkus.langchain4j.mcp.tripIntelligence.transport-type=streamable-http
 quarkus.langchain4j.mcp.tripIntelligence.url=http://localhost:8085/mcp
+quarkus.langchain4j.mcp.tripIntelligence.tool-execution-timeout=5s
 ```
 
 The `tripIntelligence` name matches the `@McpClientName("tripIntelligence")` qualifier used in the `@McpClientSupplier` methods.
@@ -263,6 +267,9 @@ Open the trip planner UI at `http://localhost:8080` and submit a trip plan. In t
 
 ??? warning "Unsatisfied dependency for McpClient"
     Verify that `quarkus-langchain4j-mcp` is in the trip planner's `pom.xml` dependencies and that the `tripIntelligence` name in `application.properties` matches the `@McpClientName` qualifier.
+
+??? warning "Trip plan fails with intelligence_unavailable"
+    The MCP server returned data the trip planner could not validate. Check that the MCP server is running the default `sunny` scenario and that its database was seeded correctly. If you started the server with a test profile such as `malformed-response` or `timeout`, restart it without that profile.
 
 ---
 

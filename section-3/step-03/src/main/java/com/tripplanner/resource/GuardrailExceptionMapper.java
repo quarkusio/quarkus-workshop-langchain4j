@@ -1,6 +1,7 @@
 package com.tripplanner.resource;
 
 import dev.langchain4j.agentic.agent.AgentInvocationException;
+import com.tripplanner.model.TripQualityException;
 import dev.langchain4j.guardrail.GuardrailException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -24,6 +25,11 @@ public class GuardrailExceptionMapper implements ExceptionMapper<AgentInvocation
         Throwable cause = exception;
         Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         while (cause != null && visited.add(cause)) {
+            if (cause instanceof TripQualityException) {
+                return Response.status(422)
+                        .entity(new ErrorResponse(TripQualityException.CODE, TripQualityException.MESSAGE))
+                        .type(MediaType.APPLICATION_JSON).build();
+            }
             if (cause instanceof GuardrailException) {
                 LOG.warn("Trip planning rejected by a guardrail", exception);
                 return Response.status(422)

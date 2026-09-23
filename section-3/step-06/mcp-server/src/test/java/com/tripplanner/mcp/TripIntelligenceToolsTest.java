@@ -18,7 +18,7 @@ class TripIntelligenceToolsTest {
 
     @Test
     void weatherForecastReturnsValidData() {
-        WeatherForecast result = tools.getWeatherForecast("Barcelona", "2026-07-15", 5);
+        WeatherForecast result = tools.getWeatherForecast("Barcelona", "2026-07-15", "5");
 
         assertNotNull(result);
         assertEquals("Barcelona", result.destination());
@@ -30,16 +30,16 @@ class TripIntelligenceToolsTest {
 
     @Test
     void weatherForecastIsDeterministic() {
-        WeatherForecast first = tools.getWeatherForecast("Rome", "2026-08-01", 3);
-        WeatherForecast second = tools.getWeatherForecast("Rome", "2026-08-01", 3);
+        WeatherForecast first = tools.getWeatherForecast("Rome", "2026-08-01", "3");
+        WeatherForecast second = tools.getWeatherForecast("Rome", "2026-08-01", "3");
 
         assertEquals(first, second);
     }
 
     @Test
     void pointsOfInterestReturnsMatchingTripType() {
-        List<PointOfInterest> family = tools.getPointsOfInterest("Rome", "family");
-        List<PointOfInterest> adventure = tools.getPointsOfInterest("Rome", "adventure");
+        List<PointOfInterest> family = tools.getPointsOfInterest("Rome", "family").entries();
+        List<PointOfInterest> adventure = tools.getPointsOfInterest("Rome", "adventure").entries();
 
         assertFalse(family.isEmpty());
         assertFalse(adventure.isEmpty());
@@ -51,14 +51,14 @@ class TripIntelligenceToolsTest {
 
     @Test
     void pointsOfInterestReturnsAllEntries() {
-        List<PointOfInterest> result = tools.getPointsOfInterest("Barcelona", "family");
+        List<PointOfInterest> result = tools.getPointsOfInterest("Barcelona", "family").entries();
 
         assertEquals(4, result.size());
     }
 
     @Test
     void pointsOfInterestReturnsEmptyForUnknownDestination() {
-        List<PointOfInterest> result = tools.getPointsOfInterest("Atlantis", "family");
+        List<PointOfInterest> result = tools.getPointsOfInterest("Atlantis", "family").entries();
 
         assertTrue(result.isEmpty());
     }

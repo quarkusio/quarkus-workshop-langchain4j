@@ -14,7 +14,8 @@ public interface DestinationIntelligence {
     String fetchIntelligence(String destination, String startDate, String days, String tripType);
 
     @Output
-    static String output(String weather, String pointsOfInterest) {
+    static String output(String destination, String weather, String pointsOfInterest) {
+        DestinationEvidence.validate(destination, weather, pointsOfInterest);
         return "Weather: " + weather + "\nPoints of interest: " + pointsOfInterest;
     }
 }

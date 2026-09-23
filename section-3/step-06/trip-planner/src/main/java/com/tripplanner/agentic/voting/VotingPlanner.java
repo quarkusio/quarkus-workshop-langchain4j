@@ -8,12 +8,13 @@ import dev.langchain4j.agentic.planner.Planner;
 import dev.langchain4j.agentic.planner.PlanningContext;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class VotingPlanner implements Planner {
 
     private final VotingStrategy strategy;
     private List<AgentInstance> subagents;
+    private final List<Object> votes = new ArrayList<>();
 
     public VotingPlanner(VotingStrategy strategy) {
         this.strategy = strategy;
@@ -26,15 +27,15 @@ public class VotingPlanner implements Planner {
 
     @Override
     public Action firstAction(PlanningContext context) {
+        votes.clear();
         return call(subagents);
     }
 
     @Override
     public Action nextAction(PlanningContext context) {
-        List<Object> votes = subagents.stream()
-                .map(agent -> context.agenticScope().readState(agent.outputKey()))
-                .collect(Collectors.toList());
-        return done(strategy.aggregate(votes));
+        // The framework calls this after each parallel agent completes.
+        votes.add(context.previousAgentInvocation().output());
+        return votes.size() == subagents.size() ? done(strategy.aggregate(votes)) : noOp();
     }
 
     @Override

@@ -146,12 +146,13 @@ The `VotingPlanner` is a custom `Planner` implementation that dispatches evaluat
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/voting/VotingPlanner.java"
 ```
 
-- `VotingStrategy` is a **functional interface**, so any lambda or method reference that takes a collection of votes and returns an aggregate can serve as the strategy.
-- `init()` saves the subagents list from the `InitPlanningContext` for later use.
-- `firstAction()` dispatches all evaluator subagents in parallel using `call(subagents)`.
-- `nextAction()` reads each evaluator's output from the workflow scope using its `outputKey`, collects them into a list, and passes them to the strategy. The aggregated result is returned via `done(result)`.
+- `VotingStrategy` is a functional interface, so any lambda or method reference that takes a collection of votes and returns an aggregate can serve as the strategy.
+- `init()` saves the subagent list from `InitPlanningContext` for use in later callbacks.
+- `firstAction()` clears the accumulated vote list and dispatches all evaluator subagents in parallel with `call(subagents)`.
+- `nextAction()` is called once per completed parallel agent. Each call appends that agent's result via `context.previousAgentInvocation().output()` and returns `noOp()` until all evaluators have reported in. Once the count matches the subagent list size, it passes all collected results to the strategy and returns `done(result)`.
 - `topology()` returns `PARALLEL` so the Dev UI renders the evaluators as parallel branches.
-- Neither `VotingPlanner` nor `VotingStrategy` are library classes — they are custom implementations specific to this application. You can adapt the strategy for any aggregation logic: majority vote, weighted average, or consensus.
+
+Neither `VotingPlanner` nor `VotingStrategy` are library classes. You can adapt the strategy for any aggregation logic: majority vote, weighted average, or consensus.
 
 ## Wire evaluators with @PlannerAgent
 
@@ -163,9 +164,9 @@ The `@PlannerAgent` annotation connects the evaluator subagents to our custom pl
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleEvaluators.java"
 ```
 
-- `@PlannerAgent` lists the three evaluator interfaces as `subAgents` and sets `outputKey = "evaluation"` so the aggregated score is available to the exit condition and reviser.
-- `@PlannerSupplier` returns a new `VotingPlanner` instance with the aggregation strategy. The `aggregateVotes` method averages the scores and concatenates non-blank suggestions separated by semicolons.
-- The method signature includes the trip context parameters that the individual evaluators need — the framework propagates them through the workflow scope.
+- `@PlannerAgent` lists the three evaluator interfaces as `subAgents` and sets `outputKey = "evaluation"` so the aggregated score is available to the exit condition and the reviser.
+- `@PlannerSupplier` returns a new `VotingPlanner` with the aggregation strategy. `aggregateVotes` requires exactly three `VehicleEvaluation` results with scores in the 1–10 range and throws `IllegalStateException` on any malformed or missing result.
+- The method signature includes the trip context parameters that the individual evaluators need, and the framework propagates them through the workflow scope.
 
 ## Add the vehicle reviser with @ChatModelSupplier
 
@@ -183,9 +184,9 @@ The reviser agent takes the current recommendation and evaluation feedback and p
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/VehicleReviser.java"
 ```
 
-- `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model. The `select()` method compares the evaluation score against a threshold.
-- The reviser's `@ChatModelSupplier` static method uses `@CdiBean` to inject the `DynamicModelSelector` and receives the current `VehicleEvaluation` from the workflow scope. This is the same pattern used in [Section 2 Step 07](../section-2/step-07.md).
-- The reviser's `outputKey = "vehicle"` overwrites the original vehicle recommendation in the workflow scope. Downstream agents (like the cost estimator) automatically receive the refined version.
+- `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model, choosing between them based on the current evaluation score. The same pattern is used in [Section 2 Step 07](../section-2/step-07.md).
+- `@OutputGuardrails(TripAppropriatenessGuardrail.class, maxRetries = 3)` applies the same content guardrail from Step 02 to each revised recommendation, retrying up to three times if a revision violates it.
+- The reviser's `outputKey = "vehicle"` overwrites the vehicle in the scope, so the cost estimator and all downstream agents receive the refined version automatically.
 
 ## Wrap the review cycle with @LoopAgent
 
@@ -198,9 +199,19 @@ The loop wraps the evaluators and reviser into an iterative cycle with an exit c
 ```
 
 - `@LoopAgent` lists `VehicleEvaluators` and `VehicleReviser` as subagents. Each iteration runs both: first the evaluators vote, then the reviser refines.
-- `maxIterations = 3` prevents runaway loops if the score never reaches the threshold.
-- `@ExitCondition(testExitAtLoopEnd = true)` checks the condition after each complete iteration. The `shouldExit` method receives the `VehicleEvaluation` from the scope and returns `true` when the average score reaches 7.5.
-- The loop's `outputKey = "vehicle"` means it writes the final refined vehicle back to the scope, overwriting the original from the research phase.
+- `maxIterations = MAX_REVISIONS + 1` sets the ceiling at four iterations — one initial evaluation plus one after each of the three permitted revisions.
+- `@ExitCondition(testExitAtLoopEnd = false)` checks the condition immediately after each evaluation, before the reviser runs again. `shouldExit` receives both the latest `VehicleEvaluation` and the `AgenticScope`. If the score reaches 7.5, it returns `true`. If the number of completed evaluations has exceeded `MAX_REVISIONS` without meeting the threshold, it throws `TripQualityException`, which propagates as a 422 with error code `quality_not_met`.
+- The loop's `outputKey = "vehicle"` writes the final vehicle back to the scope, overwriting the original from the research phase.
+
+Before the loop can throw `TripQualityException`, you need the exception class itself.
+
+==Create `src/main/java/com/tripplanner/model/TripQualityException.java`:==
+
+```java title="TripQualityException.java"
+--8<-- "../../section-3/step-03/src/main/java/com/tripplanner/model/TripQualityException.java"
+```
+
+The `CODE` and `MESSAGE` constants are used by the exception mapper and the frontend to display a consistent error when the loop exhausts its revision budget.
 
 ## Update the main workflow
 
@@ -280,7 +291,7 @@ This indicates the `DynamicModelSelector` chose the enhanced model for that iter
         .\mvnw.cmd test -Dquarkus.http.test-port=0
         ```
 
-    **Aggregation test** — `VehicleEvaluationAggregatorTest` verifies the averaging strategy: three scores produce the correct average, blank suggestions are skipped, and an empty vote list returns zero.
+    **Aggregation test** — `VehicleEvaluationAggregatorTest` verifies the averaging strategy: three scores produce the correct average, blank suggestions are skipped, and a missing, incomplete, or out-of-range vote list throws `IllegalStateException`.
 
     **Pipeline test** — `TripPlanContractTest` checks that the workflow's `subAgents` array includes `VehicleReviewLoop` between `ResearchPhase` and `CostEstimatorAgent`. The scripted model returns high evaluation scores so the loop exits after one iteration, and the HTTP endpoint returns the expected JSON contract.
 
