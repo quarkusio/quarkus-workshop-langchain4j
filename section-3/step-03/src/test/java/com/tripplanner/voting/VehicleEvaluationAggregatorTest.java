@@ -26,18 +26,16 @@ class VehicleEvaluationAggregatorTest {
     }
 
     @Test
-    void singleVoteReturnsItsScore() {
-        var votes = List.<Object>of(new VehicleEvaluation(9.0, "Perfect choice"));
-        var result = (VehicleEvaluation) VehicleEvaluators.aggregateVotes(votes);
-
-        assertEquals(9.0, result.score(), 0.01);
-        assertEquals("Perfect choice", result.suggestions());
-    }
-
-    @Test
-    void emptyVotesReturnZeroScore() {
-        var result = (VehicleEvaluation) VehicleEvaluators.aggregateVotes(List.of());
-        assertEquals(0.0, result.score(), 0.01);
+    void rejectsMissingOrMalformedVotes() {
+        var valid = new VehicleEvaluation(8, "Good");
+        assertThrows(IllegalStateException.class, () -> VehicleEvaluators.aggregateVotes(List.of()));
+        assertThrows(IllegalStateException.class, () -> VehicleEvaluators.aggregateVotes(List.of(valid)));
+        assertThrows(IllegalStateException.class, () -> VehicleEvaluators.aggregateVotes(
+                java.util.Arrays.asList(valid, null, valid)));
+        for (double score : new double[] { Double.NaN, Double.POSITIVE_INFINITY, -1, 0, 11 }) {
+            assertThrows(IllegalStateException.class, () -> VehicleEvaluators.aggregateVotes(
+                    List.of(valid, valid, new VehicleEvaluation(score, "Invalid"))));
+        }
     }
 
     @Test

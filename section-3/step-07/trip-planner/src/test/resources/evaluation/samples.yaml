@@ -1,0 +1,33 @@
+# Evaluation samples for the trip planner (step 07).
+#
+# The expected-output is the deterministic TripPlanText rendering of the plan
+# the scripted model is expected to produce. The live evaluation function
+# renders a real run the same way, so a sample passes its invariant and
+# judge checks only when the real run matches this shape.
+- name: "rome-family-three-days"
+  parameters:
+    - "Rome"
+    - "2027-07-10"
+    - "3"
+    - "family"
+    - "2"
+    - "moderate"
+    - "coastal towns"
+  expected-output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Departure\nCost total: 310\n"
+  tags:
+    - "smoke"
+    - "mcp"
+
+- name: "barcelona-family-three-days"
+  parameters:
+    - "Barcelona"
+    - "2027-07-12"
+    - "3"
+    - "family"
+    - "2"
+    - "moderate"
+    - "beaches"
+  expected-output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Departure\nCost total: 310\n"
+  tags:
+    - "smoke"
+    - "mcp"

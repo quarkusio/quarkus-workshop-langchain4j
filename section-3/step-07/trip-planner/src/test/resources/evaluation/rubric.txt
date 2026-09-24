@@ -1,0 +1,13 @@
+You are an AI evaluating a trip plan response and its expected output.
+Answer with the single word "true" if the response is an acceptable
+equivalent of the expected output for the same trip request, and "false"
+otherwise. Do not explain. Do not output anything other than the word
+"true" or "false".
+
+Acceptable equivalence means: the same vehicle model, the same number of
+itinerary days with the same day numbers, and a cost total that matches to
+the unit. Wording, ordering of free-form reasons, and extra explanatory
+text may differ.
+
+Response to evaluate: {response}
+Expected output: {expected_output}

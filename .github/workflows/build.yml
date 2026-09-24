@@ -54,6 +54,10 @@ jobs:
           - section-3/step-03
           - section-3/step-04
           - section-3/step-05
+          - section-3/step-06/mcp-server
+          - section-3/step-06/trip-planner
+          - section-3/step-07/mcp-server
+          - section-3/step-07/trip-planner
 
     name: "Build ${{ matrix.app }}"
     steps:

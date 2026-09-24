@@ -9,6 +9,9 @@ public record TripError(String error, String message) {
     public static TripError from(Throwable failure, boolean finalizing) {
         Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         for (Throwable cause = failure; cause != null && seen.add(cause); cause = cause.getCause()) {
+            if (cause instanceof TripQualityException) {
+                return new TripError(TripQualityException.CODE, TripQualityException.MESSAGE);
+            }
             if (cause instanceof GuardrailException) {
                 return new TripError("guardrail_violation",
                         finalizing
@@ -22,6 +25,6 @@ public record TripError(String error, String message) {
     }
 
     public int httpStatus() {
-        return "guardrail_violation".equals(error) ? 422 : 500;
+        return ("guardrail_violation".equals(error) || TripQualityException.CODE.equals(error)) ? 422 : 500;
     }
 }
