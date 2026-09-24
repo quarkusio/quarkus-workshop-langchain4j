@@ -1,6 +1,6 @@
 # Section 3 agent guide
 
-Steps `00` through `06` are successive snapshots of the trip planner. Each step directory is a complete, runnable Quarkus project. Later steps build on earlier ones; when you change shared behavior, propagate the fix forward through every implemented step that follows.
+Steps `00` through `07` are successive snapshots of the trip planner. Each step directory is a complete, runnable Quarkus project. Later steps build on earlier ones; when you change shared behavior, propagate the fix forward through every implemented step that follows.
 
 ## What each step adds
 
@@ -13,6 +13,7 @@ Steps `00` through `06` are successive snapshots of the trip planner. Each step 
 | **04** | Quarkus Flow + Kafka approval lifecycle, asynchronous API and UI |
 | **05** | PostgreSQL persistence, Flow checkpoints, restart and restore |
 | **06** | MCP integration with declarative `@McpClientAgent` interfaces |
+| **07** | Testing, evaluation, and observability: supplied evaluation harness, quality evaluation with invariants and a judge, optional Langfuse tracing and score attachment |
 
 When editing step `N`, touch only what that lesson introduces unless you are fixing a bug that also affects later steps. Inherited source, configuration, and UI should stay consistent with the narrative in `docs/docs/section-3/step-NN.md`.
 
