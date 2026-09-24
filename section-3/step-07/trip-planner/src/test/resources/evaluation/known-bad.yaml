@@ -1,0 +1,24 @@
+# Deliberately invalid trip plan texts. Each must FAIL the invariant strategy.
+# Used by TripPlanInvariantStrategyTest to prove the gate rejects broken plans.
+# The "reason" is the exact violation substring the strategy emits, asserted
+# against the result explanation so a fix that stops detecting the violation is
+# caught.
+- name: "missing-vehicle"
+  output: "Route: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Departure\nCost total: 310\n"
+  reason: "missing vehicle line"
+
+- name: "gap-in-days"
+  output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 3: Departure\nCost total: 310\n"
+  reason: "itinerary missing day 2"
+
+- name: "negative-cost"
+  output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nCost total: -10\n"
+  reason: "cost total is negative"
+
+- name: "malformed-cost"
+  output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nCost total: about three hundred\n"
+  reason: "cost total is not a whole number"
+
+- name: "empty-output"
+  output: ""
+  reason: "planner returned no output"

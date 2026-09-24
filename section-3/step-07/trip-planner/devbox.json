@@ -1,0 +1,6 @@
+{
+  "packages": [],
+  "env": {
+    "TESTCONTAINERS_REUSE_ENABLE": "true"
+  }
+}
