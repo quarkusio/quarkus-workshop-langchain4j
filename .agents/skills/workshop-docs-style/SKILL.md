@@ -139,6 +139,8 @@ Explain why a file or change is needed before the highlighted action directive a
 
 After a code block, if the change has several independent ideas worth calling out, use a short bullet list. Do not add a "What to notice" heading above it — just start the bullets directly. Reserve the list for genuinely independent points that are easier to scan than to connect in prose. Small annotation changes, simple helpers, and most test excerpts need only a paragraph, not a list at all.
 
+When walking through several distinct annotations or methods in a class — for example explaining `@LoopAgent`, `maxIterations`, `@ExitCondition`, and an output key each doing different things — use bullets, one per item. Do not collapse these into a dense paragraph. A paragraph is appropriate when the points are causally connected; bullets are appropriate when each item stands alone.
+
 When using the list, tie each short bullet to a relevant method, annotation, or assertion. Focus on behavior the reader could miss. Do not list every field and method just to fill the pattern, and do not repeat what the preceding prose already said.
 
 For example, the audit logger needs only: "Calling `log()` writes the guardrail's name, decision, and reason to the terminal. It also keeps the latest 100 entries in memory for tests to inspect through `getRecentEntries()`, until the application restarts."

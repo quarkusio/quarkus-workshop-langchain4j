@@ -238,7 +238,7 @@ function renderCancelled() {
 async function readFailureMessage(response) {
     try {
         const failure = await response.json();
-        if ((response.status === 422 && failure?.error === "guardrail_violation")
+        if ((response.status === 422 && ["guardrail_violation", "quality_not_met"].includes(failure?.error))
                 || (response.status === 500 && failure?.error === "planning_failed")) {
             if (typeof failure.message === "string" && failure.message.trim()) {
                 return failure.message.trim();

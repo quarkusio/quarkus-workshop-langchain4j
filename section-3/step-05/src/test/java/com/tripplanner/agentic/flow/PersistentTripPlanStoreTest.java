@@ -50,6 +50,17 @@ class PersistentTripPlanStoreTest {
     }
 
     @Test
+    void qualityFailureSurvivesStoreRecreation() {
+        PlanningRequest input = store.register(request);
+        store.submissionFailed(input.requestId(), new com.tripplanner.model.TripQualityException());
+        TripPlanStatus failed = freshRead(input.requestId());
+        assertEquals("failed", failed.status());
+        assertEquals("quality_not_met", failed.error());
+        assertEquals(com.tripplanner.model.TripQualityException.MESSAGE, failed.message());
+        assertNull(failed.plan());
+    }
+
+    @Test
     void registrationCommitsOriginalRequestBeforeBindingAndSurvivesStoreRecreation() {
         assertNull(store.latest());
         PlanningRequest input = store.register(request);

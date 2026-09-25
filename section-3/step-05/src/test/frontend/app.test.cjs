@@ -164,6 +164,7 @@ test("planning HTTP errors render safe text or fallback, including 504 correlati
     const { page, api } = await setup(t, null);
     const markup = '<img src=x onerror="window.injected=true">';
     for (const reply of [
+        { status: 422, json: envelope("failed", { plan: null, error: "quality_not_met", message: "Safe server message" }) },
         { status: 422, json: envelope("failed", { plan: null, error: "guardrail_violation", message: markup }) },
         { status: 500, json: envelope("failed", { plan: null, error: "planning_failed", message: "Safe server message" }) },
         { status: 500, json: { error: "unknown", message: "private failure" } },

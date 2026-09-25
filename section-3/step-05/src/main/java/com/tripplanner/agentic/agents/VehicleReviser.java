@@ -1,6 +1,8 @@
 package com.tripplanner.agentic.agents;
 
 import com.tripplanner.model.TripPlan;
+import com.tripplanner.guardrails.TripAppropriatenessGuardrail;
+import dev.langchain4j.service.guardrail.OutputGuardrails;
 import com.tripplanner.model.VehicleEvaluation;
 import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.declarative.ChatModelSupplier;
@@ -21,7 +23,10 @@ public interface VehicleReviser {
             Number of travelers: {travelers}
             Budget: {budget}
             Destination: {destination}
+            Additional preferences: {preferences}
+            Preserve the original traveler, budget, and preference constraints.
             """)
+    @OutputGuardrails(value = TripAppropriatenessGuardrail.class, maxRetries = 3)
     @Agent(description = "Revises the vehicle recommendation based on evaluation feedback",
            outputKey = "vehicle")
     TripPlan.VehicleRecommendation revise(TripPlan.VehicleRecommendation vehicle,
@@ -29,7 +34,8 @@ public interface VehicleReviser {
                                           String tripType,
                                           String travelers,
                                           String budget,
-                                          String destination);
+                                          String destination,
+                                          String preferences);
 
     @ChatModelSupplier
     static ChatModel chatModel(@CdiBean DynamicModelSelector modelSelector,
