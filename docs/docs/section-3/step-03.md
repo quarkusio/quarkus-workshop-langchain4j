@@ -2,7 +2,7 @@
 
 The guardrails from Step 02 catch obviously unsuitable recommendations, like suggesting a sports car for a family of five. They cannot however tell us whether the accepted vehicle is actually the *best* choice. E.g. is it comfortable enough for a long road trip? Does it fit the budget? Is it fuel-efficient for the planned route?
 
-In this step we'll add three evaluator agents that independently assess the vehicle recommendation, aggregate their scores with a custom **voting pattern**, and feed the result into a **refinement loop** that lets a reviser agent improve the recommendation until it meets a quality threshold. We'll also add an **adaptive model selection** so that the reviser starts with a lightweight model and switches to a more capable one as the recommendation improves.
+In this step we'll add three evaluator agents that independently assess the vehicle recommendation, aggregate their scores with a **voting pattern**, and feed the result into a **refinement loop** that lets a reviser agent improve the recommendation until it meets a quality threshold. We'll also add an **adaptive model selection** so that the reviser starts with a lightweight model and switches to a more capable one as the recommendation improves.
 
 ## Parallel assessment with the Voting pattern
 
@@ -28,7 +28,7 @@ flowchart LR
     class Agg strategy
 ```
 
-We'll implement this with a custom `VotingPlanner` that implements the `Planner` interface from LangChain4j. The planner dispatches all evaluator subagents in parallel using `call(subagents)`, then collects their outputs from the workflow scope and passes them to a `VotingStrategy` for aggregation.
+We'll implement this with the `VotingPlanner` provided by the LangChain4j agentic patterns module. The planner starts all evaluator subagents in parallel and records each result as a vote when that evaluator completes. Once every evaluator has reported, it passes the votes to a `VotingStrategy` for aggregation.
 
 ## Iterative refinement with @LoopAgent
 
@@ -126,37 +126,28 @@ Each evaluator assesses the vehicle recommendation from a different perspective.
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/FuelEfficiencyEvaluator.java"
 ```
 
-- Each evaluator uses `@Agent` with a unique `outputKey` so the voting planner can read their individual results from the workflow scope.
+- Each evaluator uses `@Agent` with a unique `outputKey`, so its individual score remains in the workflow scope next to the aggregated result.
 - The evaluators take the current `vehicle` recommendation from the scope, plus trip context parameters for their specific assessment dimension.
 - All three return `VehicleEvaluation`, the same record type, so the aggregation strategy can process them uniformly.
 
-## Implement the VotingPlanner
+## Add the voting planner
 
-The `VotingPlanner` is a custom `Planner` implementation that dispatches evaluators in parallel and aggregates their results.
+LangChain4j provides ready-made planners for common orchestration patterns in its `langchain4j-agentic-patterns` module, and its `VotingPlanner` does exactly what the evaluators need. The Quarkus LangChain4j BOM already manages the module's version, so the dependency does not need a `<version>` element.
 
-==Create `src/main/java/com/tripplanner/agentic/voting/VotingStrategy.java`:==
+==Add the agentic patterns dependency to `pom.xml`:==
 
-```java title="VotingStrategy.java"
---8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/voting/VotingStrategy.java"
+```xml title="pom.xml (agentic patterns dependency)"
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-agentic-patterns</artifactId>
+</dependency>
 ```
 
-==Create `src/main/java/com/tripplanner/agentic/voting/VotingPlanner.java`:==
-
-```java title="VotingPlanner.java"
---8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/voting/VotingPlanner.java"
-```
-
-- `VotingStrategy` is a functional interface, so any lambda or method reference that takes a collection of votes and returns an aggregate can serve as the strategy.
-- `init()` saves the subagent list from `InitPlanningContext` for use in later callbacks.
-- `firstAction()` clears the accumulated vote list and dispatches all evaluator subagents in parallel with `call(subagents)`.
-- `nextAction()` is called once per completed parallel agent. Each call appends that agent's result via `context.previousAgentInvocation().output()` and returns `noOp()` until all evaluators have reported in. Once the count matches the subagent list size, it passes all collected results to the strategy and returns `done(result)`.
-- `topology()` returns `PARALLEL` so the Dev UI renders the evaluators as parallel branches.
-
-Neither `VotingPlanner` nor `VotingStrategy` are library classes. You can adapt the strategy for any aggregation logic: majority vote, weighted average, or consensus.
+The planner only coordinates the evaluators, while the decision about how to combine their votes comes from a `VotingStrategy`. This is a functional interface that receives the collected votes and returns the aggregate, so any lambda or method reference can act as a strategy. The library includes `majority()`, `average()`, and `highest()` strategies for votes that are plain values such as labels or numbers. Our evaluators return a `VehicleEvaluation` that combines a score with suggestions, so we'll write our own strategy that averages the scores and keeps every evaluator's suggestions for the reviser.
 
 ## Wire evaluators with @PlannerAgent
 
-The `@PlannerAgent` annotation connects the evaluator subagents to our custom planner through a `@PlannerSupplier` method.
+The `@PlannerAgent` annotation connects the evaluator subagents to the voting planner through a `@PlannerSupplier` method.
 
 ==Create `src/main/java/com/tripplanner/agentic/workflow/VehicleEvaluators.java`:==
 
@@ -165,8 +156,13 @@ The `@PlannerAgent` annotation connects the evaluator subagents to our custom pl
 ```
 
 - `@PlannerAgent` lists the three evaluator interfaces as `subAgents` and sets `outputKey = "evaluation"` so the aggregated score is available to the exit condition and the reviser.
-- `@PlannerSupplier` returns a new `VotingPlanner` with the aggregation strategy. `aggregateVotes` requires exactly three `VehicleEvaluation` results with scores in the 1–10 range and throws `IllegalStateException` on any malformed or missing result.
+- `@PlannerSupplier` returns a new `VotingPlanner` that uses `aggregateVotes` as its voting strategy. `aggregateVotes` requires exactly three `VehicleEvaluation` results with scores in the 1–10 range and throws `IllegalStateException` on any malformed or missing result.
 - The method signature includes the trip context parameters that the individual evaluators need, and the framework propagates them through the workflow scope.
+
+??? info "How does the `VotingPlanner` drive the evaluators?"
+    A planner decides which subagents run next each time the framework asks it for an action. The `VotingPlanner` answers the first request with `call(subagents)`, which starts all evaluators in parallel. The framework then asks for the next action once for every evaluator that completes. The planner adds that evaluator's output to its votes and returns `noOp()` while others are still running. After the last one reports, it returns `done(...)` with the strategy's result, which becomes the output of `VehicleEvaluators`. Its `topology()` method returns `PARALLEL`, so the Dev UI renders the evaluators as parallel branches.
+
+    The framework calls the `@PlannerSupplier` method on every invocation, so each loop iteration collects its votes in a new planner. The [`VotingPlanner` source](https://github.com/langchain4j/langchain4j/blob/main/langchain4j-agentic-patterns/src/main/java/dev/langchain4j/agentic/patterns/voting/VotingPlanner.java){target="_blank"} is a compact example of the `Planner` interface if you want to write a planner of your own.
 
 ## Add the vehicle reviser with @ChatModelSupplier
 
