@@ -157,16 +157,17 @@ It checks the economy-budget rule first, then corrects small-vehicle recommendat
 ```
 
 - `requestParams().variables()` supplies the trip details for this agent call, so each recommendation is checked against the right group size and budget, including on retries.
-- `reprompt()` asks the model for an affordable vehicle when a listed luxury brand conflicts with an economy budget.
-- `rewriteVehicle()` replaces the type, model description, and reasoning. It chooses an SUV for adventure trips, an Estate for business trips, and an MPV otherwise.
+- `reprompt()` asks the model for an affordable vehicle when a luxury brand in `LUXURY_BRANDS` conflicts with an economy budget. The reprompt message asks for a JSON response directly rather than an acknowledgement, so the model retries in structured-output mode.
+- `rewriteVehicle()` replaces the type, model description, and reasoning. It chooses an SUV for adventure trips, an Estate for business trips, and an MPV otherwise. It also sets `guardrailOverride` on the response so the UI can explain what happened.
 - `successWith()` accepts that corrected JSON without another model call, before it becomes a `TripPlan.VehicleRecommendation`.
+- The `ANNOTATE` branch runs when the customer requested a brand from `LUXURY_BRANDS` in their preferences but the model already produced a different vehicle on its own. It sets `guardrailOverride` with an explanation and lets the response through, so the UI can surface why the requested brand was not used.
 
 For a family, the replacement model is `Family MPV; specific model subject to availability.` The accompanying reason asks the customer to confirm capacity, price, and availability.
 
 Order matters: a Ferrari sports car for four travelers on an economy budget triggers `REPROMPT` first. This prevents a generic rewrite from hiding the budget violation. The next answer may still need a group-size correction.
 
 ??? info "Limits of the vehicle check"
-    The replacement is a generic category suggestion, not a checked rental offer. No inventory, seating specification, or price lookup supports it. The economy rule only recognizes its listed brands; a different model can still be unaffordable. These keyword checks cannot establish suitability for every group size or vehicle.
+    The replacement is a generic category suggestion, not a checked rental offer. No inventory, seating specification, or price lookup supports it. The economy rule matches listed brands but cannot cover every premium model; a vehicle outside the list can still be unaffordable. These keyword checks cannot establish suitability for every group size or vehicle.
 
 ## Registering guardrails with `@OutputGuardrails`
 
@@ -293,7 +294,7 @@ The vehicle-selection skill guides the model toward sensible choices for most tr
 - Start date: a future date
 - Duration: `7` days
 - Travelers: `2`
-- Trip Type: `Romantic Getaway`
+- Trip Type: `Family Vacation`
 - Budget: `Economy (€500–€1,000)`
 - Additional Preferences: `We want a Ferrari`
 
@@ -302,7 +303,7 @@ The vehicle-selection skill guides the model toward sensible choices for most tr
 When the model recommends a Ferrari on an economy budget, the vehicle guardrail should catch the issue and interrupt with a `REPROMPT`, which will send an amended prompt back to the model. Then once the model corrects its answer you should see a `PASS`. Once both agents complete, the cost estimator calls `estimateRental` and the tool input guardrail validates its arguments. A successful run produces all four lines below, though not necessarily in this order because the vehicle and itinerary agents run in parallel:
 
 ```text
-🛡️ [TripAppropriatenessGuardrail] REPROMPT — Luxury vehicle 'ferrari ...' does not match economy budget
+🛡️ [TripAppropriatenessGuardrail] REPROMPT — Vehicle 'ferrari ...' does not match economy budget
 🛡️ [TripAppropriatenessGuardrail] PASS — No configured small-vehicle or economy-brand rule matched
 🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions
 🛡️ [RentalEstimateInputGuardrail] PASS — Rental arguments accepted
@@ -310,8 +311,10 @@ When the model recommends a Ferrari on an economy budget, the vehicle guardrail 
 
 The `RentalEstimateInputGuardrail PASS` confirms the cost estimator passed valid arguments and the calculation ran. ==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"}, select **Executions** on the LangChain4j Agentic card, and expand the cost estimator entry in the latest run. Find the `estimateRental` tool call and inspect the category, duration, and returned `dailyRate`.== The daily rate shown there is what the model used for `vehiclePerDay` in the browser.
 
-!!!note 
-    If the vehicle guardrail audit log shows `PASS` on the first attempt, the model read the economy budget and self-corrected before the guardrail needed to act. Try the request again or try to fiddle with the instructions.
+The vehicle recommendation card in the browser also displays a notice when the guardrail overrode the customer's requested brand or corrected the vehicle type. If the model produced a different vehicle without a `REPROMPT`, the card shows an `ANNOTATE` notice explaining that the requested brand was not suitable for this trip. This information comes from the `guardrailOverride` field set by the guardrail on the JSON response.
+
+!!!note
+    If the vehicle guardrail audit log shows `PASS` on the first attempt and no `ANNOTATE` notice appears in the UI, the model read the economy budget and produced an affordable vehicle without the guardrail needing to act. Try requesting a specific luxury brand in the preferences field, or try a different model.
 
 When a guardrail exhausts all its retry or reprompt attempts without a passing response, the `GuardrailExceptionMapper` returns HTTP 422 and the browser displays: `The trip plan could not pass the recommendation checks. Please revise your trip details and try again.`
 

@@ -60,7 +60,7 @@ flowchart TD
 
 === "Option 1: Continue from Step 05"
 
-    ==Stop dev mode in your Step 05 working project and apply the changes below.== Keep your existing model-provider settings and dependencies.
+    ==Apply the changes below to your Step 05 working project.== Keep your existing model-provider settings and dependencies. Dev mode restarts automatically when it detects `pom.xml` changes.
 
 === "Option 2: Use the completed Step 06 project"
 
@@ -221,6 +221,12 @@ quarkus.langchain4j.mcp.tripIntelligence.tool-execution-timeout=5s
 The `tripIntelligence` name matches the `@McpClientName("tripIntelligence")` qualifier used in the `@McpClientSupplier` methods.
 
 ---
+
+## Tightening the request validation
+
+In Step 02, the Duration field intentionally accepted any number so you could trigger the rental tool's input guardrail by entering a value outside the 1–30 range it validates. That was fine while the planner was self-contained, because the guardrail was the right place to catch bad tool arguments. Now that the MCP server is in the picture, there is a hard constraint that matters earlier: `getWeatherForecast` only accepts trips of up to 30 days. Sending a longer duration reaches the tool, throws an `IllegalArgumentException`, and surfaces as a generic planning failure with no useful message to the user.
+
+The resource now validates the request before the workflow starts. A duration outside the 1–30 range returns a 400 with a clear message and never triggers the workflow at all, which is the right place to catch a value the MCP server cannot handle. The rental tool guardrail in Step 02 still demonstrates the same concept for tool-level argument checking — these are two different layers protecting different things.
 
 ## Running the demo
 

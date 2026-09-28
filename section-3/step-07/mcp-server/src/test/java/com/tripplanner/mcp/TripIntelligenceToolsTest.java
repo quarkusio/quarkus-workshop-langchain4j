@@ -62,4 +62,10 @@ class TripIntelligenceToolsTest {
 
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void unknownTripTypeIsRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> tools.getPointsOfInterest("Rome", "leisure"));
+    }
 }

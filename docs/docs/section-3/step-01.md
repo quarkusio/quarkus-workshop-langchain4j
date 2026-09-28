@@ -317,7 +317,6 @@ The itinerary planner also has guidance for other trip types. Let's see which sk
 
 For more practice with skills, try adding child-seat guidance to `family-trip/SKILL.md`. Ask the itinerary agent to include the advice in the route overview and request any missing age, height, or weight details before suggesting a specific seat. Selecting **Family Vacation** alone is not enough to determine what restraint a child needs. Compare a request to rent a child seat with one whose preferences say "We are bringing our own child seat", checking both the activated skill content and the recommendation. Leave vehicle compatibility, availability, and price for Miles of Smiles to confirm.
 
-The trip form also includes a **Romantic Getaway** option with no matching skill yet. You could add a `romantic-trip/SKILL.md` file, register it on the itinerary agent's `@Skills` list, and check the execution trace for an `activate_skill` call when you select that trip type.
 
 The exercises above used family and adventure trips. Run the same destination as **Business Travel** and confirm the `business-trip` skill is activated instead. Planning one destination three or four times with different trip types is a quick way to see how much the itinerary changes when only the skill selection differs.
 

@@ -43,7 +43,7 @@ class TripPlanInvariantStrategyTest {
                 new TripPlan(plan.vehicle(), null, plan.itinerary(), plan.costs()),
                 new TripPlan(plan.vehicle(), plan.routeOverview(), null, plan.costs()),
                 new TripPlan(plan.vehicle(), plan.routeOverview(), plan.itinerary(), null),
-                new TripPlan(new TripPlan.VehicleRecommendation("MPV", null, "Room"),
+                new TripPlan(new TripPlan.VehicleRecommendation("MPV", null, "Room", null),
                         "Rome", List.of(new TripPlan.DayItinerary(1, "Arrival", null, null)), plan.costs()))) {
             assertFalse(strategy.evaluate(sample(3), TripPlanText.render(broken)).passed());
         }
@@ -63,7 +63,7 @@ class TripPlanInvariantStrategyTest {
     }
 
     static TripPlan validPlan(int days) {
-        return new TripPlan(new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Room for luggage"),
+        return new TripPlan(new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Room for luggage", null),
                 "Rome", IntStream.rangeClosed(1, days).mapToObj(TripPlanInvariantStrategyTest::day).toList(),
                 new TripPlan.CostEstimate("€90/day", "€10", "€0", "€100", "€50", "€20", "€310"));
     }

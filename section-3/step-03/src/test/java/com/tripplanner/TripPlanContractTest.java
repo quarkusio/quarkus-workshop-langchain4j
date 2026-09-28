@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestProfile(TripPlanContractTest.ScriptedProfile.class)
 class TripPlanContractTest {
     static final TripPlan.VehicleRecommendation VEHICLE =
-            new TripPlan.VehicleRecommendation("MPV", "Family car", "Room for four travelers");
+            new TripPlan.VehicleRecommendation("MPV", "Family car", "Room for four travelers", null);
     static final ItineraryResult ITINERARY = new ItineraryResult("Local coastal route", List.of(
             new TripPlan.DayItinerary(1, "Coast", "Explore the coast", "Genoa")));
     static final TripPlan.CostEstimate COSTS =

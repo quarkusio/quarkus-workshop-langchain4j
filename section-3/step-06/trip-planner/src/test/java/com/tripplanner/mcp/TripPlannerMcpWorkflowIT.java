@@ -262,7 +262,7 @@ class TripPlannerMcpWorkflowIT {
                 Object result;
                 if (prompt.contains("vehicle specialist")) {
                     vehiclePrompts.set(prompt);
-                    result = new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Room for two travelers and luggage");
+                    result = new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Room for two travelers and luggage", null);
                 } else if (prompt.contains("itinerary planner")) {
                     itineraryPrompts.set(prompt);
                     result = new ItineraryResult("Coastal route through the region", List.of(

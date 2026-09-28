@@ -38,7 +38,7 @@ class RentalPricingAgentGuardrailTest {
     void productionAgentDeliversGuardrailErrorAndCorrectedRentalResultToScriptedModel() {
         var scriptedModel = assertInstanceOf(PricingProfile.ScriptedModel.class, chatModel);
         scriptedModel.calls = 0;
-        var vehicle = new TripPlan.VehicleRecommendation("SUV", "Workshop SUV", "Room for the travelers");
+        var vehicle = new TripPlan.VehicleRecommendation("SUV", "Workshop SUV", "Room for the travelers", null);
         var itinerary = new ItineraryResult("Five-day local trip", List.of());
 
         // Use the CDI agent producer that applies @ToolBox in the production graph.

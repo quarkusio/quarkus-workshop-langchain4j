@@ -71,6 +71,11 @@ async function planTrip() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(currentRequest)
         });
+        if (res.status === 400) {
+            goBackToForm();
+            document.getElementById("formError").textContent = await readFailureMessage(res);
+            return;
+        }
         if (!res.ok) {
             renderError(await readFailureMessage(res));
             return;
@@ -128,6 +133,7 @@ function renderPlan(plan, status, confirmation) {
             <h3>&#x1F697; Vehicle Recommendation</h3>
             <div class="card">
                 <strong>${v.type || ""} &mdash; ${v.model || ""}</strong>
+                ${v.guardrailOverride ? `<div class="guardrail-notice">&#x26A0;&#xFE0F; Guardrail override: ${v.guardrailOverride}</div>` : ""}
                 <p>${v.reasoning || ""}</p>
             </div>
         </div>
@@ -238,11 +244,11 @@ function renderCancelled() {
 async function readFailureMessage(response) {
     try {
         const failure = await response.json();
-        if ((response.status === 422 && failure?.error === "guardrail_violation")
-                || (response.status === 500 && failure?.error === "planning_failed")) {
-            if (typeof failure.message === "string" && failure.message.trim()) {
-                return failure.message.trim();
-            }
+        if (typeof failure?.message === "string" && failure.message.trim()) {
+            const knownError = (response.status === 400 && failure?.error === "invalid_request")
+                || (response.status === 422 && failure?.error === "guardrail_violation")
+                || (response.status === 500 && failure?.error === "planning_failed");
+            if (knownError) return failure.message.trim();
         }
     } catch (e) {
         // Non-JSON error pages and empty responses use the same safe fallback.

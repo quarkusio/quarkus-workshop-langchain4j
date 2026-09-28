@@ -204,7 +204,7 @@ class TripPlannerCompositionLiveIT {
                         .findFirst().orElseThrow();
                 Object result;
                 if (prompt.contains("vehicle specialist")) {
-                    result = new VehicleRecommendation("MPV", "Family MPV", "Room for two travelers and luggage");
+                    result = new VehicleRecommendation("MPV", "Family MPV", "Room for two travelers and luggage", null);
                 } else if (prompt.contains("itinerary planner")) {
                     itineraryPrompt.set(prompt);
                     result = new ItineraryResult("Coastal route through the region", List.of(

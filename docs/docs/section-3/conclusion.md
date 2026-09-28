@@ -1,8 +1,31 @@
 # Conclusion: Enterprise Agentic Patterns
 
-Congratulations! You've completed **Section 3: Enterprise Agentic Patterns** of the Quarkus LangChain4j workshop.
+You've completed Section 3. Over seven steps, you built a Customer Trip Planner that started as a synchronous multi-agent pipeline and grew into a persistent, event-driven system with guardrails, external tool integration, and automated evaluation.
 
-Over these eight steps, you've built an intelligent Customer Trip Planner powered by the most advanced patterns available in the Quarkus LangChain4j ecosystem from dynamic skills and guardrails through custom orchestration, distributed communication, and AI-powered evaluation.
+## What you built
 
-!!! note "Coming soon"
-    This conclusion is under development. Check back for the full recap and next steps.
+The trip planner began in Step 00 as a baseline with a research agent, a cost estimator, and a synchronous REST endpoint. Each subsequent step added one enterprise concern without rewriting what came before.
+
+Step 01 introduced agent skills as Markdown files on the classpath, giving the agents domain-specific guidance that can be updated without changing code. Step 02 added output guardrails and a rental pricing tool, so the planner rejects plans that violate safety or compliance rules before they reach the customer.
+
+Step 03 brought in voting and iterative loops. Multiple agents evaluate the same vehicle recommendation, their scores are aggregated, and the pipeline loops until the recommendation passes or falls back to a default. This step also introduced adaptive model selection, routing high-stakes decisions to a more capable model.
+
+Step 04 replaced the synchronous endpoint with an event-driven workflow using Quarkus Flow and Kafka. The customer submits a request, the planner produces a trip plan asynchronously, and the UI polls for results. Step 05 made that workflow durable by persisting the plan and the approval state in PostgreSQL, so a restart doesn't lose a customer's trip.
+
+Step 06 connected the planner to external services through MCP. A dedicated `@McpClientAgent` interface calls the weather and points-of-interest tools deterministically, without giving the language model the option to skip them. Step 07 closed the loop with an evaluation harness that runs invariant checks and a judge model against saved plan outputs, producing a score and a per-case report. Optional Langfuse integration attaches those scores to the OpenTelemetry traces from the planning run.
+
+## Patterns worth keeping
+
+A few patterns from this section transfer directly to other systems.
+
+Skills as external content let domain experts change agent behavior without a code change or a redeployment. Output guardrails separate enforcement from generation, so the model can produce freely while a deterministic check catches what it shouldn't return. The voting and loop pattern applies anywhere a single model call isn't reliable enough: run several, aggregate, and retry if needed.
+
+Quarkus Flow with persistence turns a stateless agent pipeline into something that survives restarts and can pause for human approval. MCP integration with `@McpClientAgent` gives you the benefits of tool calling without the unpredictability of letting the model decide whether to call the tool at all.
+
+Evaluation as a test suite, rather than a one-off manual check, lets you catch regressions every time you change a prompt or swap a model. The combination of deterministic invariants and a judge model covers both structural correctness and subjective quality.
+
+## Where to go from here
+
+Section 2 Step 08 covers A2A communication if you want to distribute agents across services. The Quarkus LangChain4j documentation at [docs.quarkiverse.io](https://docs.quarkiverse.io/quarkus-langchain4j/) has the full API reference for everything used in this section. The [LangChain4j docs](https://docs.langchain4j.dev/) cover the underlying Java library.
+
+If you're deploying to production, the bonus step in Section 2 walks through Kubernetes deployment with Quarkus profiles, health probes, and service discovery. The observability setup from Step 07 pairs well with that, giving you traces and evaluation scores from your production runs.

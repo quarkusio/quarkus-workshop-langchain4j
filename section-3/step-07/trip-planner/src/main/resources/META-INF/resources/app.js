@@ -161,6 +161,13 @@ async function planTrip() {
             body: JSON.stringify(request)
         }, PLANNING_TIMEOUT);
         if (token !== generation) return;
+        if (response.status === 400) {
+            // Request was rejected before the workflow started — show the error on the form.
+            goBackToForm();
+            document.getElementById("formError").textContent =
+                safeMessage(data, "The trip request was invalid. Please check your inputs and try again.");
+            return;
+        }
         if (isEnvelope(data)) currentTrip = data;
         if (!response.ok || !isEnvelope(data)) {
             notice = safeMessage(data, "Could not generate the trip plan. Refresh to check its status before retrying.");
@@ -206,7 +213,7 @@ function renderTrip() {
     document.getElementById("tripStatus").textContent = submitting ? "Submitting your decision..."
         : decisionUncertain && status === "awaiting_approval" ? "Decision status not yet verified. Check its status before submitting again."
         : notice && !requestId ? "Planning outcome not available." : messages[status];
-    if (notice) {
+    if (notice && status !== "failed") {
         document.getElementById("planError").hidden = false;
         document.getElementById("planError").textContent = notice;
     }
@@ -228,6 +235,7 @@ function renderPlan(plan) {
             <h3>&#x1F697; Vehicle Recommendation</h3>
             <div class="card">
                 <strong>${escapeHtml(v.type)} &mdash; ${escapeHtml(v.model)}</strong>
+                ${v.guardrailOverride ? `<div class="guardrail-notice">&#x26A0;&#xFE0F; Guardrail override: ${escapeHtml(v.guardrailOverride)}</div>` : ""}
                 <p>${escapeHtml(v.reasoning)}</p>
             </div>
         </div>

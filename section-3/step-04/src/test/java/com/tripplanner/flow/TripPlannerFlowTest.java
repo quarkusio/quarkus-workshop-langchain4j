@@ -43,7 +43,7 @@ class TripPlannerFlowTest {
     private static final TripRequest REQUEST = new TripRequest(
             "California Coast", "2026-08-15", 5, "family", 4, "$3000", "beach and scenic drives");
     private static final TripPlan PLAN = new TripPlan(
-            new TripPlan.VehicleRecommendation("SUV", "Generic SUV", "Category recommendation only"),
+            new TripPlan.VehicleRecommendation("SUV", "Generic SUV", "Category recommendation only", null),
             "Pacific Coast Highway",
             List.of(new TripPlan.DayItinerary(1, "Arrival", "Explore Santa Monica", "Santa Monica")),
             new TripPlan.CostEstimate("$120", "$80", "$10", "$200", "$100", "$50", "$560"));

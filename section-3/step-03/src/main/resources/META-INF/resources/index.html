@@ -33,6 +33,8 @@
         .btn-plan { width: 100%; padding: 0.75rem; background: #1a237e; color: white; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
         .btn-plan:hover { background: #283593; }
         .btn-plan:disabled { background: #9e9e9e; cursor: not-allowed; }
+        #formError { color: #b71c1c; font-size: 0.9rem; margin-bottom: 1rem; }
+        #formError:empty { display: none; }
 
         /* Results page */
         .results-page { padding: 2rem; }
@@ -93,6 +95,7 @@
 <div id="formPage" class="form-page active">
     <div class="form-container">
         <h2>Plan a New Trip</h2>
+        <p id="formError" role="alert"></p>
         <div class="form-group">
             <label>Destination</label>
             <input type="text" id="destination" placeholder="e.g. Italian Riviera, Swiss Alps, Provence">
@@ -117,8 +120,6 @@
                 <option value="family">Family Vacation</option>
                 <option value="business">Business Travel</option>
                 <option value="adventure">Adventure Trip</option>
-                <option value="romantic">Romantic Getaway</option>
-                <option value="roadtrip">Classic Road Trip</option>
             </select>
         </div>
         <div class="form-group">
