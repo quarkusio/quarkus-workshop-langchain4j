@@ -1,6 +1,6 @@
 # Step 03: Voting, loops, and adaptive model selection
 
-This step extends the guardrails-aware trip planner from Step 02 with a vehicle review loop that evaluates and refines the vehicle recommendation before cost estimation. Three evaluator agents vote on the recommended vehicle in parallel using a custom `VotingPlanner`, a reviser agent refines the recommendation based on the aggregated evaluation, and an `@ExitCondition` stops the loop once the score reaches a threshold.
+This step extends the guardrails-aware trip planner from Step 02 with a vehicle review loop that evaluates and refines the vehicle recommendation before cost estimation. Three evaluator agents vote on the recommended vehicle in parallel using the `VotingPlanner` from `langchain4j-agentic-patterns`, a reviser agent refines the recommendation based on the aggregated evaluation, and an `@ExitCondition` stops the loop once the score reaches a threshold.
 
 The `VehicleReviewLoop` is inserted between the `ResearchPhase` and `CostEstimatorAgent` in the planning sequence. The cost estimator seamlessly receives the refined vehicle because the loop's `outputKey` overwrites the original recommendation in the workflow scope.
 
@@ -22,7 +22,7 @@ TripPlannerSystem (@SequenceAgent)
 └── CostEstimatorAgent → outputKey="costs"
 ```
 
-The `VotingPlanner` and `VotingStrategy` are custom classes implementing the `dev.langchain4j.agentic.planner.Planner` interface. They dispatch evaluator subagents in parallel, collect their outputs from the workflow scope, and aggregate them into a single `VehicleEvaluation` using an averaging strategy.
+The `VotingPlanner` comes from the `langchain4j-agentic-patterns` module. It dispatches the evaluator subagents in parallel, collects each evaluator's output as a vote, and aggregates the votes into a single `VehicleEvaluation` using the averaging strategy defined in `VehicleEvaluators.aggregateVotes`.
 
 ## Run
 
