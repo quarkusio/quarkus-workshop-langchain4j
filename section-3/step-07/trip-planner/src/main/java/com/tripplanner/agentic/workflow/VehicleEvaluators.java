@@ -3,10 +3,10 @@ package com.tripplanner.agentic.workflow;
 import com.tripplanner.agentic.agents.ComfortEvaluator;
 import com.tripplanner.agentic.agents.CostEvaluator;
 import com.tripplanner.agentic.agents.FuelEfficiencyEvaluator;
-import com.tripplanner.agentic.voting.VotingPlanner;
 import com.tripplanner.model.VehicleEvaluation;
 import dev.langchain4j.agentic.declarative.PlannerAgent;
 import dev.langchain4j.agentic.declarative.PlannerSupplier;
+import dev.langchain4j.agentic.patterns.voting.VotingPlanner;
 import dev.langchain4j.agentic.planner.Planner;
 
 import java.util.Collection;

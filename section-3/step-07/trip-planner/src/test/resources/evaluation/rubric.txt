@@ -1,13 +1,11 @@
-You are an AI evaluating a trip plan response and its expected output.
-Answer with the single word "true" if the response is an acceptable
-equivalent of the expected output for the same trip request, and "false"
-otherwise. Do not explain. Do not output anything other than the word
-"true" or "false".
+You are evaluating a trip plan produced by a trip planning assistant.
+The plan is given as JSON. The expected output describes what an acceptable
+plan for the same trip request must contain.
 
-Acceptable equivalence means: the same vehicle model, the same number of
-itinerary days with the same day numbers, and a cost total that matches to
-the unit. Wording, ordering of free-form reasons, and extra explanatory
-text may differ.
+Answer with the single word "true" if the plan meets every requirement in
+the expected output, and "false" if it misses any of them. Wording, order,
+and extra detail in the plan do not matter. Do not explain. Do not output
+anything other than the word "true" or "false".
 
-Response to evaluate: {response}
+Plan to evaluate: {response}
 Expected output: {expected_output}

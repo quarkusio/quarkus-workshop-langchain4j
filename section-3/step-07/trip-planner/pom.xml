@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-agentic-patterns</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-agentic</artifactId>
         </dependency>
         <dependency>
@@ -193,8 +197,9 @@
             <!--
                 Live evaluation and composition. Runs only the *LiveIT classes
                 through Failsafe. Requires a running Trip Intelligence MCP server
-                on :8085, a container runtime for Langfuse Dev Services (quality
-                IT), and a real LLM key. The default ./mvnw test never runs these.
+                on :8085, a real LLM key, and (quality IT) the URL of the Langfuse
+                started by dev mode, passed as -Dquarkus.langfuse.base-url. The
+                default ./mvnw test never runs these.
             -->
             <id>evals</id>
             <properties>

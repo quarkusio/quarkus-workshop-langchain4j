@@ -1,9 +1,10 @@
 # Evaluation samples for the trip planner (step 07).
 #
-# The expected-output is the deterministic TripPlanText rendering of the plan
-# the scripted model is expected to produce. The live evaluation function
-# renders a real run the same way, so a sample passes its invariant and
-# judge checks only when the real run matches this shape.
+# The parameters are the planner inputs, in planTrip order: destination,
+# start date, days, travel style, travelers, budget, interests.
+# The expected-output describes what an acceptable plan for that request must
+# contain. The AI judge compares a real plan against it using rubric.txt; the
+# invariant strategy only uses the parameters.
 - name: "rome-family-three-days"
   parameters:
     - "Rome"
@@ -13,7 +14,12 @@
     - "2"
     - "moderate"
     - "coastal towns"
-  expected-output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Departure\nCost total: 310\n"
+  expected-output: >-
+    A three-day family road trip starting in Rome in July for two travelers.
+    The vehicle suits two people with luggage and is not a luxury or sports
+    car. The itinerary has days 1 to 3, each with family-friendly activities,
+    and includes at least one coastal town. The cost total is a euro amount
+    that is reasonable for a moderate budget.
   tags:
     - "smoke"
     - "mcp"
@@ -27,7 +33,12 @@
     - "2"
     - "moderate"
     - "beaches"
-  expected-output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Departure\nCost total: 310\n"
+  expected-output: >-
+    A three-day family road trip starting in Barcelona in July for two
+    travelers. The vehicle suits two people with luggage and is not a luxury
+    or sports car. The itinerary has days 1 to 3, each with family-friendly
+    activities, and includes time at the beach. The cost total is a euro
+    amount that is reasonable for a moderate budget.
   tags:
     - "smoke"
     - "mcp"
@@ -41,6 +52,11 @@
     - "2"
     - "moderate"
     - "historic sites"
-  expected-output: "Vehicle: Family MPV (Room for two travelers and luggage)\nRoute: Coastal route through the region\nDay 1: Arrival\nDay 2: Family day\nDay 3: Sightseeing\nDay 4: Day trip\nDay 5: Markets\nDay 6: Leisure\nDay 7: Departure\nCost total: 310\n"
+  expected-output: >-
+    A seven-day family road trip starting in Rome in July for two travelers.
+    The vehicle suits two people with luggage and is not a luxury or sports
+    car. The itinerary has days 1 to 7, includes historic sites, and leaves
+    room for rest. The cost total is a euro amount that is reasonable for a
+    moderate budget.
   tags:
     - "smoke"
