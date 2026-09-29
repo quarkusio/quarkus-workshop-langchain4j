@@ -74,11 +74,11 @@ Unrelated wrapped agent failures return HTTP 500:
 
 Neither message includes exception details or model output. Those details are logged server-side and may be sensitive. Tool-input rejection normally returns an error to the model inside its conversation, not HTTP 422. Failures outside `AgentInvocationException` mapping, such as malformed HTTP input, are not covered by this contract.
 
-The supplied UI reads a nonblank string message only for a matching status/error-code pair and renders it with `textContent`. Invalid responses and network errors use the same generic message as `planning_failed`. Other trip fields still use the existing renderer; this error-path change is not general HTML sanitization.
+The supplied UI reads a nonblank string message only for a matching status/error-code pair and renders it with `textContent`. Invalid responses and network errors use the same generic message as `planning_failed`. Trip fields in a successful plan are escaped before rendering.
 
 ## Continue
 
-Follow the [Step 02 tutorial](../../docs/docs/section-3/step-02.md) for the hands-on changes and inspection exercise. Participants continuing from Step 01 must copy this step's `src/main/resources/META-INF/resources/app.js` to the same path in their working copy, keep their `index.html`, and refresh the browser. Copy the supplied guardrail, mapper, HTTP, and frontend tests too. No participant frontend implementation is required.
+Follow the [Step 02 tutorial](../../docs/docs/section-3/step-02.md) for the hands-on changes and inspection exercise. The frontend is the same as in Step 01. Participants continuing from Step 01 copy the supplied guardrail, mapper, HTTP, and frontend tests. No participant frontend implementation is required.
 
 When continuing to Step 03, preserve the pricing tool and guardrail, the cost agent's `days` parameter and tool instructions, and the vehicle and audit corrections. Convert `days` to `Integer` along with `travelers` if the workflow switches to numeric scope values. Carry the error codes and safe messages through the event/store boundary: the REST mapper cannot report a background failure unless that outcome is explicitly returned to the client. Do not turn every workflow failure into `guardrail_violation` or expose exception messages in workflow status responses.
 

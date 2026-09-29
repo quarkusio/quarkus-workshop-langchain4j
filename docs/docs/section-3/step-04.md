@@ -34,7 +34,7 @@ The initial planning HTTP request still waits for a generated plan or a failure.
 
 Kafka runs through Dev Services, so Docker or Podman must be running for the live exercise. Keep the model-provider configuration from Step 02, including your API key environment variable.
 
-The exercise changes the Flow definition. The frontend, event store, REST resources, payload models, and tests are supplied so we can concentrate on starting, suspending, and resuming a workflow instead of implementing HTTP and browser plumbing.
+The exercise changes the Flow definition. The event store, REST resources, payload models, and tests are supplied so we can concentrate on starting, suspending, and resuming a workflow instead of implementing HTTP and browser plumbing. The browser frontend is the one you have used since Step 00. It already knows how to show the workflow status and the approval buttons, so it does not change in this step.
 
 === "Option 1: Continue from Step 03 and build the new features hands-on"
 
@@ -45,7 +45,6 @@ The exercise changes the Flow definition. The frontend, event store, REST resour
     ==Copy these supplied paths from `section-3/step-04` to the same paths in your working copy, replacing matching files:==
 
     - `src/main/java/com/tripplanner/` (the retained agents and guardrails, plus the new Flow, store, resources, and models)
-    - `src/main/resources/META-INF/resources/` (both `index.html` and `app.js`)
     - `src/main/resources/skills/family-trip/SKILL.md` (the Step 01 baseline with driving-time and break guidance)
     - `src/test/java/com/tripplanner/` (the Flow smoke suite and store lifecycle tests)
     - `src/test/resources/application.properties`
@@ -59,7 +58,7 @@ The exercise changes the Flow definition. The frontend, event store, REST resour
 
 === "Option 2: Use the completed Step 04 project and review the changes"
 
-    ==Copy `section-3/step-04` to a working directory and open that copy.== It supplies the Flow definition and the matching frontend, store, resources, models, and tests. Keep the supplied frontend for this step; the Step 02 frontend expects a bare plan and cannot handle the approval status envelope.
+    ==Copy `section-3/step-04` to a working directory and open that copy.== It supplies the Flow definition and the matching store, resources, models, and tests.
 
     ==Apply your Step 02 model-provider settings to `src/main/resources/application.properties`, keeping the supplied Flow and Kafka settings.== If you use a different provider extension, keep its dependency as well.
 
