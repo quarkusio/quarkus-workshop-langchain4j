@@ -2,13 +2,13 @@
 
 A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. Such are the joys of working with probabilistic AI models. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline.
 
-We'll attach output guardrails to the vehicle and itinerary agents so they can request another response or rewrite a recommendation. We'll also give the cost estimator a tool that calculates rental prices from a small rate list, with a tool input guardrail to reject invalid arguments before the calculation runs. Fixed-response tests will let us inspect a corrected vehicle and distinguish exhausted recommendation checks from an unrelated planning failure, without having to provoke a live-model mistake.
+We'll attach output guardrails to the vehicle and itinerary agents so they can request another response or rewrite a recommendation. We'll also give the cost estimator a tool that calculates rental prices from a small rate list, with a tool input guardrail to reject invalid arguments before the calculation runs. Tests with fixed model responses will check each of these paths without waiting for a live model to make the right mistake.
 
 ## Per-agent output guardrails
 
-The [input guardrails from Section 1](../section-1/step-09.md) checked the customer's message before it reached the model. Here on the other hand, we need to check the recommendations the agents produce before the cost estimator uses them. **Output guardrails** run after an agent has finished its model and tool interactions, allowing the application to inspect the response before accepting it.
+The [input guardrails from Section 1](../section-1/step-09.md) checked the customer's message before it reached the model. This time we need to check the recommendations the agents produce before the cost estimator uses them. Output guardrails run after an agent has finished its model and tool interactions, allowing the application to inspect the response before accepting it.
 
-We'll add these checks to the parallel research phase from Step 01. An **itinerary guardrail** will look for an absent or empty itinerary and a short list of dangerous-area phrases, while a **vehicle guardrail** will compare the recommendation with the customer's request.
+We'll add these checks to the parallel research phase from Step 01. An itinerary guardrail will look for a missing or empty itinerary and a short list of dangerous-area phrases, while a vehicle guardrail will compare the recommendation with the customer's request.
 
 A guardrail can accept the answer, fix it, or ask the model to try again. The four responses below determine which path the workflow takes.
 
@@ -36,7 +36,7 @@ For the family of five, `successWith(AiMessage)` lets the application replace th
 
 When the model needs another attempt, `retry(errorMessage)` requests a new response without adding guidance. With `reprompt(errorMessage, instructions)`, the first argument describes the problem for the application log, and the second tells the model what to change. Our vehicle guardrail uses this to request an affordable option when a recommendation breaks the economy-budget rule.
 
-Both paths back to the model run the new response through the checks again. We'll also set an **attempt limit** when registering the guardrails so that repeated failures stop planning instead of looping indefinitely.
+Both paths back to the model run the new response through the checks again. We'll also set an attempt limit when registering the guardrails so that repeated failures stop planning instead of looping indefinitely.
 
 ## Tool input guardrails
 
@@ -46,7 +46,7 @@ Checking tool arguments is particularly important when a tool can modify the fil
 
 Our rental calculator has no such serious side effects, but the model could still request an unknown vehicle category or a rental of zero days. These values need checking before the calculator runs.
 
-A tool input guardrail sits between the agent's tool request and the calculation. Valid arguments let the tool execute. Invalid arguments **block** that call and **return an error** to the model as a tool result, giving it a chance to correct its request.
+A tool input guardrail sits between the agent's tool request and the calculation. Valid arguments let the tool execute. Invalid arguments block that call and return an error to the model as a tool result, giving it a chance to correct its request.
 
 ```mermaid
 flowchart LR
@@ -57,7 +57,7 @@ flowchart LR
     Tool -->|Daily rate and subtotal| Agent
 ```
 
-This check happens within the agent's tool-calling conversation. Rejecting a tool call does not consume the output guardrail's attempt allowance. We'll add the calculator and its input guardrail after implementing the vehicle and itinerary output checks.
+We'll add the calculator and its input guardrail after implementing the vehicle and itinerary output checks.
 
 ## Preparing the working copy
 
@@ -115,18 +115,14 @@ The itinerary guardrail asks the model to try again when its response has invali
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripSafetyGuardrail.java"
 ```
 
-- `extractJson()` finds the JSON inside a response, including one wrapped in Markdown fences.
-- `validate()` checks for an itinerary, then scans the route overview and daily descriptions for the configured phrases.
-- `retry()` requests another response. Its error message records the problem but is not sent to the model as corrective guidance.
-
-For example, an empty `itinerary` array triggers another attempt before the response becomes an `ItineraryResult`.
+`extractJson()` finds the JSON inside a response, even when the model wraps it in Markdown fences. `validate()` checks that there is an itinerary, then scans the route overview and daily descriptions for the configured phrases. If anything is wrong, `retry()` asks for another response. Its error message goes to the log, not to the model, so an empty `itinerary` array simply gets a second attempt before the response becomes an `ItineraryResult`.
 
 ??? info "What does an itinerary PASS mean?"
     `PASS` means the itinerary is nonempty and none of the configured phrases matched. It does not establish that the route is safe or has the requested number of days. Titles are not scanned, and a warning such as "avoid the conflict area" still matches the phrase list.
 
     Blank text is logged as `SKIP` and allowed through without validation. Tool-call content is not inspected.
 
-The following sequence illustrates a retry whose second response passes the implemented checks. The messages are descriptions of the interaction, not captured logs.
+Here's what a retry looks like when the second response passes:
 
 ```mermaid
 sequenceDiagram
@@ -146,9 +142,7 @@ sequenceDiagram
 
 ## Rewriting and reprompting with `successWith()` and `reprompt()`
 
-The vehicle guardrail checks whether a recommendation fits the customer's group size and budget.
-
-It checks the economy-budget rule first, then corrects small-vehicle recommendations for groups of four or more.
+The vehicle guardrail checks whether a recommendation fits the customer's group size and budget. It checks the economy-budget rule first, then corrects small-vehicle recommendations for groups of four or more.
 
 ==Create `src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java`:==
 
@@ -156,13 +150,11 @@ It checks the economy-budget rule first, then corrects small-vehicle recommendat
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java"
 ```
 
-- `requestParams().variables()` supplies the trip details for this agent call, so each recommendation is checked against the right group size and budget, including on retries.
-- `reprompt()` asks the model for an affordable vehicle when a luxury brand in `LUXURY_BRANDS` conflicts with an economy budget. The reprompt message asks for a JSON response directly rather than an acknowledgement, so the model retries in structured-output mode.
-- `rewriteVehicle()` replaces the type, model description, and reasoning. It chooses an SUV for adventure trips, an Estate for business trips, and an MPV otherwise. It also sets `guardrailOverride` on the response so the UI can explain what happened.
-- `successWith()` accepts that corrected JSON without another model call, before it becomes a `TripPlan.VehicleRecommendation`.
-- The `ANNOTATE` branch runs when the customer requested a brand from `LUXURY_BRANDS` in their preferences but the model already produced a different vehicle on its own. It sets `guardrailOverride` with an explanation and lets the response through, so the UI can surface why the requested brand was not used.
+`requestParams().variables()` gives the guardrail the trip details for this agent call, so every recommendation, retries included, is checked against the right group size and budget. When a brand from `LUXURY_BRANDS` turns up on an economy budget, `reprompt()` asks the model for an affordable vehicle. The reprompt message asks for JSON straight away instead of an acknowledgement, which keeps the model in structured-output mode.
 
-For a family, the replacement model is `Family MPV; specific model subject to availability.` The accompanying reason asks the customer to confirm capacity, price, and availability.
+For a vehicle that is too small, `rewriteVehicle()` replaces the type, model description, and reasoning with an SUV for adventure trips, an Estate for business trips, or an MPV otherwise. `successWith()` then accepts the corrected JSON without another model call. For a family, the replacement is `Family MPV; specific model subject to availability.`, with a note asking the customer to confirm capacity, price, and availability.
+
+Both paths set `guardrailOverride` on the response so the UI can explain what happened. So does the `ANNOTATE` branch, which covers a customer who asked for a luxury brand when the model had already picked something sensible on its own. That response passes through unchanged, apart from the explanation.
 
 Order matters: a Ferrari sports car for four travelers on an economy budget triggers `REPROMPT` first. This prevents a generic rewrite from hiding the budget violation. The next answer may still need a group-size correction.
 
@@ -185,7 +177,7 @@ The agents need to run these checks whenever the model returns a recommendation.
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java"
 ```
 
-Each `@OutputGuardrails` annotation connects the agent to its guardrail, which checks the response before deserialization. In this step's dependency version, `maxRetries = 3` allows the first response and two more attempts, as verified by the exhaustion tests below. These checks run alongside the existing prompts and skills within the same research workflow.
+Each `@OutputGuardrails` annotation connects the agent to its guardrail, which checks the response before deserialization. With `maxRetries = 3`, the agent gets the first response plus two more attempts, which the exhaustion tests below confirm.
 
 ## Mapping guardrail exceptions to HTTP responses
 
@@ -225,12 +217,9 @@ The model supplies the tool's arguments, so we need to check the category and du
 --8<-- "../../section-3/step-02/src/main/java/com/tripplanner/guardrails/RentalEstimateInputGuardrail.java"
 ```
 
-- `validate()` checks the raw JSON before Quarkus converts it to Java arguments. Categories must be exactly `compact`, `estate`, `suv`, or `mpv`, and days must be an integer from 1 to 30.
-- `failure()` blocks the calculation and returns the reason to the model as a tool error, giving it a chance to correct its request.
+`validate()` checks the raw JSON before Quarkus converts it to Java arguments. The category must be exactly `compact`, `estate`, `suv`, or `mpv`, and days must be a whole number from 1 to 30, so `days: 1.5` and `days: "5"` are both rejected instead of being quietly converted. `failure()` blocks the calculation and hands the reason back to the model as a tool error.
 
-For example, `days: 1.5` and `days: "5"` are both rejected. Neither is silently converted to a whole number.
-
-Rejecting a tool call does not consume the output guardrail's attempt allowance or automatically fail the HTTP request. The model can request another tool call within the same conversation. See the [tool guardrails reference](https://docs.quarkiverse.io/quarkus-langchain4j/dev/function-calling.html#_tool_guardrails){target="_blank"} for more detail.
+A rejected tool call doesn't use up any of the output guardrail's attempts, and it doesn't fail the HTTP request. The model can simply try another tool call in the same conversation. See the [tool guardrails reference](https://docs.quarkiverse.io/quarkus-langchain4j/dev/function-calling.html#_tool_guardrails){target="_blank"} for more detail.
 
 ### Giving the cost estimator access
 
@@ -267,7 +256,7 @@ If the application is not already running, start it from the project directory y
 - Trip Type: `Family Vacation`
 - Budget: `Moderate (€1,000–€2,500)`
 
-==Click **Generate Trip Plan**, wait for it to finish, and check the terminal for guardrail decisions.== You should see the INFO messages written by `GuardrailAuditLog` when both responses reach the final success branch.
+==Click **Generate Trip Plan**, wait for it to finish, and check the terminal for guardrail decisions.== When both agents' responses pass, `GuardrailAuditLog` writes two INFO lines like these:
 
 ```text
 🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions
@@ -279,14 +268,13 @@ If the application is not already running, start it from the project directory y
 
 A `PASS` means the recommendation already met the rules. A `REPROMPT` means the guardrail sent the model corrective instructions and waited for another answer. A `REWRITE` means the guardrail replaced the response directly without another model call. If a `REPROMPT` appears, look for the subsequent guardrail decision to see whether the next answer passed.
 
-The `RentalEstimateInputGuardrail` decisions are also recorded in the INFO messages above. A valid call should have a corresponding `Rental calculation executed` message, while a rejected call returns an error without entering that method. A later corrected call can produce its own calculation message, so follow the arguments for each attempt.
+The `RentalEstimateInputGuardrail` decisions show up in the same log. Every accepted call is followed by a `Rental calculation executed` message, and a rejected call never gets that far.
 
-==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"}==, select **Executions** on the LangChain4j Agentic card, and expand the `estimateCosts` in the latest run. Look for an `estimateRental` call and inspect its category, duration, and result. For example, an accepted `suv` call for five days returns a daily rate of 80 EUR and a rental subtotal of 400 EUR. Compare the returned rate with the vehicle-per-day amount displayed in the browser, without treating the full trip total as the rental subtotal.
-
+==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"}, select **Executions** on the LangChain4j Agentic card, and expand `estimateCosts` in the latest run.== Look for the `estimateRental` call and its category, duration, and result. An accepted `suv` call for five days, for example, returns a daily rate of 80 EUR and a rental subtotal of 400 EUR. The daily rate should match the vehicle-per-day amount in the browser.
 
 ## Observing a guardrail reprompt in the browser
 
-The vehicle-selection skill guides the model toward sensible choices for most trips, but the guardrail's budget rule operates independently of the skill. Let's try to trigger it by requesting a luxury vehicle on an economy budget.
+The vehicle-selection skill guides the model toward sensible choices for most trips, but the guardrail's budget rule operates independently of the skill. Let's try to trigger it by requesting a luxury vehicle on an economy budget. (A Ferrari request once made it as far as the Miles of Smiles finance department, where it was received in stony silence.)
 
 ==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and fill in the form:==
 
@@ -300,7 +288,7 @@ The vehicle-selection skill guides the model toward sensible choices for most tr
 
 ==Click **Generate Trip Plan**, wait for it to finish, and look for the guardrail decisions in the terminal.==
 
-When the model recommends a Ferrari on an economy budget, the vehicle guardrail should catch the issue and interrupt with a `REPROMPT`, which will send an amended prompt back to the model. Then once the model corrects its answer you should see a `PASS`. Once both agents complete, the cost estimator calls `estimateRental` and the tool input guardrail validates its arguments. A successful run produces all four lines below, though not necessarily in this order because the vehicle and itinerary agents run in parallel:
+When the model recommends a Ferrari on an economy budget, the vehicle guardrail steps in with a `REPROMPT`, and once the model corrects its answer you should see a `PASS`. After both agents finish, the cost estimator calls `estimateRental` and the tool input guardrail checks its arguments. You should see these four lines, though not necessarily in this order, since the vehicle and itinerary agents run in parallel:
 
 ```text
 🛡️ [TripAppropriatenessGuardrail] REPROMPT — Vehicle 'ferrari ...' does not match economy budget
@@ -308,8 +296,6 @@ When the model recommends a Ferrari on an economy budget, the vehicle guardrail 
 🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions
 🛡️ [RentalEstimateInputGuardrail] PASS — Rental arguments accepted
 ```
-
-The `RentalEstimateInputGuardrail PASS` confirms the cost estimator passed valid arguments and the calculation ran. ==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"}, select **Executions** on the LangChain4j Agentic card, and expand the cost estimator entry in the latest run. Find the `estimateRental` tool call and inspect the category, duration, and returned `dailyRate`.== The daily rate shown there is what the model used for `vehiclePerDay` in the browser.
 
 The vehicle recommendation card in the browser also displays a notice when the guardrail overrode the customer's requested brand or corrected the vehicle type. If the model produced a different vehicle without a `REPROMPT`, the card shows an `ANNOTATE` notice explaining that the requested brand was not suitable for this trip. This information comes from the `guardrailOverride` field set by the guardrail on the JSON response.
 
@@ -320,7 +306,7 @@ When a guardrail exhausts all its retry or reprompt attempts without a passing r
 
 ## Observing a tool input guardrail rejection
 
-The Duration field in the form accepts any number (the Miles of Smiles developers were perhaps a bit lazy 😉), so we can trigger the input guardrail simply by entering a value outside the tool's accepted range.
+The Duration field in the form accepts any number (the Miles of Smiles developers were perhaps a bit lazy), so we can trigger the input guardrail simply by entering a value outside the tool's accepted range.
 
 ==Open [http://localhost:8080](http://localhost:8080){target="_blank"}, fill in the form with any destination, and set Duration to `45` days. Click **Generate Trip Plan** and look for the `RentalEstimateInputGuardrail` lines in the terminal:==
 
@@ -329,9 +315,9 @@ The Duration field in the form accepts any number (the Miles of Smiles developer
 🛡️ [RentalEstimateInputGuardrail] PASS — Rental arguments accepted
 ```
 
-There is no `Rental calculation executed` line after the rejected call since the guardrail blocked it before reaching the calculation. The model receives the rejection reason as a tool result and then decides what to do. For example, it could retry with arguments within the accepted range by splitting the 45-day rental into two separate calls (30 days and 15 days) and combining the results itself. Each valid call then produces its own `PASS` and `Rental calculation executed` line.
+There is no `Rental calculation executed` line after the rejected call, because the guardrail stopped it first. The model gets the rejection reason as a tool result and decides what to do next. A resourceful model might split the 45-day rental into a 30-day and a 15-day call and add them up itself, and each of those calls gets its own `PASS` and `Rental calculation executed` line.
 
-The browser would still show a 45-day trip plan because the itinerary agent received the full duration from the form since the tool input guardrail protects the calculation, not the request. 
+The browser still shows a 45-day trip plan. The tool input guardrail protects the calculation, and the itinerary agent got the full duration straight from the form.
 
 ==Open the Dev UI Executions panel for the cost estimator, expand the latest run, and compare the rejected tool call with the corrected ones that follow it.==
 
@@ -344,9 +330,9 @@ The browser would still show a 45-day trip plan because the itinerary agent rece
     quarkus.langchain4j.openai.api-key=${OPENAI_API_KEY:test}
     ```
 
-    **Guardrail unit tests** — `*GuardrailTest` covers the output guardrails (rewrite, reprompt, retry decisions) and the rental pricing input guardrail (invalid arguments blocked, valid arguments reaching the calculation). An invalid duration is rejected with `Input guardrail failed for tool estimateRental: Set days to a whole number from 1 to 30.` A valid five-day SUV call logs `Rental calculation executed: category=suv, days=5, total=400 EUR`.
+    The `*GuardrailTest` classes cover the output guardrails (rewrite, reprompt, retry decisions) and the rental pricing input guardrail (invalid arguments blocked, valid arguments reaching the calculation). An invalid duration is rejected with `Input guardrail failed for tool estimateRental: Set days to a whole number from 1 to 30.` A valid five-day SUV call logs `Rental calculation executed: category=suv, days=5, total=400 EUR`.
 
-    **HTTP failure tests** — `TripPlanningFailureTest` calls the real `POST /trip/plan` endpoint with scripted model responses. It checks that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. `VehicleGuardrailConcurrencyTest` exercises concurrent planning through the agent pipeline with scripted model responses. The exhausted-check cases assert this response body:
+    `TripPlanningFailureTest` calls the real `POST /trip/plan` endpoint with scripted model responses. It checks that corrected vehicle fields reach the client, that exhausted guardrail attempts return HTTP 422, and that an unrelated agent failure returns HTTP 500. `VehicleGuardrailConcurrencyTest` exercises concurrent planning through the agent pipeline with scripted model responses. The exhausted-check cases assert this response body:
 
     ```json
     {
@@ -369,7 +355,7 @@ The browser would still show a 45-day trip plan because the itinerary agent rece
 
     The default Surefire configuration runs guardrail unit tests, `TripPlanningFailureTest`, and `GuardrailExceptionMapperTest`. Baseline contract checks stay in Step 00.
 
-    **Browser test** — The Playwright test displays a family vehicle correction and error responses at desktop and mobile widths using intercepted responses, without model calls. Node.js and npm are needed; they are not application dependencies.
+    There is also a Playwright browser test that shows a family vehicle correction and the error responses at desktop and mobile widths, using intercepted responses instead of model calls. It needs Node.js and npm, which are not application dependencies.
 
     ```bash
     npm install --no-save --package-lock=false playwright
