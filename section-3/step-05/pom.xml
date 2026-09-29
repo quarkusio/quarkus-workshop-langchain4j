@@ -151,7 +151,7 @@
                 <configuration>
                     <argLine>@{argLine}</argLine>
                     <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
-                    <!-- Step 04 adds persistence only; flow/guardrail coverage lives in step 03. -->
+                    <!-- Step 05 adds PostgreSQL persistence only; guardrail coverage lives in Step 02, Flow smoke tests in Step 04. -->
                     <includes>
                         <include>**/PersistentTripPlanStoreTest.java</include>
                         <include>**/TripPlanStoreLifecycleTest.java</include>

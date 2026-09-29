@@ -39,10 +39,7 @@ cd trip-planner && ./mvnw test
 
 This runs the invariant strategy against the known-good and known-bad fixtures, the judge contract with a scripted model, the scorer and sample loading, and the run recorder. It is the fast check to run after a prompt, skill, or model change.
 
-MCP server tests:
-```bash
-cd mcp-server && ./mvnw test
-```
+The MCP server carries no tests of its own in this step; its `@Tool` methods are unchanged from Step 06 and covered there.
 
 Live evaluation suite (needs the MCP server running, a container runtime, and a real model key):
 
