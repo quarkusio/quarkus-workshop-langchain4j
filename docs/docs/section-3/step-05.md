@@ -340,9 +340,11 @@ Once the plan is ready, the results page shows the workflow and request identifi
 
 ==Note both identifiers and inspect [the latest-trip response](http://localhost:8080/trip/plan/latest){target="_blank"} so you can compare the original request and plan after restarting.==
 
-==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and navigate to **Datasources**. Inspect the `workflow_instance` and `trip_plan_status` tables.==
+==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"} and select **Database view** on the Agroal card. Inspect the `workflowinstanceentity` and `trip_plan_status` tables.==
 
-The workflow table should contain the saved instance, while the trip-plan table should hold the original request and generated plan with status `awaiting_approval`. Both should carry the workflow identifier shown in the browser.
+The `workflowinstanceentity` table should contain the saved instance, while `trip_plan_status` should hold the original request and generated plan with status `awaiting_approval`. Both should carry the workflow identifier shown in the browser.
+
+![The Agroal Database view with the trip_plan_status row, showing the workflow identifier, request identifier, and awaiting_approval status](../images/section-3-step-05-database-view.png)
 
 ==Select **Workflows** on the Quarkus Flow card and inspect `trip-planner-flow`. Check the task-transition logs for your instance reaching `waitApproval` before stopping the application.== The Flow debug logging from Step 04 remains enabled. ==Keep the workflow definition and configuration unchanged during the restart check.==
 
@@ -375,7 +377,7 @@ The log excerpt below illustrates the restoration messages. ==Find your own trip
 
 The restored workflow can now process the approval and complete the simulated booking, even though it began in the previous application run. As in Step 04, HTTP 202 reports `decision_submitted`, and the browser waits for a status read reporting `confirmed`. The confirmation appears with the same identifiers, and nobody had to generate another plan. As before, no vehicle has actually been reserved.
 
-==Check `trip_plan_status` again in the Dev UI.== Its row should now have status `confirmed` and a booking confirmation in the JSON `confirmation` field, while `request`, `plan`, and `acceptedDecision` remain available.
+==Check `trip_plan_status` again in the Dev UI.== Its row should now have status `confirmed` and a booking confirmation in the JSON `confirmation` field, while `request`, `plan`, and `accepteddecision` remain available.
 
 ==Stop and start the application once more, then refresh the browser without generating a new trip.== The same confirmed trip, reviewed plan, and simulated booking reference should return. The final outcome survives a restart as well as the approval wait.
 
