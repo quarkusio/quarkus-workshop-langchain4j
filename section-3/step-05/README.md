@@ -51,13 +51,7 @@ The default Surefire suite runs only Step 05 persistence tests. Guardrail and HT
 
 `PersistentTripPlanStoreTest` reads through new transactions and new store objects. It covers registration before binding, active planning exclusion, decisions, every terminal status, replay/identity/transition guards, safe failure, deterministic ordering, and failed database commits without acknowledgement. `TripPlanStoreLifecycleTest` uses the same persistence-aware fixture for lifecycle-event handling. Store recreation alone is not an application-restart test.
 
-The browser checks from earlier steps still apply to this UI. They serve their own HTML/JS and intercept API responses. With Playwright installed in the working copy:
-
-```bash
-node --test src/test/frontend/app.test.cjs
-```
-
-Use `BROWSER_CHANNEL=chrome` for installed Chrome, or install Playwright Chromium. The opt-in `live.test.cjs` is inherited unchanged and calls a real model only when its live environment variables are set; it is not part of the controlled verification.
+The UI is unchanged from Step 04, so its browser checks live in `section-3/step-04/src/test/frontend/`.
 
 ## Restart probe
 

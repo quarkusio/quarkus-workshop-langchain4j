@@ -105,10 +105,7 @@
                     <argLine>@{argLine}</argLine>
                     <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
                     <includes>
-                        <include>**/TripPlanningFailureTest.java</include>
                         <include>**/TripPlanContractTest.java</include>
-                        <include>**/guardrails/*Test.java</include>
-                        <include>**/GuardrailExceptionMapperTest.java</include>
                         <include>**/voting/*Test.java</include>
                     </includes>
                     <systemPropertyVariables>

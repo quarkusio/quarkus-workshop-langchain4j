@@ -26,18 +26,20 @@ Each step's default `./mvnw test` suite covers **only what that step adds**. Ear
 | **00** | `TripPlanContractTest`, `TripPlannerResourceTest` (live endpoint needs `OPENAI_API_KEY`) |
 | **01** | None (skills are validated manually and in later steps) |
 | **02** | Guardrail unit tests, `TripPlanningFailureTest`, `GuardrailExceptionMapperTest` |
-| **03** | `VehicleEvaluationAggregatorTest` (aggregation), `TripPlanContractTest` (pipeline with loop), `TripPlanningFailureTest`, guardrail tests |
+| **03** | `VehicleEvaluationAggregatorTest` (aggregation), `VehicleReviewWorkflowTest` (loop, revision, exit conditions), `TripPlanContractTest` (loop position in the pipeline) |
 | **04** | `TripPlannerFlowTest` (smoke), `TripPlanStoreLifecycleTest` |
 | **05** | `PersistentTripPlanStoreTest`, `TripPlanStoreLifecycleTest` (persistence-aware) |
-| **06** | `McpAgentTest` (MCP agent declaration test) |
-| **07** | `TripPlanInvariantStrategyTest`, `TripPlanJudgeContractTest`, `TripPlanEvaluationHarnessTest`, `EvaluationRunRecorderTest` |
+| **06** | trip-planner: `McpAgentTest`, `DestinationEvidenceTest`; mcp-server: all tests (new module) |
+| **07** | trip-planner: `TripPlanInvariantStrategyTest`, `TripPlanJudgeContractTest`, `TripPlanEvaluationHarnessTest`, `EvaluationRunRecorderTest`; mcp-server: none (unchanged from Step 06) |
 
 Opt-in tests (not in the default suite):
 
 - **Step 04** — `src/test/frontend/live.test.cjs` (real model; requires env vars)
+- **Step 06** — `TripPlannerMcpWorkflowIT` (needs a running MCP server)
+- **Step 07** — `*LiveIT` classes under the `evals` profile
 - **Step 05** — `FlowRestartProbe` (three JVM phases against a disposable Postgres; see step-05 `README.md`)
 
-Browser UI checks under `src/test/frontend/` are run manually with Node/Playwright, not Maven Surefire.
+Browser UI checks under `src/test/frontend/` are run manually with Node/Playwright, not Maven Surefire. They follow the same scoping: Step 02 has the original UI checks, Step 04 has the async UI checks, and Step 06 has the MCP error-rendering checks.
 
 ## Working across steps
 

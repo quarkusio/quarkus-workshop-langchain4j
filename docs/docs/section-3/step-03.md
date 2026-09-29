@@ -289,9 +289,9 @@ This indicates the `DynamicModelSelector` chose the enhanced model for that iter
 
     **Aggregation test** — `VehicleEvaluationAggregatorTest` verifies the averaging strategy: three scores produce the correct average, blank suggestions are skipped, and a missing, incomplete, or out-of-range vote list throws `IllegalStateException`.
 
-    **Pipeline test** — `TripPlanContractTest` checks that the workflow's `subAgents` array includes `VehicleReviewLoop` between `ResearchPhase` and `CostEstimatorAgent`. The scripted model returns high evaluation scores so the loop exits after one iteration, and the HTTP endpoint returns the expected JSON contract.
+    **Pipeline test** — `TripPlanContractTest` checks that the workflow's `subAgents` array includes `VehicleReviewLoop` between `ResearchPhase` and `CostEstimatorAgent`, and that the trip plan JSON still has no `tips` field.
 
-    **Failure tests** — `TripPlanningFailureTest` and the guardrail tests from Step 02 continue to pass with the added loop. Each scripted model profile includes an `@Alternative` for the `@ModelName("enhancedModel")` model so the `DynamicModelSelector` resolves correctly without a live API key.
+    **Workflow test** — `VehicleReviewWorkflowTest` drives the `/trip/plan` endpoint end to end with a scripted model. It covers accepting the first candidate outright, revising and re-evaluating a low-scoring one, exhausting all three revisions and getting back `quality_not_met`, and running the guardrail against a revised recommendation, including the case where the guardrail's own retries are exhausted. Each scripted profile includes an `@Alternative` for the `@ModelName("enhancedModel")` model so the `DynamicModelSelector` resolves correctly without a live API key.
 
 ## Taking it further
 
