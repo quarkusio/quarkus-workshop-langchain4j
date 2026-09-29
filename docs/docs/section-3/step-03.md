@@ -143,9 +143,7 @@ The `@PlannerAgent` annotation connects the evaluator subagents to the voting pl
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleEvaluators.java"
 ```
 
-- `@PlannerAgent` lists the three evaluator interfaces as `subAgents` and sets `outputKey = "evaluation"` so the aggregated score is available to the exit condition and the reviser.
-- `@PlannerSupplier` returns a new `VotingPlanner` that uses `aggregateVotes` as its voting strategy. `aggregateVotes` requires exactly three `VehicleEvaluation` results with scores in the 1–10 range and throws `IllegalStateException` on any malformed or missing result.
-- The method signature includes the trip context parameters that the individual evaluators need, and the framework propagates them through the workflow scope.
+`@PlannerAgent` lists the three evaluator interfaces as `subAgents` and stores the aggregated score under `outputKey = "evaluation"`, where the exit condition and the reviser can find it. The `@PlannerSupplier` method returns a new `VotingPlanner` that uses `aggregateVotes` as its voting strategy. `aggregateVotes` expects exactly three `VehicleEvaluation` results with scores between 1 and 10, and throws `IllegalStateException` if one is missing or malformed. The method signature also lists the trip details the evaluators need, and the framework passes them along through the workflow scope.
 
 ??? info "How does the `VotingPlanner` drive the evaluators?"
     A planner decides which subagents run next each time the framework asks it for an action. The `VotingPlanner` answers the first request with `call(subagents)`, which starts all evaluators in parallel. The framework then asks for the next action once for every evaluator that completes. The planner adds that evaluator's output to its votes and returns `noOp()` while others are still running. After the last one reports, it returns `done(...)` with the strategy's result, which becomes the output of `VehicleEvaluators`. Its `topology()` method returns `PARALLEL`, so the Dev UI renders the evaluators as parallel branches.
@@ -168,9 +166,7 @@ The reviser agent takes the current recommendation and evaluation feedback and p
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/VehicleReviser.java"
 ```
 
-- `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model, choosing between them based on the current evaluation score.
-- `@OutputGuardrails(TripAppropriatenessGuardrail.class, maxRetries = 3)` applies the same content guardrail from Step 02 to each revised recommendation, retrying up to three times if a revision violates it.
-- The reviser's `outputKey = "vehicle"` overwrites the vehicle in the scope, so the cost estimator and all downstream agents receive the refined version automatically.
+`DynamicModelSelector` is a `@Singleton` bean that injects both the default `ChatModel` and the `@ModelName("enhancedModel")` model, and picks one based on the current evaluation score. The reviser keeps the Step 02 content guardrail through `@OutputGuardrails(TripAppropriatenessGuardrail.class, maxRetries = 3)`, so a revision that breaks the rules gets up to three more tries. Its `outputKey = "vehicle"` overwrites the vehicle in the scope, which means the cost estimator and everything after it receive the refined version without extra wiring.
 
 ## Wrap the review cycle with @LoopAgent
 
@@ -182,10 +178,9 @@ The loop wraps the evaluators and reviser into an iterative cycle with an exit c
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleReviewLoop.java"
 ```
 
-- `@LoopAgent` lists `VehicleEvaluators` and `VehicleReviser` as subagents. The evaluators vote first, then the reviser refines.
-- `maxIterations = MAX_REVISIONS + 1` allows four iterations: the initial evaluation, plus one more after each of the three permitted revisions.
-- `@ExitCondition(testExitAtLoopEnd = false)` checks the condition immediately after each evaluation, before the reviser runs again. `shouldExit` receives both the latest `VehicleEvaluation` and the `AgenticScope`. If the score reaches 7.5, it returns `true`. If the number of completed evaluations has exceeded `MAX_REVISIONS` without meeting the threshold, it throws `TripQualityException`, which propagates as a 422 with error code `quality_not_met`.
-- The loop's `outputKey = "vehicle"` writes the final vehicle back to the scope, overwriting the original from the research phase.
+`@LoopAgent` runs `VehicleEvaluators` and then `VehicleReviser` on each iteration. With `maxIterations = MAX_REVISIONS + 1` that makes four iterations: the first evaluation, plus one more after each of the three allowed revisions.
+
+`@ExitCondition(testExitAtLoopEnd = false)` checks the condition right after each evaluation, before the reviser gets its turn. `shouldExit` receives the latest `VehicleEvaluation` and the `AgenticScope`. A score of 7.5 or more returns `true` and ends the loop. If the evaluators have run more than `MAX_REVISIONS` times without reaching the threshold, it throws `TripQualityException`, which reaches the browser as a 422 with error code `quality_not_met`. The loop's own `outputKey = "vehicle"` writes the final vehicle back to the scope, replacing the one from the research phase.
 
 Before the loop can throw `TripQualityException`, you need the exception class itself.
 
@@ -256,7 +251,9 @@ This line means the `DynamicModelSelector` handed the revision to the enhanced m
 
 ==Switch to **Executions** on the same card and expand the latest run.== Each agent has its own row with its duration, inputs, and outputs. Under `vehicleReviewLoop`, the `vehicleEvaluators` rows show the three individual scores and the average they produced. If the average reached 7.5 on the first vote, the loop ends right there and `revise` never runs. If it fell short, you'll see a `revise` row followed by another round of evaluations, each tagged with its iteration number. Run the same request a few times and the number of rounds will probably change, because the evaluators are language models and have their moods like the rest of us.
 
-![The Dev UI execution view showing a completed trip plan](../images/section-3-step-03-devui-executions.png)
+![The Dev UI execution view for a run where the first vote passed, so vehicleReviewLoop has one vehicleEvaluators round and no revise row before estimateCosts](../images/section-3-step-03-devui-executions.png)
+
+Now and then `planItinerary` also tries to activate a skill that doesn't exist, such as `route-overview`. Those calls show up marked failed, the tool replies with the list of available skills, and the agent carries on with the one it did load.
 
 ==Compare the output of `recommendVehicle` in the research phase with the output of `vehicleReviewLoop`.== If the reviser ran, the two recommendations differ. If the first candidate passed, they're the same vehicle.
 
@@ -285,7 +282,9 @@ This line means the `DynamicModelSelector` handed the revision to the enhanced m
 
 As an optional exercise, try adding a fourth evaluator that assesses the vehicle's suitability for the planned route terrain (mountain roads, coastal highways, city driving). Use a different `outputKey` and update the `aggregateVotes` method to handle four votes.
 
-You can also play with the exit threshold. Lowering it to 6.0 makes the loop exit sooner, while raising it to 9.0 will probably use up all three revisions and end in `quality_not_met`. Add a log line inside `shouldExit` to watch the score change from one round to the next.
+You can also play with the exit threshold. Lowering it to 6.0 makes the loop exit sooner. Raising it to 9.5 will probably use up all three revisions, even though the scores tend to creep up with each one, and the browser then shows the `quality_not_met` message. Add a log line inside `shouldExit` to watch the score change from one round to the next.
+
+![The trip planner showing an error that the vehicle recommendation did not meet the quality threshold after three revisions](../images/section-3-step-03-quality-not-met.png)
 
 For a more advanced experiment, try a weighted voting strategy where the comfort evaluator counts double for family trips and the cost evaluator counts double for economy budgets. Pass the trip type into the aggregation to select the weights.
 
