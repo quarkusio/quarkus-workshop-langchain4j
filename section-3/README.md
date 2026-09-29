@@ -41,6 +41,8 @@ Opt-in tests (not in the default suite):
 
 Browser UI checks under `src/test/frontend/` are run manually with Node/Playwright, not Maven Surefire. They follow the same scoping: Step 02 has the original UI checks, Step 04 has the async UI checks, and Step 06 has the MCP error-rendering checks.
 
+`src/main/resources/META-INF/resources/app.js` and `index.html` are identical in every step (under `trip-planner/` in Steps 06 and 07), so participants never copy frontend files between steps. Steps 00–03 have no `/trip/plan/latest` endpoint, and the frontend treats its 404 as a sign that `/trip/plan` returns a bare `TripPlan` instead of a workflow status envelope. When you change the frontend, apply the same change to all eight copies and run the Step 02, Step 04, and Step 06 browser checks.
+
 ## Working across steps
 
 1. Read the lesson doc in `docs/docs/section-3/step-NN.md` before changing code.

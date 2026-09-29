@@ -18,7 +18,7 @@ for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 
         const page = await browser.newPage({ viewport });
         const errors = [];
         page.on("pageerror", error => errors.push(error.message));
-        await page.route("**/trip/plan/latest", route => route.fulfill({ status: 204 }));
+        await page.route("**/trip/plan/latest", route => route.fulfill({ status: 404 }));
         let reply;
         await page.route("**/trip/plan", route => reply === "network"
             ? route.abort("failed") : route.fulfill(reply));

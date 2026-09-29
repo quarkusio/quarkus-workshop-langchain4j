@@ -22,6 +22,8 @@ The third section contains 7 steps (plus a step-00 baseline) dedicated to enterp
 
 When editing Section 3, read `section-3/README.md`. Each step builds on the previous one. Change only what that lesson introduces, propagate fixes forward through later steps, and keep each step's Maven tests scoped to that lesson (do not duplicate earlier test suites into later steps).
 
+The Section 3 frontend is the exception to the per-step rule. `app.js` and `index.html` under `src/main/resources/META-INF/resources/` must stay byte-identical in all eight steps (under `trip-planner/` in Steps 06 and 07), so participants never have to touch frontend files. Apply any frontend change to every step, backward as well as forward, and keep it working with both the bare-plan API of Steps 00–03 and the workflow status API from Step 04 on.
+
 Test scoping rule: a step's default `./mvnw test` covers only what that step adds. When a new step is created by copying a previous snapshot, its earlier test suites must not be carried over; earlier coverage stays in its originating step's CI job. Only add or adapt tests for the current lesson.
 
 The documentation lives in the `docs/` directory and can be served locally at http://127.0.0.1:8000/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.

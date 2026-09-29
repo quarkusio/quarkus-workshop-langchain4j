@@ -12,7 +12,7 @@ test("MCP and quality failures render safely in the supplied UI", async () => {
         let failure;
         await page.route("http://workshop.test/**", async route => {
             const path = new URL(route.request().url()).pathname;
-            if (path === "/trip/latest") return route.fulfill({ status: 204 });
+            if (path === "/trip/plan/latest") return route.fulfill({ status: 204 });
             if (path === "/trip/plan") return route.fulfill({ status: failure.status,
                 contentType: "application/json", body: JSON.stringify(failure.body) });
             const name = path === "/" ? "index.html" : path.substring(1);
