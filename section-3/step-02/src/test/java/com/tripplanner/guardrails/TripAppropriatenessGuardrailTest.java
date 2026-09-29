@@ -1,5 +1,6 @@
 package com.tripplanner.guardrails;
 
+import com.tripplanner.model.TripPlan;
 import com.tripplanner.model.TripRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
@@ -64,6 +65,23 @@ class TripAppropriatenessGuardrailTest {
                 replacement.path("reasoning").asText());
         assertFalse(result.successfulText().contains("Mazda"));
         assertEquals("REWRITE", auditLog.getRecentEntries().getLast().decision());
+        var vehicle = objectMapper.readValue(result.successfulText(), TripPlan.VehicleRecommendation.class);
+        assertEquals("Original recommendation 'sports car' is too small for 4 travelers", vehicle.guardrailOverride());
+    }
+
+    @Test
+    void requestedLuxuryBrandReplacedByModelShouldAnnotate() throws Exception {
+        tripRequest = new TripRequest("Italian Riviera", "2026-07-10", 7, "family", 2, "moderate (€1000-€2500)", "We want a Ferrari");
+        OutputGuardrailResult result = validate(AiMessage.from("""
+                {"type": "Compact SUV", "model": "Fiat 500X", "reasoning": "Comfortable for two"}
+                """));
+        assertTrue(result.isSuccess());
+        assertTrue(result.hasRewrittenResult());
+        assertEquals("ANNOTATE", auditLog.getRecentEntries().getLast().decision());
+        var vehicle = objectMapper.readValue(result.successfulText(), TripPlan.VehicleRecommendation.class);
+        assertEquals("Fiat 500X", vehicle.model());
+        assertEquals("Requested brand 'ferrari' is not suitable for this trip; a more appropriate vehicle was selected",
+                vehicle.guardrailOverride());
     }
 
     @Test
@@ -135,7 +153,8 @@ class TripAppropriatenessGuardrailTest {
     private OutputGuardrailResult validate(AiMessage message) {
         Map<String, Object> variables = tripRequest == null ? Map.of() : Map.of(
                 "travelers", String.valueOf(tripRequest.travelers()),
-                "budget", tripRequest.budget(), "tripType", tripRequest.tripType());
+                "budget", tripRequest.budget(), "tripType", tripRequest.tripType(),
+                "preferences", tripRequest.preferences());
         return guardrail.validate(OutputGuardrailRequest.builder()
                 .responseFromLLM(ChatResponse.builder().aiMessage(message).build())
                 .chatExecutor(new ChatExecutor() {
