@@ -50,9 +50,9 @@ The exercise changes the Flow definition. The event store, REST resources, paylo
     - `src/test/resources/application.properties`
     - `src/test/frontend/`
 
-    The supplied agents are the Step 02 pipeline, with one small change: `days` and `travelers` are now `Integer` instead of `String`, because the Flow adapter passes the numbers from `TripRequest` directly. You don't need to change any agents yourself.
+    The supplied agents are the same as in Step 03, voting loop included, so you don't need to change any of them.
 
-    ==Remove `src/test/java/com/tripplanner/TripPlannerResourceTest.java` and `src/test/java/com/tripplanner/TripPlanContractTest.java` from this working copy. If you previously copied an older Step 04, also remove `src/test/java/com/tripplanner/flow/MockTripPlannerFlowAdapter.java` and any copied `TripPlanningFailureTest.java`.== The old HTTP tests called a synchronous agent pipeline and expected the old response contract. Step 04 keeps a small Flow smoke suite only; guardrail and pricing-tool coverage stays in Step 02.
+    ==Remove `src/test/java/com/tripplanner/TripPlanContractTest.java` and the `src/test/java/com/tripplanner/voting/` tests from this working copy, along with `TripPlannerResourceTest.java` if you still have it from Step 00.== These tests expected the old synchronous response. Step 04 only runs a small Flow smoke suite, and the guardrail and voting tests stay in Steps 02 and 03.
 
     ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
 
@@ -64,7 +64,7 @@ The exercise changes the Flow definition. The event store, REST resources, paylo
 
     ==Read the Flow definition and correlation explanation below, then run the same tests and browser verification as the hands-on route.== No frontend implementation is required for either route.
 
-The planning pipeline itself hasn't changed. Vehicle and itinerary research still run in parallel, followed by cost estimation with the Step 02 pricing tool and guardrails.
+The planning pipeline itself hasn't changed. Vehicle and itinerary research still run in parallel, the evaluators vote on the vehicle, and cost estimation follows with the Step 02 pricing tool and guardrails.
 
 Each planning request gets its own workflow instance, so several trips can wait for a decision at the same time. The refresh exercise assumes a single workshop user, though, because `/trip/plan/latest` returns the latest trip in the whole application.
 
@@ -204,6 +204,12 @@ This runs `TripPlannerFlowTest` and `TripPlanStoreLifecycleTest`. The Flow tests
 
 ==Check the browser's Network panel to confirm that `POST /trip/plan` has finished while the page is awaiting approval. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev){target="_blank"}, select **Workflows** on the Quarkus Flow card, and inspect `trip-planner-flow`.== Its diagram has the planning task, the approval publication, the wait, and the outcome branches.
 
+<figure markdown="span">
+  ![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](../images/section-3-step-04-flow-diagram.png){ width="600" }
+</figure>
+
+The first switch sends a failed plan straight to `publishFailure`. The `waitApproval` node is the `listen()` step, where the instance sits until a matching decision arrives.
+
 ==Refresh the browser without restarting the application. Compare the restored workflow identifier and plan with the ones you noted, and check the original destination, start date, duration, travelers, budget, and preferences in the restored form or `/trip/plan/latest` response.== The same pending trip should come back without another model call.
 
 ![A generated seven-day trip awaiting approval, with its workflow identifier above the itinerary](../images/section-3-step-04-awaiting-approval.png)
@@ -212,9 +218,11 @@ This runs `TripPlannerFlowTest` and `TripPlanStoreLifecycleTest`. The Flow tests
 
 ==Click **Approve Trip** and follow the status requests in the Network panel.== The decision response is HTTP 202 `decision_submitted`, and the plan stays visible while the booking is finalized. A later GET reports `confirmed` with a simulated `MOS-...` booking reference. No vehicle is actually reserved, much to the disappointment of the sales team.
 
-==In the Dev UI, open **Apache Kafka Client > Topics** and inspect `flow-in`.== The initiating event is `com.tripplanner.trip.requested`, with the planning request identifier and original trip details in its payload. The decision event is `com.tripplanner.trip.approval.done`, with the workflow identifier in its `flowinstanceid` extension and in its decision payload.
+==In the Dev UI, open **Apache Kafka Client > Topics** and inspect `flow-in`.== The initiating event is `com.tripplanner.trip.requested`, with the planning request identifier and original trip details in its payload. The decision event is `com.tripplanner.trip.approval.done`, with the workflow identifier in its `ce_flowinstanceid` header and in its decision payload.
 
-==Inspect `flow-out` and compare the `flowinstanceid` on `com.tripplanner.trip.approval.requested` and `com.tripplanner.booking.finalized` with the identifier displayed in the browser.== They should identify the same instance. The approval-request payload contains the status envelope, including the plan and original request, not a bare `TripPlan`.
+==Inspect `flow-out` and click each message to open its value and headers. Compare the `ce_flowinstanceid` header on `com.tripplanner.trip.approval.requested` and `com.tripplanner.booking.finalized` with the identifier displayed in the browser.== Kafka carries the CloudEvent attributes as `ce_` headers, so the `flowinstanceid` extension shows up as `ce_flowinstanceid`. Both events should name the same instance. The payload is the status envelope with the plan and original request, and `ce_flowtaskid` tells you which workflow task published it.
+
+![The booking.finalized event on flow-out, with the status envelope as its value and the CloudEvent headers, including ce_flowinstanceid and ce_type](../images/section-3-step-04-kafka-flow-out.png)
 
 ![The same workflow after approval, showing a simulated booking reference and no vehicle reservation](../images/section-3-step-04-confirmed.png)
 
