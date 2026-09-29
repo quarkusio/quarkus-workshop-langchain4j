@@ -36,7 +36,7 @@ Quarkus Flow handles the workflow side through its persistence extension, while 
 
 === "Option 1: Continue from Step 04"
 
-    ==Stop dev mode in your Step 04 working project and apply the changes below.== Keep your existing model-provider settings and dependencies.
+    ==Apply the changes below to your Step 04 working project.== Keep your existing model-provider settings and dependencies. Dev mode restarts automatically when it detects the `pom.xml` change; the first restart will take longer than usual because Dev Services is now starting a PostgreSQL container.
 
 === "Option 2: Use the completed Step 05 project"
 

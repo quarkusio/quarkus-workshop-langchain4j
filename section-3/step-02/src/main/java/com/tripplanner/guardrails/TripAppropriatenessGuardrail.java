@@ -20,7 +20,8 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
             "sports car", "sport car", "coupé", "coupe", "convertible", "2-seater", "two-seater", "roadster");
 
     private static final Set<String> LUXURY_BRANDS = Set.of(
-            "ferrari", "porsche", "lamborghini", "maserati", "bentley", "rolls-royce", "aston martin", "mclaren");
+            "ferrari", "porsche", "lamborghini", "maserati", "bentley", "rolls-royce", "aston martin", "mclaren",
+            "land rover", "range rover", "jaguar", "bmw", "mercedes", "audi", "lexus");
 
     @Inject
     GuardrailAuditLog auditLog;
@@ -54,6 +55,7 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         var variables = guardrailRequest.requestParams().variables();
         String budget = (String) variables.get("budget");
         String tripType = (String) variables.get("tripType");
+        String preferences = variables.get("preferences") instanceof String s ? s : "";
         int travelers;
         try {
             // Prompt variables may contain text or numeric method arguments.
@@ -73,17 +75,29 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         // Check the original model before a generic rewrite can hide a budget violation.
         if (budget.toLowerCase(Locale.ROOT).contains("economy") && isLuxuryBrand(vehicleModel)) {
             auditLog.log("TripAppropriatenessGuardrail", "REPROMPT",
-                    "Luxury vehicle '" + vehicleModel + "' does not match economy budget");
+                    "Luxury vehicle '" + vehicleModel + "' does not match economy budget — asking model to retry with an affordable option");
             return reprompt("The vehicle recommendation is a luxury vehicle but the budget is economy. "
                     + "Please recommend an affordable, budget-friendly vehicle instead.",
-                    "You are a vehicle advisor for road trips. You MUST recommend only budget-friendly, "
-                    + "affordable vehicles. Never suggest luxury, premium, or sports brands.");
+                    "The previous vehicle recommendation is a luxury vehicle that does not fit the economy budget. "
+                    + "Respond ONLY with a valid JSON vehicle recommendation object (with fields: type, model, reasoning) "
+                    + "for an affordable, budget-friendly, non-luxury vehicle suitable for this trip. Do not explain or acknowledge — just output the JSON.");
         }
 
         if (travelers >= 4 && isSmallVehicle(vehicleType)) {
-            rewriteVehicle((ObjectNode) root, travelers, tripType);
-            auditLog.log("TripAppropriatenessGuardrail", "REWRITE",
-                    "Vehicle type '" + vehicleType + "' is too small for " + travelers + " travelers; returned a generic category recommendation");
+            String reason = "Original recommendation '" + vehicleType + "' is too small for " + travelers + " travelers";
+            rewriteVehicle((ObjectNode) root, travelers, tripType, reason);
+            auditLog.log("TripAppropriatenessGuardrail", "REWRITE", reason + "; returned a generic category recommendation");
+            return successWith(AiMessage.from(root.toString()));
+        }
+
+        // If the user asked for a luxury brand but the output doesn't contain it, the model
+        // already overrode the request on its own. Annotate the result so the UI can show why.
+        String requestedBrand = requestedLuxuryBrand(preferences);
+        if (requestedBrand != null && !vehicleModel.contains(requestedBrand)) {
+            String reason = "Requested brand '" + requestedBrand + "' is not suitable for this trip; a more appropriate vehicle was selected";
+            ((ObjectNode) root).put("guardrailOverride", reason);
+            auditLog.log("TripAppropriatenessGuardrail", "ANNOTATE",
+                    "Preferences mentioned '" + requestedBrand + "' but output is '" + vehicleModel + "' — " + reason);
             return successWith(AiMessage.from(root.toString()));
         }
 
@@ -99,7 +113,13 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         return LUXURY_BRANDS.stream().anyMatch(vehicleModel::contains);
     }
 
-    private void rewriteVehicle(ObjectNode vehicle, int travelers, String tripType) {
+    private String requestedLuxuryBrand(String preferences) {
+        if (preferences == null || preferences.isBlank()) return null;
+        String lower = preferences.toLowerCase(Locale.ROOT);
+        return LUXURY_BRANDS.stream().filter(lower::contains).findFirst().orElse(null);
+    }
+
+    private void rewriteVehicle(ObjectNode vehicle, int travelers, String tripType, String reason) {
         String replacement = switch (tripType.toLowerCase(Locale.ROOT)) {
             case "adventure" -> "SUV";
             case "business" -> "Estate";
@@ -111,5 +131,6 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         vehicle.put("reasoning", "Vehicle corrected by guardrail: original recommendation was too small for "
                 + travelers + " travelers. Suggested category: " + replacement
                 + ". Confirm seating, luggage capacity, price, and availability with the rental provider.");
+        vehicle.put("guardrailOverride", reason);
     }
 }

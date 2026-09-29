@@ -1,5 +1,6 @@
 package com.tripplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record TripPlan(
@@ -11,7 +12,8 @@ public record TripPlan(
     public record VehicleRecommendation(
             String type,
             String model,
-            String reasoning
+            String reasoning,
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY) String guardrailOverride
     ) {}
 
     public record DayItinerary(

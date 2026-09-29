@@ -1,0 +1,27 @@
+[
+  {
+    "name": "missing-vehicle",
+    "output": "{\"vehicle\": null, \"routeOverview\": \"Rome\", \"itinerary\": [{\"day\": 1, \"title\": \"Day 1\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 2, \"title\": \"Day 2\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 3, \"title\": \"Day 3\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}], \"costs\": {\"total\": \"\\u20ac310\"}}",
+    "reason": "missing vehicle"
+  },
+  {
+    "name": "gap-in-days",
+    "output": "{\"vehicle\": {\"type\": \"MPV\", \"model\": \"Family MPV\", \"reasoning\": \"Room for luggage\"}, \"routeOverview\": \"Rome\", \"itinerary\": [{\"day\": 1, \"title\": \"Day 1\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 3, \"title\": \"Day 3\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}], \"costs\": {\"total\": \"\\u20ac310\"}}",
+    "reason": "missing day 2"
+  },
+  {
+    "name": "negative-cost",
+    "output": "{\"vehicle\": {\"type\": \"MPV\", \"model\": \"Family MPV\", \"reasoning\": \"Room for luggage\"}, \"routeOverview\": \"Rome\", \"itinerary\": [{\"day\": 1, \"title\": \"Day 1\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 2, \"title\": \"Day 2\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 3, \"title\": \"Day 3\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}], \"costs\": {\"total\": \"-10\"}}",
+    "reason": "non-negative EUR"
+  },
+  {
+    "name": "malformed-cost",
+    "output": "{\"vehicle\": {\"type\": \"MPV\", \"model\": \"Family MPV\", \"reasoning\": \"Room for luggage\"}, \"routeOverview\": \"Rome\", \"itinerary\": [{\"day\": 1, \"title\": \"Day 1\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 2, \"title\": \"Day 2\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}, {\"day\": 3, \"title\": \"Day 3\", \"description\": \"Explore\", \"overnightStop\": \"Hotel\"}], \"costs\": {\"total\": \"about three hundred\"}}",
+    "reason": "non-negative EUR"
+  },
+  {
+    "name": "empty-output",
+    "output": "",
+    "reason": "no output"
+  }
+]

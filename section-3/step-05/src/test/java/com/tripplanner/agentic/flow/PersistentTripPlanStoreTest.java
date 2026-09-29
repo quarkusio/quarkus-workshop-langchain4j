@@ -39,7 +39,7 @@ class PersistentTripPlanStoreTest {
     ObjectMapper mapper;
 
     private final TripRequest request = new TripRequest("Coast", "2027-07-10", 5, "family", 4, "economy", "Short drives");
-    private final TripPlan plan = new TripPlan(new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Category only"),
+    private final TripPlan plan = new TripPlan(new TripPlan.VehicleRecommendation("MPV", "Family MPV", "Category only", null),
             "Local route", List.of(new TripPlan.DayItinerary(1, "Arrival", "Walk around town", "Genoa")),
             new TripPlan.CostEstimate("90", "0", "0", "0", "0", "0", "450"));
 

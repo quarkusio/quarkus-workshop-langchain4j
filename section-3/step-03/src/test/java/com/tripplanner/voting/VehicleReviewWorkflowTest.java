@@ -163,7 +163,7 @@ class VehicleReviewWorkflowTest {
                 return revisions.get() == 0 ? "Initial estate" : "Revised estate " + revisions.get();
             }
             private TripPlan.VehicleRecommendation vehicle(String type, String name) {
-                return new TripPlan.VehicleRecommendation(type, name, "Room for four and luggage");
+                return new TripPlan.VehicleRecommendation(type, name, "Room for four and luggage", null);
             }
         }
     }

@@ -109,7 +109,7 @@ class VehicleGuardrailConcurrencyTest {
                         assertEquals(2, attempt, "Only economy trips need one reprompt");
                         assertTrue(request.messages().stream().filter(UserMessage.class::isInstance)
                                 .map(UserMessage.class::cast).map(UserMessage::singleText)
-                                .anyMatch(text -> text.contains("MUST recommend only budget-friendly")));
+                                .anyMatch(text -> text.contains("budget-friendly")));
                     }
                     json = "{\"type\":\"Sports car\",\"model\":\""
                             + (attempt == 1 ? "Ferrari Roma" : "Mazda MX-5") + "\",\"reasoning\":\"Test recommendation\"}";

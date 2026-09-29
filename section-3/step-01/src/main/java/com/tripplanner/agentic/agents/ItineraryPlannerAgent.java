@@ -19,6 +19,7 @@ public interface ItineraryPlannerAgent {
             - Duration: {days} days
             - Trip type: {tripType}
             - Additional preferences: {preferences}
+              Do not reference specific vehicle or car brand names in itinerary descriptions — vehicle selection is handled separately.
             """)
     @Agent(description = "Creates a detailed day-by-day itinerary and route overview",
            outputKey = "itineraryResult")

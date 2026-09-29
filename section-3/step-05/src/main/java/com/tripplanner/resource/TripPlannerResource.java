@@ -41,7 +41,8 @@ public class TripPlannerResource {
     @Path("/plan")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response planTrip(TripRequest request) {
-        if (request == null) return Response.status(400).entity(new TripError("invalid_request", "Trip details are required.")).build();
+        Response invalid = validatePlanRequest(request);
+        if (invalid != null) return invalid;
         PlanningRequest input = tripPlanStore.register(request);
         OutgoingCloudEventMetadata<PlanningRequest> metadata = OutgoingCloudEventMetadata.<PlanningRequest>builder()
                 .withId(input.requestId())
@@ -91,5 +92,17 @@ public class TripPlannerResource {
     public Response latestPlan() {
         TripPlanStatus status = tripPlanStore.latest();
         return status == null ? Response.noContent().build() : Response.ok(status).build();
+    }
+
+    private Response validatePlanRequest(TripRequest request) {
+        if (request == null)
+            return bad("Trip details are required.");
+        if (request.destination() == null || request.destination().isBlank())
+            return bad("Destination is required.");
+        return null;
+    }
+
+    private static Response bad(String message) {
+        return Response.status(400).entity(new TripError("invalid_request", message)).build();
     }
 }
