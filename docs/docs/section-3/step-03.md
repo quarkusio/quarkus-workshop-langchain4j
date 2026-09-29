@@ -2,17 +2,17 @@
 
 The guardrails from Step 02 catch obviously unsuitable recommendations, like suggesting a sports car for a family of five. They cannot however tell us whether the accepted vehicle is actually the *best* choice. E.g. is it comfortable enough for a long road trip? Does it fit the budget? Is it fuel-efficient for the planned route?
 
-In this step we'll add three evaluator agents that independently assess the vehicle recommendation, aggregate their scores with a **voting pattern**, and feed the result into a **refinement loop** that lets a reviser agent improve the recommendation until it meets a quality threshold. We'll also add an **adaptive model selection** so that the reviser starts with a lightweight model and switches to a more capable one as the recommendation improves.
+In this step we'll add three evaluator agents that each score the vehicle recommendation, combine their scores with a voting pattern, and hand the result to a refinement loop where a reviser agent improves the recommendation until it's good enough. We'll also add adaptive model selection, so the reviser starts on a lightweight model and only moves to a more capable one when the recommendation is nearly there.
 
-## Parallel assessment with the Voting pattern
+## Parallel assessment with the voting pattern
 
-The voting pattern dispatches multiple agents in parallel, collects their independent assessments, and aggregates the results into a single decision. Unlike a simple parallel fan-out that merges structured outputs, voting applies a **strategy** to the collected responses, such as averaging scores, taking a majority, or applying any custom aggregation logic.
+The voting pattern sends the same question to several agents in parallel and collects their answers. The difference from a plain parallel workflow is the last step, where a voting strategy combines the answers into one decision. It could average the scores, take a majority, or apply whatever logic you like.
 
-In production systems, voting is valuable because it distributes responsibility across agents that each have a narrow, well-defined scope. An agent focused entirely on cost will catch cost problems that a general-purpose evaluator might trade away against other concerns. The aggregation step makes those individual judgements visible, which also makes the system's behaviour auditable, since you can inspect each agent's score independently to understand why the overall result came out the way it did.
+Voting spreads the judgement across agents that each have one narrow job. An agent that only thinks about cost will catch cost problems that a general-purpose evaluator might quietly trade away for extra legroom. Each agent's score is also visible on its own, so when a vehicle fails you can see exactly who voted against it.
 
 ```mermaid
 flowchart LR
-    accTitle: Voting pattern — fan-out, assess, aggregate
+    accTitle: Voting pattern with three evaluators
     accDescr: The vehicle recommendation is sent to three evaluators in parallel. Each returns a score and suggestions. A voting strategy aggregates the scores into a single evaluation.
     Vehicle[Vehicle recommendation] --> E1[Comfort evaluator]
     Vehicle --> E2[Cost evaluator]
@@ -32,30 +32,32 @@ We'll implement this with the `VotingPlanner` provided by the LangChain4j agenti
 
 ## Iterative refinement with @LoopAgent
 
-A single evaluation pass tells us how good the recommendation is, but it doesn't improve it. We need a loop that runs the evaluators, checks whether the score meets our threshold, and if not, asks a reviser agent to improve the recommendation before evaluating again. A numeric score and an explicit exit condition also make quality verifiable, because you can write a test that asserts the system meets a defined standard rather than relying on manual review of every output.
+A single round of voting tells us how good the recommendation is, but it doesn't make it any better. For that we need a loop: the evaluators vote, and if the score is too low, a reviser agent improves the recommendation and the evaluators vote again. A numeric score and an explicit exit condition also make quality something you can write a test for.
 
 ```mermaid
 flowchart TD
-    accTitle: Vehicle review loop — evaluate, revise, check
-    accDescr: The loop runs evaluators in parallel via the voting planner, then the reviser refines the recommendation. The exit condition checks the evaluation score after the full iteration — if it reaches the threshold the loop exits, otherwise another round begins.
-    Start[Vehicle from research phase] --> Eval[VehicleEvaluators — voting]
-    Eval --> Revise[VehicleReviser — improve recommendation]
-    Revise --> Check{Score ≥ 7.5?}
-    Check -->|Yes| Exit[Use refined vehicle]
-    Check -->|No| Eval
-    Exit --> Cost[CostEstimatorAgent]
+    accTitle: Vehicle review loop
+    accDescr: The evaluators vote on the vehicle from the research phase. If the average score reaches 7.5, the loop exits and the vehicle goes to cost estimation. Otherwise the reviser improves the recommendation and the evaluators vote again. If the score is still too low after three revisions, the request fails with quality_not_met.
+    Start[Vehicle from research phase] --> Eval[VehicleEvaluators vote]
+    Eval --> Check{Average score ≥ 7.5?}
+    Check -->|Yes| Cost[CostEstimatorAgent]
+    Check -->|No, revisions left| Revise[VehicleReviser improves the vehicle]
+    Revise --> Eval
+    Check -->|No, 3 revisions used| Fail[quality_not_met error]
 
     classDef loop fill:#e8f5e9,stroke:#2e7d32,color:#16351a
     classDef check fill:#fff3e0,stroke:#b56500,color:#593200
+    classDef fail fill:#ffebee,stroke:#c62828,color:#5f1111
     class Eval,Revise loop
     class Check check
+    class Fail fail
 ```
 
-The `@LoopAgent` annotation wraps this cycle with a configurable maximum number of iterations. The `@ExitCondition` checks the aggregated evaluation score at the end of each iteration. If the score reaches 7.5, the loop exits and the refined vehicle moves on to cost estimation.
+The `@LoopAgent` annotation turns this cycle into an agent with a maximum number of iterations, and an `@ExitCondition` method decides when to stop. The check runs right after the evaluators vote, before the reviser gets a turn, so a recommendation that already scores 7.5 or more goes straight to cost estimation untouched. If the reviser has had three attempts and the evaluators still aren't convinced, the loop gives up and the planner returns a `quality_not_met` error. Miles of Smiles management would rather tell a customer "we couldn't find a car we're proud of" than hand over the keys to a dud. Mostly.
 
 ## Adaptive model selection with @ChatModelSupplier
 
-Not every iteration needs the same model. When the output is still rough, a smaller model can make broad improvements just as effectively as a larger one, at a fraction of the cost. Only once the score is already close to the threshold, and the reviser is making fine adjustments, does a more capable model justify the extra expense. This pattern is particularly relevant in systems that run quality loops at scale, where the cost difference between early and late iterations adds up quickly.
+Not every revision needs the most expensive model. While the recommendation is still rough, a smaller model can make broad improvements just fine, for a fraction of the price. Once the score is close to the threshold and the reviser is only polishing, it's worth paying for a more capable model. The finance department at Miles of Smiles was very keen on this part.
 
 The `@ChatModelSupplier` annotation on the reviser agent delegates model selection to a `DynamicModelSelector` CDI bean. This bean injects both the base model (`gpt-4o-mini`) and an enhanced model (`gpt-4o`) and chooses between them based on the current evaluation score.
 
@@ -64,33 +66,19 @@ The `@ChatModelSupplier` annotation on the reviser agent delegates model selecti
 | ≤ 6.0 | `gpt-4o-mini` (base) | Broad improvements still needed, so a lighter model suffices |
 | > 6.0 | `gpt-4o` (enhanced) | Fine-tuning a near-ready recommendation benefits from more capability |
 
-This pattern is identical to the one used in [Section 2 Step 07](../section-2/step-07.md) for dynamic model selection based on car value.
+If you did Section 2, this will look familiar. [Section 2 Step 07](../section-2/step-07.md) used the same pattern to pick a model based on the value of the car.
 
 ## Prepare the working copy
 
-As always, you have the option to keep working from the previous step, or work directly with the solution:
+As always, you can keep building on the previous step or read along with the finished solution.
 
 === "Option 1: Continue from Step 02"
 
-    Continue in your Step 02 working copy and apply the changes below. Use the completed Step 03 project for comparison if you get stuck.
+    ==Keep working in your Step 02 working copy and apply the changes below.== If you get stuck, compare your code with `section-3/step-03`.
 
 === "Option 2: Use the completed Step 03 project"
 
-    The completed project already contains the changes below. You can read through the implementation without editing, then join the exercise at [Inspecting the voting loop](#inspecting-the-voting-loop).
-
-Start dev mode if it is not already running:
-
-=== "Linux / macOS"
-    ```bash
-    cd section-3/step-03
-    ./mvnw quarkus:dev
-    ```
-
-=== "Windows"
-    ```cmd
-    cd section-3\step-03
-    .\mvnw.cmd quarkus:dev
-        ```
+    ==Copy `section-3/step-03` to a working directory and open that copy.== It already contains the changes below, so you can read through the code and join in at [Inspecting the voting loop](#inspecting-the-voting-loop).
 
 ## Add the vehicle evaluation model
 
@@ -106,7 +94,7 @@ Each evaluator will return a score between 1 and 10, along with textual suggesti
 
 ## Create the evaluator agents
 
-Each evaluator assesses the vehicle recommendation from a different perspective.
+Each evaluator cares about exactly one thing: comfort, cost, or fuel efficiency. Very good at their jobs, and terrible company on a road trip.
 
 ==Create `src/main/java/com/tripplanner/agentic/agents/ComfortEvaluator.java`:==
 
@@ -180,7 +168,7 @@ The reviser agent takes the current recommendation and evaluation feedback and p
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/agents/VehicleReviser.java"
 ```
 
-- `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model, choosing between them based on the current evaluation score. The same pattern is used in [Section 2 Step 07](../section-2/step-07.md).
+- `DynamicModelSelector` is a `@Singleton` CDI bean that injects both the default `ChatModel` and a named `@ModelName("enhancedModel")` model, choosing between them based on the current evaluation score.
 - `@OutputGuardrails(TripAppropriatenessGuardrail.class, maxRetries = 3)` applies the same content guardrail from Step 02 to each revised recommendation, retrying up to three times if a revision violates it.
 - The reviser's `outputKey = "vehicle"` overwrites the vehicle in the scope, so the cost estimator and all downstream agents receive the refined version automatically.
 
@@ -194,8 +182,8 @@ The loop wraps the evaluators and reviser into an iterative cycle with an exit c
 --8<-- "../../section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/VehicleReviewLoop.java"
 ```
 
-- `@LoopAgent` lists `VehicleEvaluators` and `VehicleReviser` as subagents. Each iteration runs both: first the evaluators vote, then the reviser refines.
-- `maxIterations = MAX_REVISIONS + 1` sets the ceiling at four iterations — one initial evaluation plus one after each of the three permitted revisions.
+- `@LoopAgent` lists `VehicleEvaluators` and `VehicleReviser` as subagents. The evaluators vote first, then the reviser refines.
+- `maxIterations = MAX_REVISIONS + 1` allows four iterations: the initial evaluation, plus one more after each of the three permitted revisions.
 - `@ExitCondition(testExitAtLoopEnd = false)` checks the condition immediately after each evaluation, before the reviser runs again. `shouldExit` receives both the latest `VehicleEvaluation` and the `AgenticScope`. If the score reaches 7.5, it returns `true`. If the number of completed evaluations has exceeded `MAX_REVISIONS` without meeting the threshold, it throws `TripQualityException`, which propagates as a 422 with error code `quality_not_met`.
 - The loop's `outputKey = "vehicle"` writes the final vehicle back to the scope, overwriting the original from the research phase.
 
@@ -260,17 +248,17 @@ If the application is not already running, start it from the project directory y
 Score 6.3 > 6.0 — switching to enhanced model for final refinement
 ```
 
-This indicates the `DynamicModelSelector` chose the enhanced model for that iteration's revision. The evaluator scores and the loop iteration count appear in the agentic execution log.
+This line means the `DynamicModelSelector` handed the revision to the enhanced model. It only appears when the reviser actually runs with a score above 6.0. If the evaluators liked the first vehicle enough to pass it outright, there's nothing to revise and nothing to log, so try another run or two.
 
 ==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui){target="_blank"} and select **Topology** on the LangChain4j Agentic card.== The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node, rendered as a parallel fan-out with the three evaluators, and the `vehicleReviser`.
 
 ![The Dev UI topology view showing the planTrip sequence with the research phase, vehicleReviewLoop containing three parallel evaluators and a reviser, and estimateCosts](../images/section-3-step-03-devui-topology.png)
 
-==Switch to **Executions** on the same card and expand the latest run.== The execution trace shows timing for each agent. In the example below, the research phase completed in 7.1 seconds (parallel), the vehicle review loop ran one iteration in 3.9 seconds — the three evaluators scored the initial recommendation at 8.5, 7.5, and 8.5 (average 8.17), the reviser refined the vehicle, and the loop exited because 8.17 ≥ 7.5. The cost estimator then priced the refined vehicle in 1.9 seconds.
+==Switch to **Executions** on the same card and expand the latest run.== Each agent has its own row with its duration, inputs, and outputs. Under `vehicleReviewLoop`, the `vehicleEvaluators` rows show the three individual scores and the average they produced. If the average reached 7.5 on the first vote, the loop ends right there and `revise` never runs. If it fell short, you'll see a `revise` row followed by another round of evaluations, each tagged with its iteration number. Run the same request a few times and the number of rounds will probably change, because the evaluators are language models and have their moods like the rest of us.
 
 ![The Dev UI execution view showing a completed trip plan](../images/section-3-step-03-devui-executions.png)
 
-==Compare the vehicle recommendation before and after the loop by inspecting the scope values.== The initial recommendation from the research phase should differ from the refined one produced by the reviser.
+==Compare the output of `recommendVehicle` in the research phase with the output of `vehicleReviewLoop`.== If the reviser ran, the two recommendations differ. If the first candidate passed, they're the same vehicle.
 
 ??? info "Verifying with tests"
     The supplied tests verify the voting aggregation, pipeline assembly, and end-to-end HTTP contract without calling a live model.
@@ -279,35 +267,35 @@ This indicates the `DynamicModelSelector` chose the enhanced model for that iter
 
     === "Linux / macOS"
         ```bash
-        ./mvnw test -Dquarkus.http.test-port=0
+        ./mvnw test
         ```
 
     === "Windows"
         ```cmd
-        .\mvnw.cmd test -Dquarkus.http.test-port=0
+        .\mvnw.cmd test
         ```
 
-    **Aggregation test** — `VehicleEvaluationAggregatorTest` verifies the averaging strategy: three scores produce the correct average, blank suggestions are skipped, and a missing, incomplete, or out-of-range vote list throws `IllegalStateException`.
+    `VehicleEvaluationAggregatorTest` checks the averaging strategy. Three scores produce the right average, blank suggestions are skipped, and a missing, incomplete, or out-of-range set of votes throws `IllegalStateException`.
 
-    **Pipeline test** — `TripPlanContractTest` checks that the workflow's `subAgents` array includes `VehicleReviewLoop` between `ResearchPhase` and `CostEstimatorAgent`, and that the trip plan JSON still has no `tips` field.
+    `TripPlanContractTest` checks that `VehicleReviewLoop` sits between `ResearchPhase` and `CostEstimatorAgent` in the workflow, and that the trip plan JSON still has no `tips` field.
 
-    **Workflow test** — `VehicleReviewWorkflowTest` drives the `/trip/plan` endpoint end to end with a scripted model. It covers accepting the first candidate outright, revising and re-evaluating a low-scoring one, exhausting all three revisions and getting back `quality_not_met`, and running the guardrail against a revised recommendation, including the case where the guardrail's own retries are exhausted. Each scripted profile includes an `@Alternative` for the `@ModelName("enhancedModel")` model so the `DynamicModelSelector` resolves correctly without a live API key.
+    `VehicleReviewWorkflowTest` calls the `/trip/plan` endpoint with a scripted model. It covers a first candidate that passes outright, a low-scoring candidate that gets revised and re-evaluated, three failed revisions ending in `quality_not_met`, and the guardrail rejecting a revised recommendation, including the case where the guardrail runs out of retries. Each scripted profile also replaces the `@ModelName("enhancedModel")` model with an `@Alternative`, so the `DynamicModelSelector` works without a live API key.
 
 ## Taking it further
 
-As an optional exercise, try adding a **fourth evaluator** that assesses the vehicle's suitability for the planned route terrain (mountain roads, coastal highways, city driving). Use a different `outputKey` and update the `aggregateVotes` method to handle four votes.
+As an optional exercise, try adding a fourth evaluator that assesses the vehicle's suitability for the planned route terrain (mountain roads, coastal highways, city driving). Use a different `outputKey` and update the `aggregateVotes` method to handle four votes.
 
-You can also experiment with the exit condition threshold — lowering it to 6.0 makes the loop exit faster, while raising it to 9.0 may consume all three iterations. Add logging inside the `shouldExit` method to observe the score progression across iterations.
+You can also play with the exit threshold. Lowering it to 6.0 makes the loop exit sooner, while raising it to 9.0 will probably use up all three revisions and end in `quality_not_met`. Add a log line inside `shouldExit` to watch the score change from one round to the next.
 
-For a more advanced experiment, try a **weighted voting strategy** where the comfort evaluator counts double for family trips and the cost evaluator counts double for economy budgets. Pass the trip type into the aggregation to select the weights.
+For a more advanced experiment, try a weighted voting strategy where the comfort evaluator counts double for family trips and the cost evaluator counts double for economy budgets. Pass the trip type into the aggregation to select the weights.
 
 ## Troubleshooting
 
 ??? warning "The enhanced model is not configured"
     ==Check that `application.properties` has the `quarkus.langchain4j.enhancedModel.*` properties and that `OPENAI_API_KEY` is set.== Both the base and enhanced models use the same API key. If the enhanced model configuration is missing, the `@ModelName("enhancedModel")` injection will fail at startup.
 
-??? warning "The loop always runs all three iterations"
-    ==Check the evaluator prompts and the exit condition threshold.== If the evaluators consistently return low scores, the reviser may not improve the recommendation enough. Try lowering the threshold in `VehicleReviewLoop.shouldExit()` or adjusting the evaluator prompts to be more generous. Inspect the evaluation scores in the Dev UI execution view.
+??? warning "Every request ends with quality_not_met"
+    ==Check the evaluator prompts and the exit condition threshold.== If the evaluators consistently return low scores, three revisions may not be enough to get the recommendation over the line. Try lowering the threshold in `VehicleReviewLoop.shouldExit()` or adjusting the evaluator prompts to be more generous. Inspect the evaluation scores in the Dev UI execution view.
 
 ??? warning "Tests fail with missing enhancedModel bean"
     ==Check that each test profile's `getEnabledAlternatives()` includes both `ScriptedModel.class` and `ScriptedEnhancedModel.class`.== The `ScriptedEnhancedModel` is an `@Alternative @ModelName("enhancedModel")` bean that delegates to the default scripted model.
@@ -317,6 +305,6 @@ For a more advanced experiment, try a **weighted voting strategy** where the com
 
 ## What's next?
 
-The planning pipeline now evaluates vehicle recommendations through a voting pattern, refines them iteratively, and adapts model selection based on quality. In Step 04, we'll wrap the entire planning pipeline in an event-driven Quarkus Flow workflow with Kafka and CloudEvents so the customer can approve or reject a proposed trip.
+The planner now has a panel of evaluators that vote on every vehicle and a reviser that keeps trying until they're happy. In Step 04, we'll wrap the planning pipeline in an event-driven Quarkus Flow workflow, so the customer can take their time before approving or rejecting a trip.
 
-[Continue to Step 04 - Event-Driven Workflows with Quarkus Flow](step-04.md)
+[Continue to Step 04 - Event-Driven Agentic Workflows with Quarkus Flow](step-04.md)

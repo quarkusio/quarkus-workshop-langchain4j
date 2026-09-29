@@ -8,11 +8,11 @@ The trip planner began in Step 00 as a baseline with a research agent, a cost es
 
 Step 01 introduced agent skills as Markdown files on the classpath, giving the agents domain-specific guidance that can be updated without changing code. Step 02 added output guardrails and a rental pricing tool, so the planner rejects plans that violate safety or compliance rules before they reach the customer.
 
-Step 03 brought in voting and iterative loops. Multiple agents evaluate the same vehicle recommendation, their scores are aggregated, and the pipeline loops until the recommendation passes or falls back to a default. This step also introduced adaptive model selection, routing high-stakes decisions to a more capable model.
+Step 03 brought in voting and iterative loops. Three evaluators score the same vehicle recommendation, a voting strategy averages their scores, and a reviser keeps improving the vehicle until it passes. If it still falls short after three revisions, the planner gives up with a `quality_not_met` error rather than sending a mediocre car on a family holiday. This step also introduced adaptive model selection, which switches the reviser to a more capable model once the recommendation is close to good enough.
 
 Step 04 replaced the synchronous endpoint with an event-driven workflow using Quarkus Flow and Kafka. The customer submits a request, the planner produces a trip plan asynchronously, and the UI polls for results. Step 05 made that workflow durable by persisting the plan and the approval state in PostgreSQL, so a restart doesn't lose a customer's trip.
 
-Step 06 connected the planner to external services through MCP. A dedicated `@McpClientAgent` interface calls the weather and points-of-interest tools deterministically, without giving the language model the option to skip them. Step 07 closed the loop with an evaluation harness that runs invariant checks and a judge model against saved plan outputs, producing a score and a per-case report. Optional Langfuse integration attaches those scores to the OpenTelemetry traces from the planning run.
+Step 06 connected the planner to external services through MCP. A dedicated `@McpClientAgent` interface calls the weather and points-of-interest tools deterministically, without giving the language model the option to skip them. Step 07 closed the loop with an evaluation harness that runs invariant checks and a judge model against saved plan outputs, producing a score and a per-case report. Langfuse, started for you by Dev Services, attaches those scores to the OpenTelemetry traces from the planning run, so you can see which run earned which score.
 
 ## Patterns worth keeping
 

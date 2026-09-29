@@ -249,4 +249,4 @@ The supplied browser tests in `src/test/frontend/` exercise status rendering and
 
 The customer can now leave a plan awaiting approval and return after a browser refresh, with a decision event resuming the matching workflow. In Step 05, we'll persist workflow and trip state so the same journey can continue after an application restart.
 
-[Continue to Step 05 - Persistent State with PostgreSQL](step-05.md)
+[Continue to Step 05 - Resilient Agentic Workflows with Persistence](step-05.md)

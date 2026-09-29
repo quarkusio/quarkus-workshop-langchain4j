@@ -383,7 +383,7 @@ The workflow table should contain the saved instance, while the trip-plan table 
 
 The log excerpt below illustrates the restoration messages. ==Find your own trip's identifier and confirm it resumes `waitApproval`.==
 
-![Example startup log restoring pending workflow instances at waitApproval](../images/step-05-restore-log.png)
+![Example startup log restoring pending workflow instances at waitApproval](../images/section-3-step-05-restore-log.png)
 
 ==Refresh the browser and compare both identifiers, the original request, and the plan with the saved response. Check that no new planning call appears in the logs, then click **Approve Trip**.==
 
@@ -421,8 +421,8 @@ podman ps | grep postgres
 podman rm -f <container-id>
 ```
 
----
+## What's next?
 
-The customer can now return to a pending trip after an application restart, but the decision is still limited to approving or rejecting the plan. In Step 06, we'll explore how evaluator agents can review a plan and request another pass when it needs improvement, using voting and refinement loops.
+The customer can now come back to a pending trip even after the application restarts. The planner still only knows what the language model remembers about each destination, though. In Step 06, we'll connect it to an MCP server with weather forecasts and points of interest, so nobody gets sent on a sunny beach week in the middle of a thunderstorm.
 
-[Continue to Step 06 - Voting, Loops, and Adaptive Model Selection](step-06.md)
+[Continue to Step 06 - MCP Integration with Non-AI Agents](step-06.md)

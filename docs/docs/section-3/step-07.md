@@ -12,15 +12,15 @@ This step adds a repeatable way to answer three questions that the demo UI canno
 
 The result is an evaluation harness you can run before every change to a prompt or a model: the same samples, the same checks, a report with a score and per-case details. When the score drops, the report points at which sample failed and why.
 
-## How evaluation differs from the guardrails in Step 03
+## How evaluation differs from the guardrails in Step 02
 
-Step 03 added guardrails that block a request or a response when it violates a hard rule, such as a destination with a known safety issue. Those are enforcement mechanisms that sit in the request path.
+Step 02 added guardrails that block a request or a response when it violates a hard rule, such as a destination with a known safety issue. Those are enforcement mechanisms that sit in the request path.
 
 Evaluation sits outside the request path. It runs against saved outputs of completed planning runs, it produces a score and a report rather than a decision, and it uses a judge model that is separate from the model that produced the plan. A guardrail stops a bad plan from being returned; evaluation tells you, after the fact, how often the planner produces bad plans and which ones.
 
 ```mermaid
 flowchart LR
-    subgraph runtime["Request path (Step 03)"]
+    subgraph runtime["Request path (Step 02)"]
         req["Plan request"] --> gr["Guardrails<br/><small>block or pass</small>"]
         gr --> plan["Trip plan"]
     end

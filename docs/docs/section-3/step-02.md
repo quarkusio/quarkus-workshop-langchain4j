@@ -1,6 +1,6 @@
 # Step 02 - Agent Guardrails and Compliance
 
-A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. That's the joy of working with probablistic AI models. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline.
+A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. Such are the joys of working with probabilistic AI models. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline.
 
 We'll attach output guardrails to the vehicle and itinerary agents so they can request another response or rewrite a recommendation. We'll also give the cost estimator a tool that calculates rental prices from a small rate list, with a tool input guardrail to reject invalid arguments before the calculation runs. Fixed-response tests will let us inspect a corrected vehicle and distinguish exhausted recommendation checks from an unrelated planning failure, without having to provoke a live-model mistake.
 
@@ -329,7 +329,7 @@ The Duration field in the form accepts any number (the Miles of Smiles developer
 🛡️ [RentalEstimateInputGuardrail] PASS — Rental arguments accepted
 ```
 
-There is no `Rental calculation executed` line after the rejected call since the guardrail blocked it before reaching the calculation. The model receives the rejection reason as a tool result and then decides what to do. For example, it could retry with arguments within the accepted range, and split the 45-day rental into two separate calls (30 days and 15 days) and combine the results itself. Each valid call then produces its own `PASS` and `Rental calculation executed` line.
+There is no `Rental calculation executed` line after the rejected call since the guardrail blocked it before reaching the calculation. The model receives the rejection reason as a tool result and then decides what to do. For example, it could retry with arguments within the accepted range by splitting the 45-day rental into two separate calls (30 days and 15 days) and combining the results itself. Each valid call then produces its own `PASS` and `Rental calculation executed` line.
 
 The browser would still show a 45-day trip plan because the itinerary agent received the full duration from the form since the tool input guardrail protects the calculation, not the request. 
 
@@ -399,7 +399,7 @@ To explore tool output guardrails instead, add a fictional internal sales note t
 
 You can also add a test with a flagged phrase only in an itinerary title, then extend `findDangerousContent()` to check titles. Another useful case is a warning such as "avoid the conflict area": the current phrase matching rejects it even though it advises the customer to stay away.
 
-These experiments are optional. Since Step 04 continues from the original guardrail rules and retry allowance, keep any experimental rule changes in a separate working copy if you want to follow that baseline.
+These experiments are optional. Later steps build on the original guardrail rules and retry allowance, so keep any experimental rule changes in a separate working copy if you want to follow along with that baseline.
 
 ## Troubleshooting
 
