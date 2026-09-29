@@ -6,12 +6,11 @@ This section builds on Sections 1 and 2 with a new scenario and a set of enterpr
 
 ## A new scenario
 
-Miles of Smiles wants a **Customer Trip Planner** that helps customers choose a destination, duration, and trip style, then returns a vehicle recommendation, route, and cost estimate.
+Miles of Smiles wants a Customer Trip Planner that helps customers choose a destination, duration, and trip style, then returns a vehicle recommendation, route, and cost estimate.
 
 A family of four on the Italian Riviera needs space for luggage, regular breaks, and child-friendly stops, while a customer combining a Geneva meeting with snowboarding in Verbier has different priorities entirely. The planner needs to handle these different scenarios, with different guidance for each.
 
-As a car rental agency, Miles of Smiles also wants to suggest useful rental extras. A family traveling with a young child may need a suitable child seat, while a winter mountain trip might call for compatible snow chains. Some of these extras will (conveniently for Miles of Smiles) be paid extras, while others like child seats are legally required and can't be considered upsells. 
-
+As a car rental agency, Miles of Smiles also wants to suggest useful rental extras. A family traveling with a young child may need a suitable child seat, while a winter mountain trip might call for compatible snow chains. Some of these extras will (conveniently for Miles of Smiles) be paid extras, while others like child seats are legally required and can't be considered upsells. (Management did ask whether snow chains could be suggested for the Riviera in August. Legal said no.)
 
 
 ```mermaid
@@ -26,13 +25,13 @@ flowchart LR
 
 ## What are we building?
 
-To keep the focus on the new concepts of this step, the workshop provides starter code in `section-3/step-00` with all the UI components already built. This starter code also has an existing set of agents to plan a basic trip. These Agents recommend a vehicle, plan a route, and estimate costs, but they rely on **general instructions** baked into their prompts. There is no separate guidance for family holidays, adventure trips, or business travel yet.
+To keep the focus on the new concepts of this step, the workshop provides starter code in `section-3/step-00` with all the UI components already built. This starter code also has an existing set of agents to plan a basic trip. These Agents recommend a vehicle, plan a route, and estimate costs, but they rely on general instructions baked into their prompts. There is no separate guidance for family holidays, adventure trips, or business travel yet.
 
 <figure markdown="span">
   ![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](../images/section-3-trip-form.png){ width="400" }
 </figure>
 
-In this step, we're going to add **skills**: Markdown files that agents can request at runtime through a built-in `activate_skill` tool. Unlike the fixed prompts we've seen in the previous chapters which are passed to the model on every request, the full skill content is added to the conversation **only after activation**.
+In this step, we're going to add skills: Markdown files that agents can request at runtime through a built-in `activate_skill` tool. The fixed prompts from the previous chapters go to the model on every request. A skill's full content only joins the conversation once the agent activates it.
 
 ```mermaid
 flowchart TD
@@ -50,7 +49,7 @@ flowchart TD
     Agent --> Result[Tailored recommendation]
 ```
 
-Keeping specific skills, like travel expertise, outside the fixed prompts lets Miles of Smiles update its advice without rewriting the agents and only load specific guidance if the model deems it useful to its response. 
+Keeping specific skills, like travel expertise, outside the fixed prompts lets Miles of Smiles update its advice without rewriting the agents and only load specific guidance if the model deems it useful to its response.
 
 
 ## Preparing a working copy
@@ -97,7 +96,7 @@ Keeping specific skills, like travel expertise, outside the fixed prompts lets M
 
 ## Dynamic skill discovery and activation
 
-You've already seen how system and user prompts work through the `@SystemMessage` and `@UserMessage` annotations. These are very useful to provide context and instructions to a model, however this guidance is sent on **every invocation**. Skills on the other hand keep domain guidance in separate Markdown files so an agent can request **only the content relevant** to the current trip.
+You've already seen how system and user prompts work through the `@SystemMessage` and `@UserMessage` annotations. They are a good way to give a model context and instructions, but that guidance is sent on every invocation. Skills keep domain guidance in separate Markdown files, so an agent can request just the part that matters for the current trip.
 
 ### Adding skills to Quarkus LangChain4j
 
@@ -119,7 +118,7 @@ quarkus.langchain4j.skills.directories=classpath:skills
 This points the extension at the `src/main/resources/skills/` directory on the classpath. You can also point it at filesystem paths for skills you want to manage outside the project.
 
 ??? "Create skills from other sources?"
-    Skills do not have to be file-system based. You can also create them from any other source — a database, a remote API, generated at runtime — using the upstream [LangChain4j builder API](https://docs.langchain4j.dev/tutorials/skills/#programmatically).
+    Skills do not have to be file-system based. You can also build them from a database, a remote API, or content generated at runtime, using the upstream [LangChain4j builder API](https://docs.langchain4j.dev/tutorials/skills/#programmatically).
 
 
 ### Defining skills
@@ -170,7 +169,7 @@ Only the vehicle and itinerary agents need direct access to these skills. You ca
 --8<-- "../../section-3/step-01/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java"
 ```
 
-The vehicle advisor has access **only** to vehicle-selection guidance, which applies across trip types. The itinerary planner can choose from the three trip-specific skills.
+The vehicle advisor has access to vehicle-selection guidance only, which applies across trip types. The itinerary planner can choose from the three trip-specific skills.
 
 The highlighted prompt changes ask the model to activate a skill before answering. Be aware that these instructions encourage tool use, but the model can still skip the call and answer from its own knowledge.
 
