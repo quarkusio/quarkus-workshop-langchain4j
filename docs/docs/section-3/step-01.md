@@ -1,4 +1,4 @@
-# Step 01 - Agent Skills with Quarkus LangChain4j
+# Step 01 - Agent Skills and Discovery
 
 ## Welcome to Section 3: Enterprise Agentic Patterns
 
@@ -55,10 +55,10 @@ Keeping specific skills, like travel expertise, outside the fixed prompts lets M
 
 ## Preparing a working copy
 
-!!!note "Build Hands-on or review"
+!!!note "Build it hands-on or review"
     You have the option to build the new features hands-on by working from the starter code, or if you prefer to just review you can go directly to the completed step 01 project. If you're going with option 1 and something doesn't end up working, you can also compare your code with the step 01 solution to see what you've missed.
 
-=== "Option 1: Build it hands-on"
+=== "Option 1: Start from the Step 00 starter code"
 
     ==Copy `section-3/step-00` to a working directory outside the step folders and open that copy in your IDE.== All paths and commands below refer to this working project, including when it's time to run the application.
 
@@ -77,7 +77,7 @@ Keeping specific skills, like travel expertise, outside the fixed prompts lets M
     === "Windows"
         ```cmd
         cd section-3\step-01
-        mvnw quarkus:dev
+        .\mvnw.cmd quarkus:dev
         ```
 
 !!! info "How the starter workflow is structured"
@@ -350,8 +350,6 @@ The exercises above used family and adventure trips. Run the same destination as
 
 ## What's next?
 
-The planner now has travel guidance in Markdown files, with each agent's access controlled by its skill list. You can update that guidance independently of the Java prompts and use tool results to check what the model received.
-
-In Step 02, you'll add guardrails and compliance checks to catch unsuitable trip recommendations before they reach the customer.
+The planner now keeps its travel advice in Markdown files that Miles of Smiles can update without touching the Java code. In Step 02, we'll add guardrails that catch unsuitable recommendations before a customer ever sees them.
 
 [Continue to Step 02 - Guardrails and Compliance](step-02.md)

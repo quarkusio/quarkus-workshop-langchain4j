@@ -296,7 +296,7 @@ Both starting routes now have the same persistence tests and configuration. ==Ru
 
 === "Windows"
     ```cmd
-    mvnw.cmd test
+    .\mvnw.cmd test
     ```
 
 The default Surefire configuration runs `PersistentTripPlanStoreTest` and persistence-aware `TripPlanStoreLifecycleTest` only. The tests check that the original request survives store recreation, that a decision cannot be submitted twice, and that confirmed, rejected, and failed records retain the reviewed plan when late events arrive. They also check request ordering and the transaction boundary before acknowledgement. Reading from another store object establishes database persistence, but a full application restart is still needed to check that Flow restores its waiting execution.
@@ -343,7 +343,7 @@ sequenceDiagram
 
 === "Windows"
     ```cmd
-    mvnw.cmd quarkus:dev
+    .\mvnw.cmd quarkus:dev
     ```
 
 ==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a trip plan with a future start date. Leave it awaiting approval.==
@@ -376,7 +376,7 @@ The workflow table should contain the saved instance, while the trip-plan table 
 
 === "Windows"
     ```cmd
-    mvnw.cmd quarkus:dev
+    .\mvnw.cmd quarkus:dev
     ```
 
 ==Check the startup log for `Restoring workflow instance:` and compare its identifier with the one from the results page.== The matching identifier shows that Flow has loaded the saved workflow and is waiting for the customer's decision again.

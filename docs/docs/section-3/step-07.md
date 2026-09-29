@@ -401,4 +401,4 @@ Use the trace to read what the run actually did. The LLM spans show the prompts 
 
 ## What's next?
 
-The trip planner is now backed by a repeatable evaluation harness: deterministic invariant checks catch structural problems without calling a model, a judge measures qualitative fitness against a rubric, and every live run produces a trace in Langfuse with its evaluation score attached. That's the end of Section 3. Head to the [conclusion](conclusion.md) for a recap of the enterprise patterns you've built across all seven steps.
+The trip planner now has an evaluation harness that checks each plan's structure without calling a model and asks a judge model to score the rest, with every live score attached to its Langfuse trace. That's the end of Section 3. Head to the [conclusion](conclusion.md) for a recap of everything you've built.

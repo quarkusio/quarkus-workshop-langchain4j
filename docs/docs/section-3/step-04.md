@@ -36,7 +36,7 @@ Kafka runs through Dev Services, so Docker or Podman must be running for the liv
 
 The exercise changes the Flow definition. The event store, REST resources, payload models, and tests are supplied so we can concentrate on starting, suspending, and resuming a workflow instead of implementing HTTP and browser plumbing. The browser frontend is the one you have used since Step 00. It already knows how to show the workflow status and the approval buttons, so it does not change in this step.
 
-=== "Option 1: Continue from Step 03 and build the new features hands-on"
+=== "Option 1: Continue from Step 03"
 
     ==Stop dev mode in your Step 03 working copy before updating the dependencies and supplied files.==
 
@@ -56,7 +56,7 @@ The exercise changes the Flow definition. The event store, REST resources, paylo
 
     ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
 
-=== "Option 2: Use the completed Step 04 project and review the changes"
+=== "Option 2: Use the completed Step 04 project"
 
     ==Copy `section-3/step-04` to a working directory and open that copy.== It supplies the Flow definition and the matching store, resources, models, and tests.
 
@@ -200,7 +200,7 @@ The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real 
 
 === "Windows"
     ```cmd
-    mvnw.cmd test
+    .\mvnw.cmd test
     ```
 
 The default Surefire configuration runs the slim `TripPlannerFlowTest` smoke suite and `TripPlanStoreLifecycleTest` only. Each CI job for a step covers that lesson's additions, so guardrail unit tests remain in Step 02.
@@ -211,7 +211,7 @@ The supplied browser tests in `src/test/frontend/` exercise status rendering and
 
 ## Following a trip through the running application
 
-==Start dev mode from your working project with `./mvnw quarkus:dev` (`mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080){target="_blank"}.== If another step uses that port, add `-Dquarkus.http.port=8083` and use the corresponding URLs below. Do not run Maven `clean` while dev mode is running.
+==Start dev mode from your working project with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080){target="_blank"}.== If another step uses that port, add `-Dquarkus.http.port=8083` and use the corresponding URLs below. Do not run Maven `clean` while dev mode is running.
 
 ==Generate a trip with a future start date and note its workflow identifier.== A family trip to the California coast for seven days and four travelers is a useful comparison with the previous chapters.
 

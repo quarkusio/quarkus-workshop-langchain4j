@@ -1,4 +1,4 @@
-# Step 02 - Agent Guardrails and Compliance
+# Step 02 - Guardrails and Compliance
 
 A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. Such are the joys of working with probabilistic AI models. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline.
 
@@ -69,7 +69,7 @@ Keep the model configuration from Step 01 and make sure `OPENAI_API_KEY` is set 
 
     The starter already displays the error messages returned by the application. Once we add the guardrails and exception mapper below, it will also show why a trip could not pass the recommendation checks.
 
-=== "Option 2: Use Step 02 solution and review the changes"
+=== "Option 2: Use the completed Step 02 project"
 
     The completed project already contains the changes below. You can read through the implementation without editing, then join the exercise at [Inspecting guardrail execution](#inspecting-guardrail-execution).
 

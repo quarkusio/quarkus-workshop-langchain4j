@@ -281,8 +281,6 @@ Open the trip planner UI at `http://localhost:8080` and submit a trip plan. In t
 
 ## What's next?
 
-The trip planner now checks the weather and local attractions before any model starts dreaming up an itinerary. It does this every time, because no language model gets a say in whether the MCP tools are called.
-
-In Step 07, we'll find out whether all this effort actually produces good plans, using an evaluation harness and traces in Langfuse.
+The trip planner now checks the weather and local attractions before any model starts dreaming up an itinerary, and no language model gets a say in whether those MCP tools are called. In Step 07, we'll find out whether all this effort actually produces good plans, using an evaluation harness and traces in Langfuse.
 
 [Continue to Step 07 - Testing, Evaluation, and Observability](step-07.md)
