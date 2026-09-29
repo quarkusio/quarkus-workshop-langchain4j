@@ -288,19 +288,21 @@ The vehicle-selection skill guides the model toward sensible choices for most tr
 
 ==Click **Generate Trip Plan**, wait for it to finish, and look for the guardrail decisions in the terminal.==
 
-When the model recommends a Ferrari on an economy budget, the vehicle guardrail steps in with a `REPROMPT`, and once the model corrects its answer you should see a `PASS`. After both agents finish, the cost estimator calls `estimateRental` and the tool input guardrail checks its arguments. You should see these four lines, though not necessarily in this order, since the vehicle and itinerary agents run in parallel:
+When the model recommends a Ferrari on an economy budget, the vehicle guardrail steps in with a `REPROMPT`. The model's second answer is an affordable car, but the preferences still mention Ferrari, so the guardrail lets it through with an `ANNOTATE` decision and a note for the customer. After both agents finish, the cost estimator calls `estimateRental` and the tool input guardrail checks its arguments. You should see lines like these, though not necessarily in this order, since the vehicle and itinerary agents run in parallel:
 
 ```text
-🛡️ [TripAppropriatenessGuardrail] REPROMPT — Vehicle 'ferrari ...' does not match economy budget
-🛡️ [TripAppropriatenessGuardrail] PASS — No configured small-vehicle or economy-brand rule matched
+🛡️ [TripAppropriatenessGuardrail] REPROMPT — Luxury vehicle 'ferrari portofino' does not match economy budget — asking model to retry with an affordable option
+🛡️ [TripAppropriatenessGuardrail] ANNOTATE — Preferences mentioned 'ferrari' but output is 'fiat 500' — Requested brand 'ferrari' is not suitable for this trip; a more appropriate vehicle was selected
 🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions
 🛡️ [RentalEstimateInputGuardrail] PASS — Rental arguments accepted
 ```
 
-The vehicle recommendation card in the browser also displays a notice when the guardrail overrode the customer's requested brand or corrected the vehicle type. If the model produced a different vehicle without a `REPROMPT`, the card shows an `ANNOTATE` notice explaining that the requested brand was not suitable for this trip. This information comes from the `guardrailOverride` field set by the guardrail on the JSON response.
+The annotation ends up in the browser too. The guardrail writes it to the `guardrailOverride` field of the JSON response, and the vehicle recommendation card shows it as a notice above the reasoning. The same notice appears when the guardrail replaces a vehicle that is too small for the group.
+
+![Vehicle recommendation card for a Fiat 500 with a guardrail override notice saying the requested Ferrari was not suitable](../images/section-3-step-02-guardrail-notice.png)
 
 !!!note
-    If the vehicle guardrail audit log shows `PASS` on the first attempt and no `ANNOTATE` notice appears in the UI, the model read the economy budget and produced an affordable vehicle without the guardrail needing to act. Try requesting a specific luxury brand in the preferences field, or try a different model.
+    The model may skip the Ferrari entirely and pick an affordable car on the first attempt. In that case you'll see no `REPROMPT`, but the `ANNOTATE` line and the notice still appear because the preferences mention a brand the plan doesn't include. If you see neither, try a different luxury brand in the preferences or a different model.
 
 When a guardrail exhausts all its retry or reprompt attempts without a passing response, the `GuardrailExceptionMapper` returns HTTP 422 and the browser displays: `The trip plan could not pass the recommendation checks. Please revise your trip details and try again.`
 
