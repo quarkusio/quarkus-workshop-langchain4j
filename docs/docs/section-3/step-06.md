@@ -239,7 +239,15 @@ The two applications run side by side. ==Start the MCP server first, in its own 
     .\mvnw.cmd quarkus:dev
     ```
 
-==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a trip plan.== In the trip planner terminal, the MCP agents fetch weather and points of interest before the AI agents start. The itinerary and vehicle recommendation should now mention the forecast and some of the local attractions.
+==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a trip plan for one of the seeded cities, such as `Barcelona`.== The itinerary and vehicle recommendation should now mention the forecast and some of the attractions from `import.sql`. The lookup is an exact match on the city name, so `barcelona` or a city missing from the database gets an empty list back. The plan still arrives, but any attractions in it come from the model's own knowledge.
+
+<figure markdown="span">
+  ![A five-day family trip to Barcelona whose vehicle recommendation mentions the sunny forecast and whose itinerary includes seeded points of interest](../images/section-3-step-06-weather-itinerary.png){ width="600" }
+</figure>
+
+==Open the Dev UI, click **Executions** on the LangChain4j Agentic card, and expand the latest run.== The `DestinationIntelligence` phase shows up as `fetchIntelligence`, and it finishes before the research agents start. Its two children, `getWeatherForecast` and `getPointsOfInterest`, are ACTION rows: plain MCP tool calls that take a few milliseconds and use no tokens. The AI rows below them are where the model time goes.
+
+![Dev UI Executions for planTrip, with fetchIntelligence running the two MCP tool calls as ACTION rows before the research, vehicle review and cost estimation agents](../images/section-3-step-06-devui-executions.png)
 
 ??? info "Verifying with tests"
 
