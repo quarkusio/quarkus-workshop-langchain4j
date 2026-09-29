@@ -238,13 +238,13 @@ The quality run does one real planning run with your configured model, applies t
 The test loads the `rome-family-three-days` sample from `samples.yaml`, opens a root span around the planning call, and grabs the trace id while that span is still current:
 
 ```java title="TripPlanQualityEvaluationLiveIT.java (capturing the trace)"
---8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java:72:91"
+--8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java:76:95"
 ```
 
-The invariant check and the judge both get the same sample, and the judge compares the plan with that sample's requirements. The test then publishes the aggregate score to that trace and waits for Langfuse to report it:
+The invariant check and the judge both get the same sample, and the judge compares the plan with that sample's requirements. The test injects the judge's model with `@ModelName("judgeModel")`, the same gpt-4o-mini the budget guardrail uses. Without it the test would get the default model, which is the gpt-4o that wrote the plan, and nobody should mark their own homework. The test then publishes the aggregate score to that trace and waits for Langfuse to report it:
 
 ```java title="TripPlanQualityEvaluationLiveIT.java (publishing the score)"
---8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java:118:127"
+--8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java:122:131"
 ```
 
 A last check makes sure the score didn't end up on an unrelated trace. The judge's own model call is a separate trace, so its cost never gets mixed up with the planner's.

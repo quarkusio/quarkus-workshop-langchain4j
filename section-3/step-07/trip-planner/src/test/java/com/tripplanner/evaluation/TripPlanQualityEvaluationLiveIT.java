@@ -11,6 +11,7 @@ import dev.langchain4j.model.chat.ChatModel;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
+import io.quarkiverse.langchain4j.ModelName;
 import io.quarkiverse.langfuse.api.LangfuseOperations;
 import io.quarkiverse.langchain4j.testing.evaluation.EvaluationResult;
 import io.quarkiverse.langchain4j.testing.evaluation.EvaluationSample;
@@ -52,8 +53,11 @@ class TripPlanQualityEvaluationLiveIT {
     @Inject
     TripPlannerSystem tripPlannerSystem;
 
+    // The judge uses its own model, never the planner's default model, so the
+    // planner doesn't grade its own work.
     @Inject
-    ChatModel chatModel;
+    @ModelName("judgeModel")
+    ChatModel judgeModel;
 
     @Inject
     Tracer tracer;
@@ -99,7 +103,7 @@ class TripPlanQualityEvaluationLiveIT {
         // The AI judge checks the plan against the sample's requirements. It is
         // a separate invocation from the application run, so its usage stays
         // separable from the planner's measurements.
-        TripPlanJudge judge = new TripPlanJudge(chatModel);
+        TripPlanJudge judge = new TripPlanJudge(judgeModel);
         EvaluationResult judged = judge.judge(sample, output);
         assertNotNull(judged.metadata().get("judge-model"), "judge must record which model it used");
 
