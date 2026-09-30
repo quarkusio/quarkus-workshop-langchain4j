@@ -1,16 +1,20 @@
 package com.tripplanner.guardrails;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tripplanner.model.ItineraryResult;
+import com.tripplanner.model.TripPlan.DayItinerary;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.guardrail.OutputGuardrail;
 import dev.langchain4j.guardrail.OutputGuardrailResult;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ApplicationScoped
 public class TripSafetyGuardrail implements OutputGuardrail {
@@ -20,66 +24,46 @@ public class TripSafetyGuardrail implements OutputGuardrail {
             "do not travel", "armed conflict", "combat zone", "no-go zone");
 
     @Inject
-    GuardrailAuditLog auditLog;
-
-    @Inject
     ObjectMapper objectMapper;
 
     @Override
     public OutputGuardrailResult validate(AiMessage responseFromLLM) {
         String text = responseFromLLM.text();
         if (text == null || text.isBlank()) {
-            auditLog.log("TripSafetyGuardrail", "SKIP", "No text content; tool-call content was not validated");
+            Log.info("🛡️ [TripSafetyGuardrail] SKIP — No text content; tool-call content was not validated");
             return success();
         }
 
-        JsonNode root;
+        ItineraryResult result;
         try {
-            root = objectMapper.readTree(extractJson(text));
+            result = objectMapper.readValue(extractJson(text), ItineraryResult.class);
         } catch (Exception e) {
-            auditLog.log("TripSafetyGuardrail", "RETRY", "Response is not valid JSON");
+            Log.info("🛡️ [TripSafetyGuardrail] RETRY — Response is not valid JSON");
             return retry("The response is not valid JSON. Please return a valid JSON object matching the ItineraryResult format.");
         }
 
-        JsonNode itinerary = root == null ? null : root.path("itinerary");
-        if (itinerary == null || !itinerary.isArray() || itinerary.isEmpty()) {
-            auditLog.log("TripSafetyGuardrail", "RETRY", "Itinerary is missing or empty");
+        if (result.itinerary() == null || result.itinerary().isEmpty()) {
+            Log.info("🛡️ [TripSafetyGuardrail] RETRY — Itinerary is missing or empty");
             return retry("The trip plan must include a day-by-day itinerary. Please provide at least one day.");
         }
 
-        List<String> dangerousMatches = findDangerousContent(root);
+        String planText = Stream.concat(
+                        Stream.of(result.routeOverview()),
+                        result.itinerary().stream().map(DayItinerary::description))
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(" "))
+                .toLowerCase();
+
+        List<String> dangerousMatches = DANGEROUS_KEYWORDS.stream().filter(planText::contains).toList();
         if (!dangerousMatches.isEmpty()) {
             String matched = String.join(", ", dangerousMatches);
-            auditLog.log("TripSafetyGuardrail", "RETRY", "Dangerous content detected: " + matched);
+            Log.infof("🛡️ [TripSafetyGuardrail] RETRY — Dangerous content detected: %s", matched);
             return retry("The trip plan references potentially dangerous areas (" + matched
                     + "). Please regenerate the plan avoiding these areas and suggesting safe alternatives.");
         }
 
-        auditLog.log("TripSafetyGuardrail", "PASS", "Nonempty itinerary; no configured phrases in route overview or day descriptions");
+        Log.info("🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions");
         return success();
-    }
-
-    private List<String> findDangerousContent(JsonNode root) {
-        List<String> matches = new ArrayList<>();
-        String routeOverview = root.path("routeOverview").asText("").toLowerCase();
-        checkForDangerousKeywords(routeOverview, matches);
-
-        JsonNode itinerary = root.path("itinerary");
-        if (itinerary.isArray()) {
-            for (JsonNode day : itinerary) {
-                String description = day.path("description").asText("").toLowerCase();
-                checkForDangerousKeywords(description, matches);
-            }
-        }
-        return matches;
-    }
-
-    private void checkForDangerousKeywords(String text, List<String> matches) {
-        for (String keyword : DANGEROUS_KEYWORDS) {
-            if (text.contains(keyword) && !matches.contains(keyword)) {
-                matches.add(keyword);
-            }
-        }
     }
 
     static String extractJson(String text) {

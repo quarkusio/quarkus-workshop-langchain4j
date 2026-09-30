@@ -31,9 +31,6 @@ class TripAppropriatenessGuardrailTest {
     @Inject
     ObjectMapper objectMapper;
 
-    @Inject
-    GuardrailAuditLog auditLog;
-
     @BeforeEach
     void setUp() {
         tripRequest = new TripRequest("Italian Riviera", "2026-07-10", 5, "family", 4, "moderate (€1000-€2500)", "coastal towns");
@@ -45,7 +42,6 @@ class TripAppropriatenessGuardrailTest {
         OutputGuardrailResult result = validate(message);
         assertTrue(result.isSuccess());
         assertFalse(result.hasRewrittenResult());
-        assertEquals("PASS", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test
@@ -64,7 +60,6 @@ class TripAppropriatenessGuardrailTest {
                 + "Suggested category: MPV. Confirm seating, luggage capacity, price, and availability with the rental provider.",
                 replacement.path("reasoning").asText());
         assertFalse(result.successfulText().contains("Mazda"));
-        assertEquals("REWRITE", auditLog.getRecentEntries().getLast().decision());
         var vehicle = objectMapper.readValue(result.successfulText(), TripPlan.VehicleRecommendation.class);
         assertEquals("Original recommendation 'sports car' is too small for 4 travelers", vehicle.guardrailOverride());
     }
@@ -77,7 +72,6 @@ class TripAppropriatenessGuardrailTest {
                 """));
         assertTrue(result.isSuccess());
         assertTrue(result.hasRewrittenResult());
-        assertEquals("ANNOTATE", auditLog.getRecentEntries().getLast().decision());
         var vehicle = objectMapper.readValue(result.successfulText(), TripPlan.VehicleRecommendation.class);
         assertEquals("Fiat 500X", vehicle.model());
         assertEquals("Requested brand 'ferrari' is not suitable for this trip; a more appropriate vehicle was selected",
@@ -105,14 +99,12 @@ class TripAppropriatenessGuardrailTest {
         assertFalse(result.isSuccess());
         assertFalse(result.hasRewrittenResult());
         assertTrue(result.getReprompt().orElseThrow().contains("budget-friendly"));
-        assertEquals("REPROMPT", auditLog.getRecentEntries().getLast().decision());
 
         var corrected = validate(AiMessage.from("""
                 {"type":"Sports car","model":"Mazda MX-5","reasoning":"Affordable"}
                 """));
         assertTrue(corrected.isSuccess());
         assertTrue(corrected.hasRewrittenResult());
-        assertEquals("REWRITE", auditLog.getRecentEntries().getLast().decision());
     }
 
     @ParameterizedTest
@@ -133,21 +125,18 @@ class TripAppropriatenessGuardrailTest {
     @ValueSource(strings = {" ", "not json", "null", "[]", "{}", "{\"type\":\"SUV\"}"})
     void unvalidatedTextIsSkippedNotPassed(String text) {
         assertTrue(validate(AiMessage.from(text)).isSuccess());
-        assertEquals("SKIP", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test
     void toolCallContentIsSkippedNotPassed() {
         var message = AiMessage.from(ToolExecutionRequest.builder().name("vehicle").arguments("{}").build());
         assertTrue(validate(message).isSuccess());
-        assertEquals("SKIP", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test
     void missingContextIsSkippedNotPassed() {
         tripRequest = null;
         assertTrue(validate(AiMessage.from(validVehicleJson())).isSuccess());
-        assertEquals("SKIP", auditLog.getRecentEntries().getLast().decision());
     }
 
     private OutputGuardrailResult validate(AiMessage message) {

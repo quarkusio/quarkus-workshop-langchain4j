@@ -1,17 +1,19 @@
 package com.tripplanner.guardrails;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.tripplanner.model.TripPlan.VehicleRecommendation;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.guardrail.OutputGuardrail;
 import dev.langchain4j.guardrail.OutputGuardrailRequest;
 import dev.langchain4j.guardrail.OutputGuardrailResult;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.Set;
+import java.io.UncheckedIOException;
 import java.util.Locale;
+import java.util.Set;
 
 @ApplicationScoped
 public class TripAppropriatenessGuardrail implements OutputGuardrail {
@@ -24,31 +26,26 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
             "land rover", "range rover", "jaguar", "bmw", "mercedes", "audi", "lexus");
 
     @Inject
-    GuardrailAuditLog auditLog;
-
-    @Inject
     ObjectMapper objectMapper;
 
     @Override
     public OutputGuardrailResult validate(OutputGuardrailRequest guardrailRequest) {
         String text = guardrailRequest.responseFromLLM().aiMessage().text();
         if (text == null || text.isBlank()) {
-            auditLog.log("TripAppropriatenessGuardrail", "SKIP", "No text content; tool-call content was not validated");
+            Log.info("🛡️ [TripAppropriatenessGuardrail] SKIP — No text content; tool-call content was not validated");
             return success();
         }
 
-        JsonNode root;
+        VehicleRecommendation vehicle;
         try {
-            root = objectMapper.readTree(TripSafetyGuardrail.extractJson(text));
+            vehicle = objectMapper.readValue(TripSafetyGuardrail.extractJson(text), VehicleRecommendation.class);
         } catch (Exception e) {
-            auditLog.log("TripAppropriatenessGuardrail", "SKIP", "Response is not valid JSON; suitability was not validated");
+            Log.info("🛡️ [TripAppropriatenessGuardrail] SKIP — Response is not valid JSON; suitability was not validated");
             return success();
         }
 
-        if (root == null || !root.isObject() || !root.path("type").isTextual()
-                || root.path("type").asText().isBlank() || !root.path("model").isTextual()
-                || root.path("model").asText().isBlank()) {
-            auditLog.log("TripAppropriatenessGuardrail", "SKIP", "Vehicle type or model is missing; suitability was not validated");
+        if (vehicle == null || isBlank(vehicle.type()) || isBlank(vehicle.model())) {
+            Log.info("🛡️ [TripAppropriatenessGuardrail] SKIP — Vehicle type or model is missing; suitability was not validated");
             return success();
         }
 
@@ -61,21 +58,20 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
             // Prompt variables may contain text or numeric method arguments.
             travelers = Integer.parseInt(String.valueOf(variables.get("travelers")));
         } catch (NumberFormatException e) {
-            auditLog.log("TripAppropriatenessGuardrail", "SKIP", "Traveler count is missing or invalid; suitability was not validated");
+            Log.info("🛡️ [TripAppropriatenessGuardrail] SKIP — Traveler count is missing or invalid; suitability was not validated");
             return success();
         }
         if (budget == null || budget.isBlank() || tripType == null || tripType.isBlank()) {
-            auditLog.log("TripAppropriatenessGuardrail", "SKIP", "Trip variables are missing or incomplete; suitability was not validated");
+            Log.info("🛡️ [TripAppropriatenessGuardrail] SKIP — Trip variables are missing or incomplete; suitability was not validated");
             return success();
         }
 
-        String vehicleType = root.path("type").asText("").toLowerCase(Locale.ROOT);
-        String vehicleModel = root.path("model").asText("").toLowerCase(Locale.ROOT);
+        String vehicleType = vehicle.type().toLowerCase(Locale.ROOT);
+        String vehicleModel = vehicle.model().toLowerCase(Locale.ROOT);
 
         // Check the original model before a generic rewrite can hide a budget violation.
         if (budget.toLowerCase(Locale.ROOT).contains("economy") && isLuxuryBrand(vehicleModel)) {
-            auditLog.log("TripAppropriatenessGuardrail", "REPROMPT",
-                    "Luxury vehicle '" + vehicleModel + "' does not match economy budget — asking model to retry with an affordable option");
+            Log.infof("🛡️ [TripAppropriatenessGuardrail] REPROMPT — Luxury vehicle '%s' does not match economy budget — asking model to retry with an affordable option", vehicleModel);
             return reprompt("The vehicle recommendation is a luxury vehicle but the budget is economy. "
                     + "Please recommend an affordable, budget-friendly vehicle instead.",
                     "The previous vehicle recommendation is a luxury vehicle that does not fit the economy budget. "
@@ -85,9 +81,8 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
 
         if (travelers >= 4 && isSmallVehicle(vehicleType)) {
             String reason = "Original recommendation '" + vehicleType + "' is too small for " + travelers + " travelers";
-            rewriteVehicle((ObjectNode) root, travelers, tripType, reason);
-            auditLog.log("TripAppropriatenessGuardrail", "REWRITE", reason + "; returned a generic category recommendation");
-            return successWith(AiMessage.from(root.toString()));
+            Log.infof("🛡️ [TripAppropriatenessGuardrail] REWRITE — %s; returned a generic category recommendation", reason);
+            return successWith(AiMessage.from(toJson(genericVehicle(travelers, tripType, reason))));
         }
 
         // If the user asked for a luxury brand but the output doesn't contain it, the model
@@ -95,13 +90,12 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         String requestedBrand = requestedLuxuryBrand(preferences);
         if (requestedBrand != null && !vehicleModel.contains(requestedBrand)) {
             String reason = "Requested brand '" + requestedBrand + "' is not suitable for this trip; a more appropriate vehicle was selected";
-            ((ObjectNode) root).put("guardrailOverride", reason);
-            auditLog.log("TripAppropriatenessGuardrail", "ANNOTATE",
-                    "Preferences mentioned '" + requestedBrand + "' but output is '" + vehicleModel + "' — " + reason);
-            return successWith(AiMessage.from(root.toString()));
+            var annotated = new VehicleRecommendation(vehicle.type(), vehicle.model(), vehicle.reasoning(), reason);
+            Log.infof("🛡️ [TripAppropriatenessGuardrail] ANNOTATE — Preferences mentioned '%s' but output is '%s' — %s", requestedBrand, vehicleModel, reason);
+            return successWith(AiMessage.from(toJson(annotated)));
         }
 
-        auditLog.log("TripAppropriatenessGuardrail", "PASS", "No configured small-vehicle or economy-brand rule matched");
+        Log.info("🛡️ [TripAppropriatenessGuardrail] PASS — No configured small-vehicle or economy-brand rule matched");
         return success();
     }
 
@@ -119,18 +113,30 @@ public class TripAppropriatenessGuardrail implements OutputGuardrail {
         return LUXURY_BRANDS.stream().filter(lower::contains).findFirst().orElse(null);
     }
 
-    private void rewriteVehicle(ObjectNode vehicle, int travelers, String tripType, String reason) {
+    private VehicleRecommendation genericVehicle(int travelers, String tripType, String reason) {
         String replacement = switch (tripType.toLowerCase(Locale.ROOT)) {
             case "adventure" -> "SUV";
             case "business" -> "Estate";
             default -> "MPV";
         };
-        vehicle.put("type", replacement);
-        vehicle.put("model", (replacement.equals("MPV") ? "Family MPV" : replacement)
-                + "; specific model subject to availability.");
-        vehicle.put("reasoning", "Vehicle corrected by guardrail: original recommendation was too small for "
-                + travelers + " travelers. Suggested category: " + replacement
-                + ". Confirm seating, luggage capacity, price, and availability with the rental provider.");
-        vehicle.put("guardrailOverride", reason);
+        return new VehicleRecommendation(
+                replacement,
+                (replacement.equals("MPV") ? "Family MPV" : replacement) + "; specific model subject to availability.",
+                "Vehicle corrected by guardrail: original recommendation was too small for "
+                        + travelers + " travelers. Suggested category: " + replacement
+                        + ". Confirm seating, luggage capacity, price, and availability with the rental provider.",
+                reason);
+    }
+
+    private String toJson(VehicleRecommendation vehicle) {
+        try {
+            return objectMapper.writeValueAsString(vehicle);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

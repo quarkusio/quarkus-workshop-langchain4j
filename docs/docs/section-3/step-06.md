@@ -143,7 +143,7 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationIntelligence.java"
 ```
 
-The `@Output` method calls `DestinationEvidence.validate()` before assembling the combined string. It checks the JSON from the MCP server for required fields and sensible numbers, and makes sure the response is about the destination we asked for. Anything malformed throws `TripIntelligenceException`, which maps to a 502 with error code `intelligence_unavailable`, so the frontend can tell the customer that the destination data was the problem.
+The `@Output` method calls `DestinationEvidence.validate()` before assembling the combined string. It reads the JSON from the MCP server into small records that mirror the server's weather and points-of-interest types, checks them for required fields and sensible numbers, and makes sure the response is about the destination we asked for. Anything malformed throws `TripIntelligenceException`, which maps to a 502 with error code `intelligence_unavailable`, so the frontend can tell the customer that the destination data was the problem.
 
 ==Create `trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationEvidence.java`:==
 

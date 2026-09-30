@@ -15,28 +15,22 @@ class TripSafetyGuardrailTest {
     @Inject
     TripSafetyGuardrail guardrail;
 
-    @Inject
-    GuardrailAuditLog auditLog;
-
     @Test
     void validItineraryShouldPass() {
         AiMessage message = AiMessage.from(validItineraryResultJson());
         OutputGuardrailResult result = guardrail.validate(message);
         assertTrue(result.isSuccess());
-        assertEquals("PASS", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test
     void blankTextIsSkippedNotPassed() {
         assertTrue(guardrail.validate(AiMessage.from(" ")).isSuccess());
-        assertEquals("SKIP", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test
     void toolCallContentIsSkippedNotPassed() {
         var message = AiMessage.from(ToolExecutionRequest.builder().name("itinerary").arguments("{}").build());
         assertTrue(guardrail.validate(message).isSuccess());
-        assertEquals("SKIP", auditLog.getRecentEntries().getLast().decision());
     }
 
     @Test

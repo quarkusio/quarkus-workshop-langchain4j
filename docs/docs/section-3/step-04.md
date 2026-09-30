@@ -54,6 +54,8 @@ The exercise changes the Flow definition. The event store, REST resources, paylo
 
     ==Remove `src/test/java/com/tripplanner/TripPlanContractTest.java` and the `src/test/java/com/tripplanner/voting/` tests from this working copy, along with `TripPlannerResourceTest.java` if you still have it from Step 00.== These tests expected the old synchronous response. Step 04 only runs a small Flow smoke suite, and the guardrail and voting tests stay in Steps 02 and 03.
 
+    ==Remove `src/main/java/com/tripplanner/resource/GuardrailExceptionMapper.java`, and `src/test/java/com/tripplanner/resource/GuardrailExceptionMapperTest.java` if you have it.== Agents no longer run inside the REST call, so the mapper would never see an exception.
+
     ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
 
 === "Option 2: Use the completed Step 04 project"
@@ -117,7 +119,7 @@ The `.envelope(this::matchesDecision)` filter makes sure it's the right event. O
 
     The supplied `matchesDecision()` helper reads the instance extension and deserializes the decision with the injected mapper before checking the store. It keeps both checks in a single envelope predicate. Adding `dataAs()` after an instance-envelope filter would replace that predicate in this DSL instead of combining the checks.
 
-    Agent exceptions now occur outside the REST call, so the Step 02 exception mapper cannot return them directly. These helpers turn planning or finalization exceptions into a failed status, which the workflow publishes as an event. The error model checks the cause chain for an actual guardrail exception and returns a safe message; unrelated failures are server errors. A finalization failure keeps the plan the customer reviewed.
+    Agent exceptions now occur outside the REST call, so the Step 02 exception mapper never sees them and this step drops it. These helpers turn planning or finalization exceptions into a failed status, which the workflow publishes as an event. The error model checks the cause chain for an actual guardrail exception and returns a safe message; unrelated failures are server errors. A finalization failure keeps the plan the customer reviewed.
 
 ## Keeping the result attached to its request
 
@@ -129,7 +131,7 @@ The supplied `TripPlanStatus` record carries the trip details and current outcom
 --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/model/TripPlanStatus.java"
 ```
 
-Along with both identifiers, the record carries the original `request` and the generated `plan`, which is what lets the browser restore the trip after a refresh. `status` holds the current state, with a `confirmation` once booking completes, or an `error` and `message` when something fails. Calling `failed()` keeps any plan that was already generated.
+Along with both identifiers, the record carries the original `request` and the generated `plan`, which is what lets the browser restore the trip after a refresh. `status` holds the current state, with a `confirmation` once booking completes, or an `error` and `message` when something fails. Calling `failed()` keeps any plan that was already generated. `withError()` attaches an error code and message without changing the state, which the REST resource uses when it stops waiting for a slow plan.
 
 The store doesn't take incoming events on trust. Before accepting an outcome, it checks that the workflow identifier matches a registered request and that the trip is in the right state, so an old approval request can't reopen a trip that was already rejected. An event also can't report that it failed to publish, so the store listens for Flow's `WorkflowFailedEvent` through `onWorkflowFailed()` as well. When a workflow really fails, the store records a safe failure for that request and keeps any plan the customer already reviewed.
 
