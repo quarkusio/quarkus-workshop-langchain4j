@@ -92,9 +92,7 @@ For a live check, generate a trip and record its identifier. Confirm the plannin
 
 ## Participation routes
 
-The [Step 04 tutorial](../../docs/docs/section-3/step-04.md) supplies the copy list for participants continuing from Step 03. Use this step's store, resources, payload models, Flow helpers, and tests together. Keep the complete supplied `TripPlannerFlow` class, including its injected `ObjectMapper` and `matchesDecision()` helper, when editing the descriptor. Remove the earlier bare-response `TripPlanContractTest`, the Step 03 `voting/` tests, and `TripPlannerResourceTest` if it was carried over from Step 00. The supplied agents are unchanged from Step 03; the adapter converts `days` and `travelers` to strings before calling `planTrip`. The cost agent keeps its duration and tool instructions. The participant edit is the Flow descriptor, not frontend or storage implementation.
-
-Participants opening the completed step use the same supplied files and verification sequence. Neither route introduces persistence or real booking integration.
+The [Step 04 tutorial](../../docs/docs/section-3/step-04.md) starts from a copy of this completed project instead of the participant's Step 03 working copy, and walks through each change from Step 03. Participants carry over only their model-provider settings. The agents, guardrails, skill, and frontend are unchanged from Step 03; the adapter converts `days` and `travelers` to strings before calling `planTrip`. Step 03's `TripPlanContractTest` and `voting/` tests are not part of this project. This step adds no persistence or real booking integration.
 
 ## Guides
 

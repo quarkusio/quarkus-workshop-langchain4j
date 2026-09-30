@@ -1,6 +1,6 @@
 # Step 02 - Guardrails and Compliance
 
-A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. Such are the joys of working with probabilistic AI models. Similarly, the model might suggest an unsafe itinerary that goes through dangerous areas. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline and especially before returning to the final result to the user. 
+A family of five asks Miles of Smiles for a road trip, but the vehicle agent recommends a two-seat sports car. Even with the skills we added in Step 01, the model-backed agents can still overlook our instructions when generating a response. Such are the joys of working with probabilistic AI models. Similarly, the model might suggest an unsafe itinerary that goes through dangerous areas. The application therefore needs safety and compliance checks of its own before passing recommendations to the rest of the planning pipeline and especially before returning the final result to the user.
 
 In this step we'll attach output guardrails to the vehicle and itinerary agents so they can request another response or rewrite a recommendation. We'll also give the cost estimator a tool that calculates rental prices from a small rate list, with a tool input guardrail to reject invalid arguments before the calculation runs. 
 
@@ -10,7 +10,7 @@ The [input guardrails from Section 1](../section-1/step-09.md) checked the custo
 
 For our scenario, we need to check the recommendations the parallel itinerary and vehicle selection agents produce before the cost estimator uses them. An **itinerary guardrail** will look for a missing or empty itinerary and a short list of dangerous-area phrases, while a **vehicle guardrail** will compare the recommendation with the customer's request.
 
-Guardrails can take different kinds of action based on the context and how we implement them. They can either **accept** the original answer if everything looks good, or take action by either **correcting** the result itself or going back to the model and asking it to retry. In that case you have the option of simply **retrying with the same instructions** as before, **reprompting by adding additional context** to the request. The diagram below shows these four possible paths a guardrail can take:
+Guardrails can take different kinds of action based on the context and how we implement them. They can either **accept** the original answer if everything looks good, or take action by either **correcting** the result itself or going back to the model and asking it to retry. In that case you have the option of simply **retrying with the same instructions** as before, or **reprompting by adding additional context** to the request. The diagram below shows these four possible paths a guardrail can take:
 
 ```mermaid
 flowchart LR
@@ -36,7 +36,7 @@ You can also set an **attempt limit** when registering the guardrails so that re
 
 ## Tool guardrails
 
-Aside from add guardrails to agents, you can also add **guardrails to local or MCP tool calls**. Checking tool arguments can be particularly important when a tool can modify the file system or write to a database. Before a destructive action such as deleting files or removing database records, a **tool input guardrail** can check whether the requested paths or records are within the permitted scope. A **tool output guardrail** on the other hand inspects the response from a tool for correctness before the agentic system continues with potentially incorrect data.
+Aside from adding guardrails to agents, you can also add **guardrails to local or MCP tool calls**. Checking tool arguments can be particularly important when a tool can modify the file system or write to a database. Before a destructive action such as deleting files or removing database records, a **tool input guardrail** can check whether the requested paths or records are within the permitted scope. A **tool output guardrail** on the other hand inspects the response from a tool for correctness before the agentic system continues with potentially incorrect data.
 
 For the Miles of Smiles app, we're going to give the cost estimator agent a rental calculator tool so it can calculate the vehicle cost using Miles of Smiles' daily rates. If the model requests an unknown vehicle category or a rental of zero days, the calculator might return invalid information, which might end up causing issues in the system. For that, we will add a tool input guardrail to **check the values before** the calculator runs.
 
@@ -59,7 +59,7 @@ flowchart LR
 
 === "Option 2: Follow the completed Step 02 project"
 
-    The completed project already contains the changes below. You can follow along through the implementation, then join the exercise at [Inspecting guardrail execution](#inspecting-guardrail-execution).
+    The completed project already contains the changes below. You can follow along through the implementation, then join the exercise at [Testing the new guardrail implementation](#testing-the-new-guardrail-implementation).
 
     ==Open `section-3/step-02` and start dev mode:==
 
@@ -113,7 +113,7 @@ sequenceDiagram
 
 ## Rewriting and reprompting with `successWith()` and `reprompt()`
 
-The next step is to create a guardrail for the vehicle selction agent. The guardrail needs to check whether a recommended car fits the customer's group size and budget. It checks the economy-budget rule first, then corrects small-vehicle recommendations for groups of four or more.
+The next step is to create a guardrail for the vehicle selection agent. The guardrail needs to check whether a recommended car fits the customer's group size and budget. It checks the economy-budget rule first, then corrects small-vehicle recommendations for groups of four or more.
 
 ==Create `src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java`:==
 
@@ -130,7 +130,7 @@ The next step is to create a guardrail for the vehicle selction agent. The guard
 
 !!! info "Deterministic validation limitations"
     As you can see, we added a simple set of strings for the small vehicles and luxury brands. It's very possible that the LLM
-    suggests a luxury vehicle that is not in this list, or a small vehicle that id described in a different way and our guardrail
+    suggests a luxury vehicle that is not in this list, or a small vehicle that is described in a different way and our guardrail
     would not catch the issue. In Step 7 we will introduce evaluation guardrail patterns that involve a different AI model to 
     evaluate the response from the main model.
     
@@ -228,7 +228,7 @@ Time to test if everything is working! As always, if the application is not alre
 - Trip Type: `Family Vacation`
 - Budget: `Moderate (€1,000–€2,500)`
 
-==Click **Generate Trip Plan**, wait for it to finish, and check the terminal for guardrail decisions.== Whe the responses pass, the guardrails write INFO lines like these (not necessarily in this order):
+==Click **Generate Trip Plan**, wait for it to finish, and check the terminal for guardrail decisions.== When the responses pass, the guardrails write INFO lines like these (not necessarily in this order):
 
 ```text
 🛡️ [TripSafetyGuardrail] PASS — Nonempty itinerary; no configured phrases in route overview or day descriptions
@@ -294,7 +294,7 @@ There is no `Rental calculation executed` line after the rejected call, because 
 ==Open the Dev UI Executions panel for the cost estimator, expand the latest run, and compare the rejected tool call with the corrected ones that follow it.==
 
 ??? info "Verifying with tests"
-    Because a live model will not reliably reproduce a specific bad recommendation on demand, the supplied tests use fixed responses to exercise each guardrail branch deterministically. You can find them in the step-02 folder
+    Because a live model will not reliably reproduce a specific bad recommendation on demand, the supplied tests use fixed responses to exercise each guardrail branch deterministically. You can find them in the step-02 folder.
 
     - The `*GuardrailTest` classes cover the output guardrails (rewrite, reprompt, retry decisions) and the rental pricing input guardrail (invalid arguments blocked, valid arguments reaching the calculation). An invalid duration is rejected with `Input guardrail failed for tool estimateRental: Set days to a whole number from 1 to 30.` A valid five-day SUV call logs `Rental calculation executed: category=suv, days=5, total=400 EUR`.
 
@@ -371,12 +371,10 @@ The planner now checks its research recommendations and can calculate rental pri
     The model may already produce output that passes these rules. ==Run the fixed-payload tests above to check specific branches, and inspect the terminal logs for `SKIP` decisions.== A skipped check permits processing to continue without validating that recommendation.
 
 ??? warning "An unsuitable response was accepted"
-    ==Compare the original response with the fields and keywords checked by the guardrail.== The itinerary scan ignores titles and cannot recognize hazards expressed in other words. It also permits null or blank text without inspecting tool-call content, but now records `SKIP` instead of claiming a pass.
-
-    The vehicle check permits blank text, JSON parsing failures, missing vehicle fields, and missing or incomplete trip variables without checking suitability. Each path logs `SKIP`. A later deserialization failure is still possible. The keyword lists do not cover every small or expensive vehicle, and a generic correction does not establish actual capacity or affordability. These paths need attention before using the sample to enforce rental policy.
+    ==Compare the original response with the fields and keywords checked by the guardrail, and look for `SKIP` lines in the log.== Both guardrails log `SKIP` and let the response through when they can't check it, for example on blank text or unparseable JSON. The itinerary scan ignores titles, and the keyword lists don't cover every small or expensive vehicle. Step 07 replaces the luxury-brand list with an LLM judge.
 
 ??? warning "Planning fails after retries"
-    ==Check the audit message for the rejection reason, then inspect the HTTP response in the browser's network panel and the server exception log.== HTTP 422 with `guardrail_violation` identifies an actual guardrail failure in the cause chain. HTTP 500 with `planning_failed` identifies an unrelated wrapped agent failure. Client messages intentionally omit the internal exception details, which can include model content or provider information; take care when sharing logs.
+    ==Check the guardrail log lines for the rejection reason, then inspect the HTTP response in the browser's network panel and the server exception log.== HTTP 422 with `guardrail_violation` identifies an actual guardrail failure in the cause chain. HTTP 500 with `planning_failed` identifies an unrelated wrapped agent failure. Client messages intentionally omit the internal exception details, which can include model content or provider information; take care when sharing logs.
 
 ??? warning "OPENAI_API_KEY is not set"
     ==Set `OPENAI_API_KEY` in the shell used to start the application, then restart it.== Keep the same model configuration used in Step 01.

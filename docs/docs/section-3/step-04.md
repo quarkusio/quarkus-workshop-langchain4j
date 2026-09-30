@@ -2,13 +2,13 @@
 
 The trip planner can now generate recommendations and check them before returning a response, but a customer may need time to read the itinerary before agreeing to a booking. Keeping the planning request open while they decide would tie approval to a long-lived HTTP connection. (Miles of Smiles management did suggest a 30-second countdown timer to "encourage decisiveness". It was vetoed.)
 
-[Quarkus Flow](https://quarkiverse.github.io/quarkiverse-docs/quarkus-flow/dev/index.html){target="_blank"} lets the workflow pause after generating a plan without holding a thread while the customer decides. Kafka carries the request and decision as [CloudEvents](https://cloudevents.io/){target="_blank"}, so approval can arrive in a separate HTTP request and resume the matching workflow.
+[Quarkus Flow](https://quarkiverse.github.io/quarkiverse-docs/quarkus-flow/dev/index.html){target="_blank"} lets the workflow pause after generating a plan and release its thread while the customer decides. It uses Kafka to carry the request and decision as [CloudEvents](https://cloudevents.io/){target="_blank"}, so approval can arrive in a separate HTTP request and resume the matching workflow.
 
-By the end of the exercise, the customer can refresh the browser, return to the same pending trip with its original request details, and approve or reject it. Approval produces a simulated booking reference; rejection ends the workflow without booking finalization. No vehicle is reserved, and no inventory or booking service is called.
+By the end of the exercise, the customer can refresh the browser, return to the same pending trip with its original request details, and approve or reject it.
 
-## Separating planning from the customer decision
+## Keeping track of in-flight workflows
 
-The workflow starts when a trip request arrives, runs the existing planning pipeline, and publishes the plan for approval. Its wait matches a decision to the workflow instance that requested it. Failures and rejection also produce events, so the browser can learn the outcome instead of waiting indefinitely for a confirmation that will never arrive.
+When a customer creates a trip, the workflow runs the same planning pipeline as before, but this time it publishes the plan as a CloudEvent onto a Kafka topic, and then waits for the customer to make up their mind. It might be a minute or it might be after lunch. When the decision comes in, it picks up the workflow from where it left off (making sure to continue the right customer's workflow) and finalizes the trip and returns the confirmation to the customer.
 
 ```mermaid
 flowchart TD
@@ -23,117 +23,158 @@ flowchart TD
     booking -->|Failure| failed
 ```
 
-Quarkus Flow expresses these tasks in Java using the [CNCF Serverless Workflow specification](https://serverlessworkflow.io/){target="_blank"}. CloudEvents supplies the envelope, including `type`, `source`, `id`, and `data`; Kafka transports those events between the application and the workflow.
+CloudEvents supplies the envelope, including `type`, `source`, `id`, and `data`, and Kafka transports those events between the application and the workflow.
 
-The initial planning HTTP request still waits for a generated plan or a failure. Once that request finishes, the workflow remains at the approval wait without keeping an HTTP connection open. This separation is the pattern we'll implement here; a fully asynchronous planning API is outside this exercise.
+## Starting from the Step 04 project
 
-!!! note "Browser refresh is not application recovery"
-    Both the workflow and the trip store live in memory. Refreshing the browser while the application remains running restores the saved trip, but restarting the application loses it and its waiting workflow. Kafka event retention does not restore this in-memory state. Step 05 introduces persistence.
+This chapter starts from the completed Step 04 project instead of your Step 03 working copy. Moving from a synchronous REST call to an event-driven workflow touches the build, the configuration, both REST resources, and several new classes, and most of those changes are wiring that carries events between the REST API and the workflow. Starting from the finished project lets us concentrate on how Flow starts, pauses, and resumes a trip, while the rest of this page walks through every change so you know how the project differs from the one you built in Step 03.
 
-## Preparing the working project
+Kafka runs through Dev Services, so a container runtime such as Docker or Podman must be running for this and the following chapters.
 
-Kafka runs through Dev Services, so Docker or Podman must be running for the live exercise. Keep the model-provider configuration from Step 02, including your API key environment variable.
+==Copy `section-3/step-04` to a working directory outside the step folders and open that copy in your IDE.== All paths and commands below refer to this working copy.
 
-The exercise changes the Flow definition. The event store, REST resources, payload models, and tests are supplied so we can concentrate on starting, suspending, and resuming a workflow instead of implementing HTTP and browser plumbing. The browser frontend is the one you have used since Step 00. It already knows how to show the workflow status and the approval buttons, so it does not change in this step.
+==If you configured a different model provider in an earlier step, apply the same settings to `src/main/resources/application.properties` and add the provider's extension to `pom.xml`.== The rest of the configuration, including the skills directory and the Flow and Kafka channels, is already in place.
 
-=== "Option 1: Continue from Step 03"
+The agents, guardrails, skill, and browser page are the same as in Step 03. Vehicle and itinerary research still run in parallel, the evaluators vote on the vehicle, and cost estimation follows with the Step 02 pricing tool and guardrails. What changes is how a request reaches that pipeline and how its result gets back to the customer.
 
-    ==Stop dev mode in your Step 03 working copy before updating the dependencies and supplied files.==
-
-    ==Copy `pom.xml` from `section-3/step-04` into your working copy. Keep any local model-provider dependencies you added in Step 02.== This supplies the Flow BOM, Flow messaging and LangChain4j integration, Kafka connector, and test dependencies together with their compatible build configuration. Versions are maintained in that file.
-
-    ==Copy these supplied paths from `section-3/step-04` to the same paths in your working copy, replacing matching files:==
-
-    - `src/main/java/com/tripplanner/` (the retained agents and guardrails, plus the new Flow, store, resources, and models)
-    - `src/main/resources/skills/family-trip/SKILL.md` (the Step 01 baseline with driving-time and break guidance)
-    - `src/test/java/com/tripplanner/` (the Flow smoke suite and store lifecycle tests)
-    - `src/test/resources/application.properties`
-    - `src/test/frontend/`
-
-    The supplied agents are the same as in Step 03, voting loop included, so you don't need to change any of them.
-
-    ==Remove `src/test/java/com/tripplanner/TripPlanContractTest.java` and the `src/test/java/com/tripplanner/voting/` tests from this working copy, along with `TripPlannerResourceTest.java` if you still have it from Step 00.== These tests expected the old synchronous response. Step 04 only runs a small Flow smoke suite, and the guardrail and voting tests stay in Steps 02 and 03.
-
-    ==Remove `src/main/java/com/tripplanner/resource/GuardrailExceptionMapper.java`, and `src/test/java/com/tripplanner/resource/GuardrailExceptionMapperTest.java` if you have it.== Agents no longer run inside the REST call, so the mapper would never see an exception.
-
-    ==Add the messaging configuration below, then open the supplied `TripPlannerFlow.java` and implement its `descriptor()` method using the focused excerpt in the exercise.== Keep the supplied fields and helper methods around it.
-
-=== "Option 2: Use the completed Step 04 project"
-
-    ==Copy `section-3/step-04` to a working directory and open that copy.== It supplies the Flow definition and the matching store, resources, models, and tests.
-
-    ==Apply your Step 02 model-provider settings to `src/main/resources/application.properties`, keeping the supplied Flow and Kafka settings.== If you use a different provider extension, keep its dependency as well.
-
-    ==Read the Flow definition and correlation explanation below, then run the same tests and browser verification as the hands-on route.== No frontend implementation is required for either route.
-
-The planning pipeline itself hasn't changed. Vehicle and itinerary research still run in parallel, the evaluators vote on the vehicle, and cost estimation follows with the Step 02 pricing tool and guardrails.
-
-Each planning request gets its own workflow instance, so several trips can wait for a decision at the same time. The refresh exercise assumes a single workshop user, though, because `/trip/plan/latest` returns the latest trip in the whole application.
-
-### Connecting Flow to Kafka
-
-The supplied POM includes the Flow extensions and Kafka connector:
-
-```xml title="pom.xml (Flow and Kafka dependencies)"
---8<-- "../../section-3/step-04/pom.xml:69:84"
+```mermaid
+flowchart LR
+    browser[Browser] -->|"POST /trip/plan"| planApi[Planning API]
+    browser -->|"PUT /trip/approve"| approvalApi[Approval API]
+    planApi -->|Trip requested| flowIn[(flow-in topic)]
+    approvalApi -->|Decision| flowIn
+    flowIn --> workflow[Trip planner workflow]
+    workflow -->|Plan and outcome| flowOut[(flow-out topic)]
+    flowOut --> store[Trip plan store]
+    store -->|Status| planApi
 ```
 
-The messaging channels carry trip requests to Flow and bring plans and outcomes back to the application.
+The planning API is the existing `TripPlannerResource`, and the approval API is the new `TripApprovalResource`. The workflow is defined in `TripPlannerFlow`, and `TripPlanStore` keeps track of each trip while its workflow runs. The sections below follow a trip through these classes in the order it reaches them.
 
-==For the hands-on route, append the following settings to `src/main/resources/application.properties`, keeping your existing model and skills configuration:==
+## Connecting Flow to Kafka
+
+The build adds Quarkus Flow, its messaging and LangChain4j integrations, and the Kafka connector. Flow versions come from the Flow BOM, which is imported next to the Quarkus BOM.
+
+```xml title="pom.xml (Flow BOM)"
+--8<-- "../../section-3/step-04/pom.xml:38:44"
+```
+
+```xml title="pom.xml (Flow and Kafka dependencies)"
+--8<-- "../../section-3/step-04/pom.xml:73:88"
+```
+
+The messaging channels carry trip requests and decisions to Flow and bring plans and outcomes back to the application.
 
 ```properties title="application.properties (Flow and messaging)"
---8<-- "../../section-3/step-04/src/main/resources/application.properties:15:42"
+--8<-- "../../section-3/step-04/src/main/resources/application.properties:18:41"
 ```
 
 The application sends requests and decisions through `flow-in-producer` to the `flow-in` topic, where Flow reads them. Plans and final outcomes travel back through `flow-out` to the application's `flow-out-consumer`, which records them for the browser.
 
-==Keep `%dev.quarkus.live-reload.watched-resources=skills/family-trip/SKILL.md` from Step 01, adding it if your working copy lacks it.== Editing that skill automatically reloads the application. Finish any pending approval exercise before editing code, configuration, or watched skills, because a reload loses this chapter's in-memory trips and workflow waits.
+The `%dev.quarkus.live-reload.watched-resources` entry from Step 01 is still there. A reload loses this chapter's in-memory trips, so finish any pending approval before editing code, configuration, or the skill.
+
+## Sending the trip request as an event
+
+In Step 03, `planTrip()` called `TripPlannerSystem` directly and returned the `TripPlan` once the agents had finished. It now registers the request with the store, publishes it as a CloudEvent, and waits for the workflow to report back.
+
+```java title="TripPlannerResource.java (planTrip)" hl_lines="4-10 12 20"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/resource/TripPlannerResource.java:43:75"
+```
+
+- `register()` gives the request a `requestId` before any workflow exists, and the CloudEvent uses it as its `id`.
+- The event type `com.tripplanner.trip.requested` is the type the workflow is scheduled on, so every POST starts a new workflow instance.
+- The emitter writes to `flow-in-producer`. If Kafka refuses the message, the nack handler marks the trip as failed, and the waiting planning request returns that failure.
+- `awaitPlan()` holds the HTTP request until the store records a plan or a failure, for at most `trip.planning.timeout`.
+
+The request still waits for the plan, because the customer needs it on screen, but it returns as soon as the workflow pauses for approval. Its response body is now a `TripPlanStatus`, which wraps the plan together with the workflow identifiers. The resource also has two new endpoints. `GET /trip/plan/status` looks up a trip by either identifier, and `GET /trip/plan/latest` returns the most recent trip, which is how the browser restores a pending trip after a refresh. The browser page didn't need to change, because it already detects which kind of response the API returns.
 
 ## Starting and resuming the workflow
 
-The supplied adapter calls the same trip-planning pipeline as before. Its booking method only creates a sample reference and a message identifying the result as simulated.
+The pipeline call that used to live in `planTrip()` has moved to `TripPlannerFlowAdapter`, which the workflow calls. Its booking method only creates a sample reference and a message identifying the result as simulated.
 
 ```java title="TripPlannerFlowAdapter.java (adapter methods)"
 --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlowAdapter.java:19:34"
 ```
 
-The workflow will publish the generated plan and wait for the customer's decision before continuing.
+The workflow publishes the generated plan and waits for the customer's decision before continuing.
 
-==Open `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java`. For the hands-on route, update `descriptor()` to match the following definition. Keep the supplied imports, injections, and the `plan()`, `resolveDecision()`, and `matchesDecision()` helpers unchanged:==
+==Open `src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java` and find the `descriptor()` method:==
 
-```java title="TripPlannerFlow.java (workflow definition)" hl_lines="4 6-24"
+```java title="TripPlannerFlow.java (workflow definition)"
 --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java:32:57"
 ```
 
-`schedule()` starts a new workflow instance for every `com.tripplanner.trip.requested` event, and `withInstanceId()` hands the instance identifier to the planning task so it can tie the workflow to the original request. If planning fails, `switchWhenOrElse()` skips approval and goes straight to `publishFailure`. Otherwise `emitJson()` publishes the plan, and `listen()` pauses the workflow until a `com.tripplanner.trip.approval.done` event arrives.
+The definition reads top to bottom, one call per stage of the trip:
 
-The `.envelope(this::matchesDecision)` filter makes sure it's the right event. One with the wrong `flowinstanceid`, a mismatched decision, or an unreadable payload is ignored, and the workflow keeps waiting. The last branch publishes the confirmation, rejection, or failure, and `END` stops each outcome from running into the next one. Rejection never calls the booking adapter.
+- `schedule()` starts a new workflow instance for every `com.tripplanner.trip.requested` event.
+- `withInstanceId()` hands the instance identifier to the planning task, so it can tie the workflow to the original request.
+- `switchWhenOrElse()` sends a failed plan straight to `publishFailure` and skips approval.
+- `emitJson()` publishes the plan as `com.tripplanner.trip.approval.requested`.
+- `listen()` pauses the workflow until a `com.tripplanner.trip.approval.done` event arrives. Its `.envelope(this::matchesDecision)` filter ignores an event with the wrong `flowinstanceid`, a mismatched decision, or an unreadable payload, and the workflow keeps waiting.
+- `switchCase()` publishes the confirmation, rejection, or failure. `END` stops each outcome from running into the next one.
 
-??? info "Complete supplied Flow class"
-    The complete source includes the imports and injected adapter, store, and `ObjectMapper`, as well as all three helper methods. These are supplied for both participation routes; only the workflow definition is the participant edit.
+A rejection goes straight to `publishRejection` and ends the workflow, so only an approved trip reaches the booking adapter. Every planning request starts its own workflow instance, and several trips can wait for a decision at the same time.
+
+The three helper methods below `descriptor()` are the tasks the workflow runs. `plan()` binds the instance to its request in the store before calling the adapter, `resolveDecision()` checks the decision and finalizes the booking, and `matchesDecision()` is the `listen()` filter.
+
+??? info "Complete Flow class"
+    The complete source includes the imports, the injected adapter, store, and `ObjectMapper`, and all three helper methods.
 
     ```java title="TripPlannerFlow.java"
     --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java"
     ```
 
-    The supplied `matchesDecision()` helper reads the instance extension and deserializes the decision with the injected mapper before checking the store. It keeps both checks in a single envelope predicate. Adding `dataAs()` after an instance-envelope filter would replace that predicate in this DSL instead of combining the checks.
+    The `matchesDecision()` helper reads the instance extension and deserializes the decision with the injected mapper before checking the store. It keeps both checks in a single envelope predicate. Adding `dataAs()` after an instance-envelope filter would replace that predicate in this DSL instead of combining the checks.
 
-    Agent exceptions now occur outside the REST call, so the Step 02 exception mapper never sees them and this step drops it. These helpers turn planning or finalization exceptions into a failed status, which the workflow publishes as an event. The error model checks the cause chain for an actual guardrail exception and returns a safe message; unrelated failures are server errors. A finalization failure keeps the plan the customer reviewed.
+## Handling failures outside the REST call
+
+The agents now run on a workflow thread after the planning request has handed its event to Kafka, so a guardrail exception is thrown inside the workflow. The Step 02 `GuardrailExceptionMapper` handles exceptions thrown by REST calls, and this step removes it.
+
+Instead, `plan()` and `resolveDecision()` catch planning and finalization exceptions and turn them into a failed `TripPlanStatus`, which the workflow publishes as `com.tripplanner.trip.failed`. The new `TripError.from()` method builds that status. It walks the cause chain for an actual guardrail exception and returns a safe message, while other failures become server errors. A finalization failure keeps the plan the customer reviewed. When the planning request picks up a failed status, it uses the same error to choose the HTTP code, so a guardrail violation still reaches the browser as a 422.
 
 ## Keeping the result attached to its request
 
-There are two identifiers because the HTTP request exists before Flow creates its instance. The REST resource registers a `requestId` and publishes it with the original `TripRequest` in `com.tripplanner.trip.requested`. The workflow then binds its own `instanceId` to that request, so the browser never mistakes another trip's result for its own.
+There are two identifiers because the HTTP request exists before Flow creates its instance. The REST resource registers a `requestId` and publishes it with the original `TripRequest` in `com.tripplanner.trip.requested`. The workflow then binds its own `instanceId` to that request, so every result the browser receives carries the identifiers of its own trip.
 
-The supplied `TripPlanStatus` record carries the trip details and current outcome in both API responses and workflow events.
+The `TripPlanStatus` record carries the trip details and current outcome in both API responses and workflow events.
 
 ```java title="TripPlanStatus.java"
 --8<-- "../../section-3/step-04/src/main/java/com/tripplanner/model/TripPlanStatus.java"
 ```
 
-Along with both identifiers, the record carries the original `request` and the generated `plan`, which is what lets the browser restore the trip after a refresh. `status` holds the current state, with a `confirmation` once booking completes, or an `error` and `message` when something fails. Calling `failed()` keeps any plan that was already generated. `withError()` attaches an error code and message without changing the state, which the REST resource uses when it stops waiting for a slow plan.
+Along with both identifiers, the record carries:
 
-The store doesn't take incoming events on trust. Before accepting an outcome, it checks that the workflow identifier matches a registered request and that the trip is in the right state, so an old approval request can't reopen a trip that was already rejected. An event also can't report that it failed to publish, so the store listens for Flow's `WorkflowFailedEvent` through `onWorkflowFailed()` as well. When a workflow really fails, the store records a safe failure for that request and keeps any plan the customer already reviewed.
+- `request` and `plan`, the original trip details and the generated plan, which let the browser restore the trip after a refresh.
+- `status`, the current state.
+- `confirmation` once booking completes, or `error` and `message` when something fails.
+
+Two helpers change it. `failed()` keeps any plan that was already generated, and `withError()` attaches an error code and message and keeps the current state, which the REST resource uses when it stops waiting for a slow plan.
+
+`TripPlanStore` keeps every trip in memory. It maps each `requestId` to the trip's current status and each workflow `instanceId` back to its `requestId`. It also holds the decision submitted for each waiting instance and remembers the most recent request for `/trip/plan/latest`.
+
+```java title="TripPlanStore.java (in-memory state)"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:30:46"
+```
+
+`register()` creates the entry when the planning request arrives, and `bind()` links the Flow instance to it when the workflow's `plan()` task starts.
+
+The workflow's events come back to the store on `flow-out-consumer`. Each event type published by an `emitJson()` task maps to a trip state, and the `flowinstanceid` extension, which Flow adds to every event it publishes, says which instance sent it.
+
+```java title="TripPlanStore.java (outcome consumer)"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:62:81"
+```
+
+The store checks every incoming event before recording it. `accept()` makes sure the workflow identifier matches a registered request and that the trip is in the right state, so a stale approval request for a rejected trip is ignored and the trip stays rejected. Once an outcome is accepted, the store wakes the `awaitPlan()` call in the waiting planning request. A workflow that fails while publishing its outcome has no event to send, so the store also implements Flow's `WorkflowExecutionListener` and handles `WorkflowFailedEvent` in `onWorkflowFailed()` as well. When a workflow really fails, the store records a safe failure for that request and keeps any plan the customer already reviewed.
+
+## Resuming with the customer's decision
+
+The approval endpoint is new in this step. `TripApprovalResource` accepts `PUT /trip/approve` with the workflow's `instanceId` and a status of `approved` or `rejected`. It first asks the store to record the decision, which accepts it only for a trip that is waiting for a decision, and then publishes the decision for Flow.
+
+```java title="TripApprovalResource.java (publishing the decision)" hl_lines="6 8"
+--8<-- "../../section-3/step-04/src/main/java/com/tripplanner/resource/TripApprovalResource.java:46:66"
+```
+
+The event type `com.tripplanner.trip.approval.done` is the one the workflow's `listen()` step waits for. The `flowinstanceid` extension names the instance the customer is deciding on, and `matchesDecision()` compares it with the waiting workflow, so each decision resumes the workflow it was made for. The endpoint answers with HTTP 202 as soon as the event is sent, because the workflow finishes the booking afterwards.
 
 ```mermaid
 sequenceDiagram
@@ -159,32 +200,19 @@ sequenceDiagram
 The browser shows the workflow identifier so you can compare it with the CloudEvents later. After a decision, HTTP 202 only means the submission was accepted. The page shows `decision_submitted` and keeps polling `GET /trip/plan/status` until the backend reports `confirmed`, `rejected`, or `failed`.
 
 ??? info "Validation, timeouts, and error responses"
-    `PUT /trip/approve` needs a nonblank `instanceId` and a `status` of exactly `approved` or `rejected`. A missing identifier or invalid decision returns HTTP 400, an unknown trip 404, and a trip that is no longer awaiting approval 409, so duplicate or late decisions never reach Kafka.
+    `PUT /trip/approve` needs a nonblank `instanceId` and a `status` of `approved` or `rejected`. An invalid decision returns HTTP 400, an unknown trip 404, and a trip in any other state 409, so only decisions for a trip awaiting approval reach Kafka.
 
-    Planning waits up to `trip.planning.timeout`, which defaults to `PT120S`. An HTTP 504 `planning_timeout` means the HTTP wait expired, not that the workflow stopped. The response still carries the request and instance identifiers, so the status can be checked later.
+    Planning waits up to `trip.planning.timeout` (`PT120S` by default). An HTTP 504 `planning_timeout` means the HTTP wait expired while the workflow keeps running, and the status can be checked later with the returned identifiers. Guardrail failures return 422 `guardrail_violation`, other planning failures 500 `planning_failed`, and failures during the simulated booking `finalization_failed`.
 
-    Guardrail failures during planning return HTTP 422 `guardrail_violation`, other planning failures return HTTP 500 `planning_failed`, and failures during the simulated booking use `finalization_failed`. Status reads return HTTP 200 for any known trip, even a failed one, so the frontend checks the `status` field instead of the HTTP code. Error messages never include raw exception details or model output.
+## Testing the event flow with a mocked adapter
 
-    The frontend also limits how long it polls and waits on the network. If polling times out, it keeps the reviewed plan on screen and says so, without labelling the trip confirmed, rejected, or failed.
-
-??? info "Supplied API reference"
-    `POST /trip/plan` accepts a `TripRequest` and normally returns HTTP 200 with an `awaiting_approval` envelope. A null request returns 400, overlapping planning returns 409, and planning failures or timeouts use the responses described above.
-
-    `PUT /trip/approve` accepts `TripApproval` and returns HTTP 202 with `decision_submitted`. Both approval and rejection use this endpoint. If the event can't be sent, the trip is recorded as failed.
-
-    `GET /trip/plan/status?instanceId=...` returns one trip's envelope. `requestId=...` can be used before an instance identifier is available. If both are supplied, `instanceId` takes precedence. Missing identifiers return 400; an unknown identifier returns 404.
-
-    `GET /trip/plan/latest` returns the latest registered trip, including its original request and any terminal outcome. It returns HTTP 204 only when no trip is stored. It is used for browser refresh, not for correlating a planning response or choosing an older customer's trip.
-
-## Checking the event boundary without a model
-
-The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real workflow, store, and REST resources. Its in-memory messaging connectors let the tests relay each event deliberately and check the state before and after consumption. The tests use no Kafka broker or live model.
+This step's test suite covers the event flow. The contract and voting tests stay in Step 03, where the synchronous response and the voting loop are introduced. `TripPlannerFlowTest` mocks the planning adapter and uses the real workflow, store, and REST resources. The test profile swaps the Kafka channels for SmallRye in-memory connectors, which let the tests relay each event deliberately and check the state before and after consumption. For this, the POM adds Mockito and the in-memory connector as test dependencies, along with Awaitility so the tests can wait for state that changes asynchronously.
 
 ```properties title="src/test/resources/application.properties"
 --8<-- "../../section-3/step-04/src/test/resources/application.properties"
 ```
 
-==Run the Step 04 test suite from your working project:==
+==Run the Step 04 test suite from your working copy:==
 
 === "Linux / macOS"
     ```bash
@@ -196,11 +224,16 @@ The supplied `TripPlannerFlowTest` mocks the planning adapter and uses the real 
     .\mvnw.cmd test
     ```
 
-This runs `TripPlannerFlowTest` and `TripPlanStoreLifecycleTest`. The Flow tests follow an approval through to confirmation, check that rejection skips the booking, and check the 422 and 500 responses when the mocked adapter fails. The store tests cover unrelated instances, a workflow failing while it waits for approval, and duplicate failure events. The browser tests in `src/test/frontend/` are described in the [Step 04 README](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#verification){target="_blank"}.
+This runs two test classes:
+
+- `TripPlannerFlowTest` follows an approval through to confirmation, checks that rejection skips the booking, and checks the 422 and 500 responses when the mocked adapter fails.
+- `TripPlanStoreLifecycleTest` covers unrelated instances, a workflow failing while it waits for approval, and duplicate failure events.
+
+The browser tests in `src/test/frontend/` are described in the [Step 04 README](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-3/step-04#verification){target="_blank"}.
 
 ## Following a trip through the running application
 
-==Start dev mode from your working project with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080){target="_blank"}.== If another step uses that port, add `-Dquarkus.http.port=8083` and use the corresponding URLs below. Do not run Maven `clean` while dev mode is running.
+==Start dev mode from your working copy with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080){target="_blank"}.==
 
 ==Generate a trip with a future start date and note its workflow identifier.== A family trip to the California coast for seven days and four travelers is a useful comparison with the previous chapters.
 
@@ -212,13 +245,13 @@ This runs `TripPlannerFlowTest` and `TripPlanStoreLifecycleTest`. The Flow tests
 
 The first switch sends a failed plan straight to `publishFailure`. The `waitApproval` node is the `listen()` step, where the instance sits until a matching decision arrives.
 
-==Refresh the browser without restarting the application. Compare the restored workflow identifier and plan with the ones you noted, and check the original destination, start date, duration, travelers, budget, and preferences in the restored form or `/trip/plan/latest` response.== The same pending trip should come back without another model call.
+==Refresh the browser without restarting the application. Compare the restored workflow identifier and plan with the ones you noted, and check the original destination, start date, duration, travelers, budget, and preferences in the restored form or `/trip/plan/latest` response.== The same pending trip should come back from the store, with the plan the agents already generated.
 
 ![A generated seven-day trip awaiting approval, with its workflow identifier above the itinerary](../images/section-3-step-04-awaiting-approval.png)
 
 ### Approving the pending trip
 
-==Click **Approve Trip** and follow the status requests in the Network panel.== The decision response is HTTP 202 `decision_submitted`, and the plan stays visible while the booking is finalized. A later GET reports `confirmed` with a simulated `MOS-...` booking reference. No vehicle is actually reserved, much to the disappointment of the sales team.
+==Click **Approve Trip** and follow the status requests in the Network panel.== The decision response is HTTP 202 `decision_submitted`, and the plan stays visible while the booking is finalized. A later GET reports `confirmed` with a simulated `MOS-...` booking reference. The booking is simulated, much to the disappointment of the sales team, who were hoping to see real reservations.
 
 ==In the Dev UI, open **Apache Kafka Client > Topics** and inspect `flow-in`.== The initiating event is `com.tripplanner.trip.requested`, with the planning request identifier and original trip details in its payload. The decision event is `com.tripplanner.trip.approval.done`, with the workflow identifier in its `ce_flowinstanceid` header and in its decision payload.
 
@@ -226,13 +259,13 @@ The first switch sends a failed plan straight to `publishFailure`. The `waitAppr
 
 ![The booking.finalized event on flow-out, with the status envelope as its value and the CloudEvent headers, including ce_flowinstanceid and ce_type](../images/section-3-step-04-kafka-flow-out.png)
 
-![The same workflow after approval, showing a simulated booking reference and no vehicle reservation](../images/section-3-step-04-confirmed.png)
+![The same workflow after approval, showing a simulated booking reference](../images/section-3-step-04-confirmed.png)
 
 ### Rejecting a different trip
 
 ==Generate another trip, note its new workflow identifier, and click **Reject Trip**.== Rejection also passes through `decision_submitted`. It becomes final only after `GET /trip/plan/status` reports `rejected` from the recorded `com.tripplanner.trip.rejected` event.
 
-==Refresh the browser, then inspect this instance's status and events.== The trip should stay rejected, and there should be no `com.tripplanner.booking.finalized` event for this instance.
+==Refresh the browser, then inspect this instance's status and events.== The trip should stay rejected, and this instance's events should end with `com.tripplanner.trip.rejected`.
 
 ![A different workflow with its rejection recorded and the reviewed plan still visible](../images/section-3-step-04-rejected.png)
 
