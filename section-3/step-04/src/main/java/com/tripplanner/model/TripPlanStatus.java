@@ -6,6 +6,10 @@ public record TripPlanStatus(String requestId, String instanceId, TripRequest re
         return new TripPlanStatus(requestId, instanceId, request, state, tripPlan, booking, null, null);
     }
 
+    public TripPlanStatus withError(String code, String text) {
+        return new TripPlanStatus(requestId, instanceId, request, status, plan, confirmation, code, text);
+    }
+
     public TripPlanStatus failed(Throwable failure) {
         TripError safe = TripError.from(failure, plan != null);
         return new TripPlanStatus(requestId, instanceId, request, "failed", plan, null, safe.error(), safe.message());

@@ -1,8 +1,8 @@
 # Step 04: Event-driven approval with Quarkus Flow
 
-This workshop step wraps the Step 02 planning pipeline in a Quarkus Flow workflow. Kafka carries CloudEvents that start planning, request a customer decision, and report confirmation, rejection, or failure. The initial HTTP request waits for planning, but the later approval wait does not keep that request open.
+This workshop step wraps the Step 03 planning pipeline in a Quarkus Flow workflow. Kafka carries CloudEvents that start planning, request a customer decision, and report confirmation, rejection, or failure. The initial HTTP request waits for planning, but the later approval wait does not keep that request open.
 
-The planning pipeline keeps parallel vehicle and itinerary research followed by cost estimation with the guarded rental-pricing tool. Booking is simulated: the adapter generates a `MOS-...` reference without contacting inventory or reserving a vehicle. Pricing-tool rates are fictional, and guardrail checks do not establish route safety, vehicle suitability, or final-price correctness.
+The planning pipeline keeps parallel vehicle and itinerary research, the vehicle review loop, and cost estimation with the guarded rental-pricing tool. Booking is simulated: the adapter generates a `MOS-...` reference without contacting inventory or reserving a vehicle. Pricing-tool rates are fictional, and guardrail checks do not establish route safety, vehicle suitability, or final-price correctness.
 
 ## Run
 
@@ -92,9 +92,7 @@ For a live check, generate a trip and record its identifier. Confirm the plannin
 
 ## Participation routes
 
-The [Step 04 tutorial](../../docs/docs/section-3/step-04.md) supplies the copy list for participants continuing from Step 02. Use this step's store, resources, payload models, Flow helpers, and tests together. Keep the complete supplied `TripPlannerFlow` class, including its injected `ObjectMapper` and `matchesDecision()` helper, when editing the descriptor. Remove the earlier bare-response `TripPlannerResourceTest` and `TripPlanContractTest`. The supplied agents retain the predecessor's pricing tool and corrected guardrails, with `days` and `travelers` parameters changed to `Integer` for numeric Flow scope values. The cost agent keeps its duration and tool instructions. The participant edit is the Flow descriptor, not frontend or storage implementation.
-
-Participants opening the completed step use the same supplied files and verification sequence. Neither route introduces persistence or real booking integration.
+The [Step 04 tutorial](../../docs/docs/section-3/step-04.md) starts from a copy of this completed project instead of the participant's Step 03 working copy, and walks through each change from Step 03. Participants carry over only their model-provider settings. The agents, guardrails, skill, and frontend are unchanged from Step 03; the adapter converts `days` and `travelers` to strings before calling `planTrip`. Step 03's `TripPlanContractTest` and `voting/` tests are not part of this project. This step adds no persistence or real booking integration.
 
 ## Guides
 

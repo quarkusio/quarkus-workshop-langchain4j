@@ -3,13 +3,15 @@ package com.tripplanner.agentic.workflow;
 import com.tripplanner.agentic.agents.ComfortEvaluator;
 import com.tripplanner.agentic.agents.CostEvaluator;
 import com.tripplanner.agentic.agents.FuelEfficiencyEvaluator;
-import com.tripplanner.agentic.voting.VotingPlanner;
 import com.tripplanner.model.VehicleEvaluation;
 import dev.langchain4j.agentic.declarative.PlannerAgent;
 import dev.langchain4j.agentic.declarative.PlannerSupplier;
+import dev.langchain4j.agentic.patterns.voting.VotingPlanner;
 import dev.langchain4j.agentic.planner.Planner;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public interface VehicleEvaluators {
 
@@ -37,19 +39,20 @@ public interface VehicleEvaluators {
         if (votes == null || votes.size() != 3) {
             throw new IllegalStateException("Expected all three vehicle evaluations");
         }
-        double totalScore = 0;
-        StringBuilder suggestions = new StringBuilder();
-        for (Object vote : votes) {
-            if (!(vote instanceof VehicleEvaluation eval) || !Double.isFinite(eval.score())
-                    || eval.score() < 1 || eval.score() > 10) {
-                throw new IllegalStateException("Each vehicle evaluator must return a score between 1 and 10");
-            }
-            totalScore += eval.score();
-            if (eval.suggestions() != null && !eval.suggestions().isBlank()) {
-                if (!suggestions.isEmpty()) suggestions.append("; ");
-                suggestions.append(eval.suggestions());
-            }
+        List<VehicleEvaluation> evaluations = votes.stream().map(VehicleEvaluators::checkedEvaluation).toList();
+        double average = evaluations.stream().mapToDouble(VehicleEvaluation::score).average().orElseThrow();
+        String suggestions = evaluations.stream()
+                .map(VehicleEvaluation::suggestions)
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.joining("; "));
+        return new VehicleEvaluation(average, suggestions);
+    }
+
+    private static VehicleEvaluation checkedEvaluation(Object vote) {
+        if (!(vote instanceof VehicleEvaluation eval) || !Double.isFinite(eval.score())
+                || eval.score() < 1 || eval.score() > 10) {
+            throw new IllegalStateException("Each vehicle evaluator must return a score between 1 and 10");
         }
-        return new VehicleEvaluation(totalScore / votes.size(), suggestions.toString());
+        return eval;
     }
 }

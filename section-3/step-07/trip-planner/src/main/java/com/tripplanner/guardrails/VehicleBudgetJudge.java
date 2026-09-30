@@ -12,7 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
  *
  * <p>Runs on a fast, cheap model (configured as {@code judgeModel}) to keep
  * latency low. Returns a structured {@link BudgetVerdict} with a boolean verdict
- * and a short explanation suitable for audit logging.
+ * and a short explanation suitable for logging.
  */
 @ApplicationScoped
 @RegisterAiService(modelName = "judgeModel")

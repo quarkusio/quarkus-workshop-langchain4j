@@ -1,6 +1,6 @@
 package com.tripplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.langchain4j.model.output.structured.Description;
 import java.util.List;
 
 public record TripPlan(
@@ -13,7 +13,7 @@ public record TripPlan(
             String type,
             String model,
             String reasoning,
-            @JsonProperty(access = JsonProperty.Access.READ_ONLY) String guardrailOverride
+            @Description("Leave empty. Only the application sets this field.") String guardrailOverride
     ) {}
 
     public record DayItinerary(

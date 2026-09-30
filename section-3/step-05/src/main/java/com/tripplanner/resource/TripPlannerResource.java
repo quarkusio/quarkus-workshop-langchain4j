@@ -62,8 +62,7 @@ public class TripPlannerResource {
             TripPlanStatus result = tripPlanStore.awaitPlan(input.requestId(), planTimeout);
             if (result == null) {
                 TripPlanStatus pending = tripPlanStore.byRequestId(input.requestId());
-                return Response.status(504).entity(new TripPlanStatus(pending.requestId(), pending.instanceId(),
-                        pending.request(), pending.status(), pending.plan(), pending.confirmation(), "planning_timeout",
+                return Response.status(504).entity(pending.withError("planning_timeout",
                         "Planning is taking longer than expected. The workflow may still complete; check its status before retrying.")).build();
             }
             int code = "failed".equals(result.status()) ? new TripError(result.error(), result.message()).httpStatus() : 200;

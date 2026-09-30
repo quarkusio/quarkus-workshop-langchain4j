@@ -143,7 +143,19 @@ When walking through several distinct annotations or methods in a class — for 
 
 When using the list, tie each short bullet to a relevant method, annotation, or assertion. Focus on behavior the reader could miss. Do not list every field and method just to fill the pattern, and do not repeat what the preceding prose already said.
 
-For example, the audit logger needs only: "Calling `log()` writes the guardrail's name, decision, and reason to the terminal. It also keeps the latest 100 entries in memory for tests to inspect through `getRecentEntries()`, until the application restarts."
+For example, a guardrail whose `validate()` runs independent checks in order reads better as a lead sentence and one bullet per check, followed by a short paragraph for the shared consequence:
+
+```
+`validate()` runs three checks in order and returns as soon as one fails:
+
+- The response must parse as JSON. `extractJson()` strips any Markdown fences the model wraps around it.
+- The `itinerary` array must contain at least one day.
+- The route overview and day descriptions must not contain any phrase from `DANGEROUS_KEYWORDS`.
+
+A failed check returns `retry()`, which asks the model for a new response.
+```
+
+By contrast, adding `@OutputGuardrails` to two agents needs one paragraph, not a list.
 
 Add a compact input or output example when it clarifies the behavior, and label illustrative output clearly. Preserve limitations that affect the exercise beside the relevant code. Avoid repeating the explanation in a closing summary or adding a transition that merely announces the next heading.
 

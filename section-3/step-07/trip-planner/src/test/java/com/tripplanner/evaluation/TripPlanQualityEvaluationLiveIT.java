@@ -11,10 +11,11 @@ import dev.langchain4j.model.chat.ChatModel;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
+import io.quarkiverse.langchain4j.ModelName;
 import io.quarkiverse.langfuse.api.LangfuseOperations;
 import io.quarkiverse.langchain4j.testing.evaluation.EvaluationResult;
 import io.quarkiverse.langchain4j.testing.evaluation.EvaluationSample;
-import io.quarkiverse.langchain4j.testing.evaluation.Parameters;
+import io.quarkiverse.langchain4j.testing.evaluation.SampleLoaderResolver;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
@@ -22,11 +23,13 @@ import jakarta.inject.Inject;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 /**
  * The full live evaluation loop: one real planning run (real LLM plus the real
@@ -35,32 +38,26 @@ import java.util.Set;
  * strategy and by the AI judge, and the resulting score published to Langfuse
  * and verified back through the score API as landing on exactly this trace.
  *
- * <p>Run with {@code ./mvnw verify -Pevals}. Requires a container runtime
- * (Langfuse Dev Services) and a real LLM key. The MCP server must be running.
+ * <p>Run with {@code ./mvnw verify -Pevals
+ * -Dquarkus.langfuse.base-url=<dev mode Langfuse URL>}. The score goes to the
+ * Langfuse instance started by dev mode, so it can still be inspected after
+ * this JVM exits. Requires a real LLM key and the running MCP server.
  */
 @QuarkusTest
 @TestProfile(TripPlanQualityEvaluationLiveIT.LiveProfile.class)
-@org.junit.jupiter.api.condition.EnabledIf("containerRuntimeAvailable")
+@EnabledIfSystemProperty(named = "quarkus.langfuse.base-url", matches = ".+")
 class TripPlanQualityEvaluationLiveIT {
-
-    static boolean containerRuntimeAvailable() {
-        try {
-            Process p = new ProcessBuilder("bash", "-c",
-                    "command -v podman >/dev/null 2>&1 || command -v docker >/dev/null 2>&1")
-                    .redirectErrorStream(true).start();
-            return p.waitFor() == 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     private static final String SAMPLE = "rome-family-three-days";
 
     @Inject
     TripPlannerSystem tripPlannerSystem;
 
+    // The judge uses its own model, never the planner's default model, so the
+    // planner doesn't grade its own work.
     @Inject
-    ChatModel chatModel;
+    @ModelName("judgeModel")
+    ChatModel judgeModel;
 
     @Inject
     Tracer tracer;
@@ -76,6 +73,11 @@ class TripPlanQualityEvaluationLiveIT {
         org.junit.jupiter.api.Assumptions.assumeTrue(
                 TripPlannerCompositionLiveIT.probeSunnyServer(),
                 "Trip Intelligence MCP server on :8085 is not running the sunny fixture");
+        EvaluationSample<String> sample = loadSample(SAMPLE);
+        List<String> input = IntStream.range(0, sample.parameters().size())
+                .mapToObj(i -> sample.parameters().get(i, String.class))
+                .toList();
+
         // One real planning run, with the root span current so the agent's
         // internal spans join this trace. Capture the trace id before ending.
         String traceId;
@@ -86,7 +88,8 @@ class TripPlanQualityEvaluationLiveIT {
                 .startSpan();
         try (var scope = root.makeCurrent()) {
             traceId = root.getSpanContext().getTraceId();
-            plan = tripPlannerSystem.planTrip("Rome", "2027-07-10", "3", "family", "2", "moderate", "coastal towns");
+            plan = tripPlannerSystem.planTrip(input.get(0), input.get(1), input.get(2), input.get(3),
+                    input.get(4), input.get(5), input.get(6));
         } finally {
             root.end();
         }
@@ -95,17 +98,18 @@ class TripPlanQualityEvaluationLiveIT {
         String output = TripPlanText.render(plan);
 
         // Deterministic gate on the saved output.
-        EvaluationResult invariant = invariants.evaluate(sample(output), output);
+        EvaluationResult invariant = invariants.evaluate(sample, output);
 
-        // The AI judge is a separate invocation from the application run, so its
-        // usage stays separable from the planner's measurements.
-        TripPlanJudge judge = new TripPlanJudge(chatModel);
-        EvaluationResult judged = judge.judge(sample(output), output);
+        // The AI judge checks the plan against the sample's requirements. It is
+        // a separate invocation from the application run, so its usage stays
+        // separable from the planner's measurements.
+        TripPlanJudge judge = new TripPlanJudge(judgeModel);
+        EvaluationResult judged = judge.judge(sample, output);
         assertNotNull(judged.metadata().get("judge-model"), "judge must record which model it used");
 
         var run = new EvaluationRun(
                 SAMPLE,
-                List.of("Rome", "2027-07-10", "3", "family", "2", "moderate", "coastal towns"),
+                input,
                 output,
                 List.of("vehicle=" + plan.vehicle().model(), "days=" + plan.itinerary().size()),
                 traceId, "openai",
@@ -133,12 +137,12 @@ class TripPlanQualityEvaluationLiveIT {
         assertEquals(published.traceId(), run.traceId());
     }
 
-    static EvaluationSample<String> sample(String output) {
-        return EvaluationSample.<String>builder()
-                .withName(SAMPLE)
-                .withParameters(Parameters.of("Rome", "2027-07-10", "3", "family", "2", "moderate", "coastal towns"))
-                .withExpectedOutput(output)
-                .build();
+    static EvaluationSample<String> loadSample(String name) {
+        return SampleLoaderResolver.load("src/test/resources/evaluation/samples.yaml", String.class)
+                .stream()
+                .filter(s -> s.name().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("no sample named " + name));
     }
 
     public static class LiveProfile implements QuarkusTestProfile {

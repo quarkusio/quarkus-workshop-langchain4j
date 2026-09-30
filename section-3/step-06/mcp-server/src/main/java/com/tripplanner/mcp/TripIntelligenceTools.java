@@ -8,6 +8,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 public class TripIntelligenceTools {
 
@@ -52,11 +53,12 @@ public class TripIntelligenceTools {
             @ToolArg(description = "Trip destination city or region") String destination,
             @ToolArg(description = "Trip type: family, adventure, or business") String tripType) {
         requireText(destination);
-        if (tripType == null || !List.of("family", "adventure", "business").contains(tripType.toLowerCase(java.util.Locale.ROOT))) {
+        String type = tripType == null ? "" : tripType.toLowerCase(Locale.ROOT);
+        if (!List.of("family", "adventure", "business").contains(type)) {
             throw new IllegalArgumentException("Unknown trip type");
         }
         if ("empty-poi".equals(scenario)) return new PoiCatalog(List.of());
-        return new PoiCatalog(PointOfInterest.list("destination = ?1 and tripType = ?2", destination, tripType.toLowerCase(java.util.Locale.ROOT)));
+        return new PoiCatalog(PointOfInterest.list("destination = ?1 and tripType = ?2", destination, type));
     }
 
     private static void requireText(String value) {
