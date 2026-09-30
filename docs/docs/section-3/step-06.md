@@ -183,13 +183,10 @@ With weather and POI data now in the scope, the AI agents can reference it.
 
 The MCP server's `pom.xml` includes `quarkus-hibernate-orm-panache` and `quarkus-jdbc-postgresql` for database access. Dev Services starts a PostgreSQL container for it, so there's no database to set up.
 
-==Add the MCP client dependency to `trip-planner/pom.xml`:==
+==Run the following command from the `trip-planner/` directory to add the MCP client extension:==
 
-```xml title="pom.xml (MCP client dependency)"
-<dependency>
-    <groupId>io.quarkiverse.langchain4j</groupId>
-    <artifactId>quarkus-langchain4j-mcp</artifactId>
-</dependency>
+```shell
+./mvnw quarkus:add-extension -Dextensions="quarkus-langchain4j-mcp"
 ```
 
 ==Add the MCP client configuration to `trip-planner/src/main/resources/application.properties`:==
