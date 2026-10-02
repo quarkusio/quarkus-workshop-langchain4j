@@ -98,16 +98,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-testing-evaluation-ai-judge</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-testing-evaluation-semantic-similarity</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
@@ -146,9 +136,7 @@
                     <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
                     <includes>
                         <include>**/TripPlanInvariantStrategyTest.java</include>
-                        <include>**/TripPlanJudgeContractTest.java</include>
                         <include>**/TripPlanEvaluationHarnessTest.java</include>
-                        <include>**/EvaluationRunRecorderTest.java</include>
                     </includes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

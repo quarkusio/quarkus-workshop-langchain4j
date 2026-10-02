@@ -3,8 +3,10 @@
 # The parameters are the planner inputs, in planTrip order: destination,
 # start date, days, travel style, travelers, budget, interests.
 # The expected-output describes what an acceptable plan for that request must
-# contain. The AI judge compares a real plan against it using rubric.txt; the
-# invariant strategy only uses the parameters.
+# contain. Dev mode seeds these samples into the Langfuse dataset
+# trip-plan-samples, where the judge compares a real plan against the
+# expected-output using rubric.txt. The invariant strategy only uses the
+# parameters.
 - name: "rome-family-three-days"
   parameters:
     - "Rome"

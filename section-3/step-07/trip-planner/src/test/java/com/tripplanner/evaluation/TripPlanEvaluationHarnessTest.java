@@ -15,7 +15,7 @@ class TripPlanEvaluationHarnessTest {
 
     @Test
     void loadsIndependentRequirementsAndChecksEachRequestedDuration() throws Exception {
-        var samples = SampleLoaderResolver.load("src/test/resources/evaluation/samples.yaml", String.class);
+        var samples = SampleLoaderResolver.load("src/main/resources/evaluation/samples.yaml", String.class);
         assertEquals(3, samples.size());
         var report = new Scorer().evaluate(samples, parameters -> TripPlanText.render(
                 TripPlanInvariantStrategyTest.validPlan(Integer.parseInt(parameters.get(2).toString()))),
@@ -28,7 +28,7 @@ class TripPlanEvaluationHarnessTest {
 
     @Test
     void oneFixedPlanCannotPassRequestsForDifferentDurations() throws Exception {
-        var samples = SampleLoaderResolver.load("src/test/resources/evaluation/samples.yaml", String.class);
+        var samples = SampleLoaderResolver.load("src/main/resources/evaluation/samples.yaml", String.class);
         var report = new Scorer().evaluate(samples,
                 parameters -> TripPlanText.render(TripPlanInvariantStrategyTest.validPlan(1)),
                 new TripPlanInvariantStrategy());

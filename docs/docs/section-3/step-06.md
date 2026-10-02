@@ -1,6 +1,6 @@
 # Step 06 - MCP Integration with Non-AI Agents
 
-The Miles of Smiles trip planner generates solid itineraries, but every recommendation is based entirely on what the language model already knows. It has no way to check whether the destination will be rainy next week or which attractions are actually worth visiting. Customers are starting to notice that a "sunny outdoor itinerary" sometimes lands on a week of thunderstorms. (Management's suggestion to rename these "immersive weather experiences" was not well received.)
+The Miles of Smiles trip planner generates solid itineraries, but every recommendation is based entirely on what the language model already knows. It has no way to check whether the destination will be rainy next week or which attractions are actually worth visiting. Customers are starting to notice that a "sunny outdoor itinerary" sometimes ends up being stuck indoors during a week of thunderstorms. (Management's suggestion to rename these "immersive weather experiences" was not well received.)
 
 We'll fix this with a Trip Intelligence MCP server, a small Quarkus service that exposes weather forecasts and points of interest as MCP tools. On the trip planner side, two new `@McpClientAgent` interfaces call these tools before any language model runs and write the results into the workflow's shared state. The itinerary planner and vehicle advisor then work from real data.
 
@@ -134,7 +134,7 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/agents/PointsOfInterestAgent.java"
 ```
 
-Both interfaces follow the same shape:
+Both interfaces use the same three annotations:
 
 - `@McpClientAgent` names the MCP tool to call through `toolName`, and the method parameters become the tool's arguments.
 - `@McpClientSupplier` provides the `McpClient`. Its `@McpClientName("tripIntelligence")` qualifier picks the named client we'll configure in `application.properties`.
