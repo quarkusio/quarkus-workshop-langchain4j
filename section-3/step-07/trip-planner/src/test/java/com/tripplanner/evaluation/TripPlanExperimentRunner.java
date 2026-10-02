@@ -33,11 +33,6 @@ public class TripPlanExperimentRunner {
 
     @WithSpan("trip-plan-evaluation")
     public Result run(String experimentName, DatasetSample item) {
-        Parameters p = item.sample().parameters();
-        TripPlan plan = tripPlannerSystem.planTrip(p.get(0), p.get(1), p.get(2), p.get(3),
-                p.get(4), p.get(5), p.get(6));
-        String output = TripPlanText.render(plan);
-
         Span span = Span.current();
         span.setAttribute("langfuse.experiment.id", experimentName);
         span.setAttribute("langfuse.experiment.name", experimentName);
@@ -46,10 +41,15 @@ public class TripPlanExperimentRunner {
         span.setAttribute("langfuse.experiment.item.root_observation_id", span.getSpanContext().getSpanId());
         span.setAttribute("langfuse.experiment.item.expected_output", item.sample().expectedOutput());
         span.setAttribute("langfuse.observation.input", item.inputJson());
-        span.setAttribute("langfuse.observation.output", output);
         span.setAttribute(AttributeKey.stringArrayKey("langfuse.trace.tags"), List.of("evaluation"));
         span.setAttribute("langfuse.trace.metadata.sample_id", item.itemId());
         span.setAttribute("langfuse.trace.metadata.model", modelName);
+
+        Parameters p = item.sample().parameters();
+        TripPlan plan = tripPlannerSystem.planTrip(p.get(0), p.get(1), p.get(2), p.get(3),
+                p.get(4), p.get(5), p.get(6));
+        String output = TripPlanText.render(plan);
+        span.setAttribute("langfuse.observation.output", output);
 
         return new Result(plan, output, span.getSpanContext().getTraceId());
     }
