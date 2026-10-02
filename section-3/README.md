@@ -13,7 +13,7 @@ Steps `00` through `07` are successive snapshots of the trip planner. Each step 
 | **04** | Quarkus Flow + Kafka approval lifecycle, asynchronous API and UI |
 | **05** | PostgreSQL persistence, Flow checkpoints, restart and restore |
 | **06** | MCP integration with declarative `@McpClientAgent` interfaces |
-| **07** | Testing, evaluation, and observability: supplied evaluation harness, quality evaluation with invariants and a judge, optional Langfuse tracing and score attachment |
+| **07** | Testing, evaluation, and observability: supplied evaluation harness with invariant checks, Langfuse dataset and LLM-as-a-judge evaluator provisioned at dev mode startup, live quality run scored by Langfuse |
 
 When editing step `N`, touch only what that lesson introduces unless you are fixing a bug that also affects later steps. Inherited source, configuration, and UI should stay consistent with the narrative in `docs/docs/section-3/step-NN.md`.
 
@@ -30,7 +30,7 @@ Each step's default `./mvnw test` suite covers **only what that step adds**. Ear
 | **04** | `TripPlannerFlowTest` (smoke), `TripPlanStoreLifecycleTest` |
 | **05** | `PersistentTripPlanStoreTest`, `TripPlanStoreLifecycleTest` (persistence-aware) |
 | **06** | trip-planner: `McpAgentTest`, `DestinationEvidenceTest`; mcp-server: all tests (new module) |
-| **07** | trip-planner: `TripPlanInvariantStrategyTest`, `TripPlanJudgeContractTest`, `TripPlanEvaluationHarnessTest`, `EvaluationRunRecorderTest`; mcp-server: none (unchanged from Step 06) |
+| **07** | trip-planner: `TripPlanInvariantStrategyTest`, `TripPlanEvaluationHarnessTest`; mcp-server: none (unchanged from Step 06) |
 
 Opt-in tests (not in the default suite):
 

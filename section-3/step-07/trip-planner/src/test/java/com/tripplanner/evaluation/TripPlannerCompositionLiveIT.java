@@ -28,7 +28,6 @@ import jakarta.inject.Singleton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,8 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Drives the final planning graph with a scripted model while the two
  * {@code @McpClientAgent} subagents call the real Trip Intelligence MCP server
  * over streamable HTTP at http://localhost:8085/mcp. One fresh run per sample;
- * each saved output is checked by the invariant strategy and retained in the
- * recorder, so a repeated experiment keeps comparable inputs and evidence.
+ * each saved output is checked by the invariant strategy.
  *
  * <p>Run with {@code ./mvnw verify -Pevals} after starting the MCP server
  * (sunny fixture). No LLM is called (scripted model) and no Langfuse
@@ -56,7 +54,6 @@ class TripPlannerCompositionLiveIT {
 
     ScriptedProfile.ScriptedModel model;
 
-    final EvaluationRunRecorder recorder = new EvaluationRunRecorder();
     final TripPlanInvariantStrategy invariants = new TripPlanInvariantStrategy();
 
     @BeforeEach
@@ -100,7 +97,7 @@ class TripPlannerCompositionLiveIT {
     }
 
     @Test
-    void aRomeFamilyTripPassesItsInvariantsAndIsRecorded() {
+    void aRomeFamilyTripPassesItsInvariants() {
         TripPlan plan = tripPlannerSystem.planTrip("Rome", "2027-07-10", "3", "family", "2", "moderate", "coastal towns");
         String output = TripPlanText.render(plan);
 
@@ -113,21 +110,6 @@ class TripPlannerCompositionLiveIT {
         // The saved output passes the deterministic gate.
         var invariant = invariants.evaluate(sample("rome-family-three-days", output), output);
         assertTrue(invariant.passed(), "saved plan must pass the invariants: " + invariant.explanation());
-
-        // The run is retained for a comparable repeated experiment.
-        var run = new EvaluationRun(
-                "rome-family-three-days",
-                List.of("Rome", "2027-07-10", "3", "family", "2", "moderate", "coastal towns"),
-                output,
-                List.of(model.evidenceLine()),
-                null, "ScriptedModel",
-                List.of(new EvaluationRun.StrategyOutcome("invariant",
-                        invariant.passed(), invariant.score(), invariant.explanation(), invariant.metadata())),
-                Instant.now());
-        recorder.record(run);
-
-        assertEquals(1, recorder.count());
-        assertTrue(recorder.history("rome-family-three-days").inputsMatch());
     }
 
     @Test
