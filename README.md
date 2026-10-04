@@ -1,4 +1,4 @@
-# quarkus-workshop-langchain4j
+# Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop
 
 A workshop to learn how to build AI-Infused applications with Quarkus and LangChain4j.
 

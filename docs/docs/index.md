@@ -1,6 +1,6 @@
-# Quarkus LangChain4j Workshop
+# Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop
 
-Welcome to the Quarkus LangChain4j Workshop!  
+Welcome to the Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop!
 This workshop will guide you through building **AI-infused applications** and **agentic systems** using Quarkus and LangChain4j.
 
 You will learn how to:
