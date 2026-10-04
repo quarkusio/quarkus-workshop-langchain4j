@@ -30,7 +30,7 @@ nav:
     - Step 8 - Using remote agents (A2A): 'section-2/step-08.md'
     - Bonus - Deploying to Kubernetes: 'section-2/step-09.md'
     - Mastering Agentic Systems: 'section-2/conclusion.md'
-  - Section 3 - Enterprise Patterns (In progress/experimental):
+  - Section 3 - Enterprise Patterns:
     - Step 1 - Agent Skills and Discovery: 'section-3/step-01.md'
     - Step 2 - Guardrails and Compliance: 'section-3/step-02.md'
     - Step 3 - Voting, Loops, and Adaptive Model Selection: 'section-3/step-03.md'

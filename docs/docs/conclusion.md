@@ -24,7 +24,7 @@ Throughout the workshop, we followed the Miles of Smiles car rental company acro
 - Engaging remote agents, potentially built using different agentic frameworks, using Agent-to-Agent (A2A) communication
 - Deploying a multi-agent system to Kubernetes/OpenShift
 
-## Section 3 - Enterprise Agentic AI Patterns _(experimental)_
+## Section 3 - Enterprise Agentic AI Patterns
 - Defining and dynamically discovering agent skills at runtime
 - Enforcing guardrails and compliance policies across agents
 - Building event-driven workflows with Quarkus Flow
