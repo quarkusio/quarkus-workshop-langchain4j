@@ -171,7 +171,7 @@ test("live restore, approval and rejection journey", { skip: !process.env.LIVE_A
             assert.equal(final.requestId, data.requestId);
             trip.confirmation = final.confirmation;
             if (decision === "rejected") assert.equal(final.confirmation, null);
-            if (decision === "approved") assert.match(await page.locator("#tripStatus").innerText(), /Simulated booking.*No vehicle has been reserved/);
+            if (decision === "approved") assert.match(await page.locator("#tripStatus").innerText(), /Booking confirmed\. Booking reference: MOS-/);
             await page.reload();
             await page.waitForFunction(expected => currentTrip?.status === expected, final.status);
             assert.equal(await page.locator("#approveBtn").count(), 0);

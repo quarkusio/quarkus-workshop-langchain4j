@@ -111,7 +111,7 @@ for (const width of [1280, 390]) {
             const terminal = decision === "approved" ? "confirmed" : "rejected";
             api.status = envelope(terminal);
             await page.clock.runFor(2000);
-            await statusIs(page, terminal === "confirmed" ? "Simulated booking confirmed" : "Trip rejected");
+            await statusIs(page, terminal === "confirmed" ? "Booking confirmed" : "Trip rejected");
             await retainsPlan(page);
             assert.ok(api.reads.every(query => query === "?instanceId=workflow-123"));
             const count = api.reads.length;
@@ -255,7 +255,7 @@ test("returning from browser history rechecks an interrupted submission", async 
         window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
         window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
     });
-    await statusIs(page, "Simulated booking confirmed");
+    await statusIs(page, "Booking confirmed");
     await retainsPlan(page);
 });
 

@@ -211,7 +211,7 @@ function renderTrip() {
         planned: "",
         awaiting_approval: "The workflow is waiting for your decision.",
         decision_submitted: "Decision submitted. Waiting for the workflow to finish processing it.",
-        confirmed: `Simulated booking confirmed. Booking reference: ${confirmation?.bookingReference || "N/A"}. No vehicle has been reserved.`,
+        confirmed: `Booking confirmed. Booking reference: ${confirmation?.bookingReference || "N/A"}.`,
         rejected: "Trip rejected. The workflow ended without finalizing a booking.",
         failed: safeMessage(currentTrip, "The backend reported that the trip could not be processed. Please try again later.")
     };
