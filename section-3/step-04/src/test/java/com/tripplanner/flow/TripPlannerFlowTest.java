@@ -78,7 +78,7 @@ class TripPlannerFlowTest {
         await().atMost(5, SECONDS).until(() -> "confirmed".equals(status(planned.instanceId()).status()));
         TripPlanStatus confirmed = status(planned.instanceId());
         assertEquals(PLAN, confirmed.plan());
-        assertTrue(confirmed.confirmation().message().contains("Simulated booking"));
+        assertEquals("Booking confirmed.", confirmed.confirmation().message());
         verify(adapter).finalizeBooking(new TripApproval(planned.instanceId(), "approved", ""));
     }
 

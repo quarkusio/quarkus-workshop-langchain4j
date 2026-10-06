@@ -1,47 +1,43 @@
 # Step 07 - Testing, Evaluation, and Observability
 
-In Step 06, we connected the planner to weather and points-of-interest tools through MCP so it could use their results when recommending a trip. Even with those details, the model still has to choose activities that fit the customer's request. It might for example recommend three days of sightseeing in Rome's historical center when the family specifically asked to visit coastal towns. Milles of Smiles could wait for customer feedback to improve their systems, but management would prefer to be more proactive about improving the results.
+In Step 06, we connected the planner to weather and points-of-interest tools through MCP so it could use their results when recommending a trip. Even with those details, the model still has to choose activities that fit the customer's request. It might, for example, recommend three days of sightseeing in Rome's historical center when the family specifically asked to visit coastal towns. Miles of Smiles needs to catch that mismatch before relying on customer feedback.
 
-We need a way to check whether changes to our prompts, skills, or models actually improve the results, or at least don't make them worse. 
-We'll define a few trip requests and describe what an acceptable result should contain. We'll then implement checks in deterministic Java code that will catch structural problems, such as a missing itinerary day, while a judge model in Langfuse will assess the recommendations against the requirements. After running an evaluation, we'll inspect the score and the judge's explanation.
+We need a way to check whether changes to our prompts, skills, or models improve the results, or at least don't make them worse. Evaluation gives us a repeatable way to make that comparison.
 
-## Evaluating trip plans
+## Evaluating with Langfuse
 
-Evaluation lets us repeat a trip request after changing the planner and compare the results against the same requirements. We'll use OpenTelemetry to record each planning run as a trace and send it to Langfuse, where a separate judge model scores the completed plan. Langfuse stores the request and its requirements together as a dataset item, so each new run can be assessed against the same criteria.
+Evaluation gives the planner a known trip request and checks the resulting plan against a description of what a satisfactory answer should contain. For a family asking for three days around Rome with coastal towns, we would expect a complete three-day itinerary with activities that fit the family and include a coastal visit. Repeating this request after a prompt or model change lets us compare the plans against the same expectations.
 
-!!! note "Evaluation vs step 2's guardrails"
-    The guardrails from Step 02 check agent responses while the customer is waiting for a plan. They can correct a response or ask the model to try again before the workflow continues. Evaluation runs separately to assess completed plans against a set of test requests.
+[Langfuse](https://langfuse.com/docs/evaluation/core-concepts){target="_blank"} is a platform for recording AI application runs and evaluating their results. We'll keep our trip requests and expectations in a dataset there, then compare runs as experiments. The [Quarkus Langfuse extension](https://docs.quarkiverse.io/quarkus-langfuse/dev/index.html){target="_blank"} connects our application to Langfuse, sends planning traces, and lets the application set up the dataset and evaluator. This gives us the plan, its score, and the calls that produced it in one place.
 
 ```mermaid
 flowchart LR
-    subgraph runtime["Request path (Step 02)"]
-        req["Plan request"] --> gr["Guardrails<br/><small>block or pass</small>"]
-        gr --> plan["Trip plan"]
-    end
-
-    yaml["samples.yaml"] -->|"seeded at dev mode startup"| ds
-
-    subgraph lf["Langfuse"]
-        ds["Dataset<br/><small>trip-plan-samples</small>"]
-        item["Experiment item<br/><small>trace + expected output</small>"]
-        judge["LLM-as-a-judge<br/><small>rubric on gpt-4o-mini</small>"]
-        score["plan-quality score<br/><small>0 to 1, with reasoning</small>"]
-        ds -.-> item
-        item --> judge --> score
-    end
-
-    subgraph test["Live evaluation test"]
-        run["Planning run<br/><small>same agents as the request path</small>"]
-        inv["Invariant checks<br/><small>deterministic</small>"]
-        run --> inv
-    end
-
-    ds -->|"dataset item"| run
-    run -->|"trace with experiment attributes"| item
-    score -->|"awaited and asserted"| test
+    sample["Same trip request<br/>and expectations"] --> first["First planning run"]
+    sample --> second["Run after a change"]
+    first --> compare["Compare plans<br/>and scores"]
+    second --> compare
 ```
 
-The test checks the plan's structure before waiting for the Langfuse score. It then fails if the score is below the required threshold. We'll inspect the trace to understand what the judge found and whether its assessment agrees with the plan.
+## Judge models
+
+Some requirements can be checked directly, such as whether a three-day trip has three itinerary days. Others need judgment. A plan might mention the coast without offering a useful coastal visit. A judge model reads the completed plan and uses a rubric, or scoring instructions, to assess it against the request. It returns a score with an explanation that we can check against the plan.
+
+We'll also add a judge to the vehicle budget guardrail. This judge checks a recommendation while the planner is working and can ask the vehicle agent to try again. The Langfuse judge scores a completed plan during an evaluation run, so its verdict helps us assess the planner without changing that plan.
+
+## Testing with scripted responses
+
+Before asking a judge to assess a live plan, we need to know that our checks work and that the workflow passes the right information between agents. Plans with known good and bad contents let us test the structural checks. Scripted model responses then give the workflow predictable replies while the MCP agents call the Trip Intelligence server. This lets us check whether weather and points of interest reach the itinerary planner without model variation obscuring a wiring problem.
+
+```mermaid
+flowchart LR
+    fixtures["Known plans"] --> structure["Do the checks catch defects?"]
+    scripts["Scripted replies + MCP data"] --> workflow["Does the workflow pass data correctly?"]
+    live["Live model + saved request"] --> quality["Does the plan meet the request?"]
+```
+
+## Understanding scores and traces
+
+A score is a starting point for reviewing a plan. The judge's explanation tells us which requirement it thought the plan missed, and a trace shows the agent calls and MCP tool results from that planning run. If the score is low, we'll compare the explanation with the plan, then use the trace to find where the recommendation came from. After a change, we can compare two experiments to see how their plans and scores differ.
 
 ## Prepare the working copy
 
@@ -71,7 +67,7 @@ Maven runs the fixture-based tests with `./mvnw test`. The `evals` profile selec
 
 ## Check vehicle budgets with a judge model
 
-Before evaluating complete plans, let's revisit the vehicle guardrail from Step 02. Its brand list catches a Ferrari on an economy budget, but can miss an expensive model from another manufacturer. We'll add a judge that checks the recommendation before the workflow continues. Later, the Langfuse evaluator will assess completed plans against our test requests.
+An economy-budget customer should not receive an expensive vehicle recommendation. The existing brand list catches an obvious luxury brand such as Ferrari, but can miss an expensive model from another manufacturer. We'll add a judge to the guardrail so it can check the vehicle before the workflow continues and ask the vehicle agent to try again when needed. This judge acts during planning. The Langfuse judge we'll configure later scores a completed plan for an evaluation run; its score does not change the customer's plan.
 
 The budget judge returns a verdict and a reason, which we'll represent with a Java record.
 
@@ -114,7 +110,7 @@ The budget judge uses its own model configuration, so you can change it independ
 
 ## Define acceptable plans for sample requests
 
-To evaluate a completed plan, we need to describe what the customer asked for and what would satisfy that request. Each sample pairs the planner inputs with those requirements.
+The Rome example gives us a repeatable question: does a plan for a three-day family trip include a coastal town? A sample saves the planner inputs alongside a description of an acceptable result. We can then change the planner and compare each new plan against the same requirements.
 
 ==Create `src/main/resources/evaluation/samples.yaml`:==
 
@@ -122,7 +118,7 @@ To evaluate a completed plan, we need to describe what the customer asked for an
 --8<-- "../../section-3/step-07/trip-planner/src/main/resources/evaluation/samples.yaml"
 ```
 
-For the three-day Rome sample, an acceptable plan needs family-friendly activities and at least one coastal town. Several itineraries could meet those requirements, so `expected-output` describes what the plan must contain without prescribing its exact wording.
+In `rome-family-three-days`, the `parameters` are the trip request and `expected-output` describes what a satisfactory plan contains, including family-friendly activities and a coastal town. Several itineraries could meet those requirements, so the sample does not prescribe exact wording or stops.
 
 The Java checks use the request parameters to check details such as the number of days. The Langfuse judge compares the generated plan with `expected-output`.
 
@@ -138,11 +134,11 @@ Java can check whether the itinerary has three days, but assessing whether its a
 --8<-- "../../section-3/step-07/trip-planner/src/main/resources/evaluation/rubric.txt"
 ```
 
-Langfuse fills in the three variables before it sends the prompt to the judge model. `{{input}}` is the trip request, `{{output}}` is the plan JSON the planner returned, and `{{ground_truth}}` is the sample's expected output. The rubric asks the judge to check the plan against each requirement and to ignore wording, order, and extra detail. We'll configure the score and the judge's explanation when we register the evaluator next.
+For the Rome sample, Langfuse replaces `{{input}}` with the saved trip request, `{{output}}` with the generated plan JSON, and `{{ground_truth}}` with the requirements in `expected-output`. The rubric asks the judge to check each requirement without penalizing different wording, order, or extra detail. The result is a score with an explanation of any missed requirements.
 
 ## Configure the Langfuse evaluator
 
-We'll configure Langfuse from the application so that starting dev mode prepares the dataset and evaluator for the tests. `LangfuseEvaluationSetup` uses the extension's `LangfuseOperations` client to register the rubric and connect Langfuse to the judge model.
+Starting dev mode will copy the YAML samples into a Langfuse dataset and register the rubric as an evaluator. When the quality test runs a sample, Langfuse receives the completed plan through its trace, applies the rubric, and records a score. `LangfuseEvaluationSetup` prepares the dataset, model connection, and evaluator through the extension's `LangfuseOperations` client.
 
 ==Create `src/main/java/com/tripplanner/evaluation/LangfuseEvaluationSetup.java`:==
 
@@ -165,9 +161,11 @@ The setup reuses existing objects and updates dataset items by sample name, so r
 !!! note "Using a provider other than OpenAI"
     The judge runs in the Langfuse worker container and calls the model through the LLM connection, so it needs an OpenAI API key even when your planner uses another provider. If your provider has an OpenAI-compatible endpoint, you can point the connection at it instead, either by editing the LLM connection in the Langfuse UI or by setting a base URL in `createLlmConnection()`. For Ollama, the base URL is `http://host.docker.internal:11434/v1`, because `localhost` inside the container is the container itself. If neither works for you, skip the quality run. The offline suite and the composition run work with any provider.
 
-## Checking plan structure
+## Check plan structure
 
-The supplied tests load the samples, invoke the planner, and retrieve the evaluation results. Copy them into the working project so we can run the checks against fixture plans first, then try the complete workflow.
+Before judging the recommendations, we need to know whether a plan is complete enough to evaluate. A missing itinerary day or invalid cost is a definite error, so Java can catch it without asking a model. We'll first test those checks against plans with known contents. Once they work, we'll test the workflow and then the quality of a live plan.
+
+The supplied evaluation code loads the samples, checks plans, runs the planner, and retrieves scores. Copy it into the working project before running the tests.
 
 ==For the hands-on route, copy these paths from `section-3/step-07/trip-planner` to the same paths in your working copy:==
 
@@ -195,16 +193,6 @@ A plan with no problems scores 1, and anything else scores 0 with the list of pr
 
 To check that the strategy detects defects, `known-bad.yaml` contains plans with a missing vehicle, a gap in the itinerary, a negative or non-numeric cost, and an empty output. `TripPlanInvariantStrategyTest` checks that each fails for the expected reason and that a complete plan passes.
 
-## Tracing parallel agent calls
-
-The vehicle and itinerary research run as parallel agents. LangChain4j runs parallel branches on an executor it gets from its `ExecutorProvider`, and by default that executor doesn't carry the OpenTelemetry context over to the new thread. Each branch would then start a trace of its own, and a single planning run would show up in Langfuse as a handful of unrelated traces.
-
-```java title="TracingExecutorSetup.java"
---8<-- "../../section-3/step-07/trip-planner/src/main/java/com/tripplanner/agentic/TracingExecutorSetup.java:20:31"
-```
-
-At startup, the class uses `Context.taskWrapping()` to copy the current trace context into tasks submitted to the Quarkus managed executor. LangChain4j uses this wrapped executor for the parallel branches, so their agent calls appear under the same planning trace in Langfuse.
-
 ## Run the offline tests
 
 `TripPlanEvaluationHarnessTest` checks that the harness loads the samples and applies the requested duration to each fixture plan. It also checks that a one-day plan fails a request for a longer trip and that the results can be saved as a JSON report. Maven runs this test alongside the invariant strategy tests by default.
@@ -221,11 +209,11 @@ At startup, the class uses `Context.taskWrapping()` to copy the current trace co
     .\mvnw.cmd test
     ```
 
-These tests check the evaluation code using plans with known contents. If a deliberately broken plan passes, or a valid fixture fails, investigate the checks before relying on their results. To assess a prompt, skill, or model change, run the live quality evaluation below.
+These tests tell us whether the structural checks recognize known good and bad plans. If a deliberately broken plan passes, or a valid fixture fails, investigate the checks before relying on their results. They do not tell us whether the agents exchange the right information during a real planning run, which is what we'll test next.
 
 ## Test the workflow with scripted responses
 
-Now that the checks pass against fixtures, we can test whether the agents pass the right data through the workflow. The composition test uses scripted model responses while the two `@McpClientAgent` subagents call the running Trip Intelligence server. Controlling the responses lets the test check the workflow against known outputs.
+Now we can test whether the agents pass the right data through the workflow. The composition test uses scripted model responses while the two `@McpClientAgent` subagents call the running Trip Intelligence server. With model responses fixed, a failed assertion points to the workflow or its MCP data rather than a change in the model's wording.
 
 `TripPlannerCompositionLiveIT` has two tests:
 
@@ -248,7 +236,7 @@ The test's `mcp` profile disables Langfuse because these assertions use the plan
 
 ## Evaluating recommendation quality
 
-The composition test uses scripted replies, so it cannot tell us whether the model will recommend suitable activities. The quality test generates a plan with your configured model and asks Langfuse to assess it against the Rome sample's requirements.
+The composition test confirms that the workflow connects its parts, but scripted replies cannot tell us whether the configured model recommends suitable activities. The quality test generates a new plan for the Rome sample, checks its structure, and asks Langfuse to assess its recommendations against the saved requirements.
 
 Before planning, the test checks that the MCP server is running the sunny fixture and that the `trip-plan-samples` dataset exists in Langfuse. If the dataset is missing, the test fails and tells you to start dev mode first, since dev mode is what creates it. The test then loads the `rome-family-three-days` item from the dataset and passes it to a small helper bean that runs the planner:
 
@@ -306,11 +294,21 @@ A passing test tells us that the plan met the structural checks and scored at le
 
 ![The trip-plan-evaluation trace in Langfuse with the full agent tree, from the MCP weather and points-of-interest calls through the vehicle, itinerary, evaluator, and cost agents, and a plan-quality score of 0.85 on the root span with the judge's reasoning](../images/section-3-step-07-langfuse-score.png)
 
-The whole planning run is one tree. The MCP calls for the weather and points of interest come first, then the vehicle advisor and itinerary planner, the three evaluators, the vehicle reviser when the review loop asks for another round, and the cost estimator with its pricing tool. The header shows the latency, cost, and token counts for the run, and the `evaluation` tag the test put on the trace. The `plan-quality` score sits on the root span, because that is the span the experiment attributes point at.
+Read the `plan-quality` score and its explanation first. Compare any missed requirement with the saved sample and the generated plan before deciding whether the planner needs a change. A low score can also reflect a mistaken judgment, so the explanation matters as much as the number.
 
-A low score can come from a poor plan or a mistaken judgment. Before changing the planner, compare the judge's explanation with the sample's requirements and the generated plan.
+The trace shows the calls that produced the plan. The MCP weather and points-of-interest calls feed the vehicle advisor and itinerary planner; the evaluators and any vehicle revision follow, then the cost estimator calls its pricing tool. The header shows latency, cost, and token counts for the run. The score is on the root span, where the experiment records the completed plan.
 
 ==Open the score's comment and find any requirement the judge says was missed.== Check the plan against that requirement. If the plan is wrong, inspect the relevant agent's prompt and response. For a recommendation that depends on weather or points of interest, check the MCP tool result as well. If the explanation misreads the plan, review the rubric before treating the score as evidence of a regression.
+
+### Keep parallel calls in one trace
+
+The vehicle and itinerary research run in parallel. By default, the executor used for those branches does not carry the current OpenTelemetry context to the new threads, so one planning run would appear as several unrelated traces. The `TracingExecutorSetup` copied earlier wraps that executor and carries the context into each branch.
+
+```java title="TracingExecutorSetup.java"
+--8<-- "../../section-3/step-07/trip-planner/src/main/java/com/tripplanner/agentic/TracingExecutorSetup.java:20:31"
+```
+
+At startup, `Context.taskWrapping()` wraps the Quarkus managed executor that LangChain4j uses for parallel branches. Their agent calls then appear under the same planning trace you just inspected.
 
 ??? info "How the trace becomes a dataset experiment"
     The experiment name is `step-07-` followed by the current time, so each run of the IT shows up as a separate run of the dataset in Langfuse. The helper bean runs the planner inside a root span:

@@ -2,55 +2,30 @@
 
 The Miles of Smiles trip planner generates solid itineraries, but every recommendation is based entirely on what the language model already knows. It has no way to check whether the destination will be rainy next week or which attractions are actually worth visiting. Customers are starting to notice that a "sunny outdoor itinerary" sometimes ends up being stuck indoors during a week of thunderstorms. (Management's suggestion to rename these "immersive weather experiences" was not well received.)
 
-We'll fix this with a Trip Intelligence MCP server, a small Quarkus service that exposes weather forecasts and points of interest as MCP tools. On the trip planner side, two new `@McpClientAgent` interfaces call these tools before any language model runs and write the results into the workflow's shared state. The itinerary planner and vehicle advisor then work from real data.
+We'll fix this with a Trip Intelligence MCP server, a small Quarkus service that exposes weather forecasts and points of interest as MCP tools. On the trip planner side, two new `@McpClientAgent` interfaces call these tools **before any language model runs** and write the results into the workflow's shared state. The itinerary planner and vehicle advisor then work from real data.
 
-## How this differs from Section 1
+## Fetching destination data before planning
 
-In Section 1, Step 08, we used `@McpToolBox` to give an AI service access to MCP tools. The language model decided when to call the weather tool, which meant it sometimes didn't.
-
-This time the MCP tools are wrapped as `@McpClientAgent` interfaces in the workflow graph, so they run at a fixed point in the workflow as plain tool calls. The data is fetched first, then every downstream agent can read it from the `AgenticScope`.
-
-```mermaid
-flowchart LR
-    subgraph section1["Section 1: MCP as LLM tool"]
-        llm1["AI Service"] -->|"LLM decides to call"| mcp1["@McpToolBox"]
-        mcp1 --> server1["MCP Server"]
-    end
-
-    subgraph section3["Section 3: MCP as workflow agent"]
-        planner["Workflow planner"] -->|"Always runs"| agent["Non-AI Agent"]
-        agent -->|"Direct MCP call"| server3["MCP Server"]
-        agent -->|"Writes to scope"| scope["AgenticScope"]
-        scope -->|"AI agents read"| ai["Itinerary Planner"]
-    end
-```
-
-## Updated workflow
-
-The trip planner sequence now starts with a `DestinationIntelligence` phase that fetches weather and points of interest in parallel:
+Each trip starts by fetching weather and points of interest from the Trip Intelligence MCP server. The workflow makes both calls in parallel, checks the returned data, and then passes it to the itinerary and vehicle agents.
 
 ```mermaid
 flowchart TD
-    subgraph trip["TripPlannerSystem"]
-        direction TB
-        intel["DestinationIntelligence<br/><small>@ParallelAgent</small>"]
-        research["ResearchPhase<br/><small>@ParallelAgent</small>"]
-        loop["VehicleReviewLoop<br/><small>@LoopAgent</small>"]
-        cost["CostEstimatorAgent"]
-
-        intel --> research --> loop --> cost
-
-        subgraph intelSub[" "]
-            weather["WeatherAgent<br/><small>non-AI, MCP</small>"]
-            poi["PointsOfInterestAgent<br/><small>non-AI, MCP</small>"]
-        end
-        intel --- intelSub
-    end
-
-    mcp["Trip Intelligence<br/>MCP Server"]
-    weather -.->|"getWeatherForecast"| mcp
-    poi -.->|"getPointsOfInterest"| mcp
+    request[Trip request] --> intelligence[Fetch destination data]
+    intelligence --> weather[Get weather from MCP server]
+    intelligence --> poi[Get places from MCP server]
+    weather --> scope[Weather and places in shared state]
+    poi --> scope
+    scope --> check{Responses valid?}
+    check -->|Yes| research[Itinerary and vehicle research]
+    check -->|No| failure[Destination data error]
+    research --> review[Vehicle review and cost estimate]
 ```
+
+## MCP tools as workflow agents
+
+An MCP client is the connection to an MCP server. With [`@McpToolBox`](https://docs.quarkiverse.io/quarkus-langchain4j/dev/mcp.html#_using_mcp_tools_in_ai_services){target="_blank"}, that client makes the server's tools available to an AI service, and the model decides whether to call one while generating a response.
+
+`@McpClientAgent` lets a workflow treat a **remote MCP tool as one of its agents**. The workflow supplies the arguments, calls the tool at a defined point, and saves the result for later steps. For required lookups, this ensures the tool runs before later steps without an extra model call to fetch the data.
 
 ## Preparing the working copy
 
@@ -66,7 +41,7 @@ A container runtime (Docker or Podman) is needed for PostgreSQL and Kafka Dev Se
 
 ## Project structure
 
-Step 06 is a multi-module project with two submodules:
+The trip planner and the Trip Intelligence server run as separate Quarkus applications. The server exposes the weather and points-of-interest tools on port 8085, and the planner calls them over HTTP from port 8080. The project has one Maven module for each application:
 
 ```
 step-06/
@@ -78,8 +53,6 @@ step-06/
     ├── pom.xml
     └── src/
 ```
-
-This mirrors the structure used in `section-2/step-08` for the A2A remote agent. The MCP server is a standalone Quarkus application that the trip planner connects to over HTTP.
 
 ## Building the MCP server
 
@@ -118,9 +91,27 @@ Both tools throw `IllegalArgumentException` for blank or out-of-range input, whi
 
 Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatically provisions a PostgreSQL container for the MCP server, separate from the trip planner's database.
 
-## Creating declarative MCP agents
+## Connecting the trip planner to the MCP server
 
-`@McpClientAgent` is a declarative annotation that wraps a single MCP tool as a non-AI agent. You write a Java interface, and the framework supplies the implementation that makes the MCP tool call.
+The trip planner needs a named MCP client so its new agents know which server to call. The `tripIntelligence` client uses Streamable HTTP to reach the server on port 8085.
+
+==Run the following command from the `trip-planner/` directory to add the MCP client extension:==
+
+```shell
+./mvnw quarkus:add-extension -Dextensions="quarkus-langchain4j-mcp"
+```
+
+==Add the MCP client configuration to `trip-planner/src/main/resources/application.properties`:==
+
+```properties title="trip-planner/src/main/resources/application.properties (MCP client)"
+--8<-- "../../section-3/step-06/trip-planner/src/main/resources/application.properties:14:17"
+```
+
+The client name `tripIntelligence` will select this connection in both MCP agent interfaces.
+
+## Creating the weather and points-of-interest agents
+
+`WeatherAgent` calls `getWeatherForecast` with the destination and trip dates, while `PointsOfInterestAgent` calls `getPointsOfInterest` with the destination and trip type.
 
 ==Create `trip-planner/src/main/java/com/tripplanner/agentic/agents/WeatherAgent.java`:==
 
@@ -134,13 +125,11 @@ Port 8085 avoids conflicts with the trip planner (8080). Dev Services automatica
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/agents/PointsOfInterestAgent.java"
 ```
 
-Both interfaces use the same three annotations:
-
-- `@McpClientAgent` names the MCP tool to call through `toolName`, and the method parameters become the tool's arguments.
-- `@McpClientSupplier` provides the `McpClient`. Its `@McpClientName("tripIntelligence")` qualifier picks the named client we'll configure in `application.properties`.
-- `outputKey` stores the result in the scope, so downstream agents can read `weather` and `pointsOfInterest` from it.
+Both interfaces use `@McpClientName("tripIntelligence")` to reach the server. Their JSON responses are saved under `weather` and `pointsOfInterest`, ready for the next workflow phase.
 
 ## Wiring the DestinationIntelligence phase
+
+`DestinationIntelligence` runs the two MCP agents in parallel at the start of each trip. Their JSON results enter the shared scope, where `DestinationEvidence` checks them before the research agents use them. An invalid response stops planning with `intelligence_unavailable` instead of passing bad destination data to the model.
 
 ==Create `trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationIntelligence.java`:==
 
@@ -148,7 +137,9 @@ Both interfaces use the same three annotations:
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/DestinationIntelligence.java"
 ```
 
-The `@Output` method calls `DestinationEvidence.validate()` before assembling the combined string. `validate()` reads the JSON from the MCP server into small records that mirror the server's weather and points-of-interest types, then checks that:
+The `@Output` method validates the two results and combines them after both calls finish. Its `intelligenceComplete` output lets `TripPlannerSystem` continue to research; the weather and places remain available under their own scope keys.
+
+`DestinationEvidence.validate()` parses the JSON into records that mirror the server's weather and points-of-interest types, then checks that:
 
 - every required field is present
 - the numbers are sensible
@@ -189,25 +180,6 @@ With weather and POI data now in the scope, the AI agents can reference it.
 ```java hl_lines="22-24" title="ResearchPhase.java"
 --8<-- "../../section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/ResearchPhase.java"
 ```
-
-## Configuring the MCP client
-
-==Run the following command from the `trip-planner/` directory to add the MCP client extension:==
-
-```shell
-./mvnw quarkus:add-extension -Dextensions="quarkus-langchain4j-mcp"
-```
-
-==Add the MCP client configuration to `trip-planner/src/main/resources/application.properties`:==
-
-```properties title="application.properties (MCP client)"
-# MCP client for the Trip Intelligence server
-quarkus.langchain4j.mcp.tripIntelligence.transport-type=streamable-http
-quarkus.langchain4j.mcp.tripIntelligence.url=http://localhost:8085/mcp
-quarkus.langchain4j.mcp.tripIntelligence.tool-execution-timeout=5s
-```
-
-The `tripIntelligence` name matches the `@McpClientName("tripIntelligence")` qualifier used in the `@McpClientSupplier` methods.
 
 ## Tightening the request validation
 
@@ -251,33 +223,15 @@ The two applications run side by side. ==Start the MCP server first, in its own 
     .\mvnw.cmd quarkus:dev
     ```
 
-==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a trip plan for one of the seeded cities, such as `Barcelona`.== The itinerary and vehicle recommendation should now mention the forecast and some of the attractions from `import.sql`. The lookup is an exact match on the city name, so `barcelona` or a city missing from the database gets an empty list back. The plan still arrives, but any attractions in it come from the model's own knowledge.
+==Open [http://localhost:8080](http://localhost:8080){target="_blank"} and generate a family trip to `Barcelona`.== Look for the weather in the vehicle recommendation and for places from `import.sql`, such as Barcelona Science Museum or Barcelona Central Park, in the itinerary. The model may choose which places to include, so a particular name is not guaranteed. The database lookup matches the city name exactly; `barcelona` or an unseeded city returns an empty list.
 
 <figure markdown="span">
   ![A five-day family trip to Barcelona whose vehicle recommendation mentions the sunny forecast and whose itinerary includes seeded points of interest](../images/section-3-step-06-weather-itinerary.png){ width="600" }
 </figure>
 
-==Open the Dev UI, click **Executions** on the LangChain4j Agentic card, and expand the latest run.== The `DestinationIntelligence` phase shows up as `fetchIntelligence`, and it finishes before the research agents start. Its two children, `getWeatherForecast` and `getPointsOfInterest`, are ACTION rows: plain MCP tool calls that take a few milliseconds. The AI rows below them are where the model time and tokens go.
+After viewing the plan, ==open the Dev UI, click **Executions** on the LangChain4j Agentic card, and expand the latest run.== The `DestinationIntelligence` phase appears as `fetchIntelligence` before the research agents. Its `getWeatherForecast` and `getPointsOfInterest` children are ACTION rows for direct MCP calls. Inspect their results to see which weather and places were supplied before the AI agents wrote the plan.
 
 ![Dev UI Executions for planTrip, with fetchIntelligence running the two MCP tool calls as ACTION rows before the research, vehicle review and cost estimation agents](../images/section-3-step-06-devui-executions.png)
-
-??? info "Verifying with tests"
-
-    The MCP server has its own test suite that verifies both weather computation and database-backed POI queries:
-
-    ```bash
-    cd section-3/step-06/mcp-server
-    ./mvnw test
-    ```
-
-    The trip planner tests check the `@McpClientAgent` interface declarations:
-
-    ```bash
-    cd section-3/step-06/trip-planner
-    ./mvnw test
-    ```
-
-    On Windows, use `.\mvnw.cmd test` in each directory.
 
 ## What's next?
 
