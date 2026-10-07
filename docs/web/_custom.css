@@ -171,14 +171,16 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-/* Push sidebar and content below the fixed navbar */
+/* Push sidebar and content below the fixed navbar, widen sidebar */
 .sidebar.main {
     top: var(--navbar-height) !important;
     height: calc(100vh - var(--navbar-height)) !important;
+    width: 18rem !important;
 }
 
 .main-content {
     padding-top: var(--navbar-height);
+    margin-left: 18rem;
 }
 
 /* Sidebar navigation styles */
