@@ -1,0 +1,26 @@
+{#let menu=cdi:menu}
+<section class="menu">
+  <div class="sidebar-nav">
+    {#for item in menu.items}
+    {#if item.children??}
+    <div class="sidebar-section" data-section="{item.section}">
+      <h3 class="nav-section-title menu-title">
+        {#if item.icon??}<i class="{item.icon}"></i> {/if}{item.title}
+      </h3>
+      <ul>
+        {#for child in item.children}
+        <li><a href="{site.url(child.path)}" class="sidebar-link">{child.title}</a></li>
+        {/for}
+      </ul>
+    </div>
+    {#else}
+    <div class="sidebar-section" data-section="{item.section}">
+      <a href="{site.url(item.path)}" class="sidebar-link standalone-link">
+        {#if item.icon??}<i class="{item.icon}"></i> {/if}{item.title}
+      </a>
+    </div>
+    {/if}
+    {/for}
+  </div>
+</section>
+{/let}
