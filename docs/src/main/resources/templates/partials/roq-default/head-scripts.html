@@ -1,0 +1,40 @@
+{#bundle /}
+{#search-script /}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Highlight active sidebar link
+  var currentPath = window.location.pathname.replace(/\/$/, '');
+  var links = document.querySelectorAll('.sidebar-link');
+  links.forEach(function (link) {
+    var href = link.getAttribute('href').replace(/\/$/, '');
+    if (href === currentPath) {
+      link.classList.add('active');
+      // Expand parent section
+      var section = link.closest('.sidebar-section');
+      if (section) {
+        section.classList.add('active-section');
+      }
+    }
+  });
+
+  // Collapsible sidebar sections
+  var titles = document.querySelectorAll('.nav-section-title');
+  titles.forEach(function (title) {
+    title.addEventListener('click', function () {
+      var section = this.closest('.sidebar-section');
+      if (section) {
+        section.classList.toggle('collapsed');
+      }
+    });
+  });
+
+  // Auto-expand section containing active link, collapse others
+  var sections = document.querySelectorAll('.sidebar-section');
+  sections.forEach(function (section) {
+    if (!section.classList.contains('active-section') && section.querySelector('ul')) {
+      section.classList.add('collapsed');
+    }
+  });
+
+});
+</script>

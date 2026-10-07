@@ -1,0 +1,531 @@
+---
+title: "Step 6 - Multimodal agents"
+layout: page
+content-toc: true
+---
+# Step 06 - Multimodal Agents
+
+## New Requirement: Visual Car Inspection
+
+In Step 5, you implemented the Human-in-the-Loop pattern for safe, controlled disposition decisions. The system relies entirely on textual feedback from employees returning cars. But what if the person returning the car could also **upload a photo**?
+
+The Miles of Smiles management team wants to enhance the rental return process:
+
+Allow employees to optionally upload an image of the car when returning it, so the system can automatically enrich the rental feedback with visual observations.
+
+In this step you'll learn how to integrate **multimodal capabilities** (text + image) into your existing agentic workflow using LangChain4j's `ImageContent` to enrich the rental feedback with visual insights.
+
+---
+
+## What You'll Learn
+
+In this step, you will:
+
+- Add **image upload** to the rental return form using multipart form data
+- Convert uploaded images to LangChain4j's **`ImageContent`** for multimodal processing
+- Create a **`CarImageAnalysisAgent`** that analyzes car images and enriches rental feedback
+- Integrate the new agent at the beginning of the existing **`CarProcessingWorkflow`** sequence
+- Understand how `ImageContent` flows through agent parameters using `@UserMessage`
+- Understand how optional agents can be used to handle the absence of an input and skip the work of the agent
+- See how the agent gracefully handles the **absence of an image**, returning the feedback unchanged
+
+---
+
+## Understanding Multimodal Agents
+
+### What is Multimodal Processing?
+
+**Multimodal processing** allows an AI agent to work with multiple types of content simultaneously — in this case, **text and images**. Instead of just reading feedback like "the car has some damage", the agent can also _see_ the car and identify specific issues.
+
+### How LangChain4j Handles Images
+
+LangChain4j provides the `ImageContent` class to represent image data in messages sent to the LLM:
+
+- **`ImageContent`** wraps an image (as base64-encoded data with a MIME type) as a content part
+- When passed as a method parameter annotated with `@UserMessage`, it is automatically included alongside text in the message sent to the LLM
+- The LLM receives both the text prompt and the image, enabling visual reasoning
+
+Rather than creating a separate "image analysis" output, the `CarImageAnalysisAgent` will use an **enrichment pattern**:
+
+1. Receive the original rental feedback text and an optional car image
+2. If an image is present, analyze it and **append visual observations** to the feedback
+3. If no image is present, return the feedback **unchanged**
+4. The enriched feedback then flows into the existing `FeedbackAnalysisWorkflow`
+
+
+---
+
+## What Are We Going to Build?
+
+We're enhancing the car management system with multimodal image analysis:
+
+1. Update the UI to add an image upload field for rented cars in the Fleet Status grid
+2. Modify the REST endpoint to accept multipart form data with an optional image
+3. Transform the uploaded file into a LangChain4j `ImageContent` object
+4. Create a `CarImageAnalysisAgent` that analyzes car images
+5. Insert the new agent at the beginning of the workflow sequence
+
+**The Updated Architecture:**
+
+```mermaid
+graph TB
+    Start(["Car Return with optional image"]) --> A["CarProcessingWorkflow<br/>Sequential"]
+
+    A --> IMG["Step 1: CarImageAnalysisAgent<br/>Image Analysis"]
+    IMG -->|"enriched rentalFeedback"| B["Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    B --> B1["FeedbackTask.cleaning()"]
+    B --> B2["FeedbackTask.maintenance()"]
+    B --> B3["FeedbackTask.disposition()"]
+    B1 --> BA["FeedbackAnalysisAgent"]
+    B2 --> BA
+    B3 --> BA
+    BA --> BEnd["FeedbackAnalysisResults"]
+
+    BEnd --> C["Step 3: FleetSupervisorAgent<br/>Autonomous Orchestration"]
+    C --> CEnd["Supervisor Decision"]
+
+    CEnd --> D["Step 4: CarConditionFeedbackAgent<br/>Final Summary"]
+    D --> End(["Updated Car"])
+
+    style A fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style IMG fill:#E8B4F8,stroke:#333,stroke-width:2,color:#000
+    style B fill:#87CEEB,stroke:#333,stroke-width:2,color:#000
+    style C fill:#FFB6C1,stroke:#333,stroke-width:2,color:#000
+    style D fill:#90EE90,stroke:#333,stroke-width:2,color:#000
+    style Start fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+    style End fill:#E8E8E8,stroke:#333,stroke-width:2,color:#000
+```
+
+
+
+
+---
+
+## Prerequisites
+
+Before starting:
+
+- **Completed [Step 05](step-05.md)** — This step builds on Step 5's architecture
+- Application from Step 05 is stopped (Ctrl+C)
+- Understanding of the existing `CarProcessingWorkflow` sequence
+
+---
+
+## Update the UI for Image Upload
+
+### Update the JavaScript
+
+The action cell for all actionable cars in `populateFleetStatusTable` now includes a file input for optional image upload:
+
+**app.js (action cell in populateFleetStatusTable)**
+```javascript
+if (car.status =<mark> 'RENTED' || car.status </mark>= 'AT_CLEANING' || car.status === 'IN_MAINTENANCE') \{
+    actionCell = `
+        <td>
+            <form onsubmit="processFeedback(event, $\{car.id}, '$\{car.status}')">
+                <input type="file" id="car-image-$\{car.id}" accept="image/*">
+                <input type="text" class="feedback-input" id="feedback-$\{car.id}" placeholder="Enter feedback">
+                <button type="submit" class="return-button">Return</button>
+            </form>
+        </td>`;
+}
+```
+
+The `processFeedback` function is updated to send a `FormData` object (multipart) instead of a simple query parameter, and now uses a single consolidated endpoint for all car returns:
+
+**app.js (processFeedback with FormData)**
+```javascript
+const imageInput = document.getElementById(`car-image-$\{carId}`);
+const formData = new FormData();
+formData.append('feedback', feedback);
+if (imageInput && imageInput.files.length > 0) \{
+    formData.append('carImage', imageInput.files[0]);
+}
+
+fetch(`/car-management/return/$\{carId}`, \{
+    method: 'POST',
+    body: formData
+})
+```
+
+---
+
+## Update the REST Endpoint
+
+### Accept Multipart Form Data
+
+Update `src/main/java/com/carmanagement/resource/CarManagementResource.java` to accept the image as a `FileUpload` and convert it to `ImageContent`:
+
+**CarManagementResource.java hl_lines=**
+```java 37-61 114-127"
+{snippet:insert("section-2/step-06/src/main/java/com/carmanagement/resource/CarManagementResource.java")}
+```
+
+**Let's break it down:**
+
+#### `@Consumes(MediaType.MULTIPART_FORM_DATA)`
+
+The consolidated return endpoint now consumes multipart form data instead of query parameters, and routes feedback based on the car's current status:
+
+```java
+@POST
+@Path("/return/\{carNumber}")
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+@Blocking
+public Uni<Response> processReturn(Integer carNumber,
+        @RestForm String feedback, @RestForm FileUpload carImage) \{
+```
+
+- **`@RestForm`**: Extracts form fields from the multipart request
+- **`FileUpload`**: RESTEasy Reactive's type for handling uploaded files
+- The endpoint looks up the car's status and routes the feedback to the appropriate parameter
+
+#### The `toImageContent` Helper
+
+```java
+private ImageContent toImageContent(FileUpload fileUpload) \{
+    if (fileUpload <mark> null || fileUpload.filePath() </mark> null) \{
+        return null;
+    }
+    try \{
+        byte[] bytes = Files.readAllBytes(fileUpload.filePath());
+        String base64 = Base64.getEncoder().encodeToString(bytes);
+        String mimeType = fileUpload.contentType();
+        return new ImageContent(base64, mimeType);
+    } catch (IOException e) \{
+        Log.error("Failed to read uploaded car image", e);
+        return null;
+    }
+}
+```
+
+- Reads the uploaded file and converts it to **base64-encoded** data
+- Creates an `ImageContent` with the base64 data and the file's MIME type (e.g., `image/jpeg`, `image/png`)
+- Falls back to `null` when no image is provided
+
+---
+
+## Pass the Image Through the Service Layer
+
+### Update `src/main/java/com/carmanagement/service/CarManagementService`
+
+Add `ImageContent` as a parameter and forward it to the workflow:
+
+**CarManagementService.java  hl_lines=**
+```java 37-38"
+{snippet:insert("section-2/step-06/src/main/java/com/carmanagement/service/CarManagementService.java")}
+```
+
+The image is passed straight through to the workflow alongside the feedback string and the `carImage` parameter:
+
+```java
+CarConditions carConditions = carProcessingWorkflow.processCarReturn(
+        tasks,
+        carInfo,
+        carNumber,
+        feedback,
+        carImage);
+```
+
+---
+
+## Create the CarImageAnalysisAgent
+
+This is the core of this step — a new agent that processes car images.
+
+In `src/main/java/com/carmanagement/agentic/agents`, create `CarImageAnalysisAgent.java`:
+
+**CarImageAnalysisAgent.java  hl_lines=**
+```java 28 30-32"
+{snippet:insert("section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java")}
+```
+
+**Let's break it down:**
+
+#### The `@SystemMessage`
+
+```java
+@SystemMessage("""
+    You are a car image analyst for a car rental company.
+    You will receive the current rental feedback for a car being returned.
+    If an image of the car is provided, analyze it and enrich the rental feedback by appending
+    your visual observations about the car's condition (e.g., visible damage, scratches, dents,
+    cleanliness issues, tire condition, etc.).
+    If no image is provided, return the rental feedback exactly as it is, without any modification.
+    Your response must always include the original rental feedback text followed by your observations if any.
+    """)
+```
+
+The system message instructs the LLM to:
+
+- **Analyze the image** if one is provided, looking for visible damage, cleanliness issues, etc.
+- **Preserve the original feedback** — always include it in the response
+- **Be a no-op when there's no image** — return the feedback unchanged
+
+#### The `@UserMessage` and `ImageContent` Parameter
+
+```java
+@UserMessage("""
+    Rental Feedback: \{rentalFeedback}
+    """)
+String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") ImageContent carImage);
+```
+
+Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning. In this case we also need to add the @V annotation to specify the variable name in the template of the UserMessage.
+
+#### The `outputKey` and the `optional` flag
+
+```java
+@Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
+        outputKey = "rentalFeedback", optional = true)
+```
+
+The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of an agent if not all of its required parameters are provided; in this case it will be skipped if the image is missing.
+
+---
+
+## Update the Workflow
+
+### Add the Agent to the Sequence
+
+Update `CarProcessingWorkflow.java` to include `CarImageAnalysisAgent` as the **first** sub-agent and add the `ImageContent` parameter:
+
+**CarProcessingWorkflow.java**
+```java
+{snippet:insert("section-2/step-06/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
+```
+
+**Key Changes:**
+
+- **`CarImageAnalysisAgent.class`** is added as the first sub-agent in the `@SequenceAgent`
+- The sequence is now: `CarImageAnalysisAgent` → `FeedbackAnalysisWorkflow` → `FleetSupervisorAgent` → `CarConditionFeedbackAgent`
+- **`ImageContent carImage`** is added as a new parameter to `processCarReturn`
+
+The flow is:
+
+1. `CarImageAnalysisAgent` analyzes the image and enriches `rentalFeedback` in the scope
+2. `FeedbackAnalysisWorkflow` receives the enriched `rentalFeedback` and runs parallel analysis
+3. The rest of the workflow proceeds as before
+
+---
+
+## Try It Out
+
+### Start the Application
+
+1. Navigate to the step-06 directory:
+
+```bash
+cd section-2/step-06
+```
+
+2. Start the application:
+
+#### Linux / macOS
+
+```bash
+./mvnw quarkus:dev
+```
+
+#### Windows
+
+```cmd
+mvnw quarkus:dev
+```
+
+3. Open [http://localhost:8080](http://localhost:8080)
+
+### Test Without an Image
+
+Find the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback **without** uploading an image:
+
+```text
+The car has a small dent on the rear bumper
+```
+
+Click **Return**.
+
+**Expected Result:**
+
+- The `CarImageAnalysisAgent` receives the feedback with an empty image
+- Since there's no meaningful image, it returns the feedback unchanged
+- The rest of the workflow processes the original feedback as before
+
+### Test With an Image
+
+1. Find or take a photo of a car (there is a sample image named `q4-tree.png` in the `resources` folder, but any car photo will work)
+2. In the Fleet Status grid, find the car and click "Choose File" in its Action column
+3. Select the image
+4. Enter some feedback:
+
+```text
+Customer mentioned a minor scratch
+```
+
+5. Click **Return**
+
+**Expected Result:**
+
+- The `CarImageAnalysisAgent` analyzes the image alongside the feedback
+- It enriches the feedback with visual observations, e.g.: _"Customer mentioned a minor scratch. Visual analysis: The image shows a visible scratch on the front left fender, approximately 15cm long. The paint is chipped in the affected area. Additionally, the front bumper shows minor scuff marks on the lower right corner."_
+- The enriched feedback flows into `FeedbackAnalysisWorkflow`, which may now detect cleaning, maintenance, or disposition needs that the original text alone wouldn't have triggered
+
+### Check the Agent Report
+
+Click **Generate Report** to see the execution trace. You'll see the `CarImageAnalysisAgent` as the first step in the sequence, with its input (original feedback) and output (enriched feedback).
+
+---
+
+## How It All Works Together
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Web UI
+    participant REST as CarManagementResource
+    participant Service as CarManagementService
+    participant Workflow as CarProcessingWorkflow
+    participant ImageAgent as CarImageAnalysisAgent
+    participant FeedbackWF as FeedbackAnalysisWorkflow
+
+    User->>UI: Enter feedback + upload image
+    UI->>REST: POST multipart (feedback + image)
+    REST->>REST: toImageContent(fileUpload)
+    REST->>Service: processCarReturn(..., imageContent)
+    Service->>Workflow: processCarReturn(..., carImage)
+
+    rect rgb(232, 180, 248)
+    Note over Workflow,ImageAgent: Image Analysis (Step 1)
+    Workflow->>ImageAgent: analyzeCarImage(rentalFeedback, carImage)
+    ImageAgent->>ImageAgent: LLM analyzes text + image
+    ImageAgent->>Workflow: enriched rentalFeedback
+    end
+
+    rect rgb(255, 243, 205)
+    Note over Workflow,FeedbackWF: Parallel Analysis (Step 2)
+    Workflow->>FeedbackWF: Uses enriched rentalFeedback
+    par Concurrent Execution
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.cleaning()
+    and
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.maintenance()
+    and
+        FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.disposition()
+    end
+    end
+
+    Note over Workflow: Steps 3-4: Supervisor + Condition (unchanged)
+```
+
+---
+
+## Key Takeaways
+
+- **Multimodal agents** can process both text and images in a single interaction
+- **`ImageContent`** is LangChain4j's way to represent images for LLM consumption
+- **`@UserMessage` on `ImageContent`** parameters automatically includes the image in the message to the LLM
+- **The enrichment pattern** (outputKey matching an existing scope variable) allows new agents to augment data without changing downstream code
+- **Optional agent**: The agent can be skipped if no image is provided
+- **Multipart form data** with `@RestForm FileUpload` makes image upload straightforward in Quarkus
+- **Base64 encoding** is used to convert uploaded files into `ImageContent`
+
+---
+
+## Experiment Further
+
+### 1. Try Different Image Types
+
+Upload various car images to see how the agent describes different conditions:
+
+- A clean, well-maintained car
+- A car with visible damage (dents, scratches)
+- A dirty car (mud, stains)
+- An interior shot showing wear
+
+### 2. Compare With and Without Images
+
+Return the same car with identical text feedback but with and without an image. Compare how the downstream agents (cleaning, maintenance, disposition) react differently based on the enriched feedback.
+
+### 3. Adjust the System Message
+
+Modify the `CarImageAnalysisAgent`'s system message to focus on specific aspects:
+
+- Only report safety-critical damage
+- Include estimated repair costs
+- Rate the car's cleanliness on a scale of 1-10
+
+---
+
+## Troubleshooting
+
+<details>
+<summary>Image not being processed</summary>
+
+Verify that:
+
+- The file input has `accept="image/*"` to filter non-image files
+- The JavaScript correctly appends the file to `FormData`
+- The `toImageContent` method is reading the file and encoding it as base64
+- Check the server logs for any `IOException` messages
+
+</details>
+
+
+<details>
+<summary>Agent returns feedback unchanged even with an image</summary>
+
+This can happen if:
+
+- The image is too small or blank (the LLM sees nothing to analyze)
+- The MIME type is incorrect — verify `fileUpload.contentType()` returns a valid image type
+- The LLM model doesn't support vision — ensure your configured model supports multimodal input
+
+</details>
+
+
+<details>
+<summary>Request too large</summary>
+
+Large images (>10MB) may exceed request size limits. Consider:
+
+- Adding `accept="image/*"` to the file input (already done)
+- Configuring `quarkus.http.body.max-body-size` in `application.properties` if needed
+- Compressing images client-side before upload
+
+</details>
+
+
+---
+## Cleanup
+
+Before moving to the next step, let's clean up:
+
+1. **Stop the running server** by pressing `Ctrl+C` in the terminal where Quarkus is running
+
+2. **Return to the root project directory**:
+
+    ```bash
+    cd ..
+    ```
+
+---
+
+
+## What's Next?
+
+You've successfully added multimodal image analysis to the car management system!
+
+The system now:
+
+- Accepts optional car images during rental returns
+- Analyzes images using a multimodal LLM agent
+- Enriches rental feedback with visual observations
+- Seamlessly integrates with the existing workflow — no downstream changes needed
+
+**Key Progression:**
+- **Step 4**: Sophisticated local orchestration with Supervisor Pattern
+- **Step 5**: Human-in-the-Loop for safe, controlled autonomous decisions
+- **Step 6**: Multimodal image analysis for enriched feedback
+
+In **Step 07**, you'll learn about **dynamic model selection** — automatically routing high-value vehicle decisions to a more capable LLM while keeping costs down for routine dispositions!
+
+[Continue to Step 07 - Dynamic Model Selection](step-07.md)
