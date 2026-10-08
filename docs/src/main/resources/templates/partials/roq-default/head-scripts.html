@@ -2,38 +2,49 @@
 {#search-script /}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  // Highlight active sidebar link
-  var currentPath = window.location.pathname.replace(/\/$/, '');
-  var links = document.querySelectorAll('.sidebar-link');
-  links.forEach(function (link) {
-    var href = link.getAttribute('href').replace(/\/$/, '');
-    if (href === currentPath) {
-      link.classList.add('active');
-      // Expand parent section
-      var section = link.closest('.sidebar-section');
-      if (section) {
-        section.classList.add('active-section');
-      }
-    }
+  // Disable transitions while collapsing, to prevent the flash of open-then-close
+  document.querySelectorAll('.sidebar-section ul').forEach(function (ul) {
+    ul.style.transition = 'none';
   });
-
-  // Collapsible sidebar sections
-  var titles = document.querySelectorAll('.nav-section-title');
-  titles.forEach(function (title) {
-    title.addEventListener('click', function () {
-      var section = this.closest('.sidebar-section');
-      if (section) {
-        section.classList.toggle('collapsed');
-      }
+  document.querySelectorAll('.sidebar-section').forEach(function (s) {
+    if (s.querySelector('ul')) s.classList.add('collapsed');
+  });
+  // Re-enable transitions after the initial collapse is painted
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.querySelectorAll('.sidebar-section ul').forEach(function (ul) {
+        ul.style.transition = '';
+      });
     });
   });
 
-  // Auto-expand section containing active link, collapse others
-  var sections = document.querySelectorAll('.sidebar-section');
-  sections.forEach(function (section) {
-    if (!section.classList.contains('active-section') && section.querySelector('ul')) {
-      section.classList.add('collapsed');
+  // Highlight active sidebar link and expand only its section
+  var currentPath = window.location.pathname.replace(/\/$/, '');
+  document.querySelectorAll('.sidebar-link').forEach(function (link) {
+    var linkPath = link.pathname ? link.pathname.replace(/\/$/, '') : link.getAttribute('href').replace(/\/$/, '');
+    if (linkPath === currentPath) {
+      link.classList.add('active');
+      var section = link.closest('.sidebar-section');
+      if (section) {
+        section.classList.add('active-section');
+        section.classList.remove('collapsed');
+      }
     }
+  });
+
+  // Clicking a section title: collapse others, expand clicked, navigate to first step
+  document.querySelectorAll('.nav-section-title').forEach(function (title) {
+    title.addEventListener('click', function () {
+      var section = this.closest('.sidebar-section');
+      if (!section) return;
+      var firstLink = section.querySelector('.sidebar-link');
+      if (!firstLink) return;
+      document.querySelectorAll('.sidebar-section').forEach(function (s) {
+        if (s.querySelector('ul')) s.classList.add('collapsed');
+      });
+      section.classList.remove('collapsed');
+      window.location.pathname = firstLink.pathname;
+    });
   });
 
 });
