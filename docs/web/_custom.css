@@ -157,7 +157,7 @@
 .navbar-search .search-trigger-icon {
     width: 0.85rem;
     height: 0.85rem;
-    fill: rgba(255, 255, 255, 0.75);
+    fill: rgba(255, 255, 255, 0.9) !important;
     flex-shrink: 0;
 }
 
@@ -175,12 +175,13 @@
 .sidebar.main {
     top: var(--navbar-height) !important;
     height: calc(100vh - var(--navbar-height)) !important;
-    width: 18rem !important;
+    width: 22rem !important;
+    scrollbar-gutter: stable;
 }
 
 .main-content {
     padding-top: var(--navbar-height);
-    margin-left: 18rem;
+    margin-left: 22rem;
 }
 
 /* Sidebar navigation styles */
