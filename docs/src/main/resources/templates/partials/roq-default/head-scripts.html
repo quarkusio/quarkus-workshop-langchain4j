@@ -1,0 +1,44 @@
+{#bundle /}
+{#search-script /}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var sidebar = document.querySelector('.sidebar.main');
+
+  // Restore sidebar scroll position from before the last navigation
+  var savedScroll = sessionStorage.getItem('sidebarScroll');
+  if (savedScroll !== null && sidebar) {
+    sidebar.scrollTop = parseInt(savedScroll, 10);
+  }
+
+  // Highlight active sidebar link
+  var currentPath = window.location.pathname.replace(/\/$/, '');
+  document.querySelectorAll('.sidebar-link').forEach(function (link) {
+    var linkPath = link.pathname ? link.pathname.replace(/\/$/, '') : link.getAttribute('href').replace(/\/$/, '');
+    if (linkPath === currentPath) {
+      link.classList.add('active');
+      // Only scroll into view if no saved position (e.g. first visit or section change)
+      if (savedScroll === null) {
+        link.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+      }
+    }
+  });
+
+  // Save sidebar scroll position before any navigation
+  document.querySelectorAll('.sidebar-link, .nav-section-title').forEach(function (el) {
+    el.addEventListener('click', function () {
+      if (sidebar) sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
+    });
+  });
+
+  // Clicking a section title navigates to its first step
+  document.querySelectorAll('.nav-section-title').forEach(function (title) {
+    title.addEventListener('click', function () {
+      var section = this.closest('.sidebar-section');
+      if (!section) return;
+      var firstLink = section.querySelector('.sidebar-link');
+      if (firstLink) window.location.pathname = firstLink.pathname;
+    });
+  });
+
+});
+</script>
