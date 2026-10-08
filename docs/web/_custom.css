@@ -175,13 +175,13 @@
 .sidebar.main {
     top: var(--navbar-height) !important;
     height: calc(100vh - var(--navbar-height)) !important;
-    width: 22rem !important;
+    width: 30rem !important;
     scrollbar-gutter: stable;
 }
 
 .main-content {
     padding-top: var(--navbar-height);
-    margin-left: 22rem;
+    margin-left: 30rem;
 }
 
 /* Sidebar navigation styles */
@@ -212,33 +212,10 @@
     color: var(--color-sidebar-heading, #dde);
 }
 
-.sidebar-section .nav-section-title::after {
-    content: '';
-    display: inline-block;
-    width: 0.4em;
-    height: 0.4em;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-    margin-left: auto;
-    transition: transform 0.2s;
-}
-
-.sidebar-section.collapsed .nav-section-title::after {
-    transform: rotate(-45deg);
-}
-
 .sidebar-section ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    overflow: hidden;
-    max-height: 2000px;
-    transition: max-height 0.3s ease;
-}
-
-.sidebar-section.collapsed ul {
-    max-height: 0;
 }
 
 .sidebar-link {
@@ -260,7 +237,6 @@
 .sidebar-link.active {
     color: var(--color-accent-400, #42a5f5);
     border-left-color: var(--color-accent-400, #42a5f5);
-    font-weight: 600;
     background: rgba(255, 255, 255, 0.08);
 }
 
