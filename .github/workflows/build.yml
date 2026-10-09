@@ -34,6 +34,7 @@ jobs:
           - section-1/step-06
           - section-1/step-07
           - section-1/step-08
+          - section-1/step-08/parallel-search
           - section-1/step-09
           - section-1/step-10
           - section-1/step-11

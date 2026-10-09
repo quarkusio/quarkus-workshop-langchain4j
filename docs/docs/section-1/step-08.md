@@ -132,6 +132,15 @@ I need to know if need to pack snow chains. Can you check the weather forecast f
 
 [//]: # (![type:video]&#40;images/chat-booking.mp4&#41;{: style='width: 80%'})
 
+## Calling a hosted search server
+
+You can also call a hosted MCP server directly from Java. The optional
+[Parallel Search example](https://github.com/quarkusio/quarkus-workshop-langchain4j/tree/main/section-1/step-08/parallel-search)
+uses a named Quarkus MCP client to search the web and fetch page excerpts without
+an API key. ==Follow the example's README to build it and inspect the returned
+source URLs and excerpts.== The command runs independently of the customer support
+application, so continue the weather lesson with your current configuration.
+
 ## Conclusion
 
 In this step, we explored how to work with MCP servers and clients within our application, enabling us to create versatile _agents_ that can not only reason but also interact dynamically with remote systems that can provide additional functionality and data to our application.
