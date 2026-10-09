@@ -34,7 +34,6 @@ jobs:
           - section-1/step-06
           - section-1/step-07
           - section-1/step-08
-          - section-1/step-08/parallel-search
           - section-1/step-09
           - section-1/step-10
           - section-1/step-11
@@ -59,6 +58,9 @@ jobs:
           - section-3/step-06/trip-planner
           - section-3/step-07/mcp-server
           - section-3/step-07/trip-planner
+        include:
+          - app: section-1/step-08/parallel-search
+            wrapper: ../../../mvnw
 
     name: "Build ${{ matrix.app }}"
     steps:
@@ -71,7 +73,7 @@ jobs:
           cache: maven
       - name: Maven Build for ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
-        run: ./mvnw -B clean verify -Dquarkus.http.host=0.0.0.0 -DskipITs=false
+        run: ${{ matrix.wrapper || './mvnw' }} -B clean verify -Dquarkus.http.host=0.0.0.0 -DskipITs=false
 
 
   docs-build:
