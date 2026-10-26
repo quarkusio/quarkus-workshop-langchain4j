@@ -26,17 +26,17 @@ The Section 3 frontend is the exception to the per-step rule. `app.js` and `inde
 
 Test scoping rule: a step's default `./mvnw test` covers only what that step adds. When a new step is created by copying a previous snapshot, its earlier test suites must not be carried over; earlier coverage stays in its originating step's CI job. Only add or adapt tests for the current lesson.
 
-The documentation lives in the `docs/` directory and can be served locally at http://127.0.0.1:8000/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.
+The documentation lives in the `docs/` directory and can be served locally at http://localhost:8080/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.
 
 ## Building and Running
 
-You'll need Java 21 or higher, Maven 3.8 or higher, and Python 3.x with pipenv for the documentation. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
+You'll need Java 21 or higher and Maven 3.8 or higher. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
 
 Each step is a self-contained Quarkus application. To run any step, navigate to its directory and execute `./mvnw quarkus:dev`. The application will start on http://localhost:8080 with Quarkus dev mode features like live reload and the dev UI enabled.
 
 To build the entire project from the root directory, run `./mvnw clean install`. This builds all modules in sequence.
 
-For the documentation, navigate to the `docs` directory, install pipenv if needed, run `pipenv install`, and then `pipenv run mkdocs serve --livereload`. The documentation will be available at http://127.0.0.1:8000/.
+For the documentation, navigate to the `docs` directory and run `mvn quarkus:dev` (or `./mvnw -f docs quarkus:dev` from the root). The documentation will be available at http://localhost:8080/.
 
 ## Development Conventions
 
@@ -113,7 +113,7 @@ Use bullet lists only when they genuinely aid readability: form field values, pr
 
 Start a step in dev mode with `./mvnw quarkus:dev`. Build without tests using `./mvnw clean package -DskipTests`. Run tests with `./mvnw test`. Clean build artifacts with `./mvnw clean`.
 
-For documentation, build with `cd docs && pipenv run mkdocs build --clean` or serve with live reload using `cd docs && pipenv run mkdocs serve --livereload`.
+For documentation, build with `./mvnw -f docs clean package` or serve with live reload using `./mvnw -f docs quarkus:dev`.
 
 ## Workshop Resources
 

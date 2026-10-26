@@ -78,33 +78,11 @@ jobs:
     name: "Build Docs"
     steps:
       - uses: actions/checkout@v7
-
-      - name: Setup Python
-        uses: actions/setup-python@v7
+      - name: Generate Roq Site
+        uses: quarkiverse/quarkus-roq@v1.1
         with:
-          python-version: '3.x'
-
-      - uses: actions/setup-java@v6
-        name: Set up Java 21
-        with:
-          java-version: ${{ env.JVM_VERSION }}
-          distribution: temurin
-          cache: maven
-
-      - name: Generate documentation
-        working-directory: docs
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxslt-dev python3-dev
-          pip install pipenv
-          pipenv install
-          pipenv run mkdocs build --clean
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: docs-site
-          path: ./docs/site
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          site-directory: ./docs/
 
   docs-deploy:
     runs-on: ubuntu-latest
@@ -115,24 +93,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     permissions:
-      contents: read
       pages: write
       id-token: write
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: docs-site
-          path: ./docs/site
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./docs/site
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
