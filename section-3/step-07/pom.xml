@@ -24,7 +24,7 @@
         <quarkus-langchain4j.version>1.14.0</quarkus-langchain4j.version>
         <quarkus-flow.version>1.1.3</quarkus-flow.version>
         <quarkus-mcp-server.version>2.0.1</quarkus-mcp-server.version>
-        <quarkus-langfuse.version>0.7.2</quarkus-langfuse.version>
+        <quarkus-langfuse.version>0.9.0</quarkus-langfuse.version>
     </properties>
 
     <dependencyManagement>
