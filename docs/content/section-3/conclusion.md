@@ -34,3 +34,5 @@ Running evaluation as a test suite lets you catch regressions every time you cha
 Section 2 Step 08 covers A2A communication if you want to distribute agents across services. The Quarkus LangChain4j documentation at [docs.quarkiverse.io](https://docs.quarkiverse.io/quarkus-langchain4j/) has the full API reference for everything used in this section. The [LangChain4j docs](https://docs.langchain4j.dev/) cover the underlying Java library.
 
 If you're deploying to production, the bonus step in Section 2 walks through Kubernetes deployment with Quarkus profiles, health probes, and service discovery. Add the observability setup from Step 07 and you get traces and evaluation scores from production runs too. Management has already asked for a dashboard.
+
+If you enjoyed this workshop, star the repository on GitHub so other developers can find it: [github.com/quarkusio/quarkus-workshop-langchain4j](https://github.com/quarkusio/quarkus-workshop-langchain4j).

@@ -43,3 +43,5 @@ Throughout the workshop, we followed the Miles of Smiles car rental company acro
 By the end of this workshop, you should have a solid foundation for building AI-enhanced applications with Quarkus, from a simple chatbot all the way to an enterprise-grade agentic system.
 If you have any questions or feedback, don't hesitate to reach out to us on [Zulip](https://quarkusio.zulipchat.com/) or open a discussion on [GitHub](https://github.com/quarkiverse/quarkus-langchain4j/discussions).
 We're excited to see what you build next!
+
+If you enjoyed this workshop, star the repository on GitHub so other developers can find it: [github.com/quarkusio/quarkus-workshop-langchain4j](https://github.com/quarkusio/quarkus-workshop-langchain4j).

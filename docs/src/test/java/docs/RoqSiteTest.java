@@ -63,6 +63,21 @@ public class RoqSiteTest {
     }
 
     @Test
+    public void conclusionPagesInviteReadersToStarTheRepository() {
+        for (String page : new String[] { "/conclusion/", "/section-2/conclusion/", "/section-3/conclusion/" }) {
+            when().get(page).then().statusCode(200)
+                    .body(containsString("star the repository on GitHub"));
+        }
+    }
+
+    @Test
+    public void navbarShowsRepositoryStats() {
+        when().get("/").then().statusCode(200)
+                .body(containsString("data-gh=\"stars\""))
+                .body(containsString("data-gh=\"forks\""));
+    }
+
+    @Test
     public void sitemapAndSearchIndexAreGenerated() {
         when().get("/sitemap.xml").then().statusCode(200)
                 .body(containsString("<urlset"));

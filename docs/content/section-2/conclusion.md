@@ -493,3 +493,5 @@ In addition, Quarkus Langchain4J also provides seamless integration with the bro
 It also adds security features, monitoring, and scalability options that are essential for enterprise-grade AI applications.
 
 **Welcome to the future of AI application development!**
+
+If you enjoyed this workshop, star the repository on GitHub so other developers can find it: [github.com/quarkusio/quarkus-workshop-langchain4j](https://github.com/quarkusio/quarkus-workshop-langchain4j).
