@@ -59,7 +59,7 @@ graph LR
 
 Before starting:
 
-- **Completed [Step 06](step-06.md)** — This step builds on Step 6's architecture
+- **Completed [Step 06](../step-06/)** — This step builds on Step 6's architecture
 - Application from Step 06 is stopped (Ctrl+C)
 - Understanding of Step 5's disposition workflow (DispositionProposalAgent, HumanApprovalAgent)
 
@@ -329,4 +329,4 @@ The system now:
 
 In **Step 08**, you'll learn about **Agent-to-Agent (A2A) communication** — converting the local PricingAgent into a remote service that runs in a separate system, demonstrating how to distribute agent workloads across multiple applications!
 
-[Continue to Step 08 - Using Remote Agents (A2A)](step-08.md)
+[Continue to Step 08 - Using Remote Agents (A2A)](../step-08/)

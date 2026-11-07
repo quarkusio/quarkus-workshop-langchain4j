@@ -287,7 +287,7 @@ Keep dev mode running while you evaluate plans and inspect their traces. The tes
 
 ==Start dev mode in your working project with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), with `OPENAI_API_KEY` set, and keep the MCP server running. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev), go to **Dev Services**, and copy the `quarkus.langfuse.base-url` value from the Langfuse entry.==
 
-![The Dev UI Dev Services page showing the Langfuse container with its injected configuration: API endpoint, host, port, UI URL, login credentials, and API keys](/images/section-3-step-07-devui-dev-services.png)
+![The Dev UI Dev Services page showing the Langfuse container with its injected configuration: API endpoint, host, port, UI URL, login credentials, and API keys](../../images/section-3-step-07-devui-dev-services.png)
 
 The same page lists the Langfuse login, `quarkus@quarkus.io` with the password `quarkuslangfuse`. The Extensions page also has a Quarkus Langfuse card with a direct link to the Langfuse UI.
 
@@ -325,7 +325,7 @@ A passing test tells us that the plan met the structural checks and scored at le
 
 <mark>Open Langfuse from the Quarkus Langfuse card, log in, and go to **Tracing**. Open the `trip-plan-evaluation` trace, select its root span in the tree, and select the **Scores** tab.</mark>
 
-![The trip-plan-evaluation trace in Langfuse with the full agent tree, from the MCP weather and points-of-interest calls through the vehicle, itinerary, evaluator, and cost agents, and a plan-quality score of 0.85 on the root span with the judge's reasoning](/images/section-3-step-07-langfuse-score.png)
+![The trip-plan-evaluation trace in Langfuse with the full agent tree, from the MCP weather and points-of-interest calls through the vehicle, itinerary, evaluator, and cost agents, and a plan-quality score of 0.85 on the root span with the judge's reasoning](../../images/section-3-step-07-langfuse-score.png)
 
 Read the `plan-quality` score and its explanation first. Compare any missed requirement with the saved sample and the generated plan before deciding whether the planner needs a change. A low score can also reflect a mistaken judgment, so the explanation matters as much as the number.
 
@@ -372,7 +372,7 @@ To compare results, we need a second evaluation of the same request. <mark>Chang
 
 <mark>Go to **Datasets**, open `trip-plan-samples`, and select the **Experiments** tab. Select two runs and click **Compare**.</mark>
 
-![Two step-07 experiment runs of the trip-plan-samples dataset compared in Langfuse, with plan-quality scores of 0.85 and 0.80 for the rome-family-three-days item, the difference between them, the item's input, and its expected output](/images/section-3-step-07-langfuse-dataset-runs.png)
+![Two step-07 experiment runs of the trip-plan-samples dataset compared in Langfuse, with plan-quality scores of 0.85 and 0.80 for the rome-family-three-days item, the difference between them, the item's input, and its expected output](../../images/section-3-step-07-langfuse-dataset-runs.png)
 
 Each quality test adds an experiment for the `rome-family-three-days` item. The comparison shows both generated plans and their scores beside the request and expected output. <mark>Open the speech-bubble icon next to each score to read the judge's reasoning.</mark> Compare the explanations with the plans to see whether the change addressed the requirement you were interested in. A single pair of runs is only a starting point because both generation and judging can vary between runs.
 
@@ -388,14 +388,14 @@ The evaluator's prompt contains the rubric from `rubric.txt`. You can edit it he
 
 <mark>Open the project dashboard to inspect model costs and timing across the recorded runs.</mark> The trace names identify the agents and tools, which helps locate the calls responsible for a slow or expensive plan.
 
-![The Langfuse project dashboard showing 8 traces, model costs, and per-agent trace names including getWeatherForecast, getPointsOfInterest, and the AI service agents](/images/section-3-step-07-langfuse-dashboard.png)
+![The Langfuse project dashboard showing 8 traces, model costs, and per-agent trace names including getWeatherForecast, getPointsOfInterest, and the AI service agents](../../images/section-3-step-07-langfuse-dashboard.png)
 
 <mark>Scroll down to the latency charts and hover over a trace name.</mark> The tooltip shows the agent class and method so you can locate the corresponding code.
 
-![The Langfuse dashboard latencies view with per-trace, per-generation, and per-observation timing percentiles](/images/section-3-step-07-langfuse-latencies.png)
+![The Langfuse dashboard latencies view with per-trace, per-generation, and per-observation timing percentiles](../../images/section-3-step-07-langfuse-latencies.png)
 
 ## Further reading
 
 Eric Deandrea's [non-deterministic-no-problem](https://github.com/edeandrea/non-deterministic-no-problem) project uses the same Quarkus Langfuse extension and goes further than this step. It detects drift in a running application with a guardrail and scores whole sessions as well as single traces. The Langfuse documentation on [running experiments through OpenTelemetry](https://langfuse.com/integrations/native/opentelemetry/experiments) describes the `langfuse.experiment.*` attributes the quality run sets.
 
-You can now rerun a trip request after changing the planner and inspect how the generated plan meets its requirements. This completes Section 3. Continue to the [conclusion](conclusion.md) to review the workshop.
+You can now rerun a trip request after changing the planner and inspect how the generated plan meets its requirements. This completes Section 3. Continue to the [conclusion](../conclusion/) to review the workshop.

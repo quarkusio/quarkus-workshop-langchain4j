@@ -250,18 +250,18 @@ cd section-3\step-06\trip-planner
 ==Open [http://localhost:8080](http://localhost:8080) and generate a family trip to `Barcelona`.== Look for the weather in the vehicle recommendation and for places from `import.sql`, such as Barcelona Science Museum or Barcelona Central Park, in the itinerary. The model may choose which places to include, so a particular name is not guaranteed. The database lookup matches the city name exactly; `barcelona` or an unseeded city returns an empty list.
 
 <figure markdown="span">
-  ![A five-day family trip to Barcelona whose vehicle recommendation mentions the sunny forecast and whose itinerary includes seeded points of interest](/images/section-3-step-06-weather-itinerary.png)\{ width="600" }
+  ![A five-day family trip to Barcelona whose vehicle recommendation mentions the sunny forecast and whose itinerary includes seeded points of interest](../../images/section-3-step-06-weather-itinerary.png)\{ width="600" }
 </figure>
 
 After viewing the plan, <mark>open the Dev UI, click **Executions** on the LangChain4j Agentic card, and expand the latest run.</mark> The `DestinationIntelligence` phase appears as `fetchIntelligence` before the research agents. Its `getWeatherForecast` and `getPointsOfInterest` children are ACTION rows for direct MCP calls. Inspect their results to see which weather and places were supplied before the AI agents wrote the plan.
 
-![Dev UI Executions for planTrip, with fetchIntelligence running the two MCP tool calls as ACTION rows before the research, vehicle review and cost estimation agents](/images/section-3-step-06-devui-executions.png)
+![Dev UI Executions for planTrip, with fetchIntelligence running the two MCP tool calls as ACTION rows before the research, vehicle review and cost estimation agents](../../images/section-3-step-06-devui-executions.png)
 
 ## What's next?
 
 The trip planner now checks the weather and local attractions before any model starts dreaming up an itinerary, and the workflow itself decides when those MCP tools are called. In Step 07, we'll find out whether all this effort actually produces good plans, using an evaluation harness and traces in Langfuse.
 
-[Continue to Step 07 - Testing, Evaluation, and Observability](step-07.md)
+[Continue to Step 07 - Testing, Evaluation, and Observability](../step-07/)
 
 ## Troubleshooting
 

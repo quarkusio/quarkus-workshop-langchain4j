@@ -12,7 +12,7 @@ In this section, we're going to continue our deep dive into agentic AI and explo
 likely need in order to build an **enterprise-grade** agentic system. 
 
 > [!NOTE]
-> If you're not familiar with how to implement and orchestrate agents, feel free to visit [section 2](../section-2/step-01.md) first.
+> If you're not familiar with how to implement and orchestrate agents, feel free to visit [section 2](../../section-2/step-01/) first.
 
 ## A new scenario
 
@@ -38,7 +38,7 @@ flowchart LR
 To keep the focus on the new concepts of this step, the workshop provides starter code with all the UI components already built for the trip planner form. 
 
 <figure markdown="span">
-  ![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](/images/section-3-trip-form.png)\{ width="400", style="border: 1px solid #e5e7eb; border-radius: 4px;" }
+  ![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](../../images/section-3-trip-form.png)\{ width="400", style="border: 1px solid #e5e7eb; border-radius: 4px;" }
 </figure>
 
 This starter code also has an existing set of agents to plan a basic trip. When the customer creates a trip, the top level trip planner agent will call 2 agents in parallel to recommend a vehicle, and plan an itinerary. Based on that data, a cost estimator agent will come up with an estimate, and finally the trip plan will be assembled and sent back to the UI.
@@ -230,7 +230,7 @@ Now let's see it in action.
 
 While the agents work, the UI shows a wait screen.
 
-![Planning your trip wait screen](/images/section-3-planning.png)
+![Planning your trip wait screen](../../images/section-3-planning.png)
 
 Read the vehicle recommendation and daily itinerary. Look for family-friendly choices such as luggage space, regular breaks. Do you see a rest day?
 
@@ -240,13 +240,13 @@ While it may seem like the skills were used, it's also entirely possible that th
 
 ==Open the Quarkus Dev UI at [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui) (or press the letter `d` from your terminal).== The extensions page lists a LangChain4j Agentic card alongside the other installed extensions.
 
-![Dev UI Extensions page with the LangChain4j Agentic card showing Agents, Topology, Executions, and Testing](/images/section-3-step-01-devui-extensions.png)
+![Dev UI Extensions page with the LangChain4j Agentic card showing Agents, Topology, Executions, and Testing](../../images/section-3-step-01-devui-extensions.png)
 
 <mark>Click **Executions** in the LangChain4j Agentic card.</mark> Because the planner extends `MonitoredAgent`, this view records agent invocations with their durations, token usage, inputs, and outputs.
 
 Inspect the `activate_skill` calls and their results under the vehicle and itinerary agents. Look for `vehicle-selection` and `family-trip`. A successful family activation returns the Markdown headed `# Family Road Trip Planning` which you can see in the output field.
 
-![Execution history for planTrip showing parallel research agents and activate_skill tool calls](/images/section-3-step-01-devui-executions.png)
+![Execution history for planTrip showing parallel research agents and activate_skill tool calls](../../images/section-3-step-01-devui-executions.png)
 
 The terminal logs provide another way to check discovery and activation. ==Check the startup logs for the skill count, then scroll through the request and response logs after generating a trip plan.
 
@@ -364,7 +364,7 @@ If you want more practice with skills, try these additional scenarios and see wh
 The planner now keeps its travel advice in Markdown files that Miles of Smiles can update without touching the Java code.
 What if the trip planner suggests something that's completely unsuitable though, like recommending a Ferrari to a group of 8 on a string budget? In Step 02, we'll add guardrails that catch unsuitable recommendations before a customer ever sees them.
 
-[Continue to Step 02 - Guardrails and Compliance](step-02.md)
+[Continue to Step 02 - Guardrails and Compliance](../step-02/)
 
 ## Troubleshooting
 

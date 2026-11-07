@@ -36,7 +36,7 @@ This chapter starts from the completed Step 04 project instead of your Step 03 w
 
 > [!NOTE]
 > **Container Runtime Needed**
-> Kafka runs through [Dev Services](https://quarkus.io/guides/dev-services), so a container runtime such as Docker or Podman must be running for this and the following chapters. (check the [requirements page](../requirements.md) for installation instructions)
+> Kafka runs through [Dev Services](https://quarkus.io/guides/dev-services), so a container runtime such as Docker or Podman must be running for this and the following chapters. (check the [requirements page](../../requirements/) for installation instructions)
 
 <mark>Copy `section-3/step-04` to a working directory outside the step folders and open that copy in your IDE.</mark> All paths and commands below refer to this working copy.
 
@@ -258,7 +258,7 @@ Whew, that was a lot of code and theory right? Let's see it in action now, and h
 
 The page shows the generated plan and offers **Approve Trip** and **Reject Trip**. The workflow identifier above the itinerary identifies this trip when you inspect its events later.
 
-![A generated seven-day trip awaiting approval, with its workflow identifier above the itinerary](/images/section-3-step-04-awaiting-approval.png)
+![A generated seven-day trip awaiting approval, with its workflow identifier above the itinerary](../../images/section-3-step-04-awaiting-approval.png)
 
 <mark>Refresh the browser without restarting the application. Compare the restored workflow identifier and plan with the ones you noted, and check the original destination, start date, duration, travelers, budget, and preferences in the restored form or `/trip/plan/latest` response.</mark> The same pending trip should come back from the store, with the plan the agents already generated.
 
@@ -266,7 +266,7 @@ The page shows the generated plan and offers **Approve Trip** and **Reject Trip*
 
 <mark>Click **Approve Trip**.</mark> The plan stays visible while the decision is submitted and the simulated booking finishes. The page then shows `confirmed` with a `MOS-...` booking reference. The booking is simulated, much to the disappointment of the sales team, who were hoping to see real reservations.
 
-![The same workflow after approval, showing a simulated booking reference](/images/section-3-step-04-confirmed.png)
+![The same workflow after approval, showing a simulated booking reference](../../images/section-3-step-04-confirmed.png)
 
 ### Rejecting a different trip
 
@@ -274,7 +274,7 @@ The page shows the generated plan and offers **Approve Trip** and **Reject Trip*
 
 <mark>Refresh the browser and confirm that this trip remains rejected with its plan still visible.</mark>
 
-![A different workflow with its rejection recorded and the reviewed plan still visible](/images/section-3-step-04-rejected.png)
+![A different workflow with its rejection recorded and the reviewed plan still visible](../../images/section-3-step-04-rejected.png)
 
 ### Inspecting the workflow and events
 
@@ -283,14 +283,14 @@ Now let's hop over to the Dev UI to inspect what has just happened.
 ==Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev)<mark>. You'll notice a new Quarkus Workflows card. </mark>Click on it and then select **Workflows**==. Inspect `trip-planner-flow`. Its diagram shows the planning task, the approval publication, the wait, and the outcome branches.
 
 <figure markdown="span">
-  ![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](/images/section-3-step-04-flow-diagram.png)\{ width="600" }
+  ![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](../../images/section-3-step-04-flow-diagram.png)\{ width="600" }
 </figure>
 
 <mark>Go back to the main Dev UI page and open **Apache Kafka Client > Topics**</mark>. Inspect `flow-in`. Find the `com.tripplanner.trip.requested` and `com.tripplanner.trip.approval.done` events for the approved trip. The first has the request ID and original trip details in its payload; the second has the workflow identifier in its `ce_flowinstanceid` header and decision payload.
 
 Inspect `flow-out` and <mark>click the approved trip's `com.tripplanner.trip.approval.requested` and `com.tripplanner.booking.finalized` messages to open their values and headers.</mark> Compare their `ce_flowinstanceid` headers with the workflow identifier you noted in the browser. Kafka carries CloudEvent attributes as `ce_` headers, so both messages should name the same instance. Their payloads contain the plan and original request, while `ce_flowtaskid` identifies the publishing task.
 
-![The booking.finalized event on flow-out, with the status envelope as its value and the CloudEvent headers, including ce_flowinstanceid and ce_type](/images/section-3-step-04-kafka-flow-out.png)
+![The booking.finalized event on flow-out, with the status envelope as its value and the CloudEvent headers, including ce_flowinstanceid and ce_type](../../images/section-3-step-04-kafka-flow-out.png)
 
 <mark>Find the rejected trip's messages in `flow-out` using its workflow identifier.</mark> Its events should end with `com.tripplanner.trip.rejected`, with no booking confirmation for that instance.
 
@@ -298,4 +298,4 @@ Inspect `flow-out` and <mark>click the approved trip's `com.tripplanner.trip.app
 
 The customer can now leave a plan awaiting approval and return after a browser refresh, with a decision event resuming the matching workflow. In Step 05, we'll persist workflow and trip state so the same journey can continue after an application restart.
 
-[Continue to Step 05 - Resilient Agentic Workflows with Persistence](step-05.md)
+[Continue to Step 05 - Resilient Agentic Workflows with Persistence](../step-05/)

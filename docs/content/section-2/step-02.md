@@ -8,7 +8,7 @@ content-toc: true
 ## Agentic Workflows
 
 In the previous step, you created an agent that could autonomously determine whether a returned car needed a cleaning or not.
-In the end, implementing this agent was not much different from creating a single AI service like we did in the [previous section](../section-1/step-01.md).
+In the end, implementing this agent was not much different from creating a single AI service like we did in the [previous section](../../section-1/step-01/).
 It did, however, set us up for building a more advanced agentic system, which is what we're going to start building now.
 In this step, we're going to take a look at how we can orchestrate multiple agents using an **Agentic Workflow**.
 
@@ -157,7 +157,7 @@ In this step, we'll use a **sequential workflow** to:
 
 ## What Are We Going to Build?
 
-![App Blueprint](/images/agentic-app-2.png)
+![App Blueprint](../../images/agentic-app-2.png)
 
 We'll enhance the car management system with:
 
@@ -509,7 +509,7 @@ Open your browser to [http://localhost:8080](http://localhost:8080).
 
 The **Fleet Status** section now has a **"Condition"** column showing each car's current state:
 
-![Agentic UI with Condition Column](/images/agentic-UI-2.png)
+![Agentic UI with Condition Column](../../images/agentic-UI-2.png)
 
 ### Test the Workflow
 
@@ -652,7 +652,7 @@ How does the condition agent synthesize feedback from multiple sources?
 > We chose a **sequential** workflow in this step because:
 >
 > 1. It's simpler to understand as your first workflow
-> 2. It sets us up for [Step 03](step-03.md), where we'll add more agents that **do** depend on each other
+> 2. It sets us up for [Step 03](../step-03/), where we'll add more agents that **do** depend on each other
 >
 > Feel free to try converting this to a parallel workflow as an experiment! Replace `@SequenceAgent` with `@ParallelAgent` and see what happens.
 
@@ -711,4 +711,4 @@ You learned how agents collaborate through `AgenticScope` and how sequential wor
 
 In **Step 03**, you'll learn about **composing Multiple Agentic Workflows**, combining sequential, parallel, and conditional workflows to build sophisticated agent systems!
 
-[Continue to Step 03 - Composing Multiple Agentic Workflows](step-03.md)
+[Continue to Step 03 - Composing Multiple Agentic Workflows](../step-03/)

@@ -173,7 +173,7 @@ graph TD
 
 Before starting:
 
-- **Completed [Step 07](step-07.md)** - This step directly builds on Step 7's architecture
+- **Completed [Step 07](../step-07/)** - This step directly builds on Step 7's architecture
 - Application from Step 07 is stopped (Ctrl+C)
 - Ports 8080 and 8888 are available (you'll run two applications simultaneously)
 - Understanding of Step 7's dynamic model selection, Step 6's multimodal image analysis, Step 5's HITL Pattern, and Step 4's Supervisor Pattern (we keep the same patterns, just make PricingAgent remote)
@@ -558,7 +558,7 @@ Open your browser to [http://localhost:8080](http://localhost:8080).
 
 You'll see the Fleet Status grid with inline feedback forms in the Action column and the approval notification button.
 
-![Fleet Status Grid](/images/agentic-UI-maintenance-returns-2.png)
+![Fleet Status Grid](../../images/agentic-UI-maintenance-returns-2.png)
 
 Find the Honda Civic (status: Rented) in the Fleet Status grid and enter feedback indicating severe damage:
 
@@ -876,7 +876,7 @@ You learned how to:
 
 Congratulations on completing the final step of Section 2! Ready to wrap up? Head to the conclusion to review everything you've learned and see how these patterns apply to real-world scenarios!
 
-[Continue to Conclusion - Mastering Agentic Systems](conclusion.md)
+[Continue to Conclusion - Mastering Agentic Systems](../conclusion/)
 
 ---
 

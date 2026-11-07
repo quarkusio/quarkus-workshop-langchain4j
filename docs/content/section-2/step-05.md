@@ -605,4 +605,4 @@ You've successfully implemented the Human-in-the-Loop pattern for safe, controll
 
 In **Step 06**, you'll learn about **multimodal image analysis** — allowing employees to upload car photos during rental returns, so the system can automatically enrich feedback with visual observations using a multimodal AI agent!
 
-[Continue to Step 06 - Multimodal Image Analysis](step-06.md)
+[Continue to Step 06 - Multimodal Image Analysis](../step-06/)

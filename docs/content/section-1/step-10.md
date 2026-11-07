@@ -13,7 +13,7 @@ For this,
 we will add observability to our LLM interactions by implementing logging, tracing, and metrics to our application.
 In addition, we will add fault tolerance to our LLM interactions by implementing retries and fallback mechanisms.
 
-<!--![Observability](/images/observability.png)-->
+<!--![Observability](../../images/observability.png)-->
 
 ## Observability
 
@@ -48,7 +48,7 @@ Start up Quarkus Dev Mode if you haven't already with `./mvnw quarkus:dev` go to
 
 > [!NOTE]
 > **MCP Weather Server Required**
-> This step continues to use the MCP Weather Server from [Step 8](./step-08.md#create-a-new-mcp-weather-server-project). Make sure it's running on port 8081 before testing. If you haven't started it yet, navigate to the `quarkus-workshop-langchain4j-08-mcp-server` directory and run `./mvnw quarkus:dev`.
+> This step continues to use the MCP Weather Server from [Step 8](../step-08/#create-a-new-mcp-weather-server-project). Make sure it's running on port 8081 before testing. If you haven't started it yet, navigate to the `quarkus-workshop-langchain4j-08-mcp-server` directory and run `./mvnw quarkus:dev`.
 
 Open the chat interface in the bottom right of your screen. Send an instruction to the bot and then come
 back to your console. You'll see a series requests/responses to/from the LLM with information such as
@@ -314,7 +314,7 @@ in the background.
 After you've generated some data, let's go and explore this data in Grafana. The Dev Service exposes a random port.
 The easiest way to access Grafana is to go to the Quarkus Dev UI ([http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui)) and click on the "Grafana UI" link of the "Observability" tile.
 
-![Quarkus Dev UI](/images/dev-ui-observability.png)
+![Quarkus Dev UI](../../images/dev-ui-observability.png)
 
 Let's first explore the provided custom metrics dashboards that the Dev Service creates. Go to "Dashboards" in the left menu.
 You will notice 4 dashboards, including one for OTLP and one for Prometheus. Remember how we added the Micrometer OpenTelemetry
@@ -322,11 +322,11 @@ extension? It's reflected here. Feel free to explore the dashboards.
 If you don't see much data in the graphs, you may want to select a shorter time span in the top right of your screen and/or
 create some more chat requests.
 
-![Grafana Dashboard](/images/grafana-dashboard.png)
+![Grafana Dashboard](../../images/grafana-dashboard.png)
 
 You can also find an aggregation of all metrics (including the LangChain4j relevant ones) by going to Drilldown > Metrics:
 
-![Prometheus Metrics graphs](/images/prometheus-metrics.png)
+![Prometheus Metrics graphs](../../images/prometheus-metrics.png)
 
 Now let's explore the Query functionality to find specific data. Click on the `Explore` menu item.
 An interactive query window will open up.
@@ -335,13 +335,13 @@ Then, in label filters, select `currency` and value `USD`. Finally, click the `R
 You should see an estimated cost aggregation of the latest calls to the model. This is an experimental feature
 based on what typical calls to ChatGPT cost.
 
-![Estimated Cost Graph](/images/genai-estimated-cost.png)
+![Estimated Cost Graph](../../images/genai-estimated-cost.png)
 
 Let's now take a look at how we can get our traces from Tempo. In the same Query window next the "Outline",
 select `Tempo` instead of Prometheus. Then, click on `Search` next to Query type. You will see a table appear
 below with a list of the latest trace IDs and the service they relate to.
 
-![Tempo search](/images/tempo-search.png)
+![Tempo search](../../images/tempo-search.png)
 
 Click on any one of the traces to open more details about them. You will see a list of spans that represent different
 parts of the request and response, and potentially also the database query, based on which trace you have selected.
@@ -407,7 +407,7 @@ It's up to you to decide what your preferred way to create chaos is :).  Once yo
 
 Don't forget to revert the change you just did!
 
-![Fallback is being called when an error occurs](/images/fallback.png)
+![Fallback is being called when an error occurs](../../images/fallback.png)
 
 ## Conclusion
 

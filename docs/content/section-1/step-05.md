@@ -112,12 +112,12 @@ Let's have a look at the content of our knowledge base.
 This is the Quarkus Dev UI, the toolbox with everything you need to develop your Quarkus application.
 Locate the _LangChain4j Core_ tile, and click on the _Embedding store_ link:==
 
-![Embedding store link in the dev UI](/images/langchain4j-tile.png)
+![Embedding store link in the dev UI](../../images/langchain4j-tile.png)
 
 ==Then, look for the `Search for relevant embeddings` section.
 Enter a query in the `Search text` field, for example, `Cancellation`, and then click on the `Search` button:==
 
-![Search for relevant embeddings](/images/embedding-search.png)
+![Search for relevant embeddings](../../images/embedding-search.png)
 
 You should see the segments _close_ to the searched text.
 You can visualize the segments, but also their score, i.e., how close they are to the searched text.
@@ -136,7 +136,7 @@ Ask a question related to the terms of use:==
 What can you tell me about your cancellation policy?
 ```
 
-![RAG pattern in action](/images/chat-easy-rag.png)
+![RAG pattern in action](../../images/chat-easy-rag.png)
 
 As you can see the AI is able to answer the question, and use the relevant segment from the knowledge base.
 
@@ -159,4 +159,4 @@ The LLM receives the extended prompt and can provide a more accurate response.
 
 In this step, we introduced the RAG pattern and implemented it in our AI service.
 We used EasyRAG to simplify the setup.
-In the [next step](./step-06.md), we will start deconstructing the RAG pattern to understand how it works under the hood and how to customize it.
+In the [next step](../step-06/), we will start deconstructing the RAG pattern to understand how it works under the hood and how to customize it.
