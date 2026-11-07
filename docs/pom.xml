@@ -59,6 +59,12 @@
             <version>${roq.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.quarkiverse.roq</groupId>
+            <artifactId>quarkus-roq-testing</artifactId>
+            <version>${roq.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>

@@ -78,11 +78,18 @@ jobs:
     name: "Build Docs"
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history for the sitemap <lastmod> dates
+          fetch-depth: 0
       - name: Generate Roq Site
         uses: quarkiverse/quarkus-roq@v1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           site-directory: ./docs/
+          # docs/ has no Maven wrapper, use the Maven installed on the runner
+          maven-executable: mvn
+          # run the RoqSiteTest site-generation tests (default is -DskipTests)
+          maven-build-args: ""
 
   docs-deploy:
     runs-on: ubuntu-latest
