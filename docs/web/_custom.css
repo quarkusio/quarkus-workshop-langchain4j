@@ -405,11 +405,16 @@ html.dark {
     display: flex;
 }
 
+/* Diagrams are transparent PNGs with dark strokes, so the enlarged image
+   needs a light backing or it becomes unreadable on the dark overlay. */
 .ws-lightbox img {
-    max-width: 96vw;
-    max-height: 92vh;
+    max-width: 92vw;
+    max-height: 88vh;
     object-fit: contain;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .ws-lightbox-caption {
