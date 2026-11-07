@@ -252,7 +252,7 @@ The browser shows the workflow identifier so you can compare it with the CloudEv
 
 Whew, that was a lot of code and theory right? Let's see it in action now, and hopefully it'll all make sense!
 
-==Start dev mode from your working copy with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080).==
+<mark>Start dev mode from your working copy with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), then open [http://localhost:8080](http://localhost:8080).</mark>
 
 <mark>Generate a trip with a future start date and note its workflow identifier.</mark> A family trip to the California coast for seven days and four travelers is a useful comparison with the previous chapters.
 
@@ -280,7 +280,7 @@ The page shows the generated plan and offers **Approve Trip** and **Reject Trip*
 
 Now let's hop over to the Dev UI to inspect what has just happened.
 
-==Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev)<mark>. You'll notice a new Quarkus Workflows card. </mark>Click on it and then select **Workflows**==. Inspect `trip-planner-flow`. Its diagram shows the planning task, the approval publication, the wait, and the outcome branches.
+<mark>Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev). You'll notice a new Quarkus Workflows card. Click on it and then select **Workflows**</mark>. Inspect `trip-planner-flow`. Its diagram shows the planning task, the approval publication, the wait, and the outcome branches.
 
 <figure markdown="span">
   ![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](../../images/section-3-step-04-flow-diagram.png)\{ width="600" }

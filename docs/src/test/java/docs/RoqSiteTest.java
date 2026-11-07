@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Validates that the Roq site generates without errors and that the generated
@@ -75,6 +76,31 @@ public class RoqSiteTest {
         when().get("/").then().statusCode(200)
                 .body(containsString("data-gh=\"stars\""))
                 .body(containsString("data-gh=\"forks\""));
+    }
+
+    @Test
+    public void actionHighlightsRenderAsMark() {
+        // the sources used pymdownx ==...==, which Roq's Markdown engine
+        // does not support, so those spans are <mark> in the content
+        when().get("/section-1/step-05/").then().statusCode(200)
+                .body(containsString("<mark>Create a directory named"))
+                .body(not(containsString("==Create a directory named")));
+    }
+
+    @Test
+    public void codeSamplesKeepTheirComparisonOperators() {
+        // an earlier bulk conversion of ==...== mangled the == operators
+        when().get("/section-2/step-06/").then().statusCode(200)
+                .body(containsString("car.status == 'RENTED'"));
+    }
+
+    @Test
+    public void lightModeIsTheDefault() {
+        // light unless the reader picked dark with the toggle; the OS
+        // preference must not override it
+        when().get("/").then().statusCode(200)
+                .body(containsString("localStorage.getItem('darkMode') === 'true'"))
+                .body(not(containsString("prefers-color-scheme")));
     }
 
     @Test

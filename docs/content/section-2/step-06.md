@@ -119,7 +119,7 @@ The action cell for all actionable cars in `populateFleetStatusTable` now includ
 
 **app.js (action cell in populateFleetStatusTable)**
 ```javascript
-if (car.status =<mark> 'RENTED' || car.status </mark>= 'AT_CLEANING' || car.status === 'IN_MAINTENANCE') \{
+if (car.status == 'RENTED' || car.status == 'AT_CLEANING' || car.status === 'IN_MAINTENANCE') \{
     actionCell = `
         <td>
             <form onsubmit="processFeedback(event, $\{car.id}, '$\{car.status}')">
@@ -184,7 +184,7 @@ public Uni<Response> processReturn(Integer carNumber,
 
 ```java
 private ImageContent toImageContent(FileUpload fileUpload) \{
-    if (fileUpload <mark> null || fileUpload.filePath() </mark> null) \{
+    if (fileUpload == null || fileUpload.filePath() == null) \{
         return null;
     }
     try \{

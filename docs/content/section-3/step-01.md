@@ -212,7 +212,7 @@ Now let's see it in action.
 .\mvnw.cmd quarkus:dev
 ```
 
-==Once started, open [http://localhost:8080](http://localhost:8080) in your browser.== The trip form shown at the top of this page is where you will enter each test request.
+<mark>Once started, open [http://localhost:8080](http://localhost:8080) in your browser.</mark> The trip form shown at the top of this page is where you will enter each test request.
 
 ## Planning a family beach vacation
 
@@ -238,7 +238,7 @@ Read the vehicle recommendation and daily itinerary. Look for family-friendly ch
 
 While it may seem like the skills were used, it's also entirely possible that the model produced the family travel advice from its own knowledge while ignoring the skill instructions. The execution history and logs let us check whether it really did request the skill and received its content before judging the itinerary.
 
-==Open the Quarkus Dev UI at [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui) (or press the letter `d` from your terminal).== The extensions page lists a LangChain4j Agentic card alongside the other installed extensions.
+<mark>Open the Quarkus Dev UI at [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui) (or press the letter `d` from your terminal).</mark> The extensions page lists a LangChain4j Agentic card alongside the other installed extensions.
 
 ![Dev UI Extensions page with the LangChain4j Agentic card showing Agents, Topology, Executions, and Testing](../../images/section-3-step-01-devui-extensions.png)
 
@@ -248,7 +248,7 @@ Inspect the `activate_skill` calls and their results under the vehicle and itine
 
 ![Execution history for planTrip showing parallel research agents and activate_skill tool calls](../../images/section-3-step-01-devui-executions.png)
 
-The terminal logs provide another way to check discovery and activation. ==Check the startup logs for the skill count, then scroll through the request and response logs after generating a trip plan.
+The terminal logs provide another way to check discovery and activation. <mark>Check the startup logs for the skill count, then scroll through the request and response logs after generating a trip plan.</mark>
 
 <details>
 <summary>Not seeing the request or response logs?</summary>

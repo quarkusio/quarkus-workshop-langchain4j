@@ -285,7 +285,7 @@ The test's `evals` profile connects to the Langfuse instance started by dev mode
 
 Keep dev mode running while you evaluate plans and inspect their traces. The test is skipped unless you pass its Langfuse URL through `quarkus.langfuse.base-url`.
 
-==Start dev mode in your working project with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), with `OPENAI_API_KEY` set, and keep the MCP server running. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev), go to **Dev Services**, and copy the `quarkus.langfuse.base-url` value from the Langfuse entry.==
+<mark>Start dev mode in your working project with `./mvnw quarkus:dev` (`.\mvnw.cmd quarkus:dev` on Windows), with `OPENAI_API_KEY` set, and keep the MCP server running. Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev), go to **Dev Services**, and copy the `quarkus.langfuse.base-url` value from the Langfuse entry.</mark>
 
 ![The Dev UI Dev Services page showing the Langfuse container with its injected configuration: API endpoint, host, port, UI URL, login credentials, and API keys](../../images/section-3-step-07-devui-dev-services.png)
 

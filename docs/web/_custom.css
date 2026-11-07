@@ -48,6 +48,103 @@ pre, code, kbd, samp {
     margin-top: 0;
 }
 
+/* Tips, notes and warnings: compact boxes close to the Material admonitions
+   of the previous site. The theme's own .markdown-alert p rule loses to the
+   .content-prose p margin above, which padded every box with full paragraph
+   margins on top of its own padding. */
+:is(.content-prose, .home-content) .markdown-alert {
+    margin: 1.05rem 0;
+    padding: 0 0.7rem 0.5rem;
+    font-size: 0.88em;
+    line-height: 1.55;
+    border-left-width: 3px;
+    border-radius: 0.2rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title {
+    position: relative;
+    display: block;
+    margin: 0 -0.7rem 0.45rem;
+    padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.5;
+    color: inherit;
+    border-radius: 0 0.2rem 0 0;
+    background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+/* When a box starts with a bold line, that line was its title in the
+   MkDocs sources (!!! note "Title"). Promote it to the title bar and
+   hide the generic type label, which would otherwise repeat above it. */
+:is(.content-prose, .home-content) .markdown-alert:has(> .markdown-alert-title + p > strong:first-child) > .markdown-alert-title {
+    display: none;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child {
+    position: relative;
+    display: block;
+    margin: 0 -0.7rem 0.45rem;
+    padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: inherit;
+    border-radius: 0 0.2rem 0 0;
+    background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
+    transform: translateY(-50%);
+    background-color: var(--alert-color);
+    mask-image: var(--alert-icon, none);
+    mask-size: 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title::before {
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    margin: 0;
+    width: 0.9rem;
+    height: 0.9rem;
+    transform: translateY(-50%);
+}
+
+:is(.content-prose, .home-content) .markdown-alert p {
+    margin: 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert p + p {
+    margin-top: 0.4rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert ul,
+:is(.content-prose, .home-content) .markdown-alert ol {
+    margin: 0.4rem 0;
+    padding-left: 1.3rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert pre {
+    margin: 0.5rem 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > :last-child {
+    margin-bottom: 0;
+}
+
+html.dark :is(.content-prose, .home-content) .markdown-alert {
+    box-shadow: none;
+}
+
 /* White page background edge to edge: the theme caps the page in a
    1250px wrapper on a grey body background, which shows as a grey band
    on wide screens. MkDocs Material used a white page. */
@@ -443,11 +540,18 @@ html.dark {
     display: block;
 }
 
-/* Mark/highlight styling */
-.content-prose mark {
-    background-color: #fff176;
+/* Inline highlights used as action directives (previously pymdownx
+   ==mark==). Colors match the previous site: translucent yellow in light,
+   translucent blue in dark. */
+:is(.content-prose, .home-content) mark {
+    background-color: #ffff0080;
+    color: inherit;
     padding: 0.1em 0.3em;
     border-radius: 0.15em;
+}
+
+html.dark :is(.content-prose, .home-content) mark {
+    background-color: #4287ff4d;
 }
 
 /* Code copy button via highlight.js copy plugin */

@@ -291,8 +291,8 @@ After adding your user to the Docker group, don't forget to log out and back in 
 
 You can use the dev UI to verify the ingestion like we did in the previous step.
 This time, let's test with the chatbot instead:
-==Open your browser and go to `http://localhost:8080`.
-Ask the question to the chatbot and see if it retrieves the relevant segments and builds a cohesive answer:==
+<mark>Open your browser and go to `http://localhost:8080`.
+Ask the question to the chatbot and see if it retrieves the relevant segments and builds a cohesive answer:</mark>
 
 ```
 What can you tell me about your cancellation policy?

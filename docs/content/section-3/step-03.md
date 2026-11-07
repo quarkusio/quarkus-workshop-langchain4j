@@ -274,7 +274,7 @@ Time to put the Riviera family's trip in front of the review panel! If the appli
 .\mvnw.cmd quarkus:dev
 ```
 
-==Open [http://localhost:8080](http://localhost:8080) and fill in the form:==
+<mark>Open [http://localhost:8080](http://localhost:8080) and fill in the form:</mark>
 
 - Destination: `Italian Riviera`
 - Start date: a future date
@@ -291,7 +291,7 @@ Score 6.3 > 6.0 — switching to enhanced model for final refinement
 
 This line means the `DynamicModelSelector` handed the revision to the enhanced model. It only appears when the reviser actually runs with a score above 6.0. If the evaluators liked the first vehicle enough to pass it outright, there's nothing to revise and nothing to log, so try another run or two.
 
-==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui) and select **Topology** on the LangChain4j Agentic card.== The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node, rendered as a parallel fan-out with the three evaluators, and the `vehicleReviser`.
+<mark>Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui) and select **Topology** on the LangChain4j Agentic card.</mark> The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node, rendered as a parallel fan-out with the three evaluators, and the `vehicleReviser`.
 
 ![The Dev UI topology view showing the planTrip sequence with the research phase, vehicleReviewLoop containing three parallel evaluators and a reviser, and estimateCosts](../../images/section-3-step-03-devui-topology.png)
 
