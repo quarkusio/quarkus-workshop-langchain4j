@@ -82,4 +82,4 @@ and you will see the response being displayed as it arrives.
   <source src="/images/streaming.mp4" type="video/mp4">
 </video>
 
-Let's now switch to the [next step](./step-04.md)!
+Let's now switch to the [next step](../step-04/)!

@@ -55,7 +55,7 @@ In this section, you'll see how agents extend the capabilities you created in Se
 
 ## Prerequisites
 
-Before starting, ensure you have met the [workshop setup requirements](../requirements.md).
+Before starting, ensure you have met the [workshop setup requirements](../../requirements/).
 
 ---
 
@@ -86,7 +86,7 @@ The application has two main sections:
 1. **Fleet Status** (top): Shows all cars in the Miles of Smiles fleet with their current status.
 2. **Action** column: For rented or cleaning cars, provides an inline feedback form to process returns.
 
-![Agentic App UI](/images/agentic-UI-1.png)
+![Agentic App UI](../../images/agentic-UI-1.png)
 
 ---
 
@@ -159,7 +159,7 @@ If you open the `pom.xml` file from the project, you will see this dependency:
 
 ### Key Concepts
 
-Agents share similarities with AI Services from [Section 1](../section-1/step-01.md):
+Agents share similarities with AI Services from [Section 1](../../section-1/step-01/):
 
 - Declared as interfaces (implementation generated automatically)
 - Use `@SystemMessage` to define the agent's role and behavior
@@ -170,14 +170,14 @@ Agents share similarities with AI Services from [Section 1](../section-1/step-01
 ### Key Differences
 
 - **Only one method** per interface can be annotated with `@Agent` - this is the agent entry point
-- Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](step-02.md))
+- Designed to be composed with **workflows** or be invoked by a supervisor — agents can be composed together (more on this in [Step 02](../step-02/))
 - Focus on **autonomous actions** rather than conversational responses
 
 ---
 
 ## Understanding the Application Architecture
 
-![App Blueprint](/images/agentic-app-1.png)
+![App Blueprint](../../images/agentic-app-1.png)
 
 The application consists of four main components:
 
@@ -312,9 +312,9 @@ Defines the inputs and output:
 
 ## Component 4: The CleaningTool
 
-If you went through Section 1, you'll remember that we already covered [tool and function calling](../section-1/step-07.md) for single AI services.
+If you went through Section 1, you'll remember that we already covered [tool and function calling](../../section-1/step-07/) for single AI services.
 They work in pretty much the exact same way for Agents: Tools enable agents to call functions that can take action.
-These tools can be local LangChain4j tools running within the same Quarkus application, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../section-1/step-08.md)..
+These tools can be local LangChain4j tools running within the same Quarkus application, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../../section-1/step-08/)..
 
 **CleaningTool.java**
 ```java
@@ -509,4 +509,4 @@ In this step, you built a **single autonomous agent** that makes decisions and u
 
 In **Step 02**, you'll learn how to compose **multiple agents into workflows** — where agents collaborate to solve complex problems together!
 
-[Continue to Step 02 - Composing Simple Agentic Workflows](step-02.md)
+[Continue to Step 02 - Composing Simple Agentic Workflows](../step-02/)

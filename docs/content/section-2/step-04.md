@@ -722,4 +722,4 @@ The system now:
 
 In **Step 05**, you'll keep this refactored feedback-analysis architecture and add the **Human-in-the-Loop (HITL) pattern** so that high-value vehicle dispositions require human approval before execution.
 
-[Continue to Step 05 - Human-in-the-Loop Pattern](step-05.md)
+[Continue to Step 05 - Human-in-the-Loop Pattern](../step-05/)

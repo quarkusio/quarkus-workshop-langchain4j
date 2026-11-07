@@ -333,7 +333,7 @@ sequenceDiagram
 
 Once the plan is ready, the results page shows the workflow and request identifiers above the approval buttons.
 
-![The results page with workflow and request identifiers above the approval buttons](/images/section-3-step-04-awaiting-approval.png)
+![The results page with workflow and request identifiers above the approval buttons](../../images/section-3-step-04-awaiting-approval.png)
 
 <mark>Note both identifiers and the trip details shown in the browser.</mark> You will compare them with the restored trip after restarting.
 
@@ -363,11 +363,11 @@ Once the plan is ready, the results page shows the workflow and request identifi
 
 Now inspect how the application restored that pending trip. <mark>Check the startup log for `Restoring workflow instance:` and find your trip's identifier at `waitApproval`. Check that no new planning call appears in the log.</mark> The workflow resumes at its approval wait with the plan generated before the restart.
 
-![Example startup log restoring pending workflow instances at waitApproval](/images/section-3-step-05-restore-log.png)
+![Example startup log restoring pending workflow instances at waitApproval](../../images/section-3-step-05-restore-log.png)
 
 ==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev) and select **Database view** on the Agroal card. Inspect the `workflowinstanceentity` and `trip_plan_status` tables.== The first holds the saved workflow instance. The second holds the original request and plan with status `awaiting_approval`. Both should have the workflow identifier shown in the browser.
 
-![The Agroal Database view with the trip_plan_status row, showing the workflow identifier, request identifier, and awaiting_approval status](/images/section-3-step-05-database-view.png)
+![The Agroal Database view with the trip_plan_status row, showing the workflow identifier, request identifier, and awaiting_approval status](../../images/section-3-step-05-database-view.png)
 
 <mark>Click **Approve Trip** and wait for the page to report `confirmed`.</mark> The restored workflow completes the simulated booking with the same identifiers and plan from before the restart.
 
@@ -417,4 +417,4 @@ podman rm -f <container-id>
 
 The customer can now come back to a pending trip even after the application restarts. The planner still only knows what the language model remembers about each destination, though. In Step 06, we'll connect it to an MCP server with weather forecasts and points of interest, so nobody gets sent on a sunny beach week in the middle of a thunderstorm.
 
-[Continue to Step 06 - MCP Integration with Non-AI Agents](step-06.md)
+[Continue to Step 06 - MCP Integration with Non-AI Agents](../step-06/)

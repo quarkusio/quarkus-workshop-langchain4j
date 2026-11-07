@@ -115,4 +115,4 @@ Change the value to `0` and you will likely see the model repeat the word 50 tim
 {snippet:insert("section-1/step-02/src/main/resources/application.properties")}
 ```
 
-Let's now switch to the [next step](./step-03.md)!
+Let's now switch to the [next step](../step-03/)!

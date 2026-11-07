@@ -133,7 +133,7 @@ It replaces the `quarkus.langchain4j.easy-rag.path` property from the previous s
 Now let's create our _ingestor_.
 Remember that the role of the _ingestor_ is to read the documents and store their embeddings in the vector store.
 
-![The ingestion process](/images/ingestion.png)
+![The ingestion process](../../images/ingestion.png)
 
 <mark>Create the `dev.langchain4j.quarkus.workshop.RagIngestion` class with the following content:</mark>
 
@@ -210,7 +210,7 @@ Now that we have our documents ingested into the vector store, we need to implem
 The retriever is responsible for finding the most relevant segments for a given query.
 The augmentor is responsible for extending the prompt with the retrieved segments.
 
-![The augmentation process](/images/augmentation.png)
+![The augmentation process](../../images/augmentation.png)
 
 <mark>Create the `dev.langchain4j.quarkus.workshop.RagRetriever` class with the following content:</mark>
 
@@ -306,7 +306,7 @@ The RAG pattern is much more powerful than what we have seen here so far.
 You can use different embedding models, different vector stores, different retrievers, etc.
 The process can also be extended, especially the retrieval and the augmentation steps.
 
-![Advanced augmentation](/images/advanced-augmentation.png)
+![Advanced augmentation](../../images/advanced-augmentation.png)
 
 You can use multiple retrievers, filters, require a minimum score, etc.
 When using multiple retrievers, you can combine the results, use the best one, etc.
@@ -381,4 +381,4 @@ In this step, we deconstructed the RAG pattern to understand how it works under 
 We used our own embedding model and vector store.
 We have seen the various aspects of the process and how you can customize them.
 
-In the [next step](./step-07.md) let's switch to another very popular pattern when using LLMs: Function Calls and Tools.
+In the [next step](../step-07/) let's switch to another very popular pattern when using LLMs: Function Calls and Tools.

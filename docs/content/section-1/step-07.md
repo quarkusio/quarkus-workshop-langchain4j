@@ -22,7 +22,7 @@ Then the LLM can decide, if it wants, to call one of these functions with the pa
 The application receives the method invocation request and executes the function with the parameters provided by the LLM.
 The result is sent back to the LLM, which can use it to continue the conversation, and compute the next message.
 
-![Function calling](/images/function-calling.png)
+![Function calling](../../images/function-calling.png)
 
 In this step, we are going to see how to implement function calling in our application.
 We will set up a database and create a function that allows the LLM to retrieve data (bookings, customers...) from the database.
@@ -190,4 +190,4 @@ Additionally, you can leverage more specialized LLMs, routing specific queries�
 
 Up to now, we have seen how you can expose business logic directly to an LLM, making methods callable as reasoning tools.
 This works great inside a single Quarkus application, but what if you want to go a step further and share those tools across services, runtimes, or even different languages?
-In the [next step](./step-08.md), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.
+In the [next step](../step-08/), we’ll explore how to take this Agentic AI concept further with the Model Context Protocol.

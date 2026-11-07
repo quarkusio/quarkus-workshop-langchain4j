@@ -16,7 +16,7 @@ bidirectional links between data repositories and AI-driven tools. The design is
 developers can either make their data accessible via MCP servers or construct AI applications
 (MCP clients) that interface with these servers.
 
-![MCP](/images/mcp.png)
+![MCP](../../images/mcp.png)
 
 In this step, we are going to see how to implement both MCP servers and clients in our application. The MCP client will be integrated with our existing code, while the MCP server will be a standalone application that the MCP client's agent will call to retrieve additional context.
 
@@ -155,4 +155,4 @@ An MCP server in this context is very similar to the concept of local function c
 As you could see, the actual implementation of the MCP server is also entirely customizable.
 
 However, introducing tools and function calling also comes with new risks, such as LLM misbehavior (e.g., calling functions excessively or with incorrect parameters) or vulnerabilities to prompt injection.
-In the [next step](./step-09.md), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.
+In the [next step](../step-09/), we’ll explore a straightforward approach to mitigate prompt injection using guardrails, ensuring safer and more reliable interactions.

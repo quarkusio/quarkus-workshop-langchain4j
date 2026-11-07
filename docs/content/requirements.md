@@ -141,6 +141,6 @@ If you get stuck, simply switch to the `step-xx` directory of the last completed
 
 Once ready, you can pick one of these entries points to start the workshop:
 
-- If you discover Quarkus and Quarkus LangChain4j, start with [Section 1 - AI Apps](./section-1/step-01.md).
-- If you want to learn more advanced AI-Infused features, such as MCP, Guardrails, Observability, and Fault Tolerance, start with [Section 1 - Step 08](./section-1/step-08.md).
-- If you want to jump directly into agentic systems, start with [Section 2 - Agentic Workflows](./section-2/step-01.md).
+- If you discover Quarkus and Quarkus LangChain4j, start with [Section 1 - AI Apps](../section-1/step-01/).
+- If you want to learn more advanced AI-Infused features, such as MCP, Guardrails, Observability, and Fault Tolerance, start with [Section 1 - Step 08](../section-1/step-08/).
+- If you want to jump directly into agentic systems, start with [Section 2 - Agentic Workflows](../section-2/step-01/).

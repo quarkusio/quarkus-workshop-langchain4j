@@ -5,7 +5,7 @@ content-toc: true
 ---
 # Step 04 - System messages
 
-In [step 1](step-01.md), we saw two types of messages:
+In [step 1](../step-01/), we saw two types of messages:
 
 - User messages (`User`)
 - AI responses (`Assistant`)
@@ -40,7 +40,7 @@ We define the context, tone, and scope of the conversation.
 
 ## System message and memory
 
-Remember the _conversation memory_ we talked about in [step 1](step-01.md)?
+Remember the _conversation memory_ we talked about in [step 1](../step-01/)?
 We are sending all the messages exchanged between the user and the AI to the LLM, so the LLM can provide a context-aware
 response.
 
@@ -61,7 +61,7 @@ Make sure the application is running and open the browser at [http://localhost:8
 ```
 Tell me a story
 ```
-![Out of context](/images/out-of-context.png)
+![Out of context](../../images/out-of-context.png)
 
 The AI should respond with a message that it is out of context.
 You can relatively easily work around this by asking for a _car rental story_, but there are other solution to this
@@ -71,4 +71,4 @@ What's important is to have a system message defining the scope of the conversat
 This will never be lost, even if the conversation is very long.
 
 Alright, let's now go a bit further and implement a RAG pattern!
-That's the topic of the [next step](./step-05.md)!
+That's the topic of the [next step](../step-05/)!

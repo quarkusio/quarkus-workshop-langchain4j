@@ -38,7 +38,7 @@ If you run into an error indicating `java.util.NoSuchElementException: SRCFG0001
 This will bring up the page at [http://localhost:8080](http://localhost:8080). 
 Open it and click the red robot icon in the bottom right corner to start chatting with the chatbot.
 
-![Miles of Smiles UI](/images/ui-no-chatbot.png)
+![Miles of Smiles UI](../../images/ui-no-chatbot.png)
 
 ## Chatting with the chatbot
 
@@ -53,7 +53,7 @@ User: What is my name?
 AI: Your name is Clement.
 ```
 
-![An example of discussion with the chatbot](/images/ui.png)
+![An example of discussion with the chatbot](../../images/ui.png)
 
 This is how memory is built up for LLMs.
 <mark>In the terminal, you can observe the calls that are made to OpenAI behind the scenes. Notice the roles 'user' (`UserMessage`) and 'assistant' (`AiMessage`).</mark>
@@ -187,4 +187,4 @@ How this is done is abstracted away by Quarkus LangChain4j.
 > This annotation indicates that the `CustomerSupportAgent` object is created when the session starts and destroyed when the session ends.
 > It influences the _memory_ of our chatbot, as it remembers the conversation that happened so far in this session.
 
-So far, so good! Let's move on to the [next step](./step-02.md).
+So far, so good! Let's move on to the [next step](../step-02/).

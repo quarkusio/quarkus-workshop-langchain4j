@@ -11,7 +11,7 @@ In this step we'll attach output guardrails to the vehicle and itinerary agents 
 
 ## Per-agent output guardrails
 
-The [input guardrails from Section 1](../section-1/step-09.md) checked the customer's message before it reached the model. **Output guardrails** run *after* an agent has finished its model and tool interactions, allowing the application to inspect the response before accepting it and potentially calling a next agent with incorrect information, or returning the result to the end user.
+The [input guardrails from Section 1](../../section-1/step-09/) checked the customer's message before it reached the model. **Output guardrails** run *after* an agent has finished its model and tool interactions, allowing the application to inspect the response before accepting it and potentially calling a next agent with incorrect information, or returning the result to the end user.
 
 For our scenario, we need to check the recommendations the parallel itinerary and vehicle selection agents produce before the cost estimator uses them. An **itinerary guardrail** will look for a missing or empty itinerary and a short list of dangerous-area phrases, while a **vehicle guardrail** will compare the recommendation with the customer's request.
 
@@ -291,7 +291,7 @@ When the model recommends a Ferrari on an economy budget, the vehicle guardrail 
 
 The annotation ends up in the browser too. The guardrail writes it to the `guardrailOverride` field of the JSON response, and the vehicle recommendation card shows it as a notice above the reasoning. The same notice appears when the guardrail replaces a vehicle that is too small for the group.
 
-![Vehicle recommendation card for a Fiat 500 with a guardrail override notice saying the requested Ferrari was not suitable](/images/section-3-step-02-guardrail-notice.png)
+![Vehicle recommendation card for a Fiat 500 with a guardrail override notice saying the requested Ferrari was not suitable](../../images/section-3-step-02-guardrail-notice.png)
 
 > [!NOTE]
 > The model may skip the Ferrari entirely and pick an affordable car on the first attempt. In that case you'll see no `REPROMPT`, but the `ANNOTATE` line and the notice still appear because the preferences mention a brand the plan doesn't include. If you see neither, try a different luxury brand in the preferences or a different model.
@@ -389,7 +389,7 @@ Use your application's port in `APP_URL` if it differs from 8080. To watch the c
 
 The planner now checks its research recommendations and can calculate rental prices through a tool that rejects invalid arguments before execution. In Step 03, we'll add evaluator agents that vote on the vehicle recommendation, an iterative refinement loop, and adaptive model selection that picks a more capable model as the recommendation improves.
 
-[Continue to Step 03 - Voting, Loops, and Adaptive Model Selection](step-03.md)
+[Continue to Step 03 - Voting, Loops, and Adaptive Model Selection](../step-03/)
 
 ## Troubleshooting
 

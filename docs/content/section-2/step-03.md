@@ -45,7 +45,7 @@ In this step, you will:
 
 ## Composing Agentic Workflows
 
-Let's start with a bit of theory. In [Step 02](step-02.md), you learned about the four fundamental workflow patterns: sequential, parallel, conditional, and loop. Now we'll explore how to **compose these patterns** by nesting workflows within other workflows.
+Let's start with a bit of theory. In [Step 02](../step-02/), you learned about the four fundamental workflow patterns: sequential, parallel, conditional, and loop. Now we'll explore how to **compose these patterns** by nesting workflows within other workflows.
 
 ### What is Agentic Workflow Nesting?
 
@@ -761,4 +761,4 @@ You've built a sophisticated multi-level nested workflow combining sequence, par
 
 In **Step 04**, you'll learn about **using a supervisor pattern for dynamic orchestration** of a set of agents!
 
-[Continue to Step 04 - Supervisor Pattern for Dynamic Orchestration](step-04.md)
+[Continue to Step 04 - Supervisor Pattern for Dynamic Orchestration](../step-04/)

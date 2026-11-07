@@ -68,7 +68,7 @@ For our family, the reviser might swap the compact hatchback for an estate with 
 
 ## Adaptive model selection with @ChatModelSupplier
 
-When building agentic applications, it's important to choose the right model for the job. Some models are really good at certain tasks, while others are better at other tasks. We also have to consider the cost of models. The latest frontier models might be generally more capable, but they're typically also quite a bit more expensive. If you've gone through [Section 2 Step 07](../section-2/step-07.md), you have already seen how different agents can use different models to optimize capability and cost usage.
+When building agentic applications, it's important to choose the right model for the job. Some models are really good at certain tasks, while others are better at other tasks. We also have to consider the cost of models. The latest frontier models might be generally more capable, but they're typically also quite a bit more expensive. If you've gone through [Section 2 Step 07](../../section-2/step-07/), you have already seen how different agents can use different models to optimize capability and cost usage.
 
 In this case, Miles of Smiles wants the final reviser that reviews the votes and the specific suggestions from the evaluators to use a more capable model when the combined score is close to the theshold so that it can make the best decision possible: 
 
@@ -293,11 +293,11 @@ This line means the `DynamicModelSelector` handed the revision to the enhanced m
 
 ==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui) and select **Topology** on the LangChain4j Agentic card.== The graph shows the full agent structure: the `planTrip` sequence contains the parallel research phase, the `vehicleReviewLoop`, and `estimateCosts`. Inside the loop you can see the `vehicleEvaluators` node, rendered as a parallel fan-out with the three evaluators, and the `vehicleReviser`.
 
-![The Dev UI topology view showing the planTrip sequence with the research phase, vehicleReviewLoop containing three parallel evaluators and a reviser, and estimateCosts](/images/section-3-step-03-devui-topology.png)
+![The Dev UI topology view showing the planTrip sequence with the research phase, vehicleReviewLoop containing three parallel evaluators and a reviser, and estimateCosts](../../images/section-3-step-03-devui-topology.png)
 
 <mark>Switch to **Executions** on the same card and expand the latest run.</mark> Each agent has its own row with its duration, inputs, and outputs. Under `vehicleReviewLoop`, the `vehicleEvaluators` rows show the three individual scores and the average they produced. If the average reached 7.5 on the first vote, the loop ends right there and `revise` never runs. If it fell short, you'll see a `revise` row followed by another round of evaluations, each tagged with its iteration number. Run the same request a few times and the number of rounds will probably change, because the evaluators are language models and have their moods like the rest of us.
 
-![The Dev UI execution view for a run where the first vote passed, so vehicleReviewLoop has one vehicleEvaluators round and no revise row before estimateCosts](/images/section-3-step-03-devui-executions.png)
+![The Dev UI execution view for a run where the first vote passed, so vehicleReviewLoop has one vehicleEvaluators round and no revise row before estimateCosts](../../images/section-3-step-03-devui-executions.png)
 
 Now and then `planItinerary` also tries to activate a skill that doesn't exist, such as `route-overview`. Those calls show up marked failed, the tool replies with the list of available skills, and the agent carries on with the one it did load.
 
@@ -337,7 +337,7 @@ The supplied tests verify the voting aggregation, pipeline assembly, and end-to-
 
 - You can also play with the exit threshold. Lowering it to 6.0 makes the loop exit sooner. Raising it to 9.5 will probably use up all three revisions, even though the scores tend to creep up with each one, and the browser then shows the `quality_not_met` message. Add a log line inside `shouldExit` to watch the score change from one round to the next.
 
-    ![The trip planner showing an error that the vehicle recommendation did not meet the quality threshold after three revisions](/images/section-3-step-03-quality-not-met.png)
+    ![The trip planner showing an error that the vehicle recommendation did not meet the quality threshold after three revisions](../../images/section-3-step-03-quality-not-met.png)
 
 - For a more advanced experiment, try a weighted voting strategy where the comfort evaluator counts double for family trips and the cost evaluator counts double for economy budgets. Pass the trip type into the aggregation to select the weights.
 
@@ -345,7 +345,7 @@ The supplied tests verify the voting aggregation, pipeline assembly, and end-to-
 
 The planner now has a panel of evaluators that vote on every vehicle and a reviser that keeps trying until they're happy. In Step 04, we'll wrap the planning pipeline in an event-driven Quarkus Flow workflow, so the customer can take their time before approving or rejecting a trip.
 
-[Continue to Step 04 - Event-Driven Agentic Workflows with Quarkus Flow](step-04.md)
+[Continue to Step 04 - Event-Driven Agentic Workflows with Quarkus Flow](../step-04/)
 
 ## Troubleshooting
 

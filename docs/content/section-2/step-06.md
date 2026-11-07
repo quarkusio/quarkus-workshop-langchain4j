@@ -105,7 +105,7 @@ graph TB
 
 Before starting:
 
-- **Completed [Step 05](step-05.md)** — This step builds on Step 5's architecture
+- **Completed [Step 05](../step-05/)** — This step builds on Step 5's architecture
 - Application from Step 05 is stopped (Ctrl+C)
 - Understanding of the existing `CarProcessingWorkflow` sequence
 
@@ -528,4 +528,4 @@ The system now:
 
 In **Step 07**, you'll learn about **dynamic model selection** — automatically routing high-value vehicle decisions to a more capable LLM while keeping costs down for routine dispositions!
 
-[Continue to Step 07 - Dynamic Model Selection](step-07.md)
+[Continue to Step 07 - Dynamic Model Selection](../step-07/)

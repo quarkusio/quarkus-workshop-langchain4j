@@ -7,7 +7,7 @@ content-toc: true
 
 > [!TIP]
 > **This step is optional**
-> This bonus step requires access to a Kubernetes or OpenShift cluster. If you don't have one available, you can get a free cluster in minutes using the [OpenShift Developer Sandbox](https://developers.redhat.com/developer-sandbox) — no installation required, just sign in with a Red Hat account. If you'd rather skip this step entirely, head straight to the [conclusion](conclusion.md).
+> This bonus step requires access to a Kubernetes or OpenShift cluster. If you don't have one available, you can get a free cluster in minutes using the [OpenShift Developer Sandbox](https://developers.redhat.com/developer-sandbox) — no installation required, just sign in with a Red Hat account. If you'd rather skip this step entirely, head straight to the [conclusion](../conclusion/).
 
 Over the course of this section, you built a sophisticated distributed multi-agent system: a fleet management application with a supervisor, parallel workflows, human-in-the-loop approval, multimodal image analysis, and a remote pricing agent communicating over the A2A protocol. All of that ran on your local environment with `./mvnw quarkus:dev`.
 
@@ -370,6 +370,6 @@ This deletes the Route, both application Deployments and Services, PostgreSQL, t
 
 ## What's Next
 
-You've now seen a complete picture of the Miles and Smiles agentic system — from a single agent with a tool in Step 01, through compositional workflows, supervisor orchestration, human approval, multimodal analysis, and distributed A2A communication in Step 08, to a production cluster deployment here. Head to the [Mastering Agentic Systems](conclusion.md) conclusion to reflect on everything you've built and the patterns you can carry into your own projects.
+You've now seen a complete picture of the Miles and Smiles agentic system — from a single agent with a tool in Step 01, through compositional workflows, supervisor orchestration, human approval, multimodal analysis, and distributed A2A communication in Step 08, to a production cluster deployment here. Head to the [Mastering Agentic Systems](../conclusion/) conclusion to reflect on everything you've built and the patterns you can carry into your own projects.
 
 If you're continuing to **Section 3**, you'll take these foundations into enterprise territory: agent skills and dynamic discovery, persistent event-driven workflows with Quarkus Flow, adaptive model selection, and AI-powered evaluation.
