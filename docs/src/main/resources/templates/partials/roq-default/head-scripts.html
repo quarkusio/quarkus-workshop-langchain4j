@@ -1,6 +1,20 @@
 {#bundle /}
 {#search-script /}
 <script>
+    // Restore the dark mode preference before first paint. The roq theme
+    // only persists the choice but never restores it, so without this the
+    // site resets to light on every navigation. Default remains light.
+    (function() {
+        try {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+        } catch (e) {
+            // ignore unavailable localStorage
+        }
+    })();
+</script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
   var sidebar = document.querySelector('.sidebar.main');
 
