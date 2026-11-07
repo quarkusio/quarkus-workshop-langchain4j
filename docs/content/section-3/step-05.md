@@ -329,7 +329,7 @@ sequenceDiagram
 .\mvnw.cmd quarkus:dev
 ```
 
-==Open [http://localhost:8080](http://localhost:8080) and generate a trip plan with a future start date. Leave it awaiting approval.==
+<mark>Open [http://localhost:8080](http://localhost:8080) and generate a trip plan with a future start date. Leave it awaiting approval.</mark>
 
 Once the plan is ready, the results page shows the workflow and request identifiers above the approval buttons.
 
@@ -365,7 +365,7 @@ Now inspect how the application restored that pending trip. <mark>Check the star
 
 ![Example startup log restoring pending workflow instances at waitApproval](../../images/section-3-step-05-restore-log.png)
 
-==Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev) and select **Database view** on the Agroal card. Inspect the `workflowinstanceentity` and `trip_plan_status` tables.== The first holds the saved workflow instance. The second holds the original request and plan with status `awaiting_approval`. Both should have the workflow identifier shown in the browser.
+<mark>Open the Quarkus Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev) and select **Database view** on the Agroal card. Inspect the `workflowinstanceentity` and `trip_plan_status` tables.</mark> The first holds the saved workflow instance. The second holds the original request and plan with status `awaiting_approval`. Both should have the workflow identifier shown in the browser.
 
 ![The Agroal Database view with the trip_plan_status row, showing the workflow identifier, request identifier, and awaiting_approval status](../../images/section-3-step-05-database-view.png)
 
@@ -384,7 +384,7 @@ Now inspect how the application restored that pending trip. <mark>Check the star
 <details>
 <summary>The pending trip did not come back</summary>
 
-==Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that dev mode uses `%dev.quarkus.hibernate-orm.schema-management.strategy=update`.<mark> The pending workflow checkpoint and trip row should still exist after the restart. </mark>If the rows remain but the restore log is missing, check the Flow debug log for startup errors.==
+<mark>Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that dev mode uses `%dev.quarkus.hibernate-orm.schema-management.strategy=update`. The pending workflow checkpoint and trip row should still exist after the restart. If the rows remain but the restore log is missing, check the Flow debug log for startup errors.</mark>
 
 </details>
 

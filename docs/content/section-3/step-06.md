@@ -247,7 +247,7 @@ cd section-3\step-06\trip-planner
 .\mvnw.cmd quarkus:dev
 ```
 
-==Open [http://localhost:8080](http://localhost:8080) and generate a family trip to `Barcelona`.== Look for the weather in the vehicle recommendation and for places from `import.sql`, such as Barcelona Science Museum or Barcelona Central Park, in the itinerary. The model may choose which places to include, so a particular name is not guaranteed. The database lookup matches the city name exactly; `barcelona` or an unseeded city returns an empty list.
+<mark>Open [http://localhost:8080](http://localhost:8080) and generate a family trip to `Barcelona`.</mark> Look for the weather in the vehicle recommendation and for places from `import.sql`, such as Barcelona Science Museum or Barcelona Central Park, in the itinerary. The model may choose which places to include, so a particular name is not guaranteed. The database lookup matches the city name exactly; `barcelona` or an unseeded city returns an empty list.
 
 <figure markdown="span">
   ![A five-day family trip to Barcelona whose vehicle recommendation mentions the sunny forecast and whose itinerary includes seeded points of interest](../../images/section-3-step-06-weather-itinerary.png)\{ width="600" }

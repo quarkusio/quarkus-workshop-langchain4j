@@ -50,8 +50,8 @@ Add the following dependency to your `pom.xml` file:
 The RAG pattern allows to extend the LLM knowledge with your own data.
 So, let's add some data.
 
-==Create a directory named `rag` in the `src/main/resources` directory.
-Then, create a file named `miles-of-smiles-terms-of-use.txt` in the `rag` directory with the following content:==
+<mark>Create a directory named `rag` in the `src/main/resources` directory.
+Then, create a file named `miles-of-smiles-terms-of-use.txt` in the `rag` directory with the following content:</mark>
 
 **miles-of-smiles-terms-of-use.txt**
 ```text
@@ -108,14 +108,14 @@ Right now, we use the [default embedding model provided by OpenAI](https://devel
 We will see in the next steps how to use your own embedding model.
 
 Let's have a look at the content of our knowledge base.
-==Open the browser to [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui/).
+<mark>Open the browser to [http://localhost:8080/q/dev-ui](http://localhost:8080/q/dev-ui/).
 This is the Quarkus Dev UI, the toolbox with everything you need to develop your Quarkus application.
-Locate the _LangChain4j Core_ tile, and click on the _Embedding store_ link:==
+Locate the _LangChain4j Core_ tile, and click on the _Embedding store_ link:</mark>
 
 ![Embedding store link in the dev UI](../../images/langchain4j-tile.png)
 
-==Then, look for the `Search for relevant embeddings` section.
-Enter a query in the `Search text` field, for example, `Cancellation`, and then click on the `Search` button:==
+<mark>Then, look for the `Search for relevant embeddings` section.
+Enter a query in the `Search text` field, for example, `Cancellation`, and then click on the `Search` button:</mark>
 
 ![Search for relevant embeddings](../../images/embedding-search.png)
 
@@ -129,8 +129,8 @@ The closer the embeddings, the higher the score.
 ### Augmentation
 
 Let's now go back to our chatbot and test the RAG pattern.
-==Open the browser at [http://localhost:8080](http://localhost:8080).
-Ask a question related to the terms of use:==
+<mark>Open the browser at [http://localhost:8080](http://localhost:8080).
+Ask a question related to the terms of use:</mark>
 
 ```
 What can you tell me about your cancellation policy?

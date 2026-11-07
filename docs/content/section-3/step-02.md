@@ -239,7 +239,7 @@ Time to test if everything is working! As always, if the application is not alre
 .\mvnw.cmd quarkus:dev
 ```
 
-==Open [http://localhost:8080](http://localhost:8080) and fill in the form:==
+<mark>Open [http://localhost:8080](http://localhost:8080) and fill in the form:</mark>
 
 - Destination: `Italian Riviera`
 - Start date: a future date
@@ -262,13 +262,13 @@ A `PASS` means the recommendation already met the rules. A `REPROMPT` means the 
 
 The `RentalEstimateInputGuardrail` decisions show up in the same log.
 
-==Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui), select **Executions** on the LangChain4j Agentic card, and expand `estimateCosts` in the latest run.== Look for the `estimateRental` call and its category, duration, and result. An accepted `suv` call for five days, for example, returns a daily rate of 80 EUR and a rental subtotal of 400 EUR. The daily rate should match the vehicle-per-day amount in the browser.
+<mark>Open the [Quarkus Dev UI](http://localhost:8080/q/dev-ui), select **Executions** on the LangChain4j Agentic card, and expand `estimateCosts` in the latest run.</mark> Look for the `estimateRental` call and its category, duration, and result. An accepted `suv` call for five days, for example, returns a daily rate of 80 EUR and a rental subtotal of 400 EUR. The daily rate should match the vehicle-per-day amount in the browser.
 
 ## Observing a guardrail reprompt in the browser
 
 The vehicle-selection skill guides the model toward sensible choices for most trips, but the guardrail's budget rule operates independently of the skill. Let's try to trigger it by requesting a luxury vehicle on an economy budget. 
 
-==Open [http://localhost:8080](http://localhost:8080) and fill in the form:==
+<mark>Open [http://localhost:8080](http://localhost:8080) and fill in the form:</mark>
 
 - Destination: `Italian Riviera`
 - Start date: a future date
@@ -302,7 +302,7 @@ When a guardrail exhausts all its retry or reprompt attempts without a passing r
 
 The Duration field in the form accepts any number (the Miles of Smiles developers were perhaps a bit lazy), so we can trigger the input guardrail simply by entering a value outside the tool's accepted range.
 
-==Open [http://localhost:8080](http://localhost:8080), fill in the form with any destination, and set Duration to `45` days. Click **Generate Trip Plan** and look for the `RentalEstimateInputGuardrail` lines in the terminal:==
+<mark>Open [http://localhost:8080](http://localhost:8080), fill in the form with any destination, and set Duration to `45` days. Click **Generate Trip Plan** and look for the `RentalEstimateInputGuardrail` lines in the terminal:</mark>
 
 ```text
 🛡️ [RentalEstimateInputGuardrail] REJECT — Set days to a whole number from 1 to 30.
