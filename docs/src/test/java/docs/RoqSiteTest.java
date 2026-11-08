@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Validates that the Roq site generates without errors and that the generated
@@ -101,6 +103,54 @@ public class RoqSiteTest {
         when().get("/").then().statusCode(200)
                 .body(containsString("localStorage.getItem('darkMode') === 'true'"))
                 .body(not(containsString("prefers-color-scheme")));
+    }
+
+    @Test
+    public void snippetsAreNotDoubleEscaped() {
+        // Qute escapes extension results by default; the snippet extension
+        // returns RawString so quotes and angle brackets reach the Markdown
+        // converter as source text. Without it the page shows &quot; and &lt;.
+        when().get("/section-2/step-06/").then().statusCode(200)
+                .body(containsString("@Path(&quot;/car-management&quot;)"))
+                .body(containsString("Uni&lt;Response&gt;"))
+                .body(not(containsString("&amp;quot;")))
+                .body(not(containsString("&amp;lt;")));
+    }
+
+    @Test
+    public void stackedSnippetsDoNotLeaveAnEmptyLine() {
+        // A fence can stack several snippets. Each call returns its text
+        // without the newline that ended it, so the line break after the call
+        // keeps the code continuous instead of adding a blank line.
+        when().get("/section-1/step-06/").then().statusCode(200)
+                .body(containsString(".contentRetriever(contentRetriever)\n"
+                        + "                .contentInjector(new ContentInjector() {"));
+    }
+
+    @Test
+    public void codeFencesCarryTheLinesToHighlight() {
+        when().get("/section-2/step-06/").then().statusCode(200)
+                .body(containsString("data-hl-lines=\"4 12-14 16-17 20 42 47 49-50 52 69-82\""))
+                .body(containsString("data-hl-lines=\"12 36 39 61\""))
+                .body(not(containsString("hl_lines=**")));
+    }
+
+    @Test
+    public void mermaidFencesAreLeftForTheBrowser() {
+        // the browser turns these into SVG; the generated HTML keeps the
+        // source in a language-mermaid block
+        when().get("/section-3/step-01/").then().statusCode(200)
+                .body(containsString("<code class=\"language-mermaid\">"));
+    }
+
+    @Test
+    public void highlightLinesOptionIsParsed() {
+        assertEquals("37-61 114-127", HighlightLinesExtension.lineSpec("java hl_lines=\"37-61 114-127\""));
+        assertEquals("1-3 7", HighlightLinesExtension.lineSpec("java hl_lines='1-3 7'"));
+        assertEquals("5", HighlightLinesExtension.lineSpec("java hl_lines=5"));
+        assertNull(HighlightLinesExtension.lineSpec("java"));
+        assertNull(HighlightLinesExtension.lineSpec("java hl_lines=\"\""));
+        assertNull(HighlightLinesExtension.lineSpec(null));
     }
 
     @Test

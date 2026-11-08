@@ -239,7 +239,7 @@ The `CODE` and `MESSAGE` constants are used by the exception mapper and the fron
 <mark>Open `src/main/java/com/tripplanner/agentic/workflow/TripPlannerSystem.java` and add `VehicleReviewLoop.class` to the `subAgents` array, between `ResearchPhase` and `CostEstimatorAgent`:</mark>
 
 **TripPlannerSystem.java**
-```java
+```java hl_lines="5"
 {snippet:insert("section-3/step-03/src/main/java/com/tripplanner/agentic/workflow/TripPlannerSystem.java")}
 ```
 
@@ -250,7 +250,7 @@ The sequence now runs: parallel research → voting evaluation loop → cost est
 <mark>Update `src/main/resources/application.properties` to add the enhanced model configuration:</mark>
 
 **application.properties**
-```properties
+```properties hl_lines="7-12"
 {snippet:insert("section-3/step-03/src/main/resources/application.properties")}
 ```
 

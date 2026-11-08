@@ -175,7 +175,7 @@ The store will continue receiving the same events and returning the same `TripPl
 <mark>Open `src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java`. Remove the `requests`, `instances`, and `decisions` maps, the `latestRequestId` field, and the `HashMap` and `Map` imports. Update the imports as highlighted below, keeping the logger and injected `ObjectMapper`:</mark>
 
 **TripPlanStore.java (imports and fields)**
-```java
+```java hl_lines="16 21 25-26 30"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:3", "39")}
 ```
 
@@ -184,7 +184,7 @@ The in-memory implementation used synchronized methods to protect those maps. Da
 <mark>Replace `register()` and `bind()` with the following versions, removing their `synchronized` modifiers:</mark>
 
 **TripPlanStore.java (saving the request before planning)**
-```java
+```java hl_lines="1-8 11-17 20-21"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:41", "62")}
 ```
 
@@ -205,14 +205,14 @@ flowchart TD
 <mark>Add `@Blocking` to `consume()` and the highlighted comment, keeping its event names, dispatch, and exception handling unchanged:</mark>
 
 **TripPlanStore.java (outcome consumer)**
-```java
+```java hl_lines="2 20"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:64", "85")}
 ```
 
 <mark>Replace the private synchronized `accept()` method with this public transactional version:</mark>
 
 **TripPlanStore.java (saving a correlated outcome)**
-```java
+```java hl_lines="1-2 4-8 10 14-18"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:87", "105")}
 ```
 
@@ -227,7 +227,7 @@ The workflow checks a decision against the one accepted by the REST resource bef
 <mark>Replace `submitDecision()` and `matchesDecision()` with these database-backed versions:</mark>
 
 **TripPlanStore.java (persisting the accepted decision)**
-```java
+```java hl_lines="1-6 9-14 17-21"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:107", "128")}
 ```
 
@@ -236,7 +236,7 @@ Locking the row while accepting a decision makes concurrent submissions take tur
 <mark>Replace `submissionFailed()` and `onWorkflowFailed()` with the following versions, removing their `synchronized` modifiers and the old map updates and `notifyAll()` call:</mark>
 
 **TripPlanStore.java (persisting failures)**
-```java
+```java hl_lines="1-11 15 18"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:130", "148")}
 ```
 
@@ -249,14 +249,14 @@ The planning HTTP request waits for its result but releases its database connect
 <mark>Update `awaitPlan()` as highlighted. Remove `synchronized` and replace the map read and `timedWait()` call, without adding a transaction around this method:</mark>
 
 **TripPlanStore.java (bounded waiting)**
-```java
+```java hl_lines="1 4 8-9"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:150", "160")}
 ```
 
 <mark>Replace `byRequestId()`, `byInstanceId()`, and `latest()`, removing their `synchronized` modifiers, and add `toStatus()`. Keep the existing `error()` helper and the separate `TripPlanStatus` record unchanged:</mark>
 
 **TripPlanStore.java (queries and response conversion)**
-```java
+```java hl_lines="1-3 6-8 11-14 17-19"
 {snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java:162", "181")}
 ```
 

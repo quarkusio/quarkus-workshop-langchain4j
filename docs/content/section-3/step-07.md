@@ -100,7 +100,7 @@ The judge reads the budget tier together with the vehicle type, model, and the r
 <mark>Update the highlighted lines in `src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java` to inject and use the judge:</mark>
 
 **TripAppropriatenessGuardrail.java**
-```java
+```java hl_lines="24-26 36-37 81-95"
 {snippet:insert("section-3/step-07/trip-planner/src/main/java/com/tripplanner/guardrails/TripAppropriatenessGuardrail.java")}
 ```
 

@@ -337,7 +337,7 @@ Please, only use the following information:
 <mark>Edit the `create` method in the `RagRetriever` class to:</mark>
 
 **RagRetriever.java**
-```java
+```java hl_lines="31-39"
 {snippet:insert("section-1/step-06/src/main/java/dev/langchain4j/quarkus/workshop/RagRetriever.java", "ragretriever-1")}
 {snippet:insert("section-1/step-06/src/main/java/dev/langchain4j/quarkus/workshop/RagRetriever.java", "ragretriever-3")}
 {snippet:insert("section-1/step-06/src/main/java/dev/langchain4j/quarkus/workshop/RagRetriever.java", "ragretriever-2")}
@@ -345,7 +345,7 @@ Please, only use the following information:
 
 Now if you ask the question to the chatbot, you will get a different prompt. You can see this if you examine the latest logs:
 
-```shell
+```shell hl_lines="12"
 INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread-0) Request:
 - method: POST
 - url: https://api.openai.com/v1/chat/completions

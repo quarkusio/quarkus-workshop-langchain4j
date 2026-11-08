@@ -558,3 +558,35 @@ html.dark :is(.content-prose, .home-content) mark {
 .hljs-copy-wrapper {
     position: relative;
 }
+
+/* Line highlighting (hl_lines in the fence info string). The script wraps
+   every rendered line in .code-line; marked lines get .hl-line, which is
+   stretched over the code block padding like the previous site. */
+.content-prose pre code .code-line {
+    display: inline-block;
+    width: 100%;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+}
+
+.content-prose pre code .hl-line {
+    background-color: rgba(66, 135, 255, 0.1);
+    box-shadow: inset 2px 0 0 #4287ff;
+}
+
+html.dark .content-prose pre code .hl-line {
+    background-color: rgba(66, 135, 255, 0.2);
+}
+
+/* Mermaid diagrams replace their fenced code block once rendered */
+.content-prose .mermaid {
+    margin: 1.2em 0;
+    text-align: center;
+    overflow-x: auto;
+}
+
+.content-prose .mermaid svg {
+    max-width: 100%;
+    height: auto;
+}

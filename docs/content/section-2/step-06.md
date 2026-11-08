@@ -156,8 +156,8 @@ fetch(`/car-management/return/$\{carId}`, \{
 
 Update `src/main/java/com/carmanagement/resource/CarManagementResource.java` to accept the image as a `FileUpload` and convert it to `ImageContent`:
 
-**CarManagementResource.java hl_lines=**
-```java 37-61 114-127"
+**CarManagementResource.java**
+```java hl_lines="4 12-14 16-17 20 42 47 49-50 52 69-82"
 {snippet:insert("section-2/step-06/src/main/java/com/carmanagement/resource/CarManagementResource.java")}
 ```
 
@@ -211,8 +211,8 @@ private ImageContent toImageContent(FileUpload fileUpload) \{
 
 Add `ImageContent` as a parameter and forward it to the workflow:
 
-**CarManagementService.java  hl_lines=**
-```java 37-38"
+**CarManagementService.java**
+```java hl_lines="12 36 39 61"
 {snippet:insert("section-2/step-06/src/main/java/com/carmanagement/service/CarManagementService.java")}
 ```
 
@@ -235,8 +235,8 @@ This is the core of this step — a new agent that processes car images.
 
 In `src/main/java/com/carmanagement/agentic/agents`, create `CarImageAnalysisAgent.java`:
 
-**CarImageAnalysisAgent.java  hl_lines=**
-```java 28 30-32"
+**CarImageAnalysisAgent.java**
+```java
 {snippet:insert("section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java")}
 ```
 

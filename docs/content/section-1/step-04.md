@@ -27,7 +27,7 @@ To add a system message, we need to enhance our `CustomerSupportAgent` interface
 <mark>Update the `CustomerSupportAgent` interface content to become:</mark>
 
 **CustomerSupportAgent.java**
-```java
+```java hl_lines="12-16"
 {snippet:insert("section-1/step-04/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java")}
 ```
 

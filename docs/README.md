@@ -94,11 +94,30 @@ Snippets come from the step projects:
 ```markdown
 {snippet:insert("section-1/step-05/pom.xml")}
 {snippet:insert("section-1/step-05/pom.xml", "easy-rag")}
-{snippet:insert("section-3/step-05/src/main/java/com/tripplanner/model/TripPlanStore.java", "12:34")}
+{snippet:insert("section-3/step-05/src/main/java/com/tripplanner/model/TripPlanStore.java:12", "34")}
 ```
 
-The first form inserts the whole file. The second reads the lines between `--8<-- [start:easy-rag]` and `--8<-- [end:easy-rag]` markers, in `--8<--` or `-8<-` form, inside any comment syntax. The third reads a line range.
+The first form inserts the whole file. The second reads the lines between `--8<-- [start:easy-rag]` and `--8<-- [end:easy-rag]` markers, in `--8<--` or `-8<-` form, inside any comment syntax. The third reads a line range: the first line goes after a colon in the path, the last line is the second argument.
 
-Mermaid fenced blocks are not rendered yet; they currently appear as plain code. Avoid adding new ones until the site loads a Mermaid renderer.
+Add `hl_lines` to the fence info string to mark the lines the reader should change. The numbers are one-based lines of the rendered block, so for a line-range snippet they count from the start of the excerpt:
+
+````markdown
+```java hl_lines="22-25"
+{snippet:insert("section-1/step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java")}
+```
+````
+
+The lines get a light blue background and a blue bar on the left, faint in dark mode. Put the file name in a bold line above the fence, since the info string only carries the language and `hl_lines`.
+
+Mermaid fences render as diagrams in the browser:
+
+````markdown
+```mermaid
+flowchart LR
+    A --> B
+```
+````
+
+Mermaid is loaded from jsDelivr, only on pages that contain a diagram, the same approach the previous site used. The version is pinned in `docs/web/app.js`. If the CDN cannot be reached, the diagram source stays visible as a code block, and the diagrams render again with the matching palette when the reader switches between light and dark.
 
 For tone and structure, read `.agents/skills/workshop-docs-style/SKILL.md`.

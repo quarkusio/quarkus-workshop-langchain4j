@@ -391,7 +391,7 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 following annotations:
 
 **CustomerSupportAgent.java**
-```java
+```java hl_lines="7-11 29-30 34-36 37-39 42-50"
 {snippet:insert("section-1/step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java")}
 ```
 

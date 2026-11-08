@@ -175,14 +175,14 @@ Only the vehicle and itinerary agents need direct access to these skills. You ca
  <mark>Open `src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java` and update the highlighted lines, including the import, prompt, and annotation:</mark>
 
 **VehicleAdvisorAgent.java**
-```java
+```java hl_lines="6 12-13 24"
 {snippet:insert("section-3/step-01/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java")}
 ```
 
 <mark>In the same directory, update the highlighted lines in `ItineraryPlannerAgent.java`:</mark>
 
 **ItineraryPlannerAgent.java**
-```java
+```java hl_lines="6 12 25"
 {snippet:insert("section-3/step-01/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java")}
 ```
 
