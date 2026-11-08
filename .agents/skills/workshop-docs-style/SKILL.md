@@ -1,6 +1,6 @@
 ---
 name: workshop-docs-style
-description: Writing style guide for the Quarkus LangChain4j workshop documentation. Apply whenever writing or editing docs in docs/docs/. This skill must be consulted before writing or editing any file under docs/docs/ — do not rely on defaults.
+description: Writing style guide for the Quarkus LangChain4j workshop documentation. Apply whenever writing or editing docs in docs/content/. This skill must be consulted before writing or editing any file under docs/content/ — do not rely on defaults.
 ---
 
 # Workshop Documentation Style Guide
@@ -70,7 +70,7 @@ Write the same content as a paragraph instead.
 - Bad: `The workflow does one simple thing.`
 - Better: `The workflow takes a booking event, generates a trip plan, and waits for approval.`
 
-**Mechanical walkthrough voice for explanations.** Describe system behavior with the system as the subject, rather than pretending the reader performs its internal operations. Direct address is still welcome when connecting lessons or guiding the exercise: `You've seen how system and user prompts work`, `We're going to add four skills`, or `In the tests we just did...`. These transitions should refer to actual prior work and explain why the next activity follows. Reserve `==highlighted text==` for actions to perform now, not every use of `you` or `we`.
+**Mechanical walkthrough voice for explanations.** Describe system behavior with the system as the subject, rather than pretending the reader performs its internal operations. Direct address is still welcome when connecting lessons or guiding the exercise: `You've seen how system and user prompts work`, `We're going to add four skills`, or `In the tests we just did...`. These transitions should refer to actual prior work and explain why the next activity follows. Reserve `<mark>highlighted text</mark>` for actions to perform now, not every use of `you` or `we`.
 
 - Bad: `You start from an event with schedule and then wait with listen.`
 - Better: `The workflow starts from an event with schedule and then waits with listen.`
@@ -115,24 +115,41 @@ Bullet lists are appropriate for:
 - Sequential commands where order matters
 - Focused "What to notice" lists for complex changes with several independent ideas
 
-## MkDocs Admonitions
+## Callout Boxes
 
-`!!!tip`, `!!!note`, `!!!warning`, and `???warning` (collapsible) are all fine and encouraged where they add value. Use `!!!tip` for helpful shortcuts or alternative approaches. Use `!!!note` for important context that isn't a warning. Use `???warning` (collapsible) for troubleshooting blocks so they don't clutter the page. Do not invent a reason to add an admonition on every page — use them only when the content genuinely benefits from the callout treatment.
+The pages use GitHub alert syntax, which Roq renders as a box with a tinted title bar. `> [!TIP]`, `> [!NOTE]`, `> [!IMPORTANT]` and `> [!WARNING]` are all fine and encouraged where they add value. Use `> [!TIP]` for helpful shortcuts or alternative approaches. Use `> [!NOTE]` for important context that isn't a warning. Use `> [!WARNING]` for anything that can break the reader's setup. Do not invent a reason to add a box on every page; use them only when the content genuinely benefits from the callout treatment.
 
-Use `??? info "Why not ...?"` for optional design discussions, alternative approaches, or deeper implementation details. These boxes must be closed by default, so use `???`, not `???+`. Indent all of the explanation inside the box.
+A bold first line becomes the box title, like the old `!!! note "Title"` syntax. Write the title on its own line right after the alert marker:
 
-A short recap of the supplied starter can use a visible `!!! info` box with a small diagram. This separates existing behavior from the new work without hiding useful orientation. Use a collapsed box when the recap becomes a deeper implementation discussion.
+```markdown
+> [!NOTE]
+> **Reloading**
+> The application restarts on the next request.
+```
+
+Use `<details>` with a `<summary>` for troubleshooting blocks and optional design discussions, so they don't clutter the page:
+
+```html
+<details>
+<summary>Why not ...?</summary>
+
+The explanation goes here, after a blank line.
+
+</details>
+```
+
+A short recap of the supplied starter can use a visible `> [!NOTE]` box with a small diagram. This separates existing behavior from the new work without hiding useful orientation. Use a collapsed box when the recap becomes a deeper implementation discussion.
 
 Keep required edits and safety-critical instructions visible. If an implementation limitation affects the exercise, state the practical instruction in the main text and put the deeper explanation in a collapsed box. Readers should be able to complete the chapter without opening optional background sections.
 
 ## Action Directives
 
-Use `==highlighted text==` whenever the reader is supposed to do something right now: open a file, type a value, run a command, click a button. This is a MkDocs highlight and renders as a yellow marker.
+Use `<mark>highlighted text</mark>` whenever the reader is supposed to do something right now: open a file, type a value, run a command, click a button. Roq renders it with the same yellow marker as the previous site. The old MkDocs `==...==` delimiter does not work.
 
 Examples:
-- `==Open `application.properties` and add the following:==`
-- `==Navigate to `section-3/step-01` and start the application:==`
-- `==Click **Generate Trip Plan**.==`
+- `<mark>Open `application.properties` and add the following:</mark>`
+- `<mark>Navigate to `section-3/step-01` and start the application:</mark>`
+- `<mark>Click **Generate Trip Plan**.</mark>`
 
 Do not use action directives for passive observations ("Notice how...").
 
@@ -168,13 +185,13 @@ Review the page as a whole for rhythm and repetition. Alternate prose and lists 
 
 ### Updating existing code
 
-For files that already exist in the previous step, tell the reader to update the highlighted lines rather than replace the entire file. Use MkDocs `hl_lines` to distinguish additions and changes from unchanged context, and explicitly identify fields or imports that must be removed, since they will not appear in the resulting snippet.
+For files that already exist in the previous step, tell the reader to update the highlighted lines rather than replace the entire file. Use `hl_lines` in the fence info string, right after the language, to distinguish additions and changes from unchanged context. Put the file name in a bold line above the fence, because the info string only carries the language and `hl_lines`. Explicitly identify fields or imports that must be removed, since they will not appear in the resulting snippet.
 
 Split long classes into focused excerpts at useful editing boundaries, keeping every required change visible. A collapsed "Complete updated file" box can provide the full class for comparison. New, short files can be shown in full without breaking them into excerpts.
 
-Prefer the repository's source includes (`--8<--`) so snippets match the completed step. For excerpts, use the supported `path:start:end` syntax and check that `hl_lines` counts from the beginning of the excerpt, not the original file. Recheck ranges and highlights whenever the source changes, and make it clear when an excerpt shows only a method declaration whose body should stay unchanged.
+Prefer the repository's source includes (`--8<--`) so snippets match the completed step. For excerpts, use the supported `path:start:end` syntax and recheck the range whenever the source changes. Make it clear when an excerpt shows only a method declaration whose body should stay unchanged.
 
-When a chapter adds several settings to the same properties file, give the reader one clear edit at the point where the settings are needed. If later text refers to a setting already shown, explain its purpose there without instructing the reader to add it again. Check that each properties snippet renders the intended lines in MkDocs.
+When a chapter adds several settings to the same properties file, give the reader one clear edit at the point where the settings are needed. If later text refers to a setting already shown, explain its purpose there without instructing the reader to add it again. Check that each properties snippet renders the intended lines in the site.
 
 ## Section Structure
 
@@ -197,7 +214,7 @@ When introducing two mechanisms that look similar, explain who decides when each
 
 ### Choosing a starting point
 
-When starter and completed projects are available, provide clearly labeled MkDocs tabs for building hands-on or reviewing the completed solution. Explain that the solution is also a comparison point if a participant gets stuck. Identify the working directory for each route and where the routes rejoin for running and testing, so reviewers do not repeat edits already present in their project. Keep prerequisites such as API keys visible for both routes and use platform tabs where commands differ.
+When starter and completed projects are available, present the two routes as short subsections with descriptive headings, such as "Build it hands-on" and "Follow the completed solution". Roq has no tabbed-content support, so do not use the old `=== "Tab"` syntax. Explain that the solution is also a comparison point if a participant gets stuck. Identify the working directory for each route and where the routes rejoin for running and testing, so reviewers do not repeat edits already present in their project. Keep prerequisites such as API keys visible for both routes and give each platform its own short code block where commands differ.
 
 ### Introducing a pattern
 
@@ -215,7 +232,7 @@ Also avoid explaining the pattern's value by restating how it works. The "why" s
 
 ### Organizing the exercise
 
-Avoid artificial numbering within a page ("Step 1", "Part 2"). Use descriptive headings. The MkDocs table of contents provides navigation structure already.
+Avoid artificial numbering within a page ("Step 1", "Part 2"). Use descriptive headings. The page table of contents provides navigation structure already.
 
 Use imperative verb forms for headings that describe an action the reader takes: "Create the evaluator agents", "Configure adaptive model selection", "Update the main workflow". Reserve noun or gerund forms for conceptual or navigational sections that describe a topic rather than a task: "Parallel assessment with the Voting pattern", "Troubleshooting", "What's next?".
 
@@ -251,7 +268,7 @@ Add a diagram when it answers a question that is harder to explain in prose, suc
 
 Use plain-language labels before introducing code identifiers. Keep diagrams small enough to read on mobile, and distinguish relationships in a flowchart from the order of events in a sequence diagram. Two diagrams should answer different questions; there is no need to add one to every chapter.
 
-Validate Mermaid diagrams with a Mermaid renderer, not just a documentation build. MkDocs can build successfully while leaving invalid Mermaid for the browser to reject. When available, run `mmdc -i <chapter.md> -o <temporary-output.md>` to render the chapter's diagrams outside the source tree. Avoid literal semicolons in sequence-diagram messages or notes because Mermaid treats them as statement separators; use a line break or reword the label. Distinguish syntax/rendering checks from checking the actual page layout in a browser.
+Mermaid fences render in the browser, so the usual ` ```mermaid ` blocks work. Validate a diagram with a Mermaid renderer, not just a site build, because a build can succeed while the browser rejects the diagram. When available, run `mmdc -i <chapter.md> -o <temporary-output.md>` to render the chapter's diagrams outside the source tree. Avoid literal semicolons in sequence-diagram messages or notes because Mermaid treats them as statement separators; use a line break or reword the label. Distinguish syntax/rendering checks from checking the actual page layout in a browser.
 
 Screenshots are useful for introducing the application, unfamiliar Dev UI navigation, an important application state, or a result that confirms the exercise worked. Place each capture beside the relevant instruction or observation, crop it to the useful area, and provide descriptive alt text. Refer back to an early application screenshot instead of repeating it when the reader starts testing. Keep essential instructions in prose so readers do not have to extract them from an image.
 
@@ -271,7 +288,7 @@ Use short log excerpts only when they help the reader recognize a specific inter
 
 ## Final review
 
-Read the chapter once as an explanation and once as an exercise. The first pass should make sense without decoding every identifier; the second should supply all edits needed to continue from the previous step. Check source includes and highlighted lines, build with `pipenv run mkdocs build --clean` from `docs/`, and separately render any changed Mermaid diagrams. Verify screenshot paths, relevance, and readability, and check that the visuals explain something the prose alone makes difficult. Report validation gaps instead of assuming a successful build proves the page renders correctly.
+Read the chapter once as an explanation and once as an exercise. The first pass should make sense without decoding every identifier; the second should supply all edits needed to continue from the previous step. Check the source ranges used by includes, run `./mvnw -f docs test` and `./mvnw -f docs clean package` from the repository root with Docker running, and separately render any changed diagrams. Verify screenshot paths, relevance, and readability, and check that the visuals explain something the prose alone makes difficult. Report validation gaps instead of assuming a successful build proves the page renders correctly.
 
 Check each participation route separately, including its prerequisites and the point where it joins the shared exercise. Confirm that verification shows evidence of the behavior being taught, and that skipping optional practice leaves the reader ready for the next chapter.
 

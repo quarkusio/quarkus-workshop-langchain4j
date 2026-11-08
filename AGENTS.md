@@ -10,7 +10,7 @@ The workshop follows the Miles of Smiles car rental company across three section
 
 ## Technology Stack
 
-The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, while the documentation is built with MkDocs using Python and Pipenv. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
+The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, and the documentation site is generated with Quarkus Roq from `docs/` using Maven only, with no Python dependency. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
 
 ## Project Structure
 
@@ -26,17 +26,17 @@ The Section 3 frontend is the exception to the per-step rule. `app.js` and `inde
 
 Test scoping rule: a step's default `./mvnw test` covers only what that step adds. When a new step is created by copying a previous snapshot, its earlier test suites must not be carried over; earlier coverage stays in its originating step's CI job. Only add or adapt tests for the current lesson.
 
-The documentation lives in the `docs/` directory and can be served locally at http://127.0.0.1:8000/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.
+The documentation lives in the `docs/` directory and can be served locally at http://localhost:8080/ or accessed online at https://quarkus.io/quarkus-workshop-langchain4j/.
 
 ## Building and Running
 
-You'll need Java 21 or higher, Maven 3.8 or higher, and Python 3.x with pipenv for the documentation. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
+You'll need Java 21 or higher and Maven 3.8 or higher. You'll also need an OpenAI API key or access to a compatible LLM endpoint.
 
 Each step is a self-contained Quarkus application. To run any step, navigate to its directory and execute `./mvnw quarkus:dev`. The application will start on http://localhost:8080 with Quarkus dev mode features like live reload and the dev UI enabled.
 
 To build the entire project from the root directory, run `./mvnw clean install`. This builds all modules in sequence.
 
-For the documentation, navigate to the `docs` directory, install pipenv if needed, run `pipenv install`, and then `pipenv run mkdocs serve --livereload`. The documentation will be available at http://127.0.0.1:8000/.
+For the documentation, run `./mvnw -f docs quarkus:dev` from the root (Docker must be running for the Kroki diagram container). The documentation will be available at http://localhost:8080/. Run `./mvnw -f docs test` to check that the site still generates correctly. See `docs/README.md` for the full contribution guide.
 
 ## Development Conventions
 
@@ -103,9 +103,9 @@ Write natural, flowing prose rather than the AI pattern of bullet points followe
 
 Avoid the em-dash clarification pattern (`X — it does Y`). Write it as a full sentence instead. Avoid `**Label**: description` inline patterns, and avoid "Key Points:" / "Key Takeaways:" bullet blocks after code snippets.
 
-Avoid creating artificial section divisions like "Part 1" or "Step 1" within a single page. The MkDocs table of contents provides navigation structure. Use descriptive headings.
+Avoid creating artificial section divisions like "Part 1" or "Step 1" within a single page. The page table of contents provides navigation structure. Use descriptive headings.
 
-Use `==highlighted text==` action directives whenever the reader is expected to do something: open a file, run a command, click a button.
+Use `<mark>highlighted text</mark>` action directives whenever the reader is expected to do something: open a file, run a command, click a button. Roq's Markdown engine does not support the old MkDocs `==...==` delimiter.
 
 Use bullet lists only when they genuinely aid readability: form field values, prerequisites, troubleshooting checks, or sequential commands. For everything else, prefer paragraphs.
 
@@ -113,7 +113,7 @@ Use bullet lists only when they genuinely aid readability: form field values, pr
 
 Start a step in dev mode with `./mvnw quarkus:dev`. Build without tests using `./mvnw clean package -DskipTests`. Run tests with `./mvnw test`. Clean build artifacts with `./mvnw clean`.
 
-For documentation, build with `cd docs && pipenv run mkdocs build --clean` or serve with live reload using `cd docs && pipenv run mkdocs serve --livereload`.
+For documentation, build with `./mvnw -f docs clean package`, test with `./mvnw -f docs test`, or serve with live reload using `./mvnw -f docs quarkus:dev`.
 
 ## Workshop Resources
 

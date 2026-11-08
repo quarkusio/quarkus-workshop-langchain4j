@@ -62,3 +62,4 @@ openspec/
 .agents/skills/openspec-propose/
 .agents/skills/openspec-sync-specs/
 .agents/skills/openspec-update-change/
+docs/node_modules/

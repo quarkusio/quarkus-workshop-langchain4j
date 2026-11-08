@@ -1,0 +1,592 @@
+@theme inline {
+    --color-accent-500: #1565c0;
+    --color-pop-500: #ff8f00;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-code: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+    --navbar-height: 3.5rem;
+}
+
+/* System font stack and compact type scale, matching the previous MkDocs Material site */
+body,
+h1, h2, h3, h4, h5, h6,
+.sidebar.main {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+pre, code, kbd, samp {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+/* Content density: more workshop text per screen, like MkDocs Material */
+.content-prose {
+    font-size: 0.94rem;
+    line-height: 1.6;
+}
+
+/* Vertical rhythm matching MkDocs Material (the theme's prose defaults are looser) */
+.content-prose p,
+.content-prose ul,
+.content-prose ol,
+.content-prose blockquote {
+    margin: 0.95em 0;
+}
+
+.content-prose pre {
+    margin: 1em 0;
+}
+
+.content-prose img {
+    margin: 1.1em auto;
+}
+
+.content-prose hr {
+    margin: 1.5em 0;
+}
+
+.content-prose > :first-child {
+    margin-top: 0;
+}
+
+/* Tips, notes and warnings: compact boxes close to the Material admonitions
+   of the previous site. The theme's own .markdown-alert p rule loses to the
+   .content-prose p margin above, which padded every box with full paragraph
+   margins on top of its own padding. */
+:is(.content-prose, .home-content) .markdown-alert {
+    margin: 1.05rem 0;
+    padding: 0 0.7rem 0.5rem;
+    font-size: 0.88em;
+    line-height: 1.55;
+    border-left-width: 3px;
+    border-radius: 0.2rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title {
+    position: relative;
+    display: block;
+    margin: 0 -0.7rem 0.45rem;
+    padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.5;
+    color: inherit;
+    border-radius: 0 0.2rem 0 0;
+    background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+/* When a box starts with a bold line, that line was its title in the
+   MkDocs sources (!!! note "Title"). Promote it to the title bar and
+   hide the generic type label, which would otherwise repeat above it. */
+:is(.content-prose, .home-content) .markdown-alert:has(> .markdown-alert-title + p > strong:first-child) > .markdown-alert-title {
+    display: none;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child {
+    position: relative;
+    display: block;
+    margin: 0 -0.7rem 0.45rem;
+    padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: inherit;
+    border-radius: 0 0.2rem 0 0;
+    background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
+    transform: translateY(-50%);
+    background-color: var(--alert-color);
+    mask-image: var(--alert-icon, none);
+    mask-size: 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title::before {
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    margin: 0;
+    width: 0.9rem;
+    height: 0.9rem;
+    transform: translateY(-50%);
+}
+
+:is(.content-prose, .home-content) .markdown-alert p {
+    margin: 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert p + p {
+    margin-top: 0.4rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert ul,
+:is(.content-prose, .home-content) .markdown-alert ol {
+    margin: 0.4rem 0;
+    padding-left: 1.3rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert pre {
+    margin: 0.5rem 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > :last-child {
+    margin-bottom: 0;
+}
+
+html.dark :is(.content-prose, .home-content) .markdown-alert {
+    box-shadow: none;
+}
+
+/* White page background edge to edge: the theme caps the page in a
+   1250px wrapper on a grey body background, which shows as a grey band
+   on wide screens. MkDocs Material used a white page. */
+body {
+    background-color: #ffffff;
+}
+
+html.dark body {
+    background-color: #171717;
+}
+
+.content-prose pre,
+.content-prose code {
+    font-size: 0.86em;
+}
+
+.content-main {
+    max-width: 54rem;
+}
+
+/* Match MkDocs Material heading scale and spacing */
+.content-prose h1, .page-title {
+    font-size: 1.875rem;
+    font-weight: 300;
+    line-height: 1.3;
+    margin: 0.4em 0 0.6em;
+}
+.content-prose h2 {
+    font-size: 1.45rem;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    margin: 1.5em 0 0.6em;
+}
+.content-prose h3 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 1.4em 0 0.7em;
+}
+.content-prose h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1.2em 0 0.55em;
+}
+.content-prose h5,
+.content-prose h6 {
+    font-size: 0.94rem;
+    font-weight: 700;
+    margin: 1.2em 0 0.55em;
+}
+
+/* ── Top navbar ─────────────────────────────────────────────────────── */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    height: var(--navbar-height);
+    background: #1565c0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.navbar-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 1rem;
+    gap: 1rem;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.navbar-logo {
+    height: 2rem;
+    width: auto;
+}
+
+.navbar-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    color: #fff;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.navbar-search {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.navbar-github {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+
+.navbar-github:hover {
+    color: #fff;
+}
+
+.navbar-github svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: currentColor;
+}
+
+/* GitHub repository stats (stars / forks) in the navbar */
+.navbar-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.navbar-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.navbar-stat:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+.navbar-stat i {
+    font-size: 0.8rem;
+}
+
+.navbar-star i {
+    color: #ffd54f;
+}
+
+/* Dark mode toggle inside navbar (override theme's fixed positioning) */
+.top-navbar .dark-mode-toggle {
+    position: static;
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    box-shadow: none;
+}
+
+.top-navbar .dark-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+/* Style the search-trigger-input for the dark navbar */
+.navbar-search .search-trigger-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.375rem;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    min-width: 13rem;
+    margin-bottom: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.navbar-search .search-trigger-input:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-search .search-trigger-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: rgba(255, 255, 255, 0.9) !important;
+    flex-shrink: 0;
+}
+
+.navbar-search .search-trigger-shortcut {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.2rem;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Push sidebar and content below the fixed navbar.
+   Width matches the MkDocs Material drawer (~15.25rem = 244px). */
+.sidebar.main {
+    top: var(--navbar-height) !important;
+    height: calc(100vh - var(--navbar-height)) !important;
+    width: 15.25rem !important;
+    scrollbar-gutter: stable;
+}
+
+.main-content {
+    padding-top: var(--navbar-height);
+    margin-left: 15.25rem;
+}
+
+/* Sidebar follows the light/dark theme: light by default, dark with .dark.
+   The theme ships a permanently dark sidebar; override its variables. */
+:root {
+    --sidebar-bg: #ffffff;
+    --color-sidebar: #3f4450;
+    --color-sidebar-heading: #1f2328;
+    --color-sidebar-muted: #6a737d;
+    --color-sidebar-subtle: rgba(15, 23, 42, 0.05);
+    --color-sidebar-border: #e5e7eb;
+}
+
+html.dark {
+    --sidebar-bg: linear-gradient(180deg, #0a0a0a 0%, #171717 100%);
+    --color-sidebar: #cbd5e1;
+    --color-sidebar-heading: #f8fafc;
+    --color-sidebar-muted: #94a3b8;
+    --color-sidebar-subtle: rgba(255, 255, 255, 0.06);
+    --color-sidebar-border: #333842;
+}
+
+/* Sidebar navigation styles */
+.sidebar-nav {
+    padding: 0.5rem 0;
+}
+
+.sidebar-section {
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-section .nav-section-title {
+    cursor: pointer;
+    padding: 0.5rem 1rem 0.35rem 1rem;
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-sidebar-muted, #aab);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+}
+
+.sidebar-section .nav-section-title:hover {
+    color: var(--color-sidebar-heading, #dde);
+}
+
+.sidebar-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-link {
+    display: block;
+    padding: 0.3rem 1rem 0.3rem 1.9rem;
+    color: var(--color-sidebar, #ccd);
+    text-decoration: none;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+}
+
+.sidebar-link:hover {
+    background: var(--color-sidebar-subtle, rgba(255, 255, 255, 0.06));
+    color: var(--color-accent-400, #42a5f5);
+}
+
+.sidebar-link.active {
+    color: var(--color-accent-400, #42a5f5);
+    border-left-color: var(--color-accent-400, #42a5f5);
+    background: var(--color-sidebar-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.standalone-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Homepage prose styling */
+.home-content {
+    @apply prose prose-base max-w-none;
+    @apply dark:prose-invert;
+}
+
+/* Images centered with max width, click to zoom */
+.content-prose img,
+.home-content img {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    max-width: 80%;
+    cursor: zoom-in;
+}
+
+/* Fullscreen lightbox for content images */
+.ws-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0, 0, 0, 0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+.ws-lightbox.open {
+    display: flex;
+}
+
+/* Diagrams are transparent PNGs with dark strokes, so the enlarged image
+   needs a light backing or it becomes unreadable on the dark overlay. */
+.ws-lightbox img {
+    max-width: 92vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.ws-lightbox-caption {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 0 2rem;
+}
+
+/* Dark mode image treatment */
+.dark .content-prose img {
+    border-radius: 1rem;
+    padding: 1rem;
+    background: rgba(226, 228, 233, 0.82);
+}
+
+/* Video responsive */
+.content-prose video {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin: 1rem auto;
+    display: block;
+}
+
+/* Inline highlights used as action directives (previously pymdownx
+   ==mark==). Colors match the previous site: translucent yellow in light,
+   translucent blue in dark. */
+:is(.content-prose, .home-content) mark {
+    background-color: #ffff0080;
+    color: inherit;
+    padding: 0.1em 0.3em;
+    border-radius: 0.15em;
+}
+
+html.dark :is(.content-prose, .home-content) mark {
+    background-color: #4287ff4d;
+}
+
+/* Code copy button via highlight.js copy plugin */
+.hljs-copy-wrapper {
+    position: relative;
+}
+
+/* Line highlighting (hl_lines in the fence info string). The script wraps
+   every rendered line in .code-line; marked lines get .hl-line, which is
+   stretched over the code block padding like the previous site. */
+.content-prose pre code .code-line {
+    display: inline-block;
+    width: 100%;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+}
+
+.content-prose pre code .hl-line {
+    background-color: rgba(66, 135, 255, 0.1);
+    box-shadow: inset 2px 0 0 #4287ff;
+}
+
+html.dark .content-prose pre code .hl-line {
+    background-color: rgba(66, 135, 255, 0.2);
+}
+
+/* Mermaid diagrams replace their fenced code block once rendered */
+.content-prose .mermaid {
+    margin: 1.2em 0;
+    text-align: center;
+    overflow-x: auto;
+}
+
+.content-prose .mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
