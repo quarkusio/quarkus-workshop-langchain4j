@@ -171,7 +171,7 @@ graph TB
 The `CarProcessingWorkflow` orchestrates the entire process sequentially:
 
 **CarProcessingWorkflow.java**
-```java
+```java hl_lines="1-2"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java", "sequence-agent")}
 ```
 
@@ -182,7 +182,7 @@ Notice that `subAgents` contains **two workflows** and one agent. Workflows are 
 The `FeedbackWorkflow` runs multiple agents **simultaneously**:
 
 **FeedbackWorkflow.java**
-```java
+```java hl_lines="1-2"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java", "parallel-agent")}
 ```
 
@@ -193,7 +193,7 @@ The agents analyze different aspects (cleaning vs. maintenance) and don't depend
 The `CarAssignmentWorkflow` uses **activation conditions** to intelligently route cars to the appropriate team based on the analysis it has done:
 
 **CarAssignmentWorkflow.java**
-```java
+```java hl_lines="1 10 15"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java", "conditional-agent")}
 ```
 
@@ -488,7 +488,7 @@ while the `CleaningFeedbackAgent` is specialized in looking for clues in the str
 In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedbackAgent.java`:
 
 **MaintenanceFeedbackAgent.java**
-```java
+```java hl_lines="11 14-15 20 33"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceFeedbackAgent.java")}
 ```
 
@@ -504,7 +504,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedback
 In `src/main/java/com/carmanagement/agentic/agents`, create `CleaningFeedbackAgent.java`:
 
 **CleaningFeedbackAgent.java**
-```java
+```java hl_lines="11 15-16 20 33"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningFeedbackAgent.java")}
 ```
 
@@ -522,7 +522,7 @@ This is where the `@ParallelAgent` annotation comes into play.
 In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.java`:
 
 **FeedbackWorkflow.java**
-```java
+```java hl_lines="16-17"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java")}
 ```
 
@@ -541,7 +541,7 @@ These agents will examine the analysis results and determine what should happen 
 In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceAgent.java`:
 
 **MaintenanceAgent.java**
-```java
+```java hl_lines="40-41"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/MaintenanceAgent.java")}
 ```
 
@@ -559,7 +559,7 @@ The CleaningAgent we created previously should now return analysisResult as well
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
 **CleaningAgent.java**
-```java
+```java hl_lines="35-36"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java")}
 ```
 
@@ -571,7 +571,7 @@ service agent path based on the analysis results. Notice the same analysisResult
 In `src/main/java/com/carmanagement/agentic/workflow`, create `CarAssignmentWorkflow.java`:
 
 **CarAssignmentWorkflow.java**
-```java
+```java hl_lines="17-18 26 31"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java")}
 ```
 
@@ -587,7 +587,7 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `CarAssignmentWork
 Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java` to add the new maintenance recommendations:
 
 **CarConditionFeedbackAgent.java**
-```java
+```java hl_lines="28 36"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java")}
 ```
 
@@ -622,7 +622,7 @@ We'll also update the `outputKey` and the output method to make sure the assignm
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
 **CarProcessingWorkflow.java**
-```java
+```java hl_lines="18-19 26-37"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
 ```
 

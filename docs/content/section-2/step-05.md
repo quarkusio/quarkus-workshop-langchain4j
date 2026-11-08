@@ -147,7 +147,7 @@ This agent creates disposition proposals that will be reviewed by humans.
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionProposalAgent.java`:
 
 **DispositionProposalAgent.java**
-```java
+```java hl_lines="14-29 38-48 51"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/agents/DispositionProposalAgent.java")}
 ```
 
@@ -163,7 +163,7 @@ This agent implements Human-in-the-Loop using LangChain4j's **`@HumanInTheLoop`*
 In `src/main/java/com/carmanagement/agentic/agents`, create `HumanApprovalAgent.java`:
 
 **HumanApprovalAgent.java**
-```java
+```java hl_lines="6 17"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java")}
 ```
 
@@ -245,7 +245,7 @@ Now we need to modify the supervisor to implement the new value-based routing wi
 Update `src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java`:
 
 **FleetSupervisorAgent.java**
-```java
+```java hl_lines="10 24-35 40-46 49-51"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java")}
 ```
 
@@ -256,7 +256,7 @@ We also need to add the approval tracking fields to the data model.
 Update `src/main/java/com/carmanagement/model/CarConditions.java`:
 
 **CarConditions.java**
-```java
+```java hl_lines="8-9 11-15 20-22"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/model/CarConditions.java")}
 ```
 

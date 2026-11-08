@@ -196,7 +196,7 @@ The first step in the refactoring is to make the analysis type explicit. Instead
 In `src/main/java/com/carmanagement/model`, create `FeedbackTask.java`:
 
 **FeedbackTask.java**
-```java
+```java hl_lines="15-25 32-44 51-70"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/model/FeedbackTask.java")}
 ```
 
@@ -214,7 +214,7 @@ Now create the single feedback analyzer that can handle any of those tasks.
 In `src/main/java/com/carmanagement/agentic/agents`, create `FeedbackAnalysisAgent.java`:
 
 **FeedbackAnalysisAgent.java**
-```java
+```java hl_lines="15"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FeedbackAnalysisAgent.java")}
 ```
 
@@ -243,7 +243,7 @@ Either way, our task is to implement their idea in the form of a new PricingAgen
 In `src/main/java/com/carmanagement/agentic/agents`, create `PricingAgent.java`:
 
 **PricingAgent.java**
-```java
+```java hl_lines="16 43-45 55"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java")}
 ```
 
@@ -256,7 +256,7 @@ Create an agent that makes disposition decisions based on the pricing outcome fr
 In `src/main/java/com/carmanagement/agentic/agents`, create `DispositionAgent.java`:
 
 **DispositionAgent.java**
-```java
+```java hl_lines="16 22 32 41 43"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/agents/DispositionAgent.java")}
 ```
 
@@ -269,7 +269,7 @@ the better the supervisor will be at deciding which agents to invoke.
 In `src/main/java/com/carmanagement/agentic/agents`, create `FleetSupervisorAgent.java`:
 
 **FleetSupervisorAgent.java**
-```java
+```java hl_lines="18-26 47"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java")}
 ```
 
@@ -347,7 +347,7 @@ Now create the workflow that runs the unified agent once for each task.
 In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackAnalysisWorkflow.java`:
 
 **FeedbackAnalysisWorkflow.java**
-```java
+```java hl_lines="24-33 43-45"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/FeedbackAnalysisWorkflow.java")}
 ```
 
@@ -376,7 +376,7 @@ Now that we've built the new components, we'll replace the previous parallel age
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
 **CarProcessingWorkflow.java**
-```java
+```java hl_lines="27"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
 ```
 
@@ -386,7 +386,7 @@ We need to update the list of assignments that a car can have to include `DISPOS
 Update `src/main/java/com/carmanagement/model/CarAssignment.java`:
 
 **CarAssignment.java**
-```java
+```java hl_lines="7"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/model/CarAssignment.java")}
 ```
 
@@ -394,7 +394,7 @@ We also need to update the list of status values that a car can have to include 
 Update `src/main/java/com/carmanagement/model/CarStatus.java`:
 
 **CarStatus.java**
-```java
+```java hl_lines="10"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/model/CarStatus.java")}
 ```
 
@@ -406,7 +406,7 @@ Update `src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent
 
 
 **CarConditionFeedbackAgent.java**
-```java
+```java hl_lines="25-33 46"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/agentic/agents/CarConditionFeedbackAgent.java")}
 ```
 
@@ -419,7 +419,7 @@ Finally, the service layer needs to create the feedback tasks before invoking th
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 **CarManagementService.java**
-```java
+```java hl_lines="40-44 60-63"
 {snippet:insert("section-2/step-04/src/main/java/com/carmanagement/service/CarManagementService.java")}
 ```
 

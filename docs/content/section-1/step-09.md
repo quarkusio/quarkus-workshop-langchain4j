@@ -97,7 +97,7 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 annotation highlighted below:
 
 **CustomerSupportAgent.java**
-```java
+```java hl_lines="3 23-24 28 30"
 {snippet:insert("section-1/step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java")}
 ```
 
@@ -113,7 +113,7 @@ CustomerSupportAgentWebSocket class a bit.
 <mark>Edit the `dev.langchain4j.quarkus.workshop.CustomerSupportAgentWebSocket` class to become:</mark>
 
 **CustomerSupportAgentWebSocket.java**
-```java
+```java hl_lines="3 23-34"
 {snippet:insert("section-1/step-09/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java")}
 ```
 

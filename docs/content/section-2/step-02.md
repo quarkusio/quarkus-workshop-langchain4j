@@ -333,7 +333,7 @@ The `CleaningAgent` needs to specify an `outputKey` so its result can be accesse
 Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 
 **CleaningAgent.java**
-```java
+```java hl_lines="34-35"
 {snippet:insert("section-2/step-02/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java")}
 ```
 
@@ -368,7 +368,7 @@ Now, create the workflow that orchestrates both agents.
 In `src/main/java/com/carmanagement/agentic/workflow`, create `CarProcessingWorkflow.java`:
     
 **CarProcessingWorkflow.java**
-```java
+```java hl_lines="18-20"
 {snippet:insert("section-2/step-02/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
 ```
 
@@ -443,7 +443,7 @@ Now update the service to use the workflow instead of calling agents directly.
 Update `src/main/java/com/carmanagement/service/CarManagementService.java`:
 
 **CarManagementService.java**
-```java
+```java hl_lines="17-18 34-43"
 {snippet:insert("section-2/step-02/src/main/java/com/carmanagement/service/CarManagementService.java")}
 ```
 

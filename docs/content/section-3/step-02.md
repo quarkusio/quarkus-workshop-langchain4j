@@ -154,14 +154,14 @@ Now we need to tell the agents to actually use the guardrails after they run by 
 <mark>Open `src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java` and add the highlighted imports and annotation:</mark>
 
 **ItineraryPlannerAgent.java**
-```java
+```java hl_lines="3 7 28"
 {snippet:insert("section-3/step-02/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java")}
 ```
 
 <mark>Make the corresponding additions in `src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java`:</mark>
 
 **VehicleAdvisorAgent.java**
-```java
+```java hl_lines="3 7 25"
 {snippet:insert("section-3/step-02/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java")}
 ```
 
@@ -189,7 +189,7 @@ We need to create a tool for this, and then add a `@ToolInputGuardrails()` annot
 <mark>Create `src/main/java/com/tripplanner/agentic/tools/RentalPricingTool.java`:</mark>
 
 **RentalPricingTool.java**
-```java
+```java hl_lines="3 5 21"
 {snippet:insert("section-3/step-02/src/main/java/com/tripplanner/agentic/tools/RentalPricingTool.java")}
 ```
 
@@ -217,7 +217,7 @@ Now that we've built the tool, we need to give the cost agent access to the calc
 <mark>Open `src/main/java/com/tripplanner/agentic/agents/CostEstimatorAgent.java` and add the highlighted imports, prompt changes, annotation, and `days` parameter:</mark>
 
 **CostEstimatorAgent.java**
-```java
+```java hl_lines="3 8 18 22-28 31 36"
 {snippet:insert("section-3/step-02/src/main/java/com/tripplanner/agentic/agents/CostEstimatorAgent.java")}
 ```
 

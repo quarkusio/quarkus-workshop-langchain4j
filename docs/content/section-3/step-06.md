@@ -171,7 +171,7 @@ Anything malformed throws `TripIntelligenceException`, which maps to a 502 with 
 <mark>Update `TripPlannerSystem.java` to insert `DestinationIntelligence` as the first step:</mark>
 
 **TripPlannerSystem.java (updated subAgents)**
-```java
+```java hl_lines="4"
 {snippet:insert("section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/TripPlannerSystem.java:12", "18")}
 ```
 
@@ -182,21 +182,21 @@ With weather and POI data now in the scope, the AI agents can reference it.
 <mark>Update `ItineraryPlannerAgent` to accept `weather` and `pointsOfInterest` parameters and use them in the prompt:</mark>
 
 **ItineraryPlannerAgent.java**
-```java
+```java hl_lines="18-19 27-32 42-44"
 {snippet:insert("section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/agents/ItineraryPlannerAgent.java")}
 ```
 
 <mark>Update `VehicleAdvisorAgent` to accept a `weather` parameter:</mark>
 
 **VehicleAdvisorAgent.java**
-```java
+```java hl_lines="16-17 23-26 36-37"
 {snippet:insert("section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/agents/VehicleAdvisorAgent.java")}
 ```
 
 <mark>Update `ResearchPhase` to pass the new parameters through:</mark>
 
 **ResearchPhase.java**
-```java
+```java hl_lines="22-24"
 {snippet:insert("section-3/step-06/trip-planner/src/main/java/com/tripplanner/agentic/workflow/ResearchPhase.java")}
 ```
 
@@ -207,7 +207,7 @@ In Step 02, the Duration field accepted any number so you could trip the rental 
 <mark>Open `trip-planner/src/main/java/com/tripplanner/resource/TripPlannerResource.java` and add the duration check to `validatePlanRequest()`:</mark>
 
 **TripPlannerResource.java (request validation)**
-```java
+```java hl_lines="6-7"
 {snippet:insert("section-3/step-06/trip-planner/src/main/java/com/tripplanner/resource/TripPlannerResource.java:96", "104")}
 ```
 

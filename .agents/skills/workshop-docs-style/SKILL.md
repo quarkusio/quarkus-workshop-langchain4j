@@ -185,7 +185,7 @@ Review the page as a whole for rhythm and repetition. Alternate prose and lists 
 
 ### Updating existing code
 
-For files that already exist in the previous step, tell the reader to update the relevant lines rather than replace the entire file. The site does not highlight lines inside snippets, so name the method or field to change and show a focused excerpt with only the lines under discussion. Explicitly identify fields or imports that must be removed, since they will not appear in the resulting snippet.
+For files that already exist in the previous step, tell the reader to update the highlighted lines rather than replace the entire file. Use `hl_lines` in the fence info string, right after the language, to distinguish additions and changes from unchanged context. Put the file name in a bold line above the fence, because the info string only carries the language and `hl_lines`. Explicitly identify fields or imports that must be removed, since they will not appear in the resulting snippet.
 
 Split long classes into focused excerpts at useful editing boundaries, keeping every required change visible. A collapsed "Complete updated file" box can provide the full class for comparison. New, short files can be shown in full without breaking them into excerpts.
 
@@ -268,7 +268,7 @@ Add a diagram when it answers a question that is harder to explain in prose, suc
 
 Use plain-language labels before introducing code identifiers. Keep diagrams small enough to read on mobile, and distinguish relationships in a flowchart from the order of events in a sequence diagram. Two diagrams should answer different questions; there is no need to add one to every chapter.
 
-The current Roq build does not load a Mermaid renderer, so Mermaid fences appear as plain code. Use a screenshot or a Kroki diagram instead. If a Mermaid diagram is unavoidable, validate it with a Mermaid renderer, not just a site build, because a build can succeed while the browser rejects the diagram. When available, run `mmdc -i <chapter.md> -o <temporary-output.md>` to render the chapter's diagrams outside the source tree. Avoid literal semicolons in sequence-diagram messages or notes because Mermaid treats them as statement separators; use a line break or reword the label. Distinguish syntax/rendering checks from checking the actual page layout in a browser.
+Mermaid fences render in the browser, so the usual ` ```mermaid ` blocks work. Validate a diagram with a Mermaid renderer, not just a site build, because a build can succeed while the browser rejects the diagram. When available, run `mmdc -i <chapter.md> -o <temporary-output.md>` to render the chapter's diagrams outside the source tree. Avoid literal semicolons in sequence-diagram messages or notes because Mermaid treats them as statement separators; use a line break or reword the label. Distinguish syntax/rendering checks from checking the actual page layout in a browser.
 
 Screenshots are useful for introducing the application, unfamiliar Dev UI navigation, an important application state, or a result that confirms the exercise worked. Place each capture beside the relevant instruction or observation, crop it to the useful area, and provide descriptive alt text. Refer back to an early application screenshot instead of repeating it when the reader starts testing. Keep essential instructions in prose so readers do not have to extract them from an image.
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.quarkus.qute.RawString;
 import io.quarkus.qute.TemplateExtension;
 
 @TemplateExtension(namespace = "snippet")
@@ -43,12 +44,12 @@ public class SnippetExtension {
     /**
      * Inserts a whole file, e.g. {@code {snippet:insert("section-1/step-01/pom.xml")}}.
      */
-    static String insert(String file) throws IOException {
+    static RawString insert(String file) throws IOException {
         Path path = resolve(file);
         if (path == null) {
-            return "<!-- snippet not found: " + file + " -->";
+            return raw("<!-- snippet not found: " + file + " -->");
         }
-        return Files.readString(path);
+        return raw(Files.readString(path));
     }
 
     /**
@@ -63,7 +64,7 @@ public class SnippetExtension {
      * file path and the end line as second argument, e.g.
      * {@code {snippet:insert("section-3/step-05/pom.xml:38", "73")}} for lines 38 to 73.
      */
-    static String insert(String file, String tag) throws IOException {
+    static RawString insert(String file, String tag) throws IOException {
         int colon = file.lastIndexOf(':');
         if (colon > 0 && tag.chars().allMatch(Character::isDigit)
                 && file.substring(colon + 1).chars().allMatch(Character::isDigit)) {
@@ -71,15 +72,28 @@ public class SnippetExtension {
             int startLine = Integer.parseInt(file.substring(colon + 1));
             int endLine = Integer.parseInt(tag);
             if (path == null) {
-                return "<!-- snippet not found: " + file + " -->";
+                return raw("<!-- snippet not found: " + file + " -->");
             }
-            return lines(path, startLine, endLine);
+            return raw(lines(path, startLine, endLine));
         }
         Path path = resolve(file);
         if (path == null) {
-            return "<!-- snippet not found: " + file + " -->";
+            return raw("<!-- snippet not found: " + file + " -->");
         }
-        return section(path, tag);
+        return raw(section(path, tag));
+    }
+
+    /**
+     * Wraps snippet text without the newline that ends it. Each call sits on
+     * its own line in the fence, and the line break after the call already
+     * ends the last snippet line, so keeping it would leave an empty line
+     * between stacked snippets.
+     */
+    private static RawString raw(String content) {
+        if (content.endsWith("\n")) {
+            content = content.substring(0, content.length() - 1);
+        }
+        return new RawString(content);
     }
 
     private static Path resolve(String file) {

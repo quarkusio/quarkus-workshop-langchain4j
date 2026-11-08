@@ -195,7 +195,7 @@ Let's explore each component.
 The `CarManagementResource` provides REST APIs to handle car returns:
 
 **CarManagementResource.java**
-```java
+```java hl_lines="19 22"
 {snippet:insert("section-2/step-01/src/main/java/com/carmanagement/resource/CarManagementResource.java", "car-management")}
 ```
 
@@ -211,7 +211,7 @@ The `CarManagementResource` provides REST APIs to handle car returns:
 The `CarManagementService` orchestrates the car return process:
 
 **CarManagementService.java**
-```java
+```java hl_lines="1-2 13 19-24"
 {snippet:insert("section-2/step-01/src/main/java/com/carmanagement/service/CarManagementService.java", "processCarReturn")}
 ```
 
@@ -231,7 +231,7 @@ This simple pattern allows you to ***integrate autonomous decision-making into y
 Here's where the magic happens — the AI agent definition:
 
 **CleaningAgent.java**
-```java
+```java hl_lines="6-11 21-22"
 {snippet:insert("section-2/step-01/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java", "cleaningAgent")}
 ```
 
@@ -317,7 +317,7 @@ They work in pretty much the exact same way for Agents: Tools enable agents to c
 These tools can be local LangChain4j tools running within the same Quarkus application, like in the following `CleaningTool` example, or remote, using the [MCP protocol we visited in Section 1, Step 8](../../section-1/step-08/)..
 
 **CleaningTool.java**
-```java
+```java hl_lines="4 21 40 47-48"
 {snippet:insert("section-2/step-01/src/main/java/com/carmanagement/agentic/tools/CleaningTool.java", "CleaningTool")}
 ```
 

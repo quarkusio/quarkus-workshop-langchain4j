@@ -56,7 +56,7 @@ Currently, our websocket endpoint looks like this:
 <mark>Let's modify the `onTextMessage` method to send the response to the client as it arrives.</mark>
 
 **CustomerSupportAgentWebSocket.java**
-```java
+```java hl_lines="22-25"
 {snippet:insert("section-1/step-03/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java")}
 ```
 

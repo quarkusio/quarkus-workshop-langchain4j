@@ -94,7 +94,7 @@ flowchart TD
 ```
 
 **TripPlannerResource.java (planTrip)**
-```java
+```java hl_lines="4-10 12 20"
 {snippet:insert("section-3/step-04/src/main/java/com/tripplanner/resource/TripPlannerResource.java:43", "75")}
 ```
 
@@ -211,7 +211,7 @@ The store checks every incoming event before recording it. `accept()` makes sure
 The approval endpoint is new in this step. `TripApprovalResource` accepts `PUT /trip/approve` with the workflow's `instanceId` and a status of `approved` or `rejected`. It first asks the store to record the decision, which accepts it only for a trip that is waiting for a decision, and then publishes the decision for Flow.
 
 **TripApprovalResource.java (publishing the decision)**
-```java
+```java hl_lines="6 8"
 {snippet:insert("section-3/step-04/src/main/java/com/tripplanner/resource/TripApprovalResource.java:46", "66")}
 ```
 
