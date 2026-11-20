@@ -81,6 +81,29 @@ public class RoqSiteTest {
     }
 
     @Test
+    public void calloutBoxesRender() {
+        // > [!TIP] needs the GFM alerts extension; see MarkdownExtensions
+        when().get("/section-2/step-01/").then().statusCode(200)
+                .body(containsString("markdown-alert markdown-alert-tip"))
+                .body(containsString("Pro Tip: Clear Instructions Matter"))
+                .body(not(containsString("[!TIP]")));
+    }
+
+    @Test
+    public void tablesRender() {
+        when().get("/section-2/step-01/").then().statusCode(200)
+                .body(containsString("<table>"))
+                .body(containsString("<th>AI Agents (Section 2)</th>"))
+                .body(not(containsString("| Feature")));
+    }
+
+    @Test
+    public void headingsHaveAnchorsForTheTableOfContents() {
+        when().get("/section-2/step-01/").then().statusCode(200)
+                .body(containsString("<h3 id=\"key-differences\">"));
+    }
+
+    @Test
     public void actionHighlightsRenderAsMark() {
         // the sources used pymdownx ==...==, which Roq's Markdown engine
         // does not support, so those spans are <mark> in the content
