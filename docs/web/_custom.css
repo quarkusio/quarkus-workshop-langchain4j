@@ -145,6 +145,58 @@ html.dark :is(.content-prose, .home-content) .markdown-alert {
     box-shadow: none;
 }
 
+/* Tables: bordered, with a tinted header row like MkDocs Material. Cells
+   wrap between words only, so short first-column labels such as
+   "Interaction" are not split mid-word. */
+.content-prose table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1.2em 0;
+    font-size: 0.86em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    border-collapse: collapse;
+}
+
+.content-prose th,
+.content-prose td {
+    padding: 0.5em 0.9em;
+    vertical-align: top;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
+
+.content-prose thead th {
+    background-color: rgba(0, 0, 0, 0.04);
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+    vertical-align: bottom;
+}
+
+.content-prose tbody tr {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.content-prose td:first-child,
+.content-prose th:first-child {
+    white-space: nowrap;
+}
+
+html.dark .content-prose table {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .content-prose thead th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+html.dark .content-prose tbody tr {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
 /* White page background edge to edge: the theme caps the page in a
    1250px wrapper on a grey body background, which shows as a grey band
    on wide screens. MkDocs Material used a white page. */

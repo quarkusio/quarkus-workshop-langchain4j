@@ -26,7 +26,9 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * <p>
  * The extension is a CDI bean. The Markdown converter in
  * {@code quarkus-qute-web-markdown} injects every {@code org.commonmark.Extension}
- * bean and registers it with both the parser and the renderer.
+ * bean and registers it with both the parser and the renderer. Declaring this
+ * bean disables the library's default extensions, which
+ * {@link MarkdownExtensions} registers again.
  */
 @ApplicationScoped
 public class HighlightLinesExtension implements HtmlRenderer.HtmlRendererExtension {
