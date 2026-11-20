@@ -266,7 +266,7 @@ int highValueThreshold;
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Bean resolution error for advancedModel</summary>
 
 If you see `UnsatisfiedResolutionException` for the `@ModelName("advancedModel")` injection, verify that the named model is fully configured in `application.properties`. The name in `@ModelName("advancedModel")` must match the segment in `quarkus.langchain4j.openai.advancedModel.*` exactly.
@@ -274,7 +274,7 @@ If you see `UnsatisfiedResolutionException` for the `@ModelName("advancedModel")
 </details>
 
 
-<details>
+<details class="warning">
 <summary>All requests using the same model</summary>
 
 If you see the same model in all requests regardless of car value, check that:
@@ -286,7 +286,7 @@ If you see the same model in all requests regardless of car value, check that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>ChatModelSupplier method not being called</summary>
 
 The `@ChatModelSupplier` method must be `static` and declared directly on the agent interface. Verify the method signature returns `ChatModel` and that the `@CdiBean` and parameter types match what's available.

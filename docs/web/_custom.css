@@ -145,58 +145,6 @@ html.dark :is(.content-prose, .home-content) .markdown-alert {
     box-shadow: none;
 }
 
-/* Tables: bordered, with a tinted header row like MkDocs Material. Cells
-   wrap between words only, so short first-column labels such as
-   "Interaction" are not split mid-word. */
-.content-prose table {
-    display: block;
-    width: max-content;
-    max-width: 100%;
-    overflow-x: auto;
-    margin: 1.2em 0;
-    font-size: 0.86em;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 0.2rem;
-    border-collapse: collapse;
-}
-
-.content-prose th,
-.content-prose td {
-    padding: 0.5em 0.9em;
-    vertical-align: top;
-    word-break: normal;
-    overflow-wrap: normal;
-    hyphens: none;
-}
-
-.content-prose thead th {
-    background-color: rgba(0, 0, 0, 0.04);
-    padding-top: 0.6em;
-    padding-bottom: 0.6em;
-    vertical-align: bottom;
-}
-
-.content-prose tbody tr {
-    border-top: 1px solid rgba(0, 0, 0, 0.07);
-}
-
-.content-prose td:first-child,
-.content-prose th:first-child {
-    white-space: nowrap;
-}
-
-html.dark .content-prose table {
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-html.dark .content-prose thead th {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-html.dark .content-prose tbody tr {
-    border-top-color: rgba(255, 255, 255, 0.08);
-}
-
 /* White page background edge to edge: the theme caps the page in a
    1250px wrapper on a grey body background, which shows as a grey band
    on wide screens. MkDocs Material used a white page. */
@@ -642,3 +590,163 @@ html.dark .content-prose pre code .hl-line {
     max-width: 100%;
     height: auto;
 }
+/* Collapsible boxes, the old MkDocs "??? warning" blocks. Same shape and
+   colors as the callouts above; the class carries the old box type. */
+.content-prose details {
+    --alert-color: #0969da;
+    margin: 1.05rem 0;
+    padding: 0 0.7rem;
+    font-size: 0.88em;
+    line-height: 1.55;
+    border-left: 3px solid var(--alert-color);
+    border-radius: 0.2rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    background-color: color-mix(in srgb, var(--alert-color) 3%, transparent);
+}
+
+.content-prose details.warning {
+    --alert-color: #9a6700;
+}
+
+.content-prose details.important {
+    --alert-color: #8250df;
+}
+
+/* The theme draws summary as an inline pill with its own colors and
+   hover states; these rules reset that, including the [open] variants. */
+.content-prose details > summary,
+.content-prose details[open] > summary,
+.content-prose details > summary:hover {
+    position: relative;
+    display: block;
+    width: auto;
+    margin: 0 -0.7rem;
+    padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+    font-size: 1em;
+    line-height: 1.5;
+    font-weight: 700;
+    color: inherit;
+    cursor: pointer;
+    list-style: none;
+    border-radius: 0 0.2rem 0.2rem 0;
+    background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+.content-prose details > summary:hover {
+    background-color: color-mix(in srgb, var(--alert-color) 16%, transparent);
+}
+
+.content-prose details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.content-prose details > summary::before {
+    content: "";
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid var(--alert-color);
+    border-bottom: 2px solid var(--alert-color);
+    transform: translateY(-65%) rotate(-45deg);
+    transition: transform 0.15s;
+}
+
+.content-prose details[open] > summary {
+    margin-bottom: 0.45rem;
+    border-radius: 0 0.2rem 0 0;
+}
+
+.content-prose details[open] > summary::before {
+    transform: translateY(-75%) rotate(45deg);
+}
+
+.content-prose details > :not(summary),
+.content-prose details[open] > :not(summary) {
+    padding-left: 0;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.content-prose details[open] > ul,
+.content-prose details[open] > ol {
+    padding-left: 1.3rem;
+}
+
+.content-prose details + details {
+    margin-top: 0.6rem;
+}
+
+.content-prose details[open] > :last-child {
+    margin-bottom: 0.6rem;
+}
+
+html.dark .content-prose details {
+    box-shadow: none;
+}
+
+html.dark .content-prose details.warning {
+    --alert-color: #d29922;
+}
+
+html.dark .content-prose details:not(.warning):not(.important) {
+    --alert-color: #5ab4f5;
+}
+
+html.dark .content-prose details.important {
+    --alert-color: #a371f7;
+}
+
+/* Tables: bordered, with a tinted header row like MkDocs Material. Cells
+   wrap between words only, so short first-column labels such as
+   "Interaction" are not split mid-word. */
+.content-prose table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1.2em 0;
+    font-size: 0.86em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.2rem;
+    border-collapse: collapse;
+}
+
+.content-prose th,
+.content-prose td {
+    padding: 0.5em 0.9em;
+    vertical-align: top;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
+
+.content-prose thead th {
+    background-color: rgba(0, 0, 0, 0.04);
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+    vertical-align: bottom;
+}
+
+.content-prose tbody tr {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.content-prose td:first-child,
+.content-prose th:first-child {
+    white-space: nowrap;
+}
+
+html.dark .content-prose table {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .content-prose thead th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+html.dark .content-prose tbody tr {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+

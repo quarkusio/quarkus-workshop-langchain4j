@@ -27,7 +27,7 @@ content-toc: true
 You will need an OpenAI API key to complete this workshop.  
 If your instructor provided a key, use that one. Otherwise, [create an API key](https://developers.openai.com/api/docs/quickstart).
 
-<details>
+<details class="info">
 <summary>No instructor-provided key?</summary>
 
 New OpenAI developer accounts receive $5 in free trial credits.  

@@ -517,7 +517,7 @@ Start with a low threshold where everything requires approval. As confidence gro
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>All vehicles going through approval workflow</summary>
 
 Check that the value threshold is correctly configured in `application.properties` and that the PricingAgent is returning numeric values that can be compared.
@@ -525,7 +525,7 @@ Check that the value threshold is correctly configured in `application.propertie
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Workflow not pausing for human approval</summary>
 
 Verify that:
@@ -537,7 +537,7 @@ Verify that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Approval status not being tracked</summary>
 
 Verify that:
@@ -549,7 +549,7 @@ Verify that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Low-value vehicles still requiring approval</summary>
 
 Check the value comparison logic in FleetSupervisorAgent. Ensure the PricingAgent output is being parsed correctly as a number.
@@ -557,7 +557,7 @@ Check the value comparison logic in FleetSupervisorAgent. Ensure the PricingAgen
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Timeout errors when waiting for approval</summary>
 
 The `HumanApprovalAgent` has a 5-minute timeout by default. If you need more time, adjust the timeout value in the `.get(5, TimeUnit.MINUTES)` call. On timeout, the system defaults to REJECTED for safety.

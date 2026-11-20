@@ -457,7 +457,7 @@ Modify the `CarImageAnalysisAgent`'s system message to focus on specific aspects
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Image not being processed</summary>
 
 Verify that:
@@ -470,7 +470,7 @@ Verify that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Agent returns feedback unchanged even with an image</summary>
 
 This can happen if:
@@ -482,7 +482,7 @@ This can happen if:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Request too large</summary>
 
 Large images (>10MB) may exceed request size limits. Consider:

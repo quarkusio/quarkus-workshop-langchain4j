@@ -453,7 +453,7 @@ Does the agent automatically learn to use it?
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Error: OPENAI_API_KEY not set</summary>
 
 Make sure you've exported the environment variable:
@@ -467,25 +467,23 @@ Then restart the application.
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Tool methods not being called</summary>
 
+- Verify the tool uses `@Dependent` scope
+- Check that the `@Tool` annotation is present
+- Ensure the tool is properly referenced in `@ToolBox`
 
 </details>
 
-   - Verify the tool uses `@Dependent` scope
-   - Check that the `@Tool` annotation is present
-   - Ensure the tool is properly referenced in `@ToolBox`
-
-<details>
+<details class="warning">
 <summary>Agent always/never calls the tool</summary>
 
+- Review your `@SystemMessage` — is it clear about when to use the tool?
+- Try adding more explicit instructions
+- Consider providing examples in the system message
 
 </details>
-
-   - Review your `@SystemMessage` — is it clear about when to use the tool?
-   - Try adding more explicit instructions
-   - Consider providing examples in the system message
 
 ---
 ## Cleanup
