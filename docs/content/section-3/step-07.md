@@ -313,7 +313,7 @@ The same page lists the Langfuse login, `quarkus@quarkus.io` with the password `
 
 **TripPlanQualityEvaluationLiveIT.java**
 ```java
---8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java"
+{snippet:insert("section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanQualityEvaluationLiveIT.java")}
 ```
 
 </details>
@@ -351,7 +351,7 @@ The experiment name is `step-07-` followed by the current time, so each run of t
 
 **TripPlanExperimentRunner.java**
 ```java
---8<-- "../../section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanExperimentRunner.java:34:55"
+{snippet:insert("section-3/step-07/trip-planner/src/test/java/com/tripplanner/evaluation/TripPlanExperimentRunner.java:34", "55")}
 ```
 
 `@WithSpan("trip-plan-evaluation")` opens a span for the whole planning run, so every agent, guardrail, and MCP call is recorded beneath it. The attributes on that span turn the trace into an experiment item:

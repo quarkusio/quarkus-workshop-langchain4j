@@ -272,7 +272,7 @@ The complete file is included here for comparison with the focused edits above.
 
 **TripPlanStore.java**
 ```java
---8<-- "../../section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java"
+{snippet:insert("section-3/step-05/src/main/java/com/tripplanner/agentic/flow/TripPlanStore.java")}
 ```
 
 </details>

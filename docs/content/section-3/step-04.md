@@ -142,7 +142,7 @@ The complete source includes the imports, the injected adapter, store, and `Obje
 
 **TripPlannerFlow.java**
 ```java
---8<-- "../../section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java"
+{snippet:insert("section-3/step-04/src/main/java/com/tripplanner/agentic/flow/TripPlannerFlow.java")}
 ```
 
 The `matchesDecision()` helper reads the instance extension and deserializes the decision with the injected mapper before checking the store. It keeps both checks in a single envelope predicate. Adding `dataAs()` after an instance-envelope filter would replace that predicate in this DSL instead of combining the checks.
