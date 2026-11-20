@@ -19,7 +19,7 @@ Run the application with the following command:
 ./mvnw quarkus:dev
 ```
 
-<details>
+<details class="note">
 <summary>mvnw permission issue</summary>
 
 If you run into an error about the `mvnw` maven wrapper, you can give execution permission for the file by navigating to the project folder and executing `chmod +x mvnw`.
@@ -27,7 +27,7 @@ If you run into an error about the `mvnw` maven wrapper, you can give execution 
 </details>
 
 
-<details>
+<details class="note">
 <summary>Could not expand value OPENAI_API_KEY</summary>
 
 If you run into an error indicating `java.util.NoSuchElementException: SRCFG00011: Could not expand value OPENAI_API_KEY in property quarkus.langchain4j.openai.api-key`, make sure you have set the environment variable `OPENAI_API_KEY` with your OpenAI API key.

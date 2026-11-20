@@ -169,7 +169,7 @@ The class has three parts:
 - `@PlannerSupplier` returns a new `VotingPlanner` that uses `aggregateVotes` as its voting strategy.
 - `aggregateVotes` averages the scores and collects the suggestions. It expects exactly three `VehicleEvaluation` results with scores between 1 and 10, and throws `IllegalStateException` if one is missing or malformed.
 
-<details>
+<details class="info">
 <summary>How does the `VotingPlanner` drive the evaluators?</summary>
 
 A planner decides which subagents run next each time the framework asks it for an action. The `VotingPlanner` answers the first request with `call(subagents)`, which starts all evaluators in parallel. The framework then asks for the next action once for every evaluator that completes. The planner adds that evaluator's output to its votes and returns `noOp()` while others are still running. After the last one reports, it returns `done(...)` with the strategy's result, which becomes the output of `VehicleEvaluators`. Its `topology()` method returns `PARALLEL`, so the Dev UI renders the evaluators as parallel branches.
@@ -303,7 +303,7 @@ Now and then `planItinerary` also tries to activate a skill that doesn't exist, 
 
 <mark>Compare the output of `recommendVehicle` in the research phase with the output of `vehicleReviewLoop`.</mark> If the reviser ran, the two recommendations differ. If the first candidate passed, they're the same vehicle.
 
-<details>
+<details class="info">
 <summary>Verifying with tests</summary>
 
 The supplied tests verify the voting aggregation, pipeline assembly, and end-to-end HTTP contract without calling a live model.
@@ -349,7 +349,7 @@ The planner now has a panel of evaluators that vote on every vehicle and a revis
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>The enhanced model is not configured</summary>
 
 <mark>Check that `application.properties` has the `quarkus.langchain4j.enhancedModel.*` properties and that `OPENAI_API_KEY` is set.</mark> Both the base and enhanced models use the same API key. If the enhanced model configuration is missing, the `@ModelName("enhancedModel")` injection will fail at startup.
@@ -357,7 +357,7 @@ The planner now has a panel of evaluators that vote on every vehicle and a revis
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Every request ends with quality_not_met</summary>
 
 <mark>Check the evaluator prompts and the exit condition threshold.</mark> If the evaluators consistently return low scores, three revisions may not be enough to get the recommendation over the line. Try lowering the threshold in `VehicleReviewLoop.shouldExit()` or adjusting the evaluator prompts to be more generous. Inspect the evaluation scores in the Dev UI execution view.
@@ -365,7 +365,7 @@ The planner now has a panel of evaluators that vote on every vehicle and a revis
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Tests fail with missing enhancedModel bean</summary>
 
 <mark>Check that each test profile's `getEnabledAlternatives()` includes both `ScriptedModel.class` and `ScriptedEnhancedModel.class`.</mark> The `ScriptedEnhancedModel` is an `@Alternative @ModelName("enhancedModel")` bean that delegates to the default scripted model.
@@ -373,7 +373,7 @@ The planner now has a panel of evaluators that vote on every vehicle and a revis
 </details>
 
 
-<details>
+<details class="warning">
 <summary>OPENAI_API_KEY is not set</summary>
 
 <mark>Set `OPENAI_API_KEY` in the shell used to start the application, then restart it.</mark> Both models require the same key.

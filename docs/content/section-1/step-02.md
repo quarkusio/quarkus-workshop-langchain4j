@@ -9,7 +9,7 @@ In this step, we will play with various configurations of the language model (LL
 
 You can either use the code from `step-01` and continue from there, or check the final code of the step located in the `step-02` directory.
 
-<details>
+<details class="important">
 <summary>Do not forget to close the application</summary>
 
 If you have the application running from the previous step and decide to use the `step-02` directory, make sure to stop it (CTRL+C) before continuing.

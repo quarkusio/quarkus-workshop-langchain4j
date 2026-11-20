@@ -135,7 +135,7 @@ A rejection goes straight to `publishRejection` and ends the workflow, so only a
 
 The three helper methods below `descriptor()` are the tasks the workflow runs. `plan()` binds the instance to its request in the store before calling the adapter, `resolveDecision()` checks the decision and finalizes the booking, and `matchesDecision()` is the `listen()` filter.
 
-<details>
+<details class="info">
 <summary>Complete Flow class</summary>
 
 The complete source includes the imports, the injected adapter, store, and `ObjectMapper`, and all three helper methods.
@@ -240,7 +240,7 @@ sequenceDiagram
 
 The browser shows the workflow identifier so you can compare it with the CloudEvents later. The page shows `decision_submitted` and keeps polling `GET /trip/plan/status` until the backend reports `confirmed`, `rejected`, or `failed`.
 
-<details>
+<details class="info">
 <summary>Validation, timeouts, and error responses</summary>
 
 `PUT /trip/approve` needs a nonblank `instanceId` and a `status` of `approved` or `rejected`. An invalid decision returns HTTP 400, an unknown trip 404, and a trip in any other state 409, so only decisions for a trip awaiting approval reach Kafka.

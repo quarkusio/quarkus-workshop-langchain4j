@@ -129,7 +129,7 @@ testcontainers.reuse.enable=true
 
 With the database ready, Flow can save a waiting workflow and restore it when the application starts again. The `quarkus.flow.persistence.auto-restore=true` setting added above makes the default restoration behavior explicit. On startup, Flow reloads the saved workflow and goes straight back to waiting for the customer's decision, with the plan the agents generated before the restart.
 
-<details>
+<details class="info">
 <summary>Does this also save the agents' working state?</summary>
 
 The restart exercise begins after the agents have generated the plan, while the workflow is waiting for approval. At that point, restoring the workflow and its completed plan is enough to continue to simulated booking. LangChain4j's shared `AgenticScope` is only needed while the agents are running, so it stays in memory.
@@ -143,7 +143,7 @@ Saving that scope is a separate feature, with its own serialization and recovery
 
 Flow can now resume the approval process, but the browser also needs the customer's plan after a restart. We will save the trip details in PostgreSQL so the application can return the same plan when the browser reloads.
 
-<details>
+<details class="info">
 <summary>Why not read the plan back from Kafka?</summary>
 
 The outcome events already carry the request and plan, and Kafka can retain them after the application stops. But a restarted consumer resumes from its committed offset and only reads new events. Restoring the waiting workflow also takes Flow's own checkpoint, which lives in PostgreSQL, so we store the trip records in the same database.
@@ -265,7 +265,7 @@ Each lookup runs in a short transaction, so `awaitPlan()` holds a connection onl
 - `latest()` orders by sequence ID, so the latest request stays the most recently created trip, even after an older trip is updated or the application restarts.
 - `toStatus()` builds the API response from the entity's typed fields, so the browser receives the saved plan and current outcome.
 
-<details>
+<details class="info">
 <summary>Complete updated TripPlanStore.java</summary>
 
 The complete file is included here for comparison with the focused edits above.
@@ -278,7 +278,7 @@ The complete file is included here for comparison with the focused edits above.
 </details>
 
 
-<details>
+<details class="info">
 <summary>Does this make database writes and Kafka sends atomic?</summary>
 
 The database transactions cover only the store operations, while model calls, event publication, and polling delays run outside them. A process crash between saving a request or decision and sending its event can still leave a record with no corresponding event, and closing that gap would take a delivery design such as a transactional outbox. The restart exercise checks recovery of a saved approval wait.
@@ -381,7 +381,7 @@ Now inspect how the application restored that pending trip. <mark>Check the star
 
 <mark>Stop and start the application again, then refresh the page and inspect `/trip/plan/latest`.</mark> The same request and workflow identifiers should return with `status: "rejected"`, the original request, and the reviewed plan. `confirmation` stays null, and the database row still holds the accepted rejection, so the trip stays rejected and its events end with `com.tripplanner.trip.rejected`.
 
-<details>
+<details class="warning">
 <summary>The pending trip did not come back</summary>
 
 <mark>Check that container reuse was enabled before the first run and that the same PostgreSQL container is still available. Confirm that dev mode uses `%dev.quarkus.hibernate-orm.schema-management.strategy=update`. The pending workflow checkpoint and trip row should still exist after the restart. If the rows remain but the restore log is missing, check the Flow debug log for startup errors.</mark>
@@ -389,7 +389,7 @@ Now inspect how the application restored that pending trip. <mark>Check the star
 </details>
 
 
-<details>
+<details class="info">
 <summary>Trying restoration without a full shutdown</summary>
 
 <mark>Press `s` in the dev mode terminal to force a runtime restart without stopping the process.</mark> This keeps the Dev Services container running and lets you try workflow restoration without container reuse. The full shutdown-and-restart check above is the one that also shows container reuse working.

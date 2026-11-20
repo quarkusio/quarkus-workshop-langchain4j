@@ -652,7 +652,7 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Supervisor not invoking DispositionAgent</summary>
 
 - Check that `FeedbackTask.disposition()` includes the expected severe-damage instructions
@@ -663,7 +663,7 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Cars not getting PENDING_DISPOSITION status</summary>
 
 - Check the output logic in `CarConditionFeedbackAgent`
@@ -673,7 +673,7 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Parallel analysis results look mismatched</summary>
 
 - Verify that the task list in `CarManagementService` is created in the same order expected by the `@Output` method
@@ -682,7 +682,7 @@ Create a dedicated workflow for cars marked `PENDING_DISPOSITION`:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>PricingAgent returning unexpected values</summary>
 
 - Review the pricing guidelines in the `@SystemMessage` annotation

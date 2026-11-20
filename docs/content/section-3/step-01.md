@@ -250,7 +250,7 @@ Inspect the `activate_skill` calls and their results under the vehicle and itine
 
 The terminal logs provide another way to check discovery and activation. <mark>Check the startup logs for the skill count, then scroll through the request and response logs after generating a trip plan.</mark>
 
-<details>
+<details class="note">
 <summary>Not seeing the request or response logs?</summary>
 
 The starter already enables `log-requests` and `log-responses` in `src/main/resources/application.properties`, but if for some reason they're not set, or set to false, go ahead and add them and make sure they're set to true: 
@@ -325,7 +325,7 @@ First, to make our dev mode testing smoother, <mark>add this dev-mode setting to
 %dev.quarkus.live-reload.watched-resources=skills/family-trip/SKILL.md
 ```
 
-<details>
+<details class="note">
 <summary>Why add this watched-resources property?</summary>
 
 The extension keeps skill content in memory, so edits need an application reload to take effect. This setting makes Quarkus reload on the next HTTP request after the file changes. Paths are relative to `src/main/resources/`, and additional files can be listed with commas.
@@ -368,7 +368,7 @@ What if the trip planner suggests something that's completely unsuitable though,
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Error: OPENAI_API_KEY not set</summary>
 
 <mark>Set the environment variable in the terminal used to run the application.</mark> For Linux or macOS:
@@ -382,7 +382,7 @@ export OPENAI_API_KEY=sk-your-key-here
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Response takes too long or times out</summary>
 
 This workshop uses relatively basic and cheap models so they tend to be slow.
@@ -391,7 +391,7 @@ The Step 01 workflow invokes three agents, with vehicle selection and itinerary 
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Skills not being activated</summary>
 
 <mark>Check the following before generating another plan:</mark>
@@ -405,7 +405,7 @@ The Step 01 workflow invokes three agents, with vehicle selection and itinerary 
 </details>
 
 
-<details>
+<details class="warning">
 <summary>An activation returns the old skill content</summary>
 
 <mark>Check that `%dev.quarkus.live-reload.watched-resources` includes the edited skill file, then refresh the application page.</mark> The completed Step 01 project watches only `skills/family-trip/SKILL.md`. The terminal should show fresh `Loaded 4 skill(s)` and `Live reload total time` messages before the next generation.

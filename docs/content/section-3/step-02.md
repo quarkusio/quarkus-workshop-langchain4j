@@ -313,7 +313,7 @@ There is no `Rental calculation executed` line after the rejected call, because 
 
 <mark>Open the Dev UI Executions panel for the cost estimator, expand the latest run, and compare the rejected tool call with the corrected ones that follow it.</mark>
 
-<details>
+<details class="info">
 <summary>Verifying with tests</summary>
 
 Because a live model will not reliably reproduce a specific bad recommendation on demand, the supplied tests use fixed responses to exercise each guardrail branch deterministically. You can find them in the step-02 folder.
@@ -393,7 +393,7 @@ The planner now checks its research recommendations and can calculate rental pri
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>The rental estimate tool is missing or rejected</summary>
 
 <mark>Check that the cost agent has `@ToolBox(RentalPricingTool.class)` and that its prompt asks for `estimateRental`. Inspect the tool-call arguments and error result.</mark> Categories must be exactly `compact`, `estate`, `suv`, or `mpv`, and `days` must be a JSON integer from 1 to 30. The tool checks the arguments the model supplies, not whether they match the original trip request, so compare those values when inspecting the execution.
@@ -401,7 +401,7 @@ The planner now checks its research recommendations and can calculate rental pri
 </details>
 
 
-<details>
+<details class="warning">
 <summary>The guardrail never triggers</summary>
 
 The model may already produce output that passes these rules. <mark>Run the fixed-payload tests above to check specific branches, and inspect the terminal logs for `SKIP` decisions.</mark> A skipped check permits processing to continue without validating that recommendation.
@@ -409,7 +409,7 @@ The model may already produce output that passes these rules. <mark>Run the fixe
 </details>
 
 
-<details>
+<details class="warning">
 <summary>An unsuitable response was accepted</summary>
 
 <mark>Compare the original response with the fields and keywords checked by the guardrail, and look for `SKIP` lines in the log.</mark> Both guardrails log `SKIP` and let the response through when they can't check it, for example on blank text or unparseable JSON. The itinerary scan ignores titles, and the keyword lists don't cover every small or expensive vehicle. Step 07 replaces the luxury-brand list with an LLM judge.
@@ -417,7 +417,7 @@ The model may already produce output that passes these rules. <mark>Run the fixe
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Planning fails after retries</summary>
 
 <mark>Check the guardrail log lines for the rejection reason, then inspect the HTTP response in the browser's network panel and the server exception log.</mark> HTTP 422 with `guardrail_violation` identifies an actual guardrail failure in the cause chain. HTTP 500 with `planning_failed` identifies an unrelated wrapped agent failure. Client messages intentionally omit the internal exception details, which can include model content or provider information; take care when sharing logs.
@@ -425,7 +425,7 @@ The model may already produce output that passes these rules. <mark>Run the fixe
 </details>
 
 
-<details>
+<details class="warning">
 <summary>OPENAI_API_KEY is not set</summary>
 
 <mark>Set `OPENAI_API_KEY` in the shell used to start the application, then restart it.</mark> Keep the same model configuration used in Step 01.

@@ -702,7 +702,7 @@ Add logging to each agent and workflow to print when they start and finish. Obse
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Parallel agents not executing in parallel</summary>
 
 Check that your system has multiple CPU cores and that the thread pool is configured properly. In development mode, Quarkus should handle this automatically.
@@ -710,7 +710,7 @@ Check that your system has multiple CPU cores and that the thread pool is config
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Conditional workflow always/never executing certain agents</summary>
 
 - Verify your `@ActivationCondition` methods are correctly named
@@ -720,7 +720,7 @@ Check that your system has multiple CPU cores and that the thread pool is config
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Error: Cannot find symbol 'CarAssignment'</summary>
 
 Make sure you created both:
@@ -731,7 +731,7 @@ Make sure you created both:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Agents getting wrong input values</summary>
 
 Remember that parameter names must match the `outputKey` from previous agents or workflow inputs. Check for typos!

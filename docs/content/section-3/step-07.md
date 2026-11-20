@@ -308,7 +308,7 @@ The same page lists the Langfuse login, `quarkus@quarkus.io` with the password `
 .\mvnw.cmd -Pevals -Dit.test=TripPlanQualityEvaluationLiveIT -Dquarkus.http.test-port=0 -Dquarkus.langfuse.base-url=http://localhost:<port> verify
 ```
 
-<details>
+<details class="info">
 <summary>Complete quality IT</summary>
 
 **TripPlanQualityEvaluationLiveIT.java**
@@ -344,7 +344,7 @@ The vehicle and itinerary research run in parallel. By default, the executor use
 
 At startup, `Context.taskWrapping()` wraps the Quarkus managed executor that LangChain4j uses for parallel branches. Their agent calls then appear under the same planning trace you just inspected.
 
-<details>
+<details class="info">
 <summary>How the trace becomes a dataset experiment</summary>
 
 The experiment name is `step-07-` followed by the current time, so each run of the IT shows up as a separate run of the dataset in Langfuse. The helper bean runs the planner inside a root span:

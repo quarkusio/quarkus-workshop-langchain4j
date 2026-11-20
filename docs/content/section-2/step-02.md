@@ -660,7 +660,7 @@ How does the condition agent synthesize feedback from multiple sources?
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Error: Cannot find symbol 'CarConditions'</summary>
 
 Make sure you created the `CarConditions.java` record in the `com.carmanagement.model` package.
@@ -668,7 +668,7 @@ Make sure you created the `CarConditions.java` record in the `com.carmanagement.
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Workflow not updating car condition</summary>
 
 Check that:
@@ -680,7 +680,7 @@ Check that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>UI not showing Condition column</summary>
 
 Make sure you copied the updated UI files from `step-02` (see "Option 1: Continue from Step 01" section above)

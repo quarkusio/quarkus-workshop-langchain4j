@@ -265,7 +265,7 @@ The trip planner now checks the weather and local attractions before any model s
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Connection refused when starting the trip planner</summary>
 
 Make sure the MCP server is running on port 8085 before starting the trip planner. The MCP client connects lazily (on first tool call), so the trip planner starts even without the MCP server, but the first trip plan request will fail.
@@ -273,7 +273,7 @@ Make sure the MCP server is running on port 8085 before starting the trip planne
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Unsatisfied dependency for McpClient</summary>
 
 Verify that `quarkus-langchain4j-mcp` is in the trip planner's `pom.xml` dependencies and that the `tripIntelligence` name in `application.properties` matches the `@McpClientName` qualifier.
@@ -281,7 +281,7 @@ Verify that `quarkus-langchain4j-mcp` is in the trip planner's `pom.xml` depende
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Trip plan fails with intelligence_unavailable</summary>
 
 The MCP server returned data the trip planner could not validate. Check that the MCP server is running the default `sunny` scenario and that its database was seeded correctly. If you started the server with a test profile such as `malformed-response` or `timeout`, restart it without that profile.

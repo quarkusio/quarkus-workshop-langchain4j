@@ -792,7 +792,7 @@ This shows the raw A2A protocol messages.
 
 ## Troubleshooting
 
-<details>
+<details class="warning">
 <summary>Connection refused to localhost:8888</summary>
 
 Make sure the remote A2A server is running in Terminal 1. Check for:
@@ -810,7 +810,7 @@ Then update the client's `a2aServerUrl` accordingly.
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Task execution timeout</summary>
 
 If the remote agent takes too long to respond, you might see a timeout error. The default timeout is sufficient for most cases, but you can increase it if needed by configuring the A2A client.
@@ -818,7 +818,7 @@ If the remote agent takes too long to respond, you might see a timeout error. Th
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Parameter mismatch errors</summary>
 
 If you see errors about missing parameters, verify that:
@@ -830,7 +830,7 @@ If you see errors about missing parameters, verify that:
 </details>
 
 
-<details>
+<details class="warning">
 <summary>Both applications on same port</summary>
 
 If you see "Port already in use" on 8080:
