@@ -240,6 +240,27 @@ html.dark body {
     color: #fff;
 }
 
+/* The full workshop name is what the MkDocs header showed. It needs the
+   room the search box and the repository controls leave, so narrower
+   windows get the shorter name instead of a clipped one. */
+.navbar-title-long {
+    display: inline;
+}
+
+.navbar-title-short {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .navbar-title-long {
+        display: none;
+    }
+
+    .navbar-title-short {
+        display: inline;
+    }
+}
+
 .navbar-actions {
     display: flex;
     align-items: center;
