@@ -90,6 +90,14 @@ public class RoqSiteTest {
     }
 
     @Test
+    public void pageTitleIsNotRepeated() {
+        // the page's own # heading is the title; the theme header stays off
+        when().get("/section-2/step-01/").then().statusCode(200)
+                .body(containsString("<h1 id=\"step-01---implementing-ai-agents\">"))
+                .body(not(containsString("class=\"page-title\"")));
+    }
+
+    @Test
     public void tablesRender() {
         when().get("/section-2/step-01/").then().statusCode(200)
                 .body(containsString("<table>"))
