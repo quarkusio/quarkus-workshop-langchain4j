@@ -81,6 +81,15 @@ public class RoqSiteTest {
     }
 
     @Test
+    public void navbarShowsTheWorkshopName() {
+        // the MkDocs header showed the full site name; narrow windows get
+        // the shorter one from the media query
+        when().get("/").then().statusCode(200)
+                .body(containsString("navbar-title-long\">Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop<"))
+                .body(containsString("navbar-title-short\">Quarkus LangChain4j Workshop<"));
+    }
+
+    @Test
     public void calloutBoxesRender() {
         // > [!TIP] needs the GFM alerts extension; see MarkdownExtensions
         when().get("/section-2/step-01/").then().statusCode(200)
