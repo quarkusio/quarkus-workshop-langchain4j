@@ -55,8 +55,11 @@ body {
 }
 
 // The header is styled here rather than by the theme's header rules, so it
-// renders even if those rules are missing or change upstream.
+// renders even if those rules are missing or change upstream. The theme
+// floats .main-nav, which collapses .nav-wrapper to no height when nothing
+// contains the float; a flex bar cannot collapse and ignores the float.
 div.nav-wrapper {
+  display: flex;
   background-color: #000;
   padding-inline: 4rem;
 }
@@ -66,6 +69,8 @@ div.nav-wrapper {
   align-items: center;
   gap: 1.25rem;
   flex-wrap: nowrap;
+  width: 100%;
+  float: none;
   padding: 0.9rem 0;
 }
 
