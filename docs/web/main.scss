@@ -55,8 +55,10 @@ body {
 }
 
 // The theme pads the header by 13rem for its full-width bands, which leaves
-// no room for the workshop title next to the logo and the actions.
+// no room for the workshop title next to the logo and the actions. The
+// colours are repeated here so the bar stays readable on its own.
 div.nav-wrapper {
+  background-color: #000;
   padding-inline: 4rem;
 }
 
