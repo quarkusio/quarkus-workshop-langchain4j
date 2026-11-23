@@ -2,6 +2,7 @@ package com.carmanagement.agentic.workflow;
 
 import com.carmanagement.agentic.agents.CleaningAgent;
 import com.carmanagement.agentic.agents.MaintenanceAgent;
+import com.carmanagement.model.CarAssignment;
 import com.carmanagement.model.CarInfo;
 import dev.langchain4j.agentic.declarative.ActivationCondition;
 import dev.langchain4j.agentic.declarative.ConditionalAgent;
@@ -24,17 +25,13 @@ public interface CarAssignmentWorkflow {
             String maintenanceRequest);
 
     @ActivationCondition(MaintenanceAgent.class)
-    static boolean assignToMaintenance(String maintenanceRequest) {
-        return isRequired(maintenanceRequest);
+    static boolean assignToMaintenance(CarAssignment carAssignment) {
+        return carAssignment == CarAssignment.MAINTENANCE;
     }
 
     @ActivationCondition(CleaningAgent.class)
-    static boolean assignToCleaning(String maintenanceRequest, String cleaningRequest) {
-        return !isRequired(maintenanceRequest) && isRequired(cleaningRequest);
-    }
-    
-    private static boolean isRequired(String value) {
-        return value != null && !value.isEmpty() && !value.toUpperCase().contains("NOT_REQUIRED");
+    static boolean assignToCleaning(CarAssignment carAssignment) {
+        return carAssignment == CarAssignment.CLEANING;
     }
     // --8<-- [end:conditional-agent]
 }

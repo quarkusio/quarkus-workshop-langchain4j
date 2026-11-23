@@ -72,7 +72,7 @@ graph TB
     Start(["Car Return with optional image"]) --> A["CarProcessingWorkflow<br/>Sequential"]
 
     A --> IMG["Step 1: CarImageAnalysisAgent<br/>Image Analysis"]
-    IMG -->|"enriched rentalFeedback"| B["Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
+    IMG -->|"enriched feedback"| B["Step 2: FeedbackAnalysisWorkflow<br/>Parallel Mapper"]
     B --> B1["FeedbackTask.cleaning()"]
     B --> B2["FeedbackTask.maintenance()"]
     B --> B3["FeedbackTask.disposition()"]
@@ -245,15 +245,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `CarImageAnalysisAge
 #### The `@SystemMessage`
 
 ```java
-@SystemMessage("""
-    You are a car image analyst for a car rental company.
-    You will receive the current rental feedback for a car being returned.
-    If an image of the car is provided, analyze it and enrich the rental feedback by appending
-    your visual observations about the car's condition (e.g., visible damage, scratches, dents,
-    cleanliness issues, tire condition, etc.).
-    If no image is provided, return the rental feedback exactly as it is, without any modification.
-    Your response must always include the original rental feedback text followed by your observations if any.
-    """)
+{snippet:insert("section-2/step-06/src/main/java/com/carmanagement/agentic/agents/CarImageAnalysisAgent.java:15", "28")}
 ```
 
 The system message instructs the LLM to:
@@ -266,9 +258,9 @@ The system message instructs the LLM to:
 
 ```java
 @UserMessage("""
-    Rental Feedback: \{rentalFeedback}
+    Feedback: \{feedback}
     """)
-String analyzeCarImage(String rentalFeedback, @UserMessage @V("carImage") ImageContent carImage);
+String analyzeCarImage(String feedback, @UserMessage @V("carImage") ImageContent carImage);
 ```
 
 Note that the `@UserMessage` annotation on the `ImageContent` parameter tells LangChain4j to include the image as an additional content part in the user message sent to the LLM. That is a particular usage of the `@UserMessage` annotation that is specific for multimodal content. The LLM receives both the text template and the image simultaneously, enabling multimodal reasoning. In this case we also need to add the @V annotation to specify the variable name in the template of the UserMessage.
@@ -277,10 +269,10 @@ Note that the `@UserMessage` annotation on the `ImageContent` parameter tells La
 
 ```java
 @Agent(description = "Car image analyzer. Enriches rental feedback with visual observations from a car image.",
-        outputKey = "rentalFeedback", optional = true)
+        outputKey = "feedback", optional = true)
 ```
 
-The agent's output key is `rentalFeedback`, which means its result **replaces** the `rentalFeedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of an agent if not all of its required parameters are provided; in this case it will be skipped if the image is missing.
+The agent's output key is `feedback`, which means its result **replaces** the `feedback` value in the agentic scope. All subsequent agents in the workflow (FeedbackAnalysisWorkflow, FleetSupervisorAgent, etc.) will automatically receive the enriched feedback. The `optional` flag is set to `true` to allow to entirely skip the invocation of an agent if not all of its required parameters are provided; in this case it will be skipped if the image is missing.
 
 ---
 
@@ -303,8 +295,8 @@ Update `CarProcessingWorkflow.java` to include `CarImageAnalysisAgent` as the **
 
 The flow is:
 
-1. `CarImageAnalysisAgent` analyzes the image and enriches `rentalFeedback` in the scope
-2. `FeedbackAnalysisWorkflow` receives the enriched `rentalFeedback` and runs parallel analysis
+1. `CarImageAnalysisAgent` analyzes the image and enriches `feedback` in the scope
+2. `FeedbackAnalysisWorkflow` receives the enriched `feedback` and runs parallel analysis
 3. The rest of the workflow proceeds as before
 
 ---
@@ -396,14 +388,14 @@ sequenceDiagram
 
     rect rgb(232, 180, 248)
     Note over Workflow,ImageAgent: Image Analysis (Step 1)
-    Workflow->>ImageAgent: analyzeCarImage(rentalFeedback, carImage)
+    Workflow->>ImageAgent: analyzeCarImage(feedback, carImage)
     ImageAgent->>ImageAgent: LLM analyzes text + image
-    ImageAgent->>Workflow: enriched rentalFeedback
+    ImageAgent->>Workflow: enriched feedback
     end
 
     rect rgb(255, 243, 205)
     Note over Workflow,FeedbackWF: Parallel Analysis (Step 2)
-    Workflow->>FeedbackWF: Uses enriched rentalFeedback
+    Workflow->>FeedbackWF: Uses enriched feedback
     par Concurrent Execution
         FeedbackWF->>FeedbackWF: FeedbackAnalysisAgent<br/>with FeedbackTask.cleaning()
     and

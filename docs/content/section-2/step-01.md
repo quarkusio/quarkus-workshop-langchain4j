@@ -470,7 +470,7 @@ Then restart the application.
 <details class="warning">
 <summary>Tool methods not being called</summary>
 
-- Verify the tool uses `@Dependent` scope
+- Verify the tool class is a CDI bean annotated with `@ApplicationScoped`
 - Check that the `@Tool` annotation is present
 - Ensure the tool is properly referenced in `@ToolBox`
 

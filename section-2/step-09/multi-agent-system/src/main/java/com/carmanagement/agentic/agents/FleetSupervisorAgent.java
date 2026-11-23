@@ -4,13 +4,19 @@ import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackAnalysisResults;
 import dev.langchain4j.agentic.declarative.SupervisorAgent;
 import dev.langchain4j.agentic.declarative.SupervisorRequest;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.util.Locale;
 
 /**
  * Supervisor agent that orchestrates the entire car processing workflow.
  * Coordinates feedback analysis agents and action agents based on car condition.
  * Implements human-in-the-loop pattern for high-value vehicle dispositions.
  */
-public interface FleetSupervisorAgent {
+public class FleetSupervisorAgent {
+
+    @ConfigProperty(name = "car-management.approval.threshold")
+    int approvalThreshold;
 
     @SupervisorAgent(
         outputKey = "supervisorDecision",
@@ -23,7 +29,7 @@ public interface FleetSupervisorAgent {
             CleaningAgent.class
         }
     )
-    String superviseCarProcessing(
+    public native String superviseCarProcessing(
         CarInfo carInfo,
         Integer carNumber,
         String feedback,
@@ -31,12 +37,14 @@ public interface FleetSupervisorAgent {
     );
 
     @SupervisorRequest()
-    static String request(
+    String request(
         CarInfo carInfo,
         Integer carNumber,
         String feedback,
         FeedbackAnalysisResults feedbackAnalysisResults
     ) {
+        String threshold = String.format(Locale.US, "$%,d", approvalThreshold);
+
         boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
                                      feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
         
@@ -52,17 +60,18 @@ public interface FleetSupervisorAgent {
            Follow these steps:
            
            1. Get value from PricingAgent (keep $ format)
-           2. IF value > $15,000 (HIGH-VALUE):
+              - IF the value is unknown because the pricing service is unavailable: treat the car as HIGH-VALUE
+           2. IF value > %s (HIGH-VALUE):
               - Invoke DispositionProposalAgent → HumanApprovalAgent (workflow pauses)
               - APPROVED: Use AI recommendation → KEEP→"KEEP_CAR", DISPOSE→"DISPOSE_CAR"
               - REJECTED: Opposite of AI → KEEP→"DISPOSE_CAR", DISPOSE→"KEEP_CAR"
-           3. IF value ≤ $15,000 (LOW-VALUE):
+           3. IF value ≤ %s (LOW-VALUE):
               - Invoke DispositionAgent directly
               - KEEP→"KEEP_CAR", SCRAP/SELL/DONATE→"DISPOSE_CAR"
            4. IF "KEEP_CAR": Invoke MaintenanceAgent/CleaningAgent as needed
            
            CRITICAL: End with KEEP_CAR or DISPOSE_CAR
-           """;
+           """.formatted(threshold, threshold);
 
         return """
             You are a fleet supervisor for a car rental company. You coordinate action agents based on feedback analysis.

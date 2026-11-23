@@ -39,6 +39,7 @@ In this step, you will:
 
 - Understand how to **nest workflows within workflows** to create sophisticated multi-level orchestration
 - Explore additional types of workflow patterns such as **parallel** and **conditional**
+- Use a **decision agent** to get a typed answer from a decision model and route each car with it
 - See how `AgenticScope` flows through nested workflow levels
 
 ---
@@ -126,20 +127,23 @@ graph TB
     B1 --> BEnd[Both complete]
     B2 --> BEnd
     
-    BEnd --> C[Step 2: CarAssignmentWorkflow<br/>Conditional - Level 2]
-    C --> C1\{Maintenance<br/>needed?}
+    BEnd --> DA[Step 2: CarAssignmentDecisionAgent<br/>Decision Agent - Level 1]
+    
+    DA --> C[Step 3: CarAssignmentWorkflow<br/>Conditional - Level 2]
+    C --> C1\{Decision is<br/>MAINTENANCE?}
     C1 -->|Yes| C2[MaintenanceAgent]
-    C1 -->|No| C3\{Maintenance not needed and Cleaning<br/>needed?}
+    C1 -->|No| C3\{Decision is<br/>CLEANING?}
     C3 -->|Yes| C4[CleaningAgent]
     C2 --> C3
     C3 -->|No| CEnd[Action complete]
     C4 --> CEnd
     
-    CEnd --> D[Step 3: CarConditionFeedbackAgent<br/>Single Agent - Level 1]
+    CEnd --> D[Step 4: CarConditionFeedbackAgent<br/>Single Agent - Level 1]
     D --> End([Updated Car Conditions])
     
     style A fill:#90EE90
     style B fill:#87CEEB
+    style DA fill:#90EE90
     style C fill:#FFD700
     style D fill:#90EE90
     style Start fill:#E8E8E8
@@ -154,11 +158,11 @@ graph TB
     - Does the car need maintenance?
     - Does the car need cleaning?
 
-2. **CarAssignmentWorkflow** (Conditional): Routes the car based on the analysis:
-    - If maintenance needed, then send to maintenance team
-    - if maintenance not needed and cleaning needed, then send to cleaning
+2. **CarAssignmentDecisionAgent** (Decision) reads both analyses and chooses the team that handles the car next. It answers maintenance if any maintenance is required, otherwise cleaning if any cleaning is required, and otherwise that no action is needed.
 
-3. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
+3. **CarAssignmentWorkflow** (Conditional) activates the agent that matches this answer, which is either the `MaintenanceAgent` or the `CleaningAgent`. When no action is needed it activates neither of them, and the flow continues.
+
+4. **CarConditionFeedbackAgent** (Single): Updates the car's condition based on all feedback
 
 ---
 
@@ -175,7 +179,7 @@ The `CarProcessingWorkflow` orchestrates the entire process sequentially:
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java", "sequence-agent")}
 ```
 
-Notice that `subAgents` contains **two workflows** and one agent. Workflows are first-class citizens that can be nested just like agents.
+Notice that `subAgents` contains **two workflows** and two agents. Workflows are first-class citizens that can be nested just like agents.
 
 #### Level 2a: Parallel Feedback Workflow
 
@@ -188,9 +192,35 @@ The `FeedbackWorkflow` runs multiple agents **simultaneously**:
 
 The agents analyze different aspects (cleaning vs. maintenance) and don't depend on each other, so running them concurrently improves performance.
 
+#### Level 1: Car Assignment Decision Agent
+
+The two feedback agents describe what the car needs in free text, so the result of the parallel analysis has to be turned into a routing choice before the next workflow can act on it. The `CarAssignmentDecisionAgent` makes this choice as the second step of the sequence. It is a **decision agent**, an agent that answers a question about its arguments with a decision model instead of a chat model. A decision agent makes a single model call and receives a typed answer rather than generated text, which makes it cheaper and faster than an AI agent and a natural fit for routing, gating and classification steps.
+
+**CarAssignmentDecisionAgent.java**
+```java hl_lines="1-3 5-6"
+{snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarAssignmentDecisionAgent.java:13", "20")}
+```
+
+The question is the value of `@Decide`, and the return type of the method determines what kind of question it is. With an enum such as `CarAssignment`, the answer is a choice among its constants `MAINTENANCE`, `CLEANING` and `NONE`, whereas a `boolean` return type would make it a yes/no question. The question also carries the priority between the teams, since it asks for `MAINTENANCE` whenever any maintenance is required and considers cleaning only otherwise.
+
+Like any other agent, the decision agent reads its arguments from the `AgenticScope` by name, which here are the `maintenanceRequest` and `cleaningRequest` written by the two feedback agents. It writes its answer to its `outputKey`, so the chosen `CarAssignment` is available under `carAssignment` to the activation conditions and to the agents that run later. A decision agent has no prompt, tools or chat memory, which is why the method carries neither `@SystemMessage` nor `@UserMessage`.
+
+The decision model is configured in `application.properties`, next to the chat model:
+
+**application.properties**
+```properties
+{snippet:insert("section-2/step-03/src/main/resources/application.properties:33", "34")}
+```
+
+With the OpenAI provider, a decision agent uses OpenAI's Decisions API with the same API key as the chat model, and it needs no extra dependency. This step sets the model to `gpt-6-luna`, which is also the default.
+
+> [!NOTE]
+> **Experimental feature**
+> The [Quarkus LangChain4j agentic guide](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agentic.html) marks decision agents and the `DecisionModel` API as experimental, and OpenAI's Decisions API as a public beta.
+
 #### Level 2b: Conditional Action Workflow
 
-The `CarAssignmentWorkflow` uses **activation conditions** to intelligently route cars to the appropriate team based on the analysis it has done:
+The `CarAssignmentWorkflow` uses **activation conditions** to intelligently route cars to the appropriate team based on the answer of the decision agent:
 
 **CarAssignmentWorkflow.java**
 ```java hl_lines="1 10 15"
@@ -200,7 +230,7 @@ The `CarAssignmentWorkflow` uses **activation conditions** to intelligently rout
 - If `assignToMaintenance()` returns `true` → MaintenanceAgent runs
 - If `assignToCleaning()` returns `true` → CleaningAgent runs
 
-The logic in `assignToCleaning()` will only let the CleaningAgent run if no maintenance is required. This implements **priority routing**: maintenance takes precedence over cleaning.
+Both conditions take the `carAssignment` value that the decision agent stored in the `AgenticScope`. `assignToMaintenance()` compares it with `CarAssignment.MAINTENANCE` and `assignToCleaning()` compares it with `CarAssignment.CLEANING`, so at most one of the two agents runs. The **priority routing**, in which maintenance takes precedence over cleaning, is already settled by the question of the decision agent and doesn't have to be repeated in the conditions. When the answer is `NONE`, neither condition is true, so the conditional workflow activates no agent and the sequence continues with the `CarConditionFeedbackAgent`.
 
 ---
 
@@ -255,13 +285,16 @@ flowchart TD
     MFA --> MR[Detects: maintenance needed ✓]
     CFA --> CR[Detects: cleaning needed ✓]
     
-    MR --> CAW\{CarAssignmentWorkflow<br/>Conditional Routing}
-    CR --> CAW
+    MR --> DA[CarAssignmentDecisionAgent<br/>Maintenance has higher priority]
+    CR --> DA
     
-    CAW -->|Maintenance has higher priority| MA[Route to MaintenanceAgent]
+    DA -->|MAINTENANCE| CAW\{CarAssignmentWorkflow<br/>Conditional Routing}
+    
+    CAW --> MA[Route to MaintenanceAgent]
     MA --> Result([Result: Car goes to maintenance])
     
     style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style DA fill:#D6EAF8,stroke:#333,stroke-width:2,color:#333
     style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
     style MA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
     style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
@@ -289,13 +322,16 @@ flowchart TD
     MFA --> MR[Detects: no maintenance needed ✗]
     CFA --> CR[Detects: cleaning needed ✓]
     
-    MR --> CAW\{CarAssignmentWorkflow<br/>Conditional Routing}
-    CR --> CAW
+    MR --> DA[CarAssignmentDecisionAgent<br/>No maintenance needed, 2nd priority is cleaning]
+    CR --> DA
     
-    CAW -->|No maintenance needed, 2nd priority is cleaning| CA[Route to CleaningAgent]
+    DA -->|CLEANING| CAW\{CarAssignmentWorkflow<br/>Conditional Routing}
+    
+    CAW --> CA[Route to CleaningAgent]
     CA --> Result([Result: Car goes to cleaning])
     
     style FW fill:#FAE5D3,stroke:#333,stroke-width:2,color:#333
+    style DA fill:#D6EAF8,stroke:#333,stroke-width:2,color:#333
     style CAW fill:#D5F5E3,stroke:#333,stroke-width:2,color:#333
     style CA fill:#F9E79F,stroke:#333,stroke-width:2,color:#333
     style Result fill:#D2B4DE,stroke:#333,stroke-width:2,color:#333
@@ -312,6 +348,7 @@ Fixed the brakes, car could use a wash now
 **What happens:**
 
 - FeedbackWorkflow: Analyzes maintenance feedback
+- CarAssignmentDecisionAgent: Answers `CLEANING`
 - CarAssignmentWorkflow: Routes to CleaningAgent
 - Result: Car goes from maintenance to cleaning
 
@@ -328,7 +365,9 @@ CarAssignmentWorkflow evaluating conditions...
 CarConditionFeedbackAgent updating...
 ```
 
-Notice how the parallel agents execute simultaneously, then the conditional workflow makes routing decisions!
+Notice how the parallel agents execute simultaneously, then the conditional workflow activates the agent selected by the decision.
+
+The answer of the decision agent is not among these messages. You can read it from the status of the car in the Fleet Status grid, because `CarManagementService` sets the status from the `CarAssignment` value returned by the workflow. The car ends up In Maintenance for `MAINTENANCE`, At Cleaning for `CLEANING`, and Available to Rent for `NONE`.
 
 ---
 
@@ -350,24 +389,19 @@ Workflows are **reusable components**. For example, you could use `FeedbackWorkf
 
 ```java
 // Use in a different workflow
-@SequenceAgent(subAgents = \{
-    FeedbackWorkflow.class,  // Reuse the same workflow!
-    SomeOtherAgent.class
-})
-public interface DifferentWorkflow extends Workflow \{ }
+public interface DifferentWorkflow \{
+
+    @SequenceAgent(outputKey = "differentResult", subAgents = \{
+            FeedbackWorkflow.class,  // Reuse the same workflow!
+            SomeOtherAgent.class
+    })
+    String process(CarInfo carInfo, Integer carNumber, String feedback);
+}
 ```
 
 ### Type Safety
 
-The entire nested structure is **type-checked at compile time**:
-
-```java
-// This won't compile if the workflow structure is invalid
-CarProcessingWorkflow workflow = AiServices.create(
-    CarProcessingWorkflow.class,
-    chatLanguageModel
-);
-```
+The Quarkus LangChain4j extension **validates the agentic system at build time**. A mistake in the declaration of an agent or of one of the nested workflows is therefore reported before the application starts, rather than in the middle of a car return.
 
 ### AgenticScope Across Levels
 
@@ -377,7 +411,8 @@ The `AgenticScope` flows through all levels of nesting:
 sequenceDiagram
     participant Main as CarProcessingWorkflow
     participant Feedback as FeedbackWorkflow
-    participant Action as ActionWorkflow
+    participant Decision as CarAssignmentDecisionAgent
+    participant Action as CarAssignmentWorkflow
     participant Scope as AgenticScope
 
     Main->>Scope: Store: rentalFeedback, cleaningFeedback, maintenanceFeedback
@@ -386,9 +421,14 @@ sequenceDiagram
     Main->>Feedback: Execute
     Feedback->>Scope: Write: maintenanceRequest, cleaningRequest
     
+    Note over Decision: Level 1 - Decision
+    Main->>Decision: Execute
+    Decision->>Scope: Read: maintenanceRequest, cleaningRequest
+    Decision->>Scope: Write: carAssignment
+    
     Note over Action: Level 2 - Conditional
     Main->>Action: Execute
-    Action->>Scope: Read: maintenanceRequest, cleaningRequest
+    Action->>Scope: Read: carAssignment
     Action->>Scope: Execute selected agent
     
     Main->>Scope: Final agent updates condition
@@ -417,9 +457,10 @@ Starting from your current code in `section-2/step-02`, you'll add:
 1. **Feedback Analysis Agents** (MaintenanceFeedbackAgent, CleaningFeedbackAgent)
 2. **Parallel Feedback Workflow** to run them concurrently
 3. **Action Agents** (MaintenanceAgent, updated CleaningAgent)
-4. **Conditional Action Workflow** for intelligent routing
-5. **Nested Main Workflow** that orchestrates everything
-6. **Supporting Infrastructure** (tools, models, service updates)
+4. **Decision Agent** (CarAssignmentDecisionAgent) that chooses the team for each car
+5. **Conditional Action Workflow** for intelligent routing
+6. **Nested Main Workflow** that orchestrates everything
+7. **Supporting Infrastructure** (tools, models, service updates)
 
 **Time:** 60-90 minutes (20-30 minutes if you're working directly from step-03)
 
@@ -454,7 +495,6 @@ copy ..\step-03\src\main\resources\META-INF\resources\css\styles.css .\src\main\
 copy ..\step-03\src\main\resources\META-INF\resources\js\app.js .\src\main\resources\META-INF\resources\js\app.js
 copy ..\step-03\src\main\resources\META-INF\resources\index.html .\src\main\resources\META-INF\resources\index.html
 copy ..\step-03\src\main\resources\import.sql .\src\main\resources\import.sql
-copy ..\step-03\src\main\java\com\carmanagement\service\CarService.java .\src\main\java\com\carmanagement\service\CarService.java
 copy ..\step-03\src\main\java\com\carmanagement\model\CarStatus.java .\src\main\java\com\carmanagement\model\CarStatus.java
 ```
 
@@ -495,7 +535,7 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `MaintenanceFeedback
 **Key Points:**
 
 - Focuses on mechanical issues, body damage, and maintenance needs
-- Returns "MAINTENANCE_NOT_REQUIRED" for easy conditional checking
+- Returns "MAINTENANCE_NOT_REQUIRED" when no maintenance is needed
 - Uses `outputKey` to store result in AgenticScope
 - Accesses the feedback string via `\{feedback}` in the `@UserMessage` template
 
@@ -522,7 +562,7 @@ This is where the `@ParallelAgent` annotation comes into play.
 In `src/main/java/com/carmanagement/agentic/workflow`, create `FeedbackWorkflow.java`:
 
 **FeedbackWorkflow.java**
-```java hl_lines="16-17"
+```java hl_lines="17-18"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/FeedbackWorkflow.java")}
 ```
 
@@ -563,15 +603,36 @@ Update `src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java`:
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CleaningAgent.java")}
 ```
 
+### Create the Car Assignment Decision Agent
+
+The two feedback agents store their analysis as free text, while the conditional workflow we'll create next needs a definite choice between maintenance, cleaning and no action. A decision agent makes this choice by asking a decision model a single question about both analyses, as described in [How Each Level Works](#how-each-level-works).
+
+<mark>In `src/main/java/com/carmanagement/agentic/agents`, create `CarAssignmentDecisionAgent.java`:</mark>
+
+**CarAssignmentDecisionAgent.java**
+```java hl_lines="13-15 17-18"
+{snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/agents/CarAssignmentDecisionAgent.java")}
+```
+
+The method reads `maintenanceRequest` and `cleaningRequest` from the `AgenticScope` and stores its answer under `carAssignment`, the name that the activation conditions of the conditional workflow use for their parameter. Its return type is the `CarAssignment` enum, which belongs to the supporting infrastructure created [further down](#create-carassignment-model), so your IDE reports it as missing until you get there.
+
+The agent sends its question to a decision model, which is configured with its own property and uses the OpenAI API key already set for the chat model.
+
+<mark>Open `src/main/resources/application.properties` and add the decision model:</mark>
+
+**application.properties**
+```properties
+{snippet:insert("section-2/step-03/src/main/resources/application.properties:33", "34")}
+```
+
 ### Create the Conditional Car Assignment Workflow
 
-The Car Assignment workflow is the conditional workflow which will active the appropriate
-service agent path based on the analysis results. Notice the same analysisResult from the previous 2 agents we created.
+The Car Assignment workflow is the conditional workflow that activates the appropriate specialist agent based on the answer of the decision agent. Its `outputKey` is the same `analysisResult` that the `MaintenanceAgent` and the `CleaningAgent` write.
 
 In `src/main/java/com/carmanagement/agentic/workflow`, create `CarAssignmentWorkflow.java`:
 
 **CarAssignmentWorkflow.java**
-```java hl_lines="17-18 26 31"
+```java hl_lines="19-20 28 33"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarAssignmentWorkflow.java")}
 ```
 
@@ -579,8 +640,8 @@ In `src/main/java/com/carmanagement/agentic/workflow`, create `CarAssignmentWork
 
 - `@ConditionalAgent` evaluates conditions to determine which agent runs
 - `@ActivationCondition` methods return `true` to activate an agent
-- Maintenance has priority 
-- Cleaning only runs if maintenance is not needed
+
+Both conditions declare a `CarAssignment carAssignment` parameter, which receives the answer that the decision agent stored in the `AgenticScope`. Each of them compares it with a single constant, so maintenance and cleaning are never activated together, and neither agent runs when the answer is `NONE`. The priority of maintenance over cleaning doesn't appear in this file, because the decision agent has already applied it when it answered.
 
 ### Update CarConditionFeedbackAgent
 
@@ -615,14 +676,14 @@ Update `src/main/java/com/carmanagement/model/CarConditions.java`:
 
 Now it's finally time to compose the sub workflows in the main Car Processing workflow!
 We need to replace the direct call to the CleaningAgent with the FeedbackWorkflow that will analyze the feedback from the intake,
-and then the CarAssignmentWorkflow to actually assign the car to the appropriate team based on the analysis.
+followed by the CarAssignmentDecisionAgent that chooses the team, and then the CarAssignmentWorkflow to actually assign the car to that team.
 
-We'll also update the `outputKey` and the output method to make sure the assignment happens with the right priority.
+We'll also update the `outputKey` and the output method, which now returns the assignment chosen by the decision agent together with the car condition.
 
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
 **CarProcessingWorkflow.java**
-```java hl_lines="18-19 26-37"
+```java hl_lines="20-21 28-31"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
 ```
 
@@ -631,7 +692,8 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 - `@SequenceAgent` runs the workflows and agents in order
 - Sub-agents can be **other workflows** (FeedbackWorkflow, CarAssignmentWorkflow)
 - All agents share the same `AgenticScope`
-- The `@Output` method retrieves the carCondition, maintenanceRequest and cleaningRequest from the AgenticScope, determines what needs to happen next, and then returns the result.
+
+The `@Output` method takes `carCondition` and `carAssignment` from the `AgenticScope` and returns them together as a `CarConditions` record. It contains no routing logic of its own, because the decision agent has already determined what needs to happen next.
 
 #### Update the Service Layer
 
@@ -688,7 +750,7 @@ Try changing `FeedbackWorkflow` from `@ParallelAgent` to `@SequenceAgent`. How d
 
 ### 3. Add More Sophisticated Conditions
 
-The `CarAssignmentWorkflow` currently uses simple `isRequired()` checks. Try adding:
+The activation conditions of `CarAssignmentWorkflow` currently only compare the answer of the decision agent with an enum constant. Try adding:
 
 - Cost-based conditions (only send to maintenance if estimated cost < $500)
 - Time-based conditions (skip cleaning if it was cleaned in last 24 hours)
@@ -716,6 +778,7 @@ Check that your system has multiple CPU cores and that the thread pool is config
 - Verify your `@ActivationCondition` methods are correctly named
 - Check that parameter names match the `outputKey` values exactly
 - Add logging to the condition methods to see what values they're receiving
+- If they receive a `CarAssignment` value you didn't expect, compare it with the text of `maintenanceRequest` and `cleaningRequest` and review the question in `@Decide`
 
 </details>
 

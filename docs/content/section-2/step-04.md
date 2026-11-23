@@ -288,13 +288,9 @@ The `@SupervisorRequest` annotation is what gives the supervisor its runtime ins
 ```java
 @SupervisorRequest
 static String request(
-        String carMake,
-        String carModel,
-        Integer carYear,
+        CarInfo carInfo,
         Integer carNumber,
-        String carCondition,
-        FeedbackAnalysisResults feedbackAnalysisResults,
-        String rentalFeedback
+        FeedbackAnalysisResults feedbackAnalysisResults
 ) \{
     boolean dispositionRequired = feedbackAnalysisResults.dispositionAnalysis() != null &&
             feedbackAnalysisResults.dispositionAnalysis().toUpperCase().contains("DISPOSITION_REQUIRED");
@@ -317,6 +313,12 @@ static String request(
         STEP 3: If DispositionAgent decides KEEP:
                 - Invoke MaintenanceAgent if maintenance needed
                 - Invoke CleaningAgent if cleaning needed
+
+        IMPORTANT: When invoking DispositionAgent:
+        - Pass carValue as a STRING with dollar sign (e.g., "$10,710" not 10710)
+        - Use the EXACT format from PricingAgent's response
+
+        Follow the decision logic in your system message carefully.
         """;
 
     // returns the final formatted request string...
@@ -367,7 +369,7 @@ By transforming the parallel results into `FeedbackAnalysisResults`, you create 
 
 ## Update the CarProcessingWorkflow
 
-Now that we've built the new components, we'll replace the previous parallel agent and the subsequent conditional routing with the supervisor agent. The workflow now becomes a clean three-step sequence:
+Now that we've built the new components, we'll replace the previous parallel agent, the decision agent and the conditional routing that followed it with the supervisor agent. The workflow now becomes a clean three-step sequence:
 
 1. `FeedbackAnalysisWorkflow` performs parallel analysis
 2. `FleetSupervisorAgent` decides which action agents to invoke

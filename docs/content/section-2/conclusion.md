@@ -19,8 +19,8 @@ Let's reflect on what you've built and why these patterns matter.
 You started by transforming a traditional AI service into an **autonomous agent** that could use tools.
 
 **What you built:**
-- `CarWashAgent`: An agent that analyzes feedback and decides which car wash services to request
-- `CarWashTool`: A tool that the agent calls to execute car wash actions
+- `CleaningAgent`: An agent that analyzes feedback and decides which car wash services to request
+- `CleaningTool`: A tool that the agent calls to execute car wash actions
 
 **Key concepts:**
 - **Agent autonomy**: The LLM decides when and how to use tools based on context, but you decide whether you control the flow or let an AI manage it
@@ -57,7 +57,8 @@ Workflows let you compose specialized agents, each excellent at one task, into s
 You mastered the art of **composing workflows within workflows**, unlocking truly sophisticated agent architectures.
 
 **What you built:**
-- `FeedbackWorkflow`: Parallel analysis by three agents running concurrently
+- `FeedbackWorkflow`: Parallel analysis by two agents running concurrently
+- `CarAssignmentDecisionAgent`, a decision agent that asks the decision model configured in `application.properties` which team handles the car next and returns a `CarAssignment` value
 - `CarAssignmentWorkflow`: Conditional routing based on what actions are needed
 - `CarProcessingWorkflow`: Three-level nested workflow orchestrating everything
 - Agents for maintenance, cleaning, and comprehensive feedback analysis
@@ -65,6 +66,7 @@ You mastered the art of **composing workflows within workflows**, unlocking trul
 **Key concepts:**
 - **Parallel workflows**: Concurrent agent execution for improved response time
 - **Conditional workflows**: Dynamic routing based on runtime conditions
+- A **decision agent** returns a typed answer from a decision model instead of generated text, and the conditional workflow routes the car on that answer
 - **Activation conditions**: Boolean logic controlling when agents execute
 - **Nested composition**: Workflows containing other workflows, up to any depth
 - **Priority routing**: Handling critical issues before routine tasks
@@ -103,10 +105,11 @@ You learned how to add **human oversight** to autonomous systems, ensuring criti
 
 **What you built:**
 - `DispositionProposalAgent`: Creates disposition proposals for human review
-- `HumanApprovalAgent`: Simulates human approval decisions (in production, integrates with real approval systems)
-- Enhanced `FleetSupervisorAgent`: Routes high-value vehicles through approval workflow
+- `HumanApprovalAgent`, which pauses the workflow until a human approves or rejects the proposal in the UI, and reaches the `ApprovalService` through a `@CdiBean` parameter
+- An enhanced `FleetSupervisorAgent` that routes high-value vehicles through the approval workflow, now a bean class that injects the approval threshold from the configuration
 - Value-based routing: Different paths for high-value vs. low-value vehicles
 - Approval tracking: Status and reasoning stored for audit trails
+- `AgentLoggingListener`, a CDI bean that logs when each agent starts, completes or fails
 
 **Key concepts:**
 - **Human-in-the-Loop (HITL)**: AI proposes, humans decide, system executes only if approved
@@ -114,6 +117,9 @@ You learned how to add **human oversight** to autonomous systems, ensuring criti
 - **Value-based routing**: Different workflows based on business thresholds
 - **Fallback paths**: Alternative actions when proposals are rejected
 - **Audit trails**: Complete tracking of approval decisions and reasoning
+- An agent that needs an injected value can be a **CDI bean class** with a `native` agentic method, while the other agents stay interfaces
+- A **`@CdiBean` parameter** gives a `static` method of an agent interface access to a CDI bean
+- An **`AgentListener` bean** is registered on all the agents of the application and is notified when one of them starts, completes or fails
 
 **Why it matters:** Not all decisions should be fully autonomous. High-stakes decisions (financial, safety, legal) often require human judgment. HITL provides a safety net while still leveraging AI for analysis and recommendations. It builds trust, ensures compliance, and maintains accountability while automating routine decisions.
 
@@ -146,19 +152,19 @@ You implemented **dynamic model selection** so the system automatically uses a m
 
 **What you built:**
 
-- `DynamicModelSelector`: A CDI bean that chooses between a base and an advanced model based on the vehicle's estimated value
-- Named model configuration: Two models (`gpt-4o-mini` and `gpt-4o`) configured side-by-side in `application.properties`
+- `DispositionProposalAgent` as a bean class that injects a base and an advanced model and chooses between them based on the vehicle's estimated value
+- Named model configuration: Two models (`gpt-4.1` and `gpt-5.1`) configured side-by-side in `application.properties`
 - `@ChatModelSupplier` on `DispositionProposalAgent`: Dynamic per-invocation model selection using runtime data
 
 **Key concepts:**
 
 - **Named models**: Configuring multiple LLM backends in a single application with `quarkus.langchain4j.openai.<modelName>.*`
 - **`@ModelName`**: Qualifier for injecting a specific named model into a CDI bean
-- **`@ChatModelSupplier`**: Static method on an agent interface that returns the `ChatModel` for each invocation
-- **`@CdiBean`**: Bridges CDI dependency injection into the static supplier method
-- **Parameter matching**: The supplier receives agent method parameters by type, enabling data-driven model selection
+- A **`@ChatModelSupplier`** method provides the `ChatModel` of an agent, as an instance method in an agent class and a `static` one in an agent interface
+- An agent declared as a **bean class** injects the models itself. An injected `ChatModel` field never selects the model of the agent by itself, since this is what the supplier's return value does
+- The **parameters of the supplier** are resolved from the AgenticScope, so the supplier, invoked at each invocation of the agent, can receive the outputs of earlier agents and select the model from them
 
-**Why it matters:** Not all decisions carry equal risk. A scrapped $50,000 car is far more costly than a $3,000 one. Dynamic model selection lets you balance cost against quality — using a cheaper model for routine decisions and a stronger model when the stakes justify it. The pattern keeps model selection logic separate from agent prompts, so changes to the selection rule don't require touching any agent code.
+**Why it matters:** Not all decisions carry equal risk. A scrapped $50,000 car is far more costly than a $3,000 one. Dynamic model selection lets you balance cost against quality — using a cheaper model for routine decisions and a stronger model when the stakes justify it. The selection rule sits in a single method of the agent class, so it can change without touching the agent's prompts.
 
 ---
 
@@ -192,6 +198,7 @@ You extended beyond single-application boundaries to build **distributed multi-a
 - `AgentCard`: Describes remote agent capabilities
 - `AgentExecutor`: Handles A2A protocol communication
 - Two Quarkus applications communicating across HTTP
+- An `@ErrorHandler` on the root `CarProcessingWorkflow` that returns a fallback value when the pricing agent fails, together with a line in the supervisor prompt that treats a car of unknown value as high-value, so that it goes through human approval
 
 **Key concepts:**
 - **A2A protocol**: Open standard for agent-to-agent communication
@@ -199,6 +206,7 @@ You extended beyond single-application boundaries to build **distributed multi-a
 - **Tasks vs. Messages**: Different interaction patterns for different needs
 - **Agent discovery**: AgentCard enables clients to find and understand remote agents
 - **Protocol abstraction**: Declarative annotations hide complex protocol details
+- **Error recovery** with an `@ErrorHandler` method lets a workflow replace the output of a failed agent with a fallback value, or rethrow the failure
 
 **Why it matters:** Enterprise systems are inherently distributed. Different teams, departments, or organizations may develop specialized agents. A2A lets you integrate these agents seamlessly, creating ecosystems where agents from different sources collaborate to solve problems.
 
@@ -260,7 +268,7 @@ Agent (reasoning) → Tool (action)
 
 **When to use:** Single autonomous decision-making with side effects
 
-**Example:** `CarWashAgent` + `CarWashTool`
+**Example:** `CleaningAgent` + `CleaningTool`
 
 ---
 
@@ -273,7 +281,7 @@ Agent A → Agent B → Agent C
 
 **When to use:** Multi-step processes where each step builds on previous results
 
-**Example:** `CarWashAgent` → `CarConditionFeedbackAgent`
+**Example:** `CleaningAgent` → `CarConditionFeedbackAgent`
 
 ---
 

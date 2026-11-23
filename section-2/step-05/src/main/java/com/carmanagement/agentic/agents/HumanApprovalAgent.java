@@ -3,7 +3,7 @@ package com.carmanagement.agentic.agents;
 import com.carmanagement.model.ApprovalProposal;
 import com.carmanagement.service.ApprovalService;
 import dev.langchain4j.agentic.declarative.HumanInTheLoop;
-import io.quarkus.arc.Arc;
+import io.quarkiverse.langchain4j.agentic.runtime.CdiBean;
 import io.quarkus.logging.Log;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,14 +22,13 @@ public interface HumanApprovalAgent {
             String dispositionProposal,
             String dispositionReason,
             String carCondition,
-            String feedback
+            String feedback,
+            @CdiBean ApprovalService approvalService
     ) {
 
         Log.infof("🛑 HITL Tool: Creating approval proposal for car %d - %s %s %s",
                 carNumber, carYear, carMake, carModel);
         Log.info("⏸️  WORKFLOW PAUSED - Waiting for human approval decision via UI");
-
-        ApprovalService approvalService = Arc.container().instance(ApprovalService.class).get();
 
         try {
             // Create proposal and get CompletableFuture that completes when human decides

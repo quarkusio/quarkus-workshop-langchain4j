@@ -31,7 +31,7 @@ The workshop is divided into three sections:
 - **Section 1 – AI-infused application (11 steps):**
   You'll progressively build a customer-facing support chatbot, starting with basic LLM integration and adding features such as structured outputs, guardrails, RAG, MCP integration, and observability.
 
-- **Section 2 – Agentic systems (7 steps + bonus):**
+- **Section 2 – Agentic systems (8 steps + bonus):**
   You'll build a new multi-agent architecture, introducing agentic workflows, supervisor patterns, human-in-the-loop, multimodal agents, and Agent-to-Agent (A2A) communication, with a bonus step that covers deploying to Kubernetes/OpenShift.
 
 - **Section 3 – Enterprise agentic AI patterns (9 steps):**
@@ -40,7 +40,7 @@ The workshop is divided into three sections:
 Each step builds on the previous one, with the results stored in separate directories (`step-XX`):
 
 - Final solution for Section 1: `section-1/step-11`
-- Final solution for Section 2: `section-2/step-07`
+- Final solution for Section 2: `section-2/step-08`
 - Final solution for Section 3: `section-3/step-07`
 
 ---

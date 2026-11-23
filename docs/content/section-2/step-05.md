@@ -37,7 +37,10 @@ In this step, you will:
 - Create a **DispositionProposalAgent** that generates proposals
 - Build a **HumanApprovalAgent** using LangChain4j's **`@HumanInTheLoop`** annotation
 - Modify the **FleetSupervisorAgent** to route high-value vehicles through approval
+- Declare an agent as a **CDI bean class** so that it can inject a configuration value
+- Pass a CDI bean to a `static` agent method with the **`@CdiBean`** annotation
 - Add **approval tracking** to the data model
+- Log every agent invocation with an **`AgentListener`** bean
 - See how HITL provides **safety and control** in autonomous systems
 
 ---
@@ -163,7 +166,7 @@ This agent implements Human-in-the-Loop using LangChain4j's **`@HumanInTheLoop`*
 In `src/main/java/com/carmanagement/agentic/agents`, create `HumanApprovalAgent.java`:
 
 **HumanApprovalAgent.java**
-```java hl_lines="6 17"
+```java hl_lines="6 15 26 35-39 42"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/agents/HumanApprovalAgent.java")}
 ```
 
@@ -176,6 +179,8 @@ In `src/main/java/com/carmanagement/agentic/agents`, create `HumanApprovalAgent.
 - The future then completes and the workflow resumes with the human's decision
 - It returns a message containing APPROVED/REJECTED and the reasoning
 - The result is stored in the **AgenticScope** with key `approvalDecision`
+
+The method needs the `ApprovalService`, which is a CDI bean. An agent interface cannot have injected fields, but its `static` methods can declare parameters that are resolved from CDI when they are annotated with `@CdiBean`, and this is what the last parameter of `reviewDispositionProposal()` does. Such a parameter is not an argument of the agent. It is not read from the AgenticScope and it is not described to the supervisor, which still sees an agent that takes the details of the car and of the proposal.
 
 
 ### The ApprovalService
@@ -242,12 +247,30 @@ In `src/main/java/com/carmanagement/resource`, create `ApprovalResource.java`:
 
 Now we need to modify the supervisor to implement the new value-based routing with the approval workflow.
 
+The routing rule compares the value of the car with the approval threshold, and management wants to be able to move that threshold without anyone rewriting a prompt. The supervisor therefore reads it from the application configuration, and for this it needs an injected field. An agent interface cannot have one, so in this step `FleetSupervisorAgent` becomes a class. Quarkus LangChain4j accepts an agent in two forms. One is the interface, which every agent of this workshop has used so far, and the other is an ordinary CDI bean class. In both cases we don't implement the agentic method ourselves, because the extension does it at build time.
+
 Update `src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java`:
 
 **FleetSupervisorAgent.java**
-```java hl_lines="10 24-35 40-46 49-51"
+```java hl_lines="16 18-19 25-26 32 40 46 63-69 73"
 {snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java")}
 ```
+
+The supervisor gains `DispositionProposalAgent` and `HumanApprovalAgent` as sub-agents, and its request now tells the model to send a car worth more than the threshold through them and to call `DispositionAgent` directly otherwise. The other highlighted lines are what turns the interface into a bean:
+
+- `approvalThreshold` is an injected field. `@ConfigProperty` fills it with the value of `car-management.approval.threshold`, the property we add to `application.properties` in [Update Application Configuration](#update-application-configuration) below.
+- `superviseCarProcessing()` is declared `public native`. `native` is how Java lets a class declare a method without a body, and here it only marks the method as implemented by the extension at build time. No native library is involved.
+- `request()` is no longer `static`. As an instance method, the `@SupervisorRequest` helper can read the injected field. It formats the threshold as a dollar amount and inserts it in the two routing rules, so the default of `15000` appears in the prompt as `$15,000`.
+
+The class is a normal bean, so it could inject other beans in the same way, and any of its helper methods can use what it injects. A helper may be package-private, as `request()` is, but not `private` or `final`. The class itself has to be concrete and non-final with a no-arg constructor, and it declares exactly one agentic method. A scope annotation is optional, and we don't add one because without it the class is an `@ApplicationScoped` bean, the same scope agent interfaces get.
+
+The supervisor is itself a sub-agent of `CarProcessingWorkflow`, which remains an interface, and its own sub-agents are interfaces too. Interface agents and class agents can be freely mixed as sub-agents of each other, and injecting and calling an agent is identical for both forms.
+
+`HumanApprovalAgent` shows the other way of reaching a bean. It needs a single service inside a single `static` method, and a `@CdiBean` parameter is enough for that. The supervisor's helper depends on configuration, so we made the supervisor a bean and injected the value.
+
+> [!NOTE]
+> **The interface form remains available**
+> Declaring an agent as an interface is the form shared with plain LangChain4j, and all the other agents of this workshop keep using it. The [Agents as CDI Beans](https://docs.quarkiverse.io/quarkus-langchain4j/dev/agentic.html#_agents_as_cdi_beans) section of the Quarkus LangChain4j guide covers the class form in more detail.
 
 ### Update the CarConditions Model
 
@@ -271,6 +294,8 @@ Update `src/main/resources/application.properties`:
 # Threshold for requiring human approval on high-value dispositions
 car-management.approval.threshold=15000
 ```
+
+`FleetSupervisorAgent` injects this value into its `approvalThreshold` field and writes it into the routing rules of its request. Changing the amount that triggers a human review is therefore a matter of editing this one line.
 
 ---
 
@@ -507,7 +532,7 @@ Start with a low threshold where everything requires approval. As confidence gro
 
 ## Experiment Further
 
-1. Try adjusting the approval threshold to see how it affects which vehicles require human review. Lower it to $10,000 to require approval for more vehicles, raise it to $25,000 to only catch the most expensive ones, or set it to $0 to require approval for all dispositions.
+1. Try adjusting the approval threshold to see how it affects which vehicles require human review. The supervisor reads it from `car-management.approval.threshold`, so <mark>change the value in `application.properties` and submit one of the scenarios again</mark>. Lower it to `10000` to require approval for more vehicles, raise it to `25000` to only catch the most expensive ones, or set it to `0` to require approval for all dispositions.
 
 1. You could implement multi-level approval where vehicles worth $15,000-$25,000 need a single approver, $25,000-$50,000 need two approvers, and anything over $50,000 requires manager approval.
 
@@ -567,7 +592,7 @@ The `HumanApprovalAgent` has a 5-minute timeout by default. If you need more tim
 
 ---
 
-## Agent Observability with MonitoredAgent
+## Agent Observability with MonitoredAgent and AgentListener
 
 Beyond the HITL workflow, step-05 also introduces agent observability. This gives you the ability to inspect what every agent in the system did, what inputs it received, what it produced, and how long it took.
 
@@ -582,6 +607,24 @@ Enabling this feature requires two simple steps. First, make your workflow inter
 Second, generate an HTML report from the monitor. In `CarManagementService.java`, the `report()` method uses the static `HtmlReportGenerator.generateReport()` helper to produce a self-contained HTML page. This page includes an agent topology showing a visual map of all agents and their relationships, an execution timeline with a detailed breakdown of every agent invocation including inputs, outputs, duration, and nesting level, and error tracking that highlights any failed invocations with their exception details.
 
 The report is exposed via a REST endpoint in `CarManagementResource.java`. After processing one or more cars, click the "Generate Report" button in the UI (next to "Refresh Data") to open the report in a new tab. The report shows the full agent topology of your system, every execution grouped by workflow run, and for each agent invocation, what went in, what came out, and how long it took. This is invaluable for debugging agent behavior, understanding why the supervisor made a particular routing decision, or verifying that the HITL workflow paused and resumed correctly.
+
+The report shows what the agents did once you ask for it. To see the agents at work while a car is being processed, step-05 also contains a listener of its own. `AgentListener`, the interface that the monitor implements, can be implemented by the application as well, and `AgentLoggingListener` uses it to write a log line whenever an agent starts, completes or fails.
+
+**AgentLoggingListener.java**
+```java
+{snippet:insert("section-2/step-05/src/main/java/com/carmanagement/agentic/observability/AgentLoggingListener.java")}
+```
+
+The listener needs no registration code. An `AgentListener` bean, which must be `@ApplicationScoped` or `@Singleton`, is registered by Quarkus LangChain4j on every agent of the application, with no annotation on the agents. Each of the three callbacks writes one line, and `abbreviate()` keeps an agent's output on that line by replacing its line breaks with spaces and cutting it after 60 characters.
+
+In the callbacks the agent name is the name of the agentic method, so the supervisor is logged as `superviseCarProcessing` and the approval agent as `reviewDispositionProposal`. <mark>Submit one of the scenarios again and watch the terminal where Quarkus is running.</mark> Every agent that runs logs one message when it starts and another when it completes. The following lines illustrate their format for the approval agent, with the output left as a placeholder:
+
+```text
+Agent reviewDispositionProposal started
+Agent reviewDispositionProposal completed: <first 60 characters of the output>...
+```
+
+The console puts its usual timestamp, level and logger name in front of each message. For the approval agent the second line only appears when its method returns, after you approve or reject the proposal in the UI or after the five-minute timeout, which makes the pause of the workflow visible in the log. An agent that fails produces a warning of the form `Agent <name> failed: <exception message>`.
 
 ---
 ## Cleanup

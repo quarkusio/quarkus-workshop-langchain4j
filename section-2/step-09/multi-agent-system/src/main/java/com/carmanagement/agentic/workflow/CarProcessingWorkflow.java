@@ -6,6 +6,9 @@ import com.carmanagement.agentic.agents.FleetSupervisorAgent;
 import com.carmanagement.model.CarConditions;
 import com.carmanagement.model.CarInfo;
 import com.carmanagement.model.FeedbackTask;
+import dev.langchain4j.agentic.agent.ErrorContext;
+import dev.langchain4j.agentic.agent.ErrorRecoveryResult;
+import dev.langchain4j.agentic.declarative.ErrorHandler;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
 import dev.langchain4j.agentic.observability.MonitoredAgent;
@@ -49,9 +52,20 @@ public interface CarProcessingWorkflow extends MonitoredAgent {
         Log.debug("  carAssignment: " + carConditions.carAssignment());
         Log.debug("  dispositionStatus: " + carConditions.dispositionStatus());
         Log.debug("  dispositionReason: " + carConditions.dispositionReason());
-        
+
         return carConditions;
     }
+
+    // --8<-- [start:error-handler]
+    @ErrorHandler
+    static ErrorRecoveryResult errorHandler(ErrorContext errorContext) {
+        if (errorContext.agentName().equals("estimateValue")) {
+            Log.warn("Pricing agent unavailable, continuing with a fallback value");
+            return ErrorRecoveryResult.result("Estimated Value: unknown (pricing service unavailable)");
+        }
+        return ErrorRecoveryResult.throwException();
+    }
+    // --8<-- [end:error-handler]
 }
 
 

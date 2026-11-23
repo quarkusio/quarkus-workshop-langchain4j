@@ -138,7 +138,7 @@ The OpenAI base URL and model can be configured in `kubernetes/configmap.yaml`:
 ```yaml
 data:
   OPENAI_BASE_URL: "https://api.openai.com/v1"
-  OPENAI_MODEL_NAME: "gpt-4o"
+  OPENAI_MODEL_NAME: "gpt-4.1"
 ```
 
 ### A2A Agent Configuration
@@ -186,7 +186,7 @@ The main application's `PricingAgent` interface specifies where to fetch the age
 
 The A2A client fetches the agent card from this URL, extracts the actual endpoint URL from the card, and uses that for all subsequent communication.
 
-**Important:** The A2A agent must be running and accessible before the main application starts, as it fetches the agent card during initialization.
+The agent card is fetched the first time the pricing agent is invoked, not when the main application starts, so the main application starts even if the A2A agent is not available yet. If the A2A agent cannot be reached when a car needs a price, the car return still completes. The error handler of `CarProcessingWorkflow` supplies a fallback value, and the supervisor treats the car as high-value and sends it to human approval.
 
 ## Kubernetes Resources
 
