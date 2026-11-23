@@ -54,12 +54,30 @@ body {
   display: none;
 }
 
-// The theme pads the header by 13rem for its full-width bands, which leaves
-// no room for the workshop title next to the logo and the actions. The
-// colours are repeated here so the bar stays readable on its own.
+// The header is styled here rather than by the theme's header rules, so it
+// renders even if those rules are missing or change upstream.
 div.nav-wrapper {
   background-color: #000;
   padding-inline: 4rem;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: nowrap;
+  padding: 0.9rem 0;
+}
+
+.main-nav .logo-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.main-nav .project-logo {
+  height: 2.25rem;
+  width: auto;
 }
 
 @media screen and (max-width: 768px) {
