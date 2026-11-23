@@ -1,0 +1,29 @@
+footer_text: "The LangChain4j workshop is part of the Quarkus project, licensed under Creative Commons Attribution 3.0."
+links:
+  - title: Workshop
+    width: 3
+    subfolderitems:
+      - page: Requirements
+        url: /quarkus-workshop-langchain4j/requirements/
+      - page: Section 1 - AI Apps
+        url: /quarkus-workshop-langchain4j/section-1/step-01/
+      - page: Section 2 - Agentic Systems
+        url: /quarkus-workshop-langchain4j/section-2/step-01/
+      - page: Section 3 - Enterprise Patterns
+        url: /quarkus-workshop-langchain4j/section-3/step-01/
+  - title: Source
+    width: 3
+    subfolderitems:
+      - page: GitHub repository
+        url: https://github.com/quarkusio/quarkus-workshop-langchain4j
+      - page: Report an issue
+        url: https://github.com/quarkusio/quarkus-workshop-langchain4j/issues
+  - title: Quarkus
+    width: 3
+    subfolderitems:
+      - page: Quarkus website
+        url: https://quarkus.io/
+      - page: Quarkus LangChain4j
+        url: https://docs.quarkiverse.io/quarkus-langchain4j/
+      - page: LangChain4j documentation
+        url: https://docs.langchain4j.dev/

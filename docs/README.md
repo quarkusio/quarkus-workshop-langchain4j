@@ -34,15 +34,16 @@ The site is available at [http://localhost:8080](http://localhost:8080). Dev mod
 
 The generated site ends up in `docs/target/roq`. CI builds it with the `quarkiverse/quarkus-roq` GitHub action and deploys it to GitHub Pages from `main`. The workflow is `.github/workflows/build.yml`.
 
-`RoqSiteTest` boots the generator and checks the result: pages render without Qute errors, snippets expand, links and image paths are relative, the sitemap and search index exist, callout boxes keep their content, `<mark>` highlights render, and light mode is the default. Add an assertion there when you change something that the site generation could silently break.
+`RoqSiteTest` boots the generator and checks the result: pages render without Qute errors, snippets expand, links and image paths are relative, the sitemap and search index exist, callout boxes keep their content, `<mark>` highlights render, the Quarkus theme header is in place, and pages get the workshop layout. Add an assertion there when you change something that the site generation could silently break.
 
 ## Where things live
 
 - `docs/content/`: the pages, one Markdown file per page, with YAML front matter (`title`, `layout`, ...). The URL follows the path, so `section-1/step-01.md` becomes `/section-1/step-01/`.
 - `docs/public/images/`: screenshots and diagrams.
-- `docs/web/_custom.css` and `docs/web/app.js`: workshop styles and scripts, bundled together with the theme's. Frontend files must stay identical in every Section 3 step; check `section-3/README.md` before editing them.
-- `docs/templates/`: overrides of the Roq default theme, such as the navbar and the head partial.
-- `docs/src/main/resources/templates/`: workshop partials such as the sidebar menu and head scripts.
+- `docs/web/main.scss` and `docs/web/app.js`: workshop styles and scripts. `main.scss` imports the Quarkus theme first. Frontend files must stay identical in every Section 3 step; check `section-3/README.md` before editing them.
+- `docs/templates/theme-layouts/quarkus/`: the `page` and `home` layouts that put the navigation column, the prose and the table of contents on the theme's `base` layout.
+- `docs/src/main/resources/templates/partials/workshop/`: the sidebar menu and its scripts.
+- `docs/data/projectfooter.yaml`: the footer content the theme renders.
 - `docs/src/main/java/docs/SnippetExtension.java`: the `{snippet:insert(...)}` Qute extension.
 - `docs/content/sitemap.xml` and `docs/content/search-index.json`: small templates wired to the Roq plugins.
 

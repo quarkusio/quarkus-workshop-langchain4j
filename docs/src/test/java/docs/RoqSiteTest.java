@@ -74,19 +74,21 @@ public class RoqSiteTest {
     }
 
     @Test
-    public void navbarShowsRepositoryStats() {
+    public void headerComesFromTheQuarkusTheme() {
+        // the quarkus-website-theme renders the quarkus.io header
         when().get("/").then().statusCode(200)
-                .body(containsString("data-gh=\"stars\""))
-                .body(containsString("data-gh=\"forks\""));
+                .body(containsString("class=\"nav-wrapper\""))
+                .body(containsString("id=\"main-nav\""))
+                .body(containsString("START CODING"));
     }
 
     @Test
-    public void navbarShowsTheWorkshopName() {
-        // the MkDocs header showed the full site name; narrow windows get
-        // the shorter one from the media query
-        when().get("/").then().statusCode(200)
-                .body(containsString("navbar-title-long\">Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop<"))
-                .body(containsString("navbar-title-short\">Quarkus LangChain4j Workshop<"));
+    public void pagesGetTheWorkshopLayout() {
+        // navigation column and table of contents around the prose
+        when().get("/section-2/step-01/").then().statusCode(200)
+                .body(containsString("class=\"workshop-sidebar\""))
+                .body(containsString("class=\"workshop-toc\""))
+                .body(containsString("class=\"roq-toc\""));
     }
 
     @Test
@@ -137,12 +139,12 @@ public class RoqSiteTest {
     }
 
     @Test
-    public void lightModeIsTheDefault() {
-        // light unless the reader picked dark with the toggle; the OS
-        // preference must not override it
+    public void colourModeComesFromTheQuarkusTheme() {
+        // the theme's colormode.js starts from the OS preference and keeps the
+        // reader's choice, which is how quarkus.io behaves
         when().get("/").then().statusCode(200)
-                .body(containsString("localStorage.getItem('darkMode') === 'true'"))
-                .body(not(containsString("prefers-color-scheme")));
+                .body(containsString("/assets/javascript/colormode.js"))
+                .body(containsString("id='theme-toggle'"));
     }
 
     @Test
