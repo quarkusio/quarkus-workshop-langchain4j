@@ -657,6 +657,7 @@ $alert-icons: (
   padding: 0 0.7rem 0.5rem;
   font-size: 1rem;
   line-height: 1.55;
+  color: var(--main-text-color);
   border-left: 3px solid var(--alert-color);
   border-radius: 0.2rem;
   background-color: color-mix(in srgb, var(--alert-color) 3%, transparent);
@@ -752,6 +753,7 @@ html.dark :is(.content-prose, .home-content) .markdown-alert {
   padding: 0 0.7rem;
   font-size: 1rem;
   line-height: 1.55;
+  color: var(--main-text-color);
   border-left: 3px solid var(--alert-color);
   border-radius: 0.2rem;
   background-color: color-mix(in srgb, var(--alert-color) 3%, transparent);
@@ -891,12 +893,15 @@ html.dark .content-prose details {
 
 // hl_lines from the fence info string: app.js wraps every rendered line in
 // .code-line and marks the selected ones, which the plain text cannot do.
+// app.js wraps each highlighted line in .code-line; the theme's `*` colour
+// rule would make those wrappers black on the dark block.
 .content-prose pre code .code-line {
   display: inline-block;
   width: 100%;
   margin: 0 -0.5rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
+  color: #c9d1d9;
 }
 
 .content-prose pre code .hl-line {
