@@ -3,7 +3,11 @@ layout: base
 ---
 {@io.quarkiverse.roq.frontmatter.runtime.model.DocumentPage page}
 <div class="workshop workshop-home">
+  <aside class="workshop-sidebar">
+    {#include partials/workshop/sidebar-menu /}
+  </aside>
   <div class="workshop-main content-prose">
     {#insert /}
   </div>
 </div>
+{#include partials/workshop/sidebar-scripts /}

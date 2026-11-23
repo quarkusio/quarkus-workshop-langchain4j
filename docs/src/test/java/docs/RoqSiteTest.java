@@ -83,6 +83,23 @@ public class RoqSiteTest {
     }
 
     @Test
+    public void workshopBarShowsTheNameAndRepositoryLinks() {
+        // above the theme header: the workshop name and the repository links
+        when().get("/").then().statusCode(200)
+                .body(containsString("class=\"workshop-topbar\""))
+                .body(containsString("Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop"))
+                .body(containsString("data-gh=\"stars\""))
+                .body(containsString("data-gh=\"forks\""));
+    }
+
+    @Test
+    public void homePageKeepsTheNavigation() {
+        when().get("/").then().statusCode(200)
+                .body(containsString("class=\"workshop-sidebar\""))
+                .body(containsString("sidebar-link"));
+    }
+
+    @Test
     public void pagesGetTheWorkshopLayout() {
         // navigation column and table of contents around the prose
         when().get("/section-2/step-01/").then().statusCode(200)
