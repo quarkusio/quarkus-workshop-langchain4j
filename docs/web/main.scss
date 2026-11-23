@@ -21,43 +21,52 @@ body {
 }
 
 // ---------------------------------------------------------------------------
-// Workshop bar above the quarkus.io header: name and repository links
+// Workshop branding and actions inside the quarkus.io header
+//
+// The header partial is overridden in src/main/resources/templates, adding the
+// workshop title next to the Quarkus logo and the search and repository links
+// on the right of the same row.
 // ---------------------------------------------------------------------------
 
-.workshop-topbar {
-  background-color: #000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.workshop-topbar-inner {
+.workshop-header-title {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  max-width: 1600px;
-  margin-inline: auto;
-  padding: 0.5rem 1.5rem;
-}
-
-.workshop-brand {
+  flex: 1 1 auto;
   min-width: 0;
+  margin-left: 1.5rem;
   text-decoration: none;
 }
 
-.workshop-title {
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  white-space: nowrap;
+.workshop-header-title-long,
+.workshop-header-title-short {
   overflow: hidden;
+  color: #fff !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  letter-spacing: 0;
   text-overflow: ellipsis;
-  display: block;
+  text-transform: none !important;
+  white-space: nowrap;
 }
 
-.workshop-title-short {
+.workshop-header-title-short {
   display: none;
 }
 
-.workshop-links {
+// The theme pads the header by 13rem for its full-width bands, which leaves
+// no room for the workshop title next to the logo and the actions.
+div.nav-wrapper {
+  padding-inline: 4rem;
+}
+
+@media screen and (max-width: 768px) {
+  div.nav-wrapper {
+    padding-inline: 2rem;
+  }
+}
+
+.workshop-header-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -65,37 +74,117 @@ body {
   flex-shrink: 0;
 }
 
-.workshop-links a {
+.workshop-header-actions a {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.85rem !important;
+  text-transform: none !important;
   text-decoration: none;
 }
 
-.workshop-links a:hover {
+.workshop-header-actions a:hover {
+  color: #fff !important;
+}
+
+// Colour toggle: match the size of the icon links next to it.
+.workshop-header-actions #theme-toggle {
+  margin: 0;
+  padding: 0.25rem;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.workshop-header-actions #theme-toggle:hover {
   color: #fff;
 }
 
-// The theme's `*` colour rule would make the icons and counts black on the
-// black bar.
-.workshop-links a i,
-.workshop-links a span {
-  color: inherit;
+.workshop-header-actions #theme-toggle i {
+  color: inherit !important;
+  font-size: 1rem !important;
+  padding: 0 !important;
 }
 
-@media screen and (max-width: 1100px) {
-  .workshop-title {
+// The theme's `*` colour rule would make the icons and counts black on the
+// black header.
+.workshop-header-actions a i,
+.workshop-header-actions a span {
+  color: inherit !important;
+}
+
+.workshop-header-search .search-trigger-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 9rem;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.workshop-header-search .search-trigger-input:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.workshop-header-search .search-trigger-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  fill: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.workshop-header-search .search-trigger-shortcut {
+  margin-left: auto;
+  padding: 0.05rem 0.3rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.2rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media screen and (max-width: 1400px) {
+  .workshop-header-title-long {
     display: none;
   }
 
-  .workshop-title-short {
+  .workshop-header-title-short {
     display: block;
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 700;
-    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .workshop-header-search,
+  .workshop-header-actions a span {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .workshop-header-title {
+    margin-left: 0.75rem;
+  }
+
+  .workshop-header-title-long,
+  .workshop-header-title-short {
+    font-size: 1rem !important;
+    white-space: normal;
+  }
+
+  .workshop-header-actions a {
+    display: none;
   }
 }
 
@@ -103,7 +192,9 @@ body {
   display: grid;
   grid-template-columns: 18rem minmax(0, 54rem) 13rem;
   gap: 2.5rem;
+  width: 100%;
   max-width: 1600px;
+  box-sizing: border-box;
   margin-inline: auto;
   padding: 2rem 1.5rem 4rem;
   align-items: start;

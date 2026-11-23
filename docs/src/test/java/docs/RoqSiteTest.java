@@ -75,21 +75,26 @@ public class RoqSiteTest {
 
     @Test
     public void headerComesFromTheQuarkusTheme() {
-        // the quarkus-website-theme renders the quarkus.io header
+        // the quarkus-website-theme layout with the Quarkus logo, without the
+        // quarkus.io menu
         when().get("/").then().statusCode(200)
                 .body(containsString("class=\"nav-wrapper\""))
                 .body(containsString("id=\"main-nav\""))
-                .body(containsString("START CODING"));
+                .body(containsString("class=\"project-logo\""))
+                .body(not(containsString("id=\"menu\"")));
     }
 
     @Test
-    public void workshopBarShowsTheNameAndRepositoryLinks() {
-        // above the theme header: the workshop name and the repository links
+    public void headerShowsTheWorkshopNameAndActions() {
+        // one header: Quarkus logo, workshop name, search, repository links,
+        // colour toggle
         when().get("/").then().statusCode(200)
-                .body(containsString("class=\"workshop-topbar\""))
+                .body(containsString("class=\"workshop-header-title\""))
                 .body(containsString("Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop"))
+                .body(containsString("search-trigger-input"))
                 .body(containsString("data-gh=\"stars\""))
-                .body(containsString("data-gh=\"forks\""));
+                .body(containsString("data-gh=\"forks\""))
+                .body(containsString("id=\"theme-toggle\""));
     }
 
     @Test
@@ -161,7 +166,7 @@ public class RoqSiteTest {
         // reader's choice, which is how quarkus.io behaves
         when().get("/").then().statusCode(200)
                 .body(containsString("/assets/javascript/colormode.js"))
-                .body(containsString("id='theme-toggle'"));
+                .body(containsString("id=\"theme-toggle\""));
     }
 
     @Test

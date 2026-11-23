@@ -3,30 +3,9 @@ theme-layout: base
 ---
 {#insert /}
 
-{#header}
-{#include partials/quarkus/header.html _unisolated /}
-<div class="workshop-topbar">
-  <div class="workshop-topbar-inner">
-    <a class="workshop-brand" href="{site.url('/')}">
-      <span class="workshop-title">Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop</span>
-      <span class="workshop-title-short">Quarkus LangChain4j Workshop</span>
-    </a>
-    <div class="workshop-links">
-      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j/stargazers"
-         title="Star the workshop on GitHub">
-        <i class="fa-solid fa-star" aria-hidden="true"></i>
-        <span data-gh="stars" aria-label="GitHub stars">…</span>
-      </a>
-      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j/forks"
-         title="Fork the workshop on GitHub">
-        <i class="fa-solid fa-code-fork" aria-hidden="true"></i>
-        <span data-gh="forks" aria-label="GitHub forks">…</span>
-      </a>
-      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j"
-         title="Workshop repository on GitHub" target="_blank" rel="noopener">
-        <i class="fa-brands fa-github" aria-label="GitHub"></i>
-      </a>
-    </div>
-  </div>
-</div>
-{/header}
+{#scripts}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+{#search-overlay /}
+{#search-script /}
+{/scripts}
