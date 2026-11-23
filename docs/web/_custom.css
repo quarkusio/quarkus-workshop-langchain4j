@@ -18,10 +18,10 @@ pre, code, kbd, samp {
     font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
-/* Content density: more workshop text per screen, like MkDocs Material */
+/* Content density: workshop text at the 16px MkDocs Material body size */
 .content-prose {
-    font-size: 0.94rem;
-    line-height: 1.6;
+    font-size: 1rem;
+    line-height: 1.65;
 }
 
 /* Vertical rhythm matching MkDocs Material (the theme's prose defaults are looser) */
@@ -55,7 +55,7 @@ pre, code, kbd, samp {
 :is(.content-prose, .home-content) .markdown-alert {
     margin: 1.05rem 0;
     padding: 0 0.7rem 0.5rem;
-    font-size: 0.88em;
+    font-size: 1em;
     line-height: 1.55;
     border-left-width: 3px;
     border-radius: 0.2rem;
@@ -158,7 +158,47 @@ html.dark body {
 
 .content-prose pre,
 .content-prose code {
-    font-size: 0.86em;
+    font-size: 0.88em;
+}
+
+/* The code element inside a pre would otherwise take the 0.88em twice. */
+.content-prose pre code {
+    font-size: inherit;
+}
+
+/* The theme caps the layout at 1500px and leaves it at the left edge, which
+   pushed the text against the sidebar on wide screens. The MkDocs site
+   centered the content in the space right of the sidebar, so the cap goes
+   and the prose column keeps the text readable. */
+.wrapper {
+    max-width: none;
+}
+
+/* The theme caps the column at calc(100% - 12rem) with a :has() selector and
+   sets margin-inline:auto, which outranks a plain .content-main rule. Both
+   would stop the block below from centering as a unit. */
+.page-content:has(> .content-toc) .content-main {
+    max-width: 54rem;
+    width: 100%;
+    min-width: 0;
+    margin-inline: 0;
+}
+
+/* The prose column and its table of contents form one block, centered in
+   the space right of the sidebar. */
+.page-content:has(> .content-toc) {
+    justify-content: center;
+    padding-inline: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Pages without a table of contents, such as the home page, center their
+   column in the same way. The theme sets max-width:none on .home-content
+   for its wide layout, after this stylesheet, so the selector is nested. */
+.page-content.page-wide .content-main,
+.main-content .home-content {
+    max-width: 54rem;
+    margin-inline: auto;
 }
 
 .content-main {
@@ -192,7 +232,7 @@ html.dark body {
 }
 .content-prose h5,
 .content-prose h6 {
-    font-size: 0.94rem;
+    font-size: 1rem;
     font-weight: 700;
     margin: 1.2em 0 0.55em;
 }
@@ -617,7 +657,7 @@ html.dark .content-prose pre code .hl-line {
     --alert-color: #0969da;
     margin: 1.05rem 0;
     padding: 0 0.7rem;
-    font-size: 0.88em;
+    font-size: 1em;
     line-height: 1.55;
     border-left: 3px solid var(--alert-color);
     border-radius: 0.2rem;
