@@ -78,11 +78,16 @@ div.nav-wrapper {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
+  width: auto;
+  height: auto;
 }
 
+// The theme sizes the logo 100% wide inside a 13rem wrapper, which squashes
+// its 601x93 shape; keep a fixed height and the natural width instead.
 .main-nav .project-logo {
   height: 2.25rem;
   width: auto;
+  max-width: none;
 }
 
 @media screen and (max-width: 768px) {
@@ -133,6 +138,24 @@ div.nav-wrapper {
   color: inherit !important;
   font-size: 1rem !important;
   padding: 0 !important;
+}
+
+// The theme's header sets "Font Awesome 5 Free" on every nav icon, but the
+// page loads Font Awesome 6, whose brand glyphs live in a different family.
+.workshop-header-actions a i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  padding-left: 0 !important;
+}
+
+.workshop-header-actions a i.fa-brands {
+  font-family: "Font Awesome 6 Brands" !important;
+  font-weight: 400 !important;
+}
+
+.workshop-header-actions #theme-toggle i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
 }
 
 // The theme's `*` colour rule would make the icons and counts black on the
