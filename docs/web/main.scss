@@ -528,6 +528,13 @@ div.nav-wrapper {
   padding: 0;
 }
 
+// The highlighter leaves some tokens uncoloured (parameters, for example) so
+// they inherit the block colour; the theme's `* { color: #000 }` broke that.
+// :where keeps this below the highlighter's own token classes.
+:where(.content-prose) pre code span {
+  color: inherit;
+}
+
 // The copy button is positioned from the left of the wrapper, past the code
 // block's right edge, which made every pre scrollable sideways.
 .content-prose pre .hljs-copy-container {
