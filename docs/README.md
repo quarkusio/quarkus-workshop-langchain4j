@@ -9,6 +9,8 @@ The workshop site is a [Quarkus Roq](https://iamroq.dev/) static site. Roq rende
 
 Use the Maven wrapper from the repository root. There is no wrapper inside `docs/`.
 
+The look is the [quarkus.io theme](https://github.com/quarkusio/quarkusio.github.io#using-the-quarkus-theme-in-your-site), `io.quarkus:quarkus-website-theme`. It is published as a `1.0.0-SNAPSHOT` in the `https://quarkus.io/maven/` repository, which `docs/pom.xml` declares, so the first build needs network access to it. The theme ships the Roq 2.2.x line, which is why the docs module uses Quarkus 3.40.
+
 ## Run the site locally
 
 From the repository root:
@@ -23,7 +25,7 @@ Or from this directory:
 ../mvnw quarkus:dev
 ```
 
-The site is available at [http://localhost:8080](http://localhost:8080). Dev mode watches `docs/content`, `docs/web`, `docs/templates` and the Java sources, and regenerates the affected pages on change.
+The site is available at [http://localhost:8080](http://localhost:8080). Dev mode watches `docs/content` and `docs/templates` and regenerates the affected pages on change. A stylesheet change in `docs/web/` needs a restart of the dev server; it is not always picked up by live reload.
 
 ## Build and test
 
@@ -40,12 +42,24 @@ The generated site ends up in `docs/target/roq`. CI builds it with the `quarkive
 
 - `docs/content/`: the pages, one Markdown file per page, with YAML front matter (`title`, `layout`, ...). The URL follows the path, so `section-1/step-01.md` becomes `/section-1/step-01/`.
 - `docs/public/images/`: screenshots and diagrams.
-- `docs/web/main.scss` and `docs/web/app.js`: workshop styles and scripts. `main.scss` imports the Quarkus theme first. Frontend files must stay identical in every Section 3 step; check `section-3/README.md` before editing them.
+- `docs/web/main.scss` and `docs/web/app.js`: workshop styles and scripts. `main.scss` imports the Quarkus theme first and then the workshop rules. Frontend files must stay identical in every Section 3 step; check `section-3/README.md` before editing them.
 - `docs/templates/theme-layouts/quarkus/`: the `page` and `home` layouts that put the navigation column, the prose and the table of contents on the theme's `base` layout.
+- `docs/templates/layouts/base.html`: overrides the theme's head and scripts to load its assets through the site root path, and adds the lunr search overlay.
+- `docs/src/main/resources/templates/partials/quarkus/`: the header and footer partials that replace the theme's. The header is the workshop's own row: Quarkus logo, workshop name, search, repository links and the colour toggle.
 - `docs/src/main/resources/templates/partials/workshop/`: the sidebar menu and its scripts.
 - `docs/data/projectfooter.yaml`: the footer content the theme renders.
 - `docs/src/main/java/docs/SnippetExtension.java`: the `{snippet:insert(...)}` Qute extension.
 - `docs/content/sitemap.xml` and `docs/content/search-index.json`: small templates wired to the Roq plugins.
+
+## Working with the theme
+
+The theme provides the header row, footer, colours, grid and colour-mode script. Three of its rules need care when you touch the header or the prose:
+
+- It sets `* { color: #000 }`, which overrides inheritance everywhere and makes light text on dark backgrounds invisible. Content colours are set explicitly in `main.scss`; the same applies to any new element with white or inherited text.
+- It floats every `nav` (`nav { float: right }`) and floats nav list items. A header row needs a containing context (`display: flex` on `.nav-wrapper`, `float: none` on the nav), and any `<nav>` used for the table of contents needs its list items unfloated.
+- It loads its own assets as absolute `/assets/...` URLs, from `colormode.js` to the logos. Under the GitHub Pages root path those 404, so our templates use `site.url.fromRoot(...)` for them.
+
+Code blocks use the `github-dark` style from `app.js` in both colour modes, with the block background set in `main.scss`.
 
 ## Writing pages for this build
 
@@ -57,16 +71,20 @@ Callout boxes use GitHub alerts. A bold first line becomes the box title, as the
 > The application restarts on the next request.
 ```
 
-Use `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]` and `> [!WARNING]`. For a collapsed box, use plain HTML:
+Use `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]` and `> [!WARNING]`. For a collapsed box, use plain HTML. The class sets the colour: `note` or `info` (blue), `warning` (amber) or `important` (purple). Keep the body unindented and leave a blank line before `</details>`, or it ends up outside the box:
 
 ```html
-<details>
+<details class="warning">
 <summary>Not seeing the logs?</summary>
 
 The explanation goes here, after a blank line.
 
 </details>
 ```
+
+Tables, alerts, autolinks and heading ids come from commonmark extensions that `docs/src/main/java/docs/MarkdownExtensions.java` registers. `quarkus-qute-web-markdown` only adds them itself while the project defines no `org.commonmark.Extension` bean of its own, and `HighlightLinesExtension` is one, so keep `MarkdownExtensions` when you add or remove Markdown extensions.
+
+Search is the lunr plugin's own: `{#search-button-input /}` in the header, and `{#search-overlay /}` plus `{#search-script /}` in `docs/templates/layouts/base.html`.
 
 Action highlights use `<mark>`, not the MkDocs `==...==` delimiter, which Roq's Markdown engine does not support:
 

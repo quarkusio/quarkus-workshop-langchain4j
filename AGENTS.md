@@ -10,7 +10,7 @@ The workshop follows the Miles of Smiles car rental company across three section
 
 ## Technology Stack
 
-The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, and the documentation site is generated with Quarkus Roq from `docs/` using Maven only, with no Python dependency. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
+The workshop uses Java 21 with the latest stable Quarkus release and the corresponding LangChain4j Quarkiverse extension. Versions are kept current and should not be hardcoded in documentation or agent instructions — check the individual step `pom.xml` files for the actual versions in use. Maven handles the build process, and the documentation site is generated with Quarkus Roq from `docs/` using Maven only, with no Python dependency. The site uses the quarkus.io theme, `io.quarkus:quarkus-website-theme`, a snapshot published from `https://quarkus.io/maven/`; its header, footer, colours and grid live in that jar, and `docs/web/main.scss` adds the workshop layout on top. The UI components leverage Vaadin Web Components and wc-chatbot for the chat interface.
 
 ## Project Structure
 
@@ -97,7 +97,7 @@ Section 1 uses a simpler package structure and focuses on single-agent patterns,
 
 ## Documentation Writing Guidelines
 
-A detailed style guide for workshop documentation is maintained at `.agents/skills/workshop-docs-style/SKILL.md`. Read it before writing or editing any file under `docs/docs/`. The key points are summarised here.
+A detailed style guide for workshop documentation is maintained at `.agents/skills/workshop-docs-style/SKILL.md`. Read it before writing or editing any file under `docs/docs/`. The key points are summarised here. `docs/README.md` covers the site itself: layouts, styles and the theme rules that need care.
 
 Write natural, flowing prose rather than the AI pattern of bullet points followed by colon-separated descriptions. The reference voice is Section 1 of the workshop, which was written by the project owner.
 
