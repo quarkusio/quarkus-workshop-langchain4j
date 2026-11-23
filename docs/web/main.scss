@@ -369,6 +369,12 @@ div.nav-wrapper {
   padding: 0;
 }
 
+// The theme floats every nav list item for its menu bar.
+.workshop-toc .roq-toc li {
+  float: none;
+  margin: 0;
+}
+
 .workshop-toc .roq-toc a {
   display: block;
   padding: 0.2rem 0 0.2rem 0.6rem;
@@ -503,6 +509,38 @@ div.nav-wrapper {
 .content-prose pre,
 .content-prose code {
   font-size: 0.88em;
+}
+
+// The theme gives every pre a light grey background and its own text colour,
+// which leaves the github-dark code unreadable in dark mode. The block takes
+// the highlighter's palette in both modes.
+.content-prose pre {
+  background-color: #0d1117 !important;
+  color: #c9d1d9;
+  padding: 1rem 1.25rem;
+  border-radius: 0.4rem;
+  overflow-x: auto;
+}
+
+.content-prose pre code {
+  background-color: transparent !important;
+  overflow: visible;
+  padding: 0;
+}
+
+// The copy button is positioned from the left of the wrapper, past the code
+// block's right edge, which made every pre scrollable sideways.
+.content-prose pre .hljs-copy-container {
+  left: auto !important;
+  right: 0.75rem !important;
+  transform: none !important;
+}
+
+// The theme sets line-height: 1rem on every element, which packs code lines
+// together.
+.content-prose pre,
+.content-prose pre code {
+  line-height: 1.6;
 }
 
 // The code element inside a pre would otherwise take the 0.88em twice.
