@@ -28,7 +28,7 @@ The workshop follows Miles of Smiles, a fictional car rental company, across thr
 
 The workshop is divided into three sections:
 
-- **Section 1 – AI-infused application (11 steps):**
+- **Section 1 – AI-infused application (10 steps):**
   You'll progressively build a customer-facing support chatbot, starting with basic LLM integration and adding features such as structured outputs, guardrails, RAG, MCP integration, and observability.
 
 - **Section 2 – Agentic systems (8 steps + bonus):**

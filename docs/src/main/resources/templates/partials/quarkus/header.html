@@ -1,0 +1,29 @@
+{! Workshop header: the Quarkus logo, the workshop name, search, repository links and the colour toggle. The quarkus.io menu is not shown on the workshop site. !}
+<div class="nav-wrapper">
+  <nav id="main-nav" class="main-nav">
+    <div class="logo-wrapper">
+      <a href="https://quarkus.io/"><img src="{site.url.fromRoot('/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.webp')}" class="project-logo" title="Quarkus" alt="Quarkus"></a>
+    </div>
+    <a class="workshop-header-title" href="{site.url('/')}">
+      <span class="workshop-header-title-long">Building Agentic AI Systems with Java: Quarkus LangChain4j Workshop</span>
+      <span class="workshop-header-title-short">Quarkus LangChain4j Workshop</span>
+    </a>
+    <div class="workshop-header-actions">
+      <div class="workshop-header-search">{#search-button-input placeholder='Search' shortcut='/' /}</div>
+      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j/stargazers" title="Star the workshop on GitHub">
+        <i class="fa-solid fa-star" aria-hidden="true"></i>
+        <span data-gh="stars" aria-label="GitHub stars">…</span>
+      </a>
+      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j/forks" title="Fork the workshop on GitHub">
+        <i class="fa-solid fa-code-fork" aria-hidden="true"></i>
+        <span data-gh="forks" aria-label="GitHub forks">…</span>
+      </a>
+      <a href="https://github.com/quarkusio/quarkus-workshop-langchain4j" title="Workshop repository on GitHub" target="_blank" rel="noopener">
+        <i class="fa-brands fa-github" aria-label="GitHub"></i>
+      </a>
+      <button type="button" class="modeswitcher" id="theme-toggle" aria-label="Switch colour mode">
+        <i class="fas fa-sun" aria-hidden="true"></i><i class="fas fa-moon" aria-hidden="true"></i><i class="fas fa-cog" aria-hidden="true"></i>
+      </button>
+    </div>
+  </nav>
+</div>

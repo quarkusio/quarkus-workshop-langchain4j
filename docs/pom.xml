@@ -8,8 +8,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <quarkus.version>3.38.1</quarkus.version>
-        <roq.version>2.1.6</roq.version>
+        <quarkus.version>3.40.1.2</quarkus.version>
+        <roq.version>2.2.1</roq.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,6 +27,16 @@
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>quarkus-website</id>
+            <url>https://quarkus.io/maven/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkiverse.roq</groupId>
@@ -34,8 +44,13 @@
             <version>${roq.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-website-theme</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkiverse.roq</groupId>
-            <artifactId>quarkus-roq-theme-default</artifactId>
+            <artifactId>quarkus-roq-plugin-toc</artifactId>
             <version>${roq.version}</version>
         </dependency>
         <dependency>
