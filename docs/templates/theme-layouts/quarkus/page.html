@@ -1,0 +1,18 @@
+---
+layout: base
+content-toc-levels: 3
+---
+{@io.quarkiverse.roq.frontmatter.runtime.model.DocumentPage page}
+<div class="workshop">
+  <aside class="workshop-sidebar">
+    {#include partials/workshop/sidebar-menu /}
+  </aside>
+  <div class="workshop-main content-prose">
+    {#insert /}
+  </div>
+  <aside class="workshop-toc">
+    <p class="workshop-toc-title">Contents</p>
+    <div class="toc">{page.tocHtml}</div>
+  </aside>
+</div>
+{#include partials/workshop/sidebar-scripts /}

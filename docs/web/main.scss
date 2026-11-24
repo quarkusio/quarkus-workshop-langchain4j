@@ -1,0 +1,946 @@
+@use "quarkus-theme";
+
+// ---------------------------------------------------------------------------
+// Workshop layout on top of the Quarkus theme
+//
+// The theme pads `body > div.content` by 13rem for its full-width bands; the
+// workshop owns its width, so that padding goes and the grid below does the
+// centering: navigation, prose and table of contents as one block, like the
+// quarkus.io guides.
+// ---------------------------------------------------------------------------
+
+body > div.content {
+  padding: 0;
+}
+
+// The theme defines the colour variables but leaves the page background to
+// the site, so dark mode needs these.
+body {
+  background-color: var(--main-background-color);
+  color: var(--main-text-color);
+}
+
+// ---------------------------------------------------------------------------
+// Workshop branding and actions inside the quarkus.io header
+//
+// The header partial is overridden in src/main/resources/templates, adding the
+// workshop title next to the Quarkus logo and the search and repository links
+// on the right of the same row.
+// ---------------------------------------------------------------------------
+
+.workshop-header-title {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 1.5rem;
+  text-decoration: none;
+}
+
+.workshop-header-title-long,
+.workshop-header-title-short {
+  overflow: hidden;
+  color: #fff !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: none !important;
+  white-space: nowrap;
+}
+
+.workshop-header-title-short {
+  display: none;
+}
+
+// The header is styled here rather than by the theme's header rules, so it
+// renders even if those rules are missing or change upstream. The theme
+// floats .main-nav, which collapses .nav-wrapper to no height when nothing
+// contains the float; a flex bar cannot collapse and ignores the float.
+div.nav-wrapper {
+  display: flex;
+  background-color: #000;
+  padding-inline: 4rem;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: nowrap;
+  width: 100%;
+  float: none;
+  padding: 0.9rem 0;
+}
+
+.main-nav .logo-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+}
+
+// The theme sizes the logo 100% wide inside a 13rem wrapper, which squashes
+// its 601x93 shape; keep a fixed height and the natural width instead.
+.main-nav .project-logo {
+  height: 2.25rem;
+  width: auto;
+  max-width: none;
+}
+
+@media screen and (max-width: 768px) {
+  div.nav-wrapper {
+    padding-inline: 2rem;
+  }
+}
+
+.workshop-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.workshop-header-actions a {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.85rem !important;
+  text-transform: none !important;
+  text-decoration: none;
+}
+
+.workshop-header-actions a:hover {
+  color: #fff !important;
+}
+
+// Colour toggle: match the size of the icon links next to it.
+.workshop-header-actions #theme-toggle {
+  margin: 0;
+  padding: 0.25rem;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.workshop-header-actions #theme-toggle:hover {
+  color: #fff;
+}
+
+.workshop-header-actions #theme-toggle i {
+  color: inherit !important;
+  font-size: 1rem !important;
+  padding: 0 !important;
+}
+
+// The theme's header sets "Font Awesome 5 Free" on every nav icon, but the
+// page loads Font Awesome 6, whose brand glyphs live in a different family.
+.workshop-header-actions a i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  padding-left: 0 !important;
+}
+
+.workshop-header-actions a i.fa-brands {
+  font-family: "Font Awesome 6 Brands" !important;
+  font-weight: 400 !important;
+}
+
+.workshop-header-actions #theme-toggle i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+}
+
+// The theme's `*` colour rule would make the icons and counts black on the
+// black header.
+.workshop-header-actions a i,
+.workshop-header-actions a span {
+  color: inherit !important;
+}
+
+.workshop-header-search .search-trigger-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 9rem;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.workshop-header-search .search-trigger-input:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.workshop-header-search .search-trigger-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  fill: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.workshop-header-search .search-trigger-shortcut {
+  margin-left: auto;
+  padding: 0.05rem 0.3rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.2rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media screen and (max-width: 1400px) {
+  .workshop-header-title-long {
+    display: none;
+  }
+
+  .workshop-header-title-short {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .workshop-header-search,
+  .workshop-header-actions a span {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .workshop-header-title {
+    margin-left: 0.75rem;
+  }
+
+  .workshop-header-title-long,
+  .workshop-header-title-short {
+    font-size: 1rem !important;
+    white-space: normal;
+  }
+
+  .workshop-header-actions a {
+    display: none;
+  }
+}
+
+.workshop {
+  display: grid;
+  grid-template-columns: 18rem minmax(0, 54rem) 13rem;
+  gap: 2.5rem;
+  width: 100%;
+  max-width: 1600px;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 2rem 1.5rem 4rem;
+  align-items: start;
+}
+
+.workshop-home {
+  grid-template-columns: 18rem minmax(0, 54rem);
+  justify-content: center;
+}
+
+.workshop-sidebar {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  font-size: 0.9rem;
+  scrollbar-width: thin;
+}
+
+.workshop-toc {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  font-size: 0.82rem;
+  scrollbar-width: thin;
+}
+
+@media screen and (max-width: 1200px) {
+  .workshop {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+
+  .workshop-toc {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .workshop {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 1.25rem;
+  }
+
+  .workshop-sidebar {
+    position: static;
+    max-height: 40vh;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--sec-border-color);
+    padding-bottom: 1rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Navigation column
+// ---------------------------------------------------------------------------
+
+.workshop-sidebar .sidebar-nav {
+  padding: 0;
+}
+
+.workshop-sidebar .sidebar-section {
+  margin-bottom: 1.25rem;
+}
+
+.workshop-sidebar .nav-section-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sub-title-text-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+.workshop-sidebar .nav-section-title:hover {
+  color: var(--link-color);
+}
+
+.workshop-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.workshop-sidebar .sidebar-link {
+  display: block;
+  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  border-left: 3px solid transparent;
+  color: var(--main-text-color);
+  text-decoration: none;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.workshop-sidebar .sidebar-link:hover {
+  background: var(--hover-background-color);
+  color: var(--link-color);
+}
+
+.workshop-sidebar .sidebar-link.active {
+  color: var(--link-color);
+  border-left-color: var(--link-color);
+  background: var(--hover-background-color);
+  font-weight: 600;
+}
+
+.workshop-sidebar .standalone-link {
+  display: block;
+  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  font-size: 0.84rem;
+  text-decoration: none;
+  color: var(--main-text-color);
+}
+
+// ---------------------------------------------------------------------------
+// Table of contents (roq-toc plugin)
+// ---------------------------------------------------------------------------
+
+.workshop-toc .roq-toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// The theme floats every nav list item for its menu bar.
+.workshop-toc .roq-toc li {
+  float: none;
+  margin: 0;
+}
+
+.workshop-toc .roq-toc a {
+  display: block;
+  padding: 0.2rem 0 0.2rem 0.6rem;
+  border-left: 2px solid var(--sec-border-color);
+  color: var(--main-text-color);
+  text-decoration: none;
+  font-size: inherit;
+  line-height: 1.35;
+}
+
+.workshop-toc .roq-toc a:hover {
+  color: var(--link-color);
+  border-left-color: var(--link-color);
+}
+
+// The page title is the H1; the contents start at H2. Only its own link is
+// hidden: the nested list of H2/H3 entries lives inside the same <li>.
+.workshop-toc .roq-toc li[data-level="0"] > a {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Prose
+// ---------------------------------------------------------------------------
+
+.content-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--main-text-color);
+}
+
+// The theme sets every element to black with a `*` rule, so the text elements
+// need their own colour to follow the light and dark modes. Code is left out:
+// its colours come from highlight.js.
+.content-prose p,
+.content-prose ul,
+.content-prose ol,
+.content-prose li,
+.content-prose dl,
+.content-prose dt,
+.content-prose dd,
+.content-prose blockquote,
+.content-prose table,
+.content-prose th,
+.content-prose td,
+.content-prose summary,
+.content-prose strong,
+.content-prose em,
+.content-prose figcaption {
+  color: var(--main-text-color);
+}
+
+.content-prose p,
+.content-prose ul,
+.content-prose ol,
+.content-prose blockquote {
+  margin: 0.95em 0;
+}
+
+.content-prose li {
+  margin: 0.3em 0;
+}
+
+.content-prose ul,
+.content-prose ol {
+  padding-left: 1.5rem;
+}
+
+.content-prose pre {
+  margin: 1em 0;
+}
+
+.content-prose img {
+  margin: 1.1em auto;
+}
+
+.content-prose hr {
+  margin: 1.5em 0;
+  border: 0;
+  border-top: 1px solid var(--sec-border-color);
+}
+
+.content-prose > :first-child {
+  margin-top: 0;
+}
+
+.content-prose h1,
+.content-prose h2,
+.content-prose h3,
+.content-prose h4,
+.content-prose h5,
+.content-prose h6 {
+  color: var(--title-text-color);
+  line-height: 1.3;
+  font-weight: 500;
+  margin: 1.5em 0 0.6em;
+}
+
+.content-prose h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+.content-prose h2 {
+  font-size: 1.45rem;
+  margin-top: 2em;
+}
+
+.content-prose h3 {
+  font-size: 1.2rem;
+}
+
+.content-prose h4 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.content-prose h5,
+.content-prose h6 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.content-prose a {
+  color: var(--link-color);
+}
+
+.content-prose a:hover {
+  color: var(--link-color-hover);
+}
+
+.content-prose pre,
+.content-prose code {
+  font-size: 0.88em;
+}
+
+// The theme gives every pre a light grey background and its own text colour,
+// which leaves the github-dark code unreadable in dark mode. The block takes
+// the highlighter's palette in both modes.
+.content-prose pre {
+  background-color: #0d1117 !important;
+  color: #c9d1d9;
+  padding: 1rem 1.25rem;
+  border-radius: 0.4rem;
+  overflow-x: auto;
+}
+
+.content-prose pre code {
+  background-color: transparent !important;
+  overflow: visible;
+  padding: 0;
+}
+
+// The highlighter leaves some tokens uncoloured (parameters, for example) so
+// they inherit the block colour; the theme's `* { color: #000 }` broke that.
+// :where keeps this below the highlighter's own token classes.
+:where(.content-prose) pre code span {
+  color: inherit;
+}
+
+// The copy button is positioned from the left of the wrapper, past the code
+// block's right edge, which made every pre scrollable sideways.
+.content-prose pre .hljs-copy-container {
+  left: auto !important;
+  right: 0.75rem !important;
+  transform: none !important;
+}
+
+// The theme sets line-height: 1rem on every element, which packs code lines
+// together.
+.content-prose pre,
+.content-prose pre code {
+  line-height: 1.6;
+}
+
+// The code element inside a pre would otherwise take the 0.88em twice.
+.content-prose pre code {
+  font-size: inherit;
+}
+
+.content-prose :not(pre) > code {
+  background: var(--sec-background-color);
+  padding: 0.1em 0.35em;
+  border-radius: 0.2rem;
+  color: var(--main-code-color);
+}
+
+// Images: centered, and enlarged through the lightbox in app.js
+.content-prose img,
+.home-content img {
+  display: block;
+  max-width: 80%;
+  margin-inline: auto;
+  cursor: zoom-in;
+}
+
+html.dark .content-prose img {
+  background: rgba(226, 228, 233, 0.9);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.content-prose video {
+  display: block;
+  max-width: 100%;
+  margin: 1rem auto;
+  border-radius: 0.5rem;
+}
+
+.ws-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  cursor: zoom-out;
+}
+
+.ws-lightbox.open {
+  display: flex;
+}
+
+.ws-lightbox img {
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.ws-lightbox-caption {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  padding: 0 2rem;
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+// Action directives, previously pymdownx ==mark==
+:is(.content-prose, .home-content) mark {
+  padding: 0.1em 0.3em;
+  border-radius: 0.15em;
+  background-color: #ffff0080;
+  color: inherit;
+}
+
+html.dark :is(.content-prose, .home-content) mark {
+  background-color: #4287ff4d;
+}
+
+// ---------------------------------------------------------------------------
+// Callout boxes (> [!NOTE] and friends)
+// ---------------------------------------------------------------------------
+
+$alert-colors: (
+  note: #0969da,
+  tip: #1a7f37,
+  important: #8250df,
+  warning: #9a6700,
+  caution: #cf222e,
+);
+
+$alert-icons: (
+  note: "\f05a",
+  tip: "\f0eb",
+  important: "\f06a",
+  warning: "\f071",
+  caution: "\f057",
+);
+
+@each $type, $color in $alert-colors {
+  :is(.content-prose, .home-content) .markdown-alert-#{$type} {
+    --alert-color: #{$color};
+    --alert-icon: "#{map-get($alert-icons, $type)}";
+  }
+}
+
+:is(.content-prose, .home-content) .markdown-alert {
+  margin: 1.05rem 0;
+  padding: 0 0.7rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--main-text-color);
+  border-left: 3px solid var(--alert-color);
+  border-radius: 0.2rem;
+  background-color: color-mix(in srgb, var(--alert-color) 3%, transparent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title {
+  display: block;
+  margin: 0 -0.7rem 0.45rem;
+  padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1.5;
+  color: inherit;
+  border-radius: 0 0.2rem 0 0;
+  background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+// A bold first line was the box title in the MkDocs sources (!!! note "Title"),
+// so it is promoted to the title bar and the generic label hidden.
+:is(.content-prose, .home-content) .markdown-alert:has(> .markdown-alert-title + p > strong:first-child) > .markdown-alert-title {
+  display: none;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child {
+  display: block;
+  margin: 0 -0.7rem 0.45rem;
+  padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: inherit;
+  border-radius: 0 0.2rem 0 0;
+  background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+// The title sits in a ::before of the title element, or of the promoted bold
+// line when the box has a title of its own.
+:is(.content-prose, .home-content) .markdown-alert-title::before,
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child::before {
+  content: var(--alert-icon);
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  transform: translateY(-50%);
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands";
+  font-weight: 900;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--alert-color);
+  text-align: center;
+}
+
+:is(.content-prose, .home-content) .markdown-alert-title,
+:is(.content-prose, .home-content) .markdown-alert > .markdown-alert-title + p > strong:first-child {
+  position: relative;
+}
+
+:is(.content-prose, .home-content) .markdown-alert p {
+  margin: 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert p + p {
+  margin-top: 0.4rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert ul,
+:is(.content-prose, .home-content) .markdown-alert ol {
+  margin: 0.4rem 0;
+  padding-left: 1.3rem;
+}
+
+:is(.content-prose, .home-content) .markdown-alert pre {
+  margin: 0.5rem 0;
+}
+
+:is(.content-prose, .home-content) .markdown-alert > :last-child {
+  margin-bottom: 0;
+}
+
+html.dark :is(.content-prose, .home-content) .markdown-alert {
+  box-shadow: none;
+}
+
+// ---------------------------------------------------------------------------
+// Collapsible boxes, the old MkDocs "??? warning" blocks
+// ---------------------------------------------------------------------------
+
+.content-prose details {
+  --alert-color: #0969da;
+  margin: 1.05rem 0;
+  padding: 0 0.7rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--main-text-color);
+  border-left: 3px solid var(--alert-color);
+  border-radius: 0.2rem;
+  background-color: color-mix(in srgb, var(--alert-color) 3%, transparent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.content-prose details.warning {
+  --alert-color: #9a6700;
+}
+
+.content-prose details.important {
+  --alert-color: #8250df;
+}
+
+.content-prose details > summary {
+  position: relative;
+  display: block;
+  margin: 0 -0.7rem;
+  padding: 0.32rem 0.7rem 0.32rem 1.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: inherit;
+  cursor: pointer;
+  list-style: none;
+  border-radius: 0 0.2rem 0.2rem 0;
+  background-color: color-mix(in srgb, var(--alert-color) 10%, transparent);
+}
+
+.content-prose details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.content-prose details > summary::before {
+  content: "\f054";
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.7rem;
+  color: var(--alert-color);
+  transition: transform 0.15s;
+}
+
+.content-prose details[open] > summary {
+  margin-bottom: 0.45rem;
+  border-radius: 0 0.2rem 0 0;
+}
+
+.content-prose details[open] > summary::before {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.content-prose details > :not(summary) {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.content-prose details > ul,
+.content-prose details > ol {
+  padding-left: 1.3rem;
+}
+
+.content-prose details + details {
+  margin-top: 0.6rem;
+}
+
+.content-prose details[open] > :last-child {
+  margin-bottom: 0.6rem;
+}
+
+html.dark .content-prose details {
+  box-shadow: none;
+}
+
+// ---------------------------------------------------------------------------
+// Tables
+// ---------------------------------------------------------------------------
+
+.content-prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.2em 0;
+  font-size: 0.9em;
+  border: 1px solid var(--sec-border-color);
+  border-radius: 0.2rem;
+  border-collapse: collapse;
+}
+
+.content-prose th,
+.content-prose td {
+  padding: 0.5em 0.9em;
+  vertical-align: top;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+
+.content-prose thead th {
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  vertical-align: bottom;
+  background-color: var(--table-head-background-color);
+  color: var(--main-text-color);
+}
+
+.content-prose tbody tr {
+  border-top: 1px solid var(--sec-border-color);
+}
+
+.content-prose tbody tr:nth-child(even) {
+  background-color: var(--table-row-stripe);
+}
+
+.content-prose td:first-child,
+.content-prose th:first-child {
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// Code blocks
+// ---------------------------------------------------------------------------
+
+.hljs-copy-wrapper {
+  position: relative;
+}
+
+// The theme resets every element to black, which leaves the plain brackets in
+// .hljs-tag invisible on the dark block; give that wrapper the block's colour.
+.content-prose pre .hljs-tag,
+.content-prose pre .hljs-punctuation {
+  color: #c9d1d9;
+}
+
+// hl_lines from the fence info string: app.js wraps every rendered line in
+// .code-line and marks the selected ones, which the plain text cannot do.
+// app.js wraps each highlighted line in .code-line; the theme's `*` colour
+// rule would make those wrappers black on the dark block.
+.content-prose pre code .code-line {
+  display: inline-block;
+  width: 100%;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  color: #c9d1d9;
+}
+
+.content-prose pre code .hl-line {
+  background-color: rgba(66, 135, 255, 0.1);
+  box-shadow: inset 2px 0 0 #4287ff;
+}
+
+html.dark .content-prose pre code .hl-line {
+  background-color: rgba(66, 135, 255, 0.2);
+}
+
+// Mermaid diagrams replace their fenced block once rendered
+.content-prose .mermaid {
+  margin: 1.2em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.content-prose .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+// ---------------------------------------------------------------------------
+// Table of contents label
+// ---------------------------------------------------------------------------
+
+.workshop-toc-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sub-title-text-color);
+}

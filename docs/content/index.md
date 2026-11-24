@@ -28,10 +28,10 @@ The workshop follows Miles of Smiles, a fictional car rental company, across thr
 
 The workshop is divided into three sections:
 
-- **Section 1 – AI-infused application (11 steps):**
+- **Section 1 – AI-infused application (10 steps):**
   You'll progressively build a customer-facing support chatbot, starting with basic LLM integration and adding features such as structured outputs, guardrails, RAG, MCP integration, and observability.
 
-- **Section 2 – Agentic systems (7 steps + bonus):**
+- **Section 2 – Agentic systems (8 steps + bonus):**
   You'll build a new multi-agent architecture, introducing agentic workflows, supervisor patterns, human-in-the-loop, multimodal agents, and Agent-to-Agent (A2A) communication, with a bonus step that covers deploying to Kubernetes/OpenShift.
 
 - **Section 3 – Enterprise agentic AI patterns (9 steps):**
