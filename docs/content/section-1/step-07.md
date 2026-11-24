@@ -118,14 +118,22 @@ The optional value of the annotation can gives more information about the tool, 
 <mark>Let's now modify our AI service interface (`dev.langchain4j.quarkus.workshop.CustomerSupportAgent`):</mark>
 
 **CustomerSupportAgent.java**
-```java hl_lines="7 18 20-21"
+```java hl_lines="7 17-21 23-24"
 {snippet:insert("section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java")}
 ```
 
-We have added the `@Toolbox` annotation to the `chat` method.
+We have added the `@ToolBox` annotation to the `chat` method.
 It lists the classes that contain the tools that the LLM can call.
 
 Also note that we have added a new placeholder `\{current_date}` in the system prompt, so the LLM knows the current date (and can apply the cancellation policy).
+
+The `chat` method now returns a `String` instead of a `Multi<String>`, so the WebSocket endpoint has to return a `String` too.
+<mark>Update the `onTextMessage` method of the `CustomerSupportAgentWebSocket` class:</mark>
+
+**CustomerSupportAgentWebSocket.java**
+```java
+{snippet:insert("section-1/step-07/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgentWebSocket.java", "tools")}
+```
 
 > [!NOTE]
 > **Prompt and templates**
@@ -155,25 +163,26 @@ Hello, I would like to cancel a booking.
 My name is Speedy McWheels. But, I don't remember the booking ID. Can you list all my future bookings?
 ```
 
-**AI**: Here are your upcoming bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 3. Booking ID: 3 - From: 2025-10-01 - To: 2025-10-07 Please let me know which booking you would like to cancel.
+The chatbot lists three bookings, with the IDs 1, 2 and 3.
+Their dates depend on the day you run the application, because the sample bookings are created relative to the current date.
+The first one starts tomorrow, the second one in two weeks and the third one in a month.
 
 **You**
 ```text
 I would like to cancel the last one.
 ```
 
-**AI**: Your booking from 2025-10-01 to 2025-10-07 has been successfully cancelled. If you need any further assistance, feel free to let me know!
-
-Here are your current bookings: 1. Booking ID: 1 - From: 2025-07-10 - To: 2025-07-12 2. Booking ID: 2 - From: 2025-08-05 - To: 2025-08-12 If you need any further assistance, please let me know!
+The chatbot should confirm that booking 3 is cancelled.
+This booking starts more than 11 days from now and lasts four days, so the cancellation policy allows it.
 
 Alright, let's try now to cancel an invalid booking:
 
 **You**
 ```text
-Can you cancel my booking starting on 2025-07-10?
+Can you cancel my first booking?
 ```
 
-**AI**:  Unfortunately, I cannot cancel your booking starting on 2025-07-10 because the booking period is less than 4 days, and cancellations are not permitted for such bookings. If you have any other questions or need further assistance, please let me know!
+This time the chatbot should refuse, because the booking starts in less than 11 days and the policy only allows cancellations up to 11 days before the start.
 
 <video controls style="max-width: 100%;">
   <source src="/images/chat-booking.mp4" type="video/mp4">

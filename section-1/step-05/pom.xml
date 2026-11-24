@@ -16,14 +16,14 @@
 
         <compiler-plugin.version>3.16.0</compiler-plugin.version>
 
-        <quarkus.platform.version>3.39.5</quarkus.platform.version>
-        <quarkus-langchain4j.version>1.14.0</quarkus-langchain4j.version>
+        <quarkus.platform.version>4.0.0</quarkus.platform.version>
+        <quarkus-langchain4j.version>2.0.0.CR1</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.quarkus.platform</groupId>
+                <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bom</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
@@ -52,6 +52,14 @@
             <artifactId>quarkus-langchain4j-easy-rag</artifactId>
         </dependency>
         <!-- -8<- [end:easy-rag]       -->
+
+        <!-- -8<- [start:easy-rag-poi]       -->
+        <dependency>
+            <groupId>io.quarkiverse.poi</groupId>
+            <artifactId>quarkus-poi</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <!-- -8<- [end:easy-rag-poi]       -->
 
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -103,7 +111,7 @@
             </plugin>
 
             <plugin>
-                <groupId>io.quarkus.platform</groupId>
+                <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <extensions>true</extensions>

@@ -24,11 +24,12 @@ Let's start with a bit of cleanup.
 {snippet:insert("section-1/step-05/src/main/resources/application.properties", "easy-rag")}
 ```
 
-<mark>Then, open the `pom.xml` file and remove the following dependency:</mark>
+<mark>Then, open the `pom.xml` file and remove the following dependencies:</mark>
 
 **pom.xml**
 ```xml
 {snippet:insert("section-1/step-05/pom.xml", "easy-rag")}
+{snippet:insert("section-1/step-05/pom.xml", "easy-rag-poi")}
 ```
 
 > [!TIP]
@@ -90,7 +91,7 @@ Now we will use a persistent store to keep the embeddings between restarts.
 
 There are many options to store the embeddings, like [Redis](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-redis.html), [Infinispan](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-infinispan-store.html), specialized databases (like [Chroma](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-chroma-store.html)), etc.
 Here, we will use the [PostgreSQL pgVector store](https://docs.quarkiverse.io/quarkus-langchain4j/dev/rag-pgvector-store.html), a popular relational database. If you are not able to run Dev Services with Docker or Podman, you can use
-[an in-memory embedding store](#in-memory-embedding-store).
+[an in-memory embedding store](#in-memory-embedding-store-for-users-who-cant-use-dev-services).
 
 <mark>Add the following dependency to your `pom.xml` file:</mark>
 
@@ -351,7 +352,7 @@ INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread
 - url: https://api.openai.com/v1/chat/completions
 - headers: [Accept: text/event-stream], [Authorization: Be...1f], [Content-Type: application/json], [User-Agent: langchain4j-openai], [content-length: 886]
 - body: \{
-  "model" : "gpt-4o",
+  "model" : "gpt-4.1",
   "messages" : [ \{
     "role" : "system",
     "content" : "You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n"
@@ -359,13 +360,12 @@ INFO  [io.qua.lan.ope.OpenAiRestApi$OpenAiClientLogger] (vert.x-eventloop-thread
     "role" : "user",
     "content" : "What can you tell me about your cancellation policy?\nPlease, only use the following information:\n- 4. Cancellation Policy\n- 4. Cancellation Policy 4.1 Reservations can be cancelled up to 11 days prior to the start of the\n- booking period.\n4.2 If the booking period is less than 4 days, cancellations are not permitted.\n"
   } ],
-  "temperature" : 0.3,
-  "top_p" : 1.0,
+  "temperature" : 1.0,
   "stream" : true,
   "stream_options" : \{
     "include_usage" : true
   },
-  "max_tokens" : 1000,
+  "max_completion_tokens" : 1000,
   "presence_penalty" : 0.0,
   "frequency_penalty" : 0.0
 }
