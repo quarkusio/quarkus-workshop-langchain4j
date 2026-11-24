@@ -25,7 +25,8 @@ public class PricingAgentCard {
                 .url("http://localhost:8888/")
                 .version("1.0.0")
                 .capabilities(AgentCapabilities.builder()
-                        .streaming(true)
+                        // streaming is off until the A2A Java SDK supports Quarkus 4
+                        .streaming(false)
                         .pushNotifications(false)
                         .build())
                 .defaultInputModes(List.of("text"))

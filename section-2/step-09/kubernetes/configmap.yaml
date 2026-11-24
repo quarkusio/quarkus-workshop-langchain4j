@@ -10,4 +10,4 @@ data:
   POSTGRES_PORT: "5432"
   # OpenAI configuration
   OPENAI_BASE_URL: "https://api.openai.com/v1"
-  OPENAI_MODEL_NAME: "gpt-4o"
+  OPENAI_MODEL_NAME: "gpt-4.1"

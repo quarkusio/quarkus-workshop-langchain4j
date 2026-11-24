@@ -30,7 +30,8 @@ public class PricingAgentCard {
                 .url(baseUrl)
                 .version("1.0.0")
                 .capabilities(AgentCapabilities.builder()
-                        .streaming(true)
+                        // streaming is off until the A2A Java SDK supports Quarkus 4
+                        .streaming(false)
                         .pushNotifications(false)
                         .build())
                 .defaultInputModes(List.of("text"))

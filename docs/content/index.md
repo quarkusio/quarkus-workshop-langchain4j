@@ -40,7 +40,7 @@ The workshop is divided into three sections:
 Each step builds on the previous one, with the results stored in separate directories (`step-XX`):
 
 - Final solution for Section 1: `section-1/step-11`
-- Final solution for Section 2: `section-2/step-07`
+- Final solution for Section 2: `section-2/step-08`
 - Final solution for Section 3: `section-3/step-07`
 
 ---

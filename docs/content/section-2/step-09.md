@@ -160,10 +160,12 @@ data:
   POSTGRES_HOST: "postgresql"
   POSTGRES_PORT: "5432"
   OPENAI_BASE_URL: "https://api.openai.com/v1"
-  OPENAI_MODEL_NAME: "gpt-4o"
+  OPENAI_MODEL_NAME: "gpt-4.1"
 ```
 
 If you're using a different model, a local LLM proxy, or a compatible API endpoint (such as Azure OpenAI or a self-hosted inference server), this is the place to set it — no image rebuild required.
+
+Both values apply to the default chat model only. For cars estimated above $30,000, `DispositionProposalAgent` switches to the advanced model introduced in [Step 07](../step-07/), which keeps the `gpt-5.1` name from `application.properties` and the default OpenAI endpoint. To change those as well, add the `QUARKUS_LANGCHAIN4J_OPENAI_ADVANCEDMODEL_CHAT_MODEL_MODEL_NAME` and `QUARKUS_LANGCHAIN4J_OPENAI_ADVANCEDMODEL_BASE_URL` environment variables to the `miles-and-smiles` Deployment in `kubernetes/main-app.yaml`.
 
 A **Secret** named `miles-and-smiles` holds the sensitive values injected at runtime: your `OPENAI_API_KEY`, the PostgreSQL username and password, and the database name. The secret is created with `kubectl create secret --dry-run=client -o yaml | kubectl apply -f -`, which makes re-running the deployment idempotent — it won't fail if the secret already exists.
 
@@ -257,16 +259,23 @@ a2a.base-url=http://localhost:8888/
 %prod.a2a.base-url=http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local/
 ```
 
-The `PricingAgentCard` class in the remote A2A agent injects this `a2a.base-url` property and uses it to generate the URLs it advertises in its agent card. When the main application fetches the agent card at startup, it receives the Kubernetes-internal URL and uses that for all subsequent A2A calls.
+The `PricingAgentCard` class in the remote A2A agent injects this `a2a.base-url` property and uses it to generate the URLs it advertises in its agent card. When the main application fetches the agent card, which it does the first time it needs a price, it receives the Kubernetes-internal URL and uses that for all subsequent A2A calls.
 
-The main application's `@A2AClientAgent` annotation specifies the Kubernetes service URL directly so it knows where to fetch the agent card in production:
+The main application needs the same switch to know where to fetch the agent card. In [Step 08](../step-08/) the URL was written in the `a2aServerUrl` attribute of `@A2AClientAgent`, and an annotation attribute is a constant that cannot follow the active profile. The `PricingAgent` of this step leaves the attribute out and declares an `@A2AServerUrlSupplier` method, which reads the URL from the configuration:
 
-```java
-@A2AClientAgent(
-    a2aServerUrl = "http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local",
-    ...
-)
+**PricingAgent.java**
+```java hl_lines="13 17-20"
+{snippet:insert("section-2/step-09/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/PricingAgent.java")}
 ```
+
+The property that the supplier reads has one value for each profile in the `application.properties` of the main application:
+
+**application.properties**
+```properties
+{snippet:insert("section-2/step-09/multi-agent-system/src/main/resources/application.properties:43", "46")}
+```
+
+In dev mode the main application looks for the pricing agent on `localhost:8888`, where the A2A agent of this step listens, and in the cluster it uses the Kubernetes service name.
 
 PostgreSQL connectivity follows the same pattern: dev mode connects to `localhost`, while in production the `POSTGRES_HOST` environment variable is injected from the ConfigMap and resolves to the `postgresql` Kubernetes service.
 
@@ -298,7 +307,7 @@ Both Quarkus applications include the `quarkus-smallrye-health` extension, which
 | `/q/health/ready` | Readiness | Is the application ready to serve traffic? If this fails, the pod is removed from the Service load balancer. |
 | `/q/health/started` | Startup | Has the application finished starting up? Kubernetes won't check liveness or readiness until this passes, giving the app time to initialize without triggering a premature restart. |
 
-The startup probe is particularly important here because the main application fetches the A2A agent card on startup — a network call that can take a few seconds. The startup probe is configured with a generous timeout (`failureThreshold: 30`, `periodSeconds: 10`, up to five minutes) so the pod isn't killed before it finishes initializing.
+The startup probe is configured with a generous timeout (`failureThreshold: 30`, `periodSeconds: 10`, up to five minutes) so the pod isn't killed before it finishes initializing. Reaching the remote pricing agent is not part of that initialization, because the main application fetches the A2A agent card only when the pricing agent is first invoked. If the A2A agent cannot be reached at that point, the car return still completes. The error handler added in [Step 08](../step-08/) supplies a fallback value, and the supervisor treats the car as high-value and sends it to human approval.
 
 Once the application is running, you can query the health endpoints directly using the OpenShift Route. First get your route hostname:
 
@@ -342,7 +351,7 @@ The SmallRye Health UI at `$APP_URL/q/health-ui` presents the same information i
 
 **Pods stuck in `Pending` or `ImagePullBackOff`** — the cluster can't reach the registry or the image name is wrong. Check pod events with `kubectl describe pod <pod-name> -n miles-and-smiles`. For `ImagePullBackOff`, verify the image names in the YAML manifests match what was pushed to your registry.
 
-**Main application fails to start** — the main application fetches the A2A agent card during initialization. If the A2A agent pod isn't fully ready at that point, the fetch will fail. The manifests are designed to be applied in order with readiness waits between them, so if you're applying them manually make sure to wait for the A2A agent first:
+If **every car that needs disposition waits for human approval**, including cars of low value, the main application is probably not reaching the A2A agent. It contacts the agent the first time it needs a price and not during startup, and when that call fails the error handler from Step 08 replaces the estimate with an unknown value that the supervisor treats as high-value. The main application's log then contains the warning `Pricing agent unavailable, continuing with a fallback value`. Check that the A2A agent pod is ready:
 
 ```bash
 kubectl wait --for=condition=ready pod \

@@ -29,9 +29,10 @@ In this step, you will:
 - **Convert** the local `PricingAgent` into a remote A2A service
 - Build a **client agent** that connects to remote A2A agents using `@A2AClientAgent`
 - Create an **A2A server** that exposes an AI agent as a remote service
-- Learn about **AgentCard**, **AgentExecutor**, and **TaskUpdater** components from the A2A SDK
+- Learn about **AgentCard**, **AgentExecutor**, and **AgentEmitter** components from the A2A SDK
 - Understand the difference between **Tasks** and **Messages** in A2A protocol
 - Run **multiple Quarkus applications** that communicate via A2A
+- Recover from an unavailable remote agent with an **`@ErrorHandler`**
 - See the architectural trade-offs: lose Supervisor Pattern sophistication, gain distribution benefits
 
 > [!NOTE]
@@ -117,7 +118,7 @@ sequenceDiagram
     participant AI as AI Agent
 
     Client->>Server: Create Task (POST /tasks)
-    Server->>Executor: Initialize TaskUpdater
+    Server->>Executor: Call execute() with an AgentEmitter
     Executor->>AI: Execute with input
     AI->>AI: Process and use tools
     AI->>Executor: Return result
@@ -295,7 +296,7 @@ cd section-2\step-08\multi-agent-system
 
 ## Part 1: Convert PricingAgent to A2A Client
 
-The only change needed in the main application is converting the `PricingAgent` from a local agent to an A2A client.
+The only change the main application needs in order to call the remote service is converting the `PricingAgent` from a local agent to an A2A client.
 
 ### Step 1: Update the PricingAgent to A2A Client
 
@@ -350,7 +351,6 @@ These parameters are sent to the remote agent as task inputs. The parameters mat
 
 2. No manual HTTP requests needed
 3. Type-safe: compile-time checking of parameters
-4. Automatic error handling and retries
 
 ---
 
@@ -423,16 +423,18 @@ Clients can query this endpoint to discover the agent's capabilities.
 
 **Capabilities:**
 ```java
-.capabilities(new AgentCapabilities.Builder()
-        .streaming(true)
+.capabilities(AgentCapabilities.builder()
+        // streaming is off until the A2A Java SDK supports Quarkus 4
+        .streaming(false)
         .pushNotifications(false)
-        .stateTransitionHistory(false)
         .build())
 ```
 
+The card declares `streaming(false)` because the A2A Java SDK does not support Quarkus 4 yet, so leave streaming switched off or the pricing call will fail.
+
 **Skills:**
 ```java
-.skills(List.of(new AgentSkill.Builder()
+.skills(List.of(AgentSkill.builder()
     .id("pricing")
     .name("Vehicle pricing")
     .description("Estimates the market value of a vehicle based on make, model, year, and condition")
@@ -445,8 +447,8 @@ Skills describe what the agent can do. This helps clients discover appropriate a
 **Transport Protocol:**
 ```java
 .preferredTransport(TransportProtocol.JSONRPC.asString())
-.additionalInterfaces(List.of(
-        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888")))
+.supportedInterfaces(Collections.singletonList(
+        new AgentInterface(TransportProtocol.JSONRPC.asString(), "http://localhost:8888/")))
 ```
 
 Specifies that this agent communicates via JSON-RPC over HTTP.
@@ -481,10 +483,10 @@ The executor extracts the input parameters from the incoming message and calls t
 
 ```java
 String agentResponse = pricingAgent.estimateValue(
-        inputs.get(0),                      // carMake
-        inputs.get(1),                      // carModel
-        Integer.parseInt(inputs.get(2)),    // carYear
-        inputs.get(3));                     // carCondition
+        inputs[0],                      // carMake
+        inputs[1],                      // carModel
+        Integer.parseInt(inputs[2]),     // carYear
+        inputs[3]);                     // carCondition
 ```
 
 Extracts each parameter by index from the message parts. The order matches the client's method signature exactly.
@@ -492,13 +494,11 @@ Extracts each parameter by index from the message parts. The order matches the c
 #### Return the Result
 
 ```java
-TextPart responsePart = new TextPart(agentResponse, null);
-List<Part<?>> parts = List.of(responsePart);
-updater.addArtifact(parts, null, null, null);
-updater.complete();
+emitter.addArtifact(List.of(new TextPart(agentResponse)));
+emitter.complete();
 ```
 
-Creates a text part with the agent's response and sends it back to the client via the `TaskUpdater`. This completes the A2A task.
+Creates a text part with the agent's response and sends it back to the client via the `AgentEmitter`. This completes the A2A task.
 
 ---
 
@@ -614,6 +614,85 @@ Notice the **cross-application communication** via A2A!
 
 ---
 
+## Recovering When the Pricing Service Is Unavailable
+
+Running the pricing logic in a separate application means that every car return needing a price now depends on a second process and on the network between the two. If the pricing team restarts its service while an employee is returning a damaged car, the call made by `PricingAgent` fails. Without any recovery this failure propagates to the caller and the whole return ends with an error, even though every other agent could have done its work.
+
+An agentic system can declare an error handler to decide what happens in this situation. The handler is called when one of the agents fails, and it chooses between propagating the error, invoking the agent again, and supplying a result in its place so that the rest of the system carries on. In a distributed system a remote dependency that is temporarily unreachable is an expected condition, and deciding in a single place how the system degrades keeps a partial outage from stopping the work that does not depend on it.
+
+If you are following the completed solution, the two code changes described below are already in place.
+
+### Add an Error Handler to the Workflow
+
+In LangChain4j the handler is a method annotated with `@ErrorHandler`. It receives an `ErrorContext` describing the failure and returns an `ErrorRecoveryResult` that tells the framework how to continue.
+
+<mark>Open `multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java` and add the following method after the `@Output` method:</mark>
+
+**CarProcessingWorkflow.java**
+```java
+{snippet:insert("section-2/step-08/multi-agent-system/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java", "error-handler")}
+```
+
+<mark>Add the three imports it needs at the top of the file:</mark>
+
+```java
+import dev.langchain4j.agentic.agent.ErrorContext;
+import dev.langchain4j.agentic.agent.ErrorRecoveryResult;
+import dev.langchain4j.agentic.declarative.ErrorHandler;
+```
+
+The `ErrorContext` carries the name of the agent that failed, the `AgenticScope` and the exception. Here the name is that of the agentic method, so a failure of the A2A client `PricingAgent` is reported as `estimateValue`. The `ErrorRecoveryResult` returned by the handler selects one of three outcomes:
+
+- `throwException()` propagates the error, which is also what happens when no handler is declared.
+- `retry()` invokes the failed agent again, typically after the handler has corrected something in the scope.
+- `result(value)` uses the given value as the result of the failed agent and lets the system carry on.
+
+Invoking the pricing agent again would fail in the same way while the remote service is down, so for `estimateValue` the handler logs a warning and returns a result saying that the value is unknown. The failure of any other agent is still propagated, since a missing price is the only case we know how to continue from.
+
+An error handler declared on the root agent of the system receives the failures of every agent nested below it. This is why the method sits on `CarProcessingWorkflow` and not on `FleetSupervisorAgent`, even though the supervisor is the one that actually invokes the pricing agent.
+
+### Send Cars Without a Price to Human Approval
+
+The fallback keeps the workflow running, but the supervisor still has to decide what to do with a car whose value it does not know. Its instructions compare the estimated value with the approval threshold to choose between the two disposition paths from [Step 05](../step-05/), and an unknown value is neither above nor below that threshold. Disposing of a car without knowing what it is worth is a decision a person should confirm, so the supervisor is told to treat such a car as high-value, which sends it through `DispositionProposalAgent` and `HumanApprovalAgent`.
+
+<mark>Open `multi-agent-system/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java` and add the highlighted line under the first step of `dispositionMessage`:</mark>
+
+**FleetSupervisorAgent.java**
+```java hl_lines="7"
+{snippet:insert("section-2/step-08/multi-agent-system/src/main/java/com/carmanagement/agentic/agents/FleetSupervisorAgent.java:57", "74")}
+```
+
+Like the rest of the supervisor's prompt, this line is an instruction to the model and not a condition evaluated in Java, so the exercise below checks in the log and in the UI that the supervisor followed it.
+
+### Stop the Remote Agent and Return a Car
+
+The main application does not contact the remote agent when it starts. It fetches the agent card the first time the pricing agent is invoked, so it starts normally even when the pricing service is down, and an outage only shows when a car needs a price. With the remote server stopped the connection is refused and the call fails immediately. A server that accepts the connection without ever returning its card makes that first invocation fail after 30 seconds by default, a limit that the `resolutionTimeoutSeconds` attribute of `@A2AClientAgent` changes.
+
+<mark>In Terminal 1, stop the remote A2A server with `Ctrl+C`.</mark> Leave the main application running in Terminal 2.
+
+The return to try is the low-value scenario of [Step 05](../step-05/), in which the Ford Focus was expected to go straight to `DispositionAgent` without asking for approval.
+
+<mark>In the Fleet Status grid, find the Ford Focus (status: Rented), enter the following feedback and click **Return**:</mark>
+
+```
+The car is totaled, completely inoperable, very old
+```
+
+When the supervisor asks for the value of the car, the pricing call fails and the main application logs two warnings in Terminal 2. One is written by the `AgentLoggingListener` added in Step 05, which reports the failed agent with the message of the exception, and the other by the error handler. The excerpt below is illustrative and shows only the message part of each line, where the text after `failed:` depends on the underlying error:
+
+```
+Agent estimateValue failed: <exception message>
+Pricing agent unavailable, continuing with a fallback value
+```
+
+The return itself does not fail. The supervisor receives `Estimated Value: unknown (pricing service unavailable)` where it expected an estimate, and its instructions tell it to treat the car as high-value. Since the listener also logs every agent that starts after the failure, the same log shows whether the supervisor went on to the proposal and approval agents.
+
+<mark>Wait for the **Approval Needed** button to appear in the UI and click it to open the approval request.</mark> The value on the card is what the reviewer has to go on, so check that it reflects the missing estimate. <mark>Choose **Keep & Repair** or **Dispose** to let the workflow complete.</mark>
+
+The experiments at the end of this page need the pricing service again. <mark>Start the remote server again in Terminal 1 with the same command as before.</mark> To check that pricing is back, return another rented car with feedback that requires disposition and look for `Remote A2A PricingAgent called` in Terminal 1.
+
+---
+
 ## How It All Works Together
 
 Let's trace the complete flow:
@@ -689,7 +768,6 @@ Quarkus LangChain4j handles:
 - Sending the HTTP request via JSON-RPC
 - Waiting for the response
 - Deserializing the result
-- Error handling and retries
 
 ### Server Side (AgentCard + AgentExecutor)
 
@@ -699,7 +777,7 @@ The server requires more components:
 |-----------|---------|
 | **AgentCard** | Describes agent capabilities, published at `/.well-known/agent-card.json` endpoint |
 | **AgentExecutor** | Receives and processes A2A task requests |
-| **TaskUpdater** | Updates task status and sends results back to client |
+| **AgentEmitter** | Updates task status and sends results back to client |
 | **AI Agent** | The actual AI service (PricingAgent) |
 
 This separation allows:
@@ -731,6 +809,7 @@ This separation allows:
 - **Two runtimes communicate**: Real-world simulation of distributed agent systems
 - **Selective distribution**: Not every agent needs to be remote — only distribute what benefits from it (e.g., the pricing service can be reused by other applications)
 - **Local + remote mix**: Combining local agents (DispositionAgent) with remote A2A agents (PricingAgent) in the same workflow
+- An `@ErrorHandler` on the root workflow turns the failure of a remote agent into a fallback result, so an outage of the pricing service sends the car to human approval instead of failing the return
 
 ---
 

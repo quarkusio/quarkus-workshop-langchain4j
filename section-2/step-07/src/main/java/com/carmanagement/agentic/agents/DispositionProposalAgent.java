@@ -5,14 +5,25 @@ import dev.langchain4j.agentic.declarative.ChatModelSupplier;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import io.quarkiverse.langchain4j.agentic.runtime.CdiBean;
+import io.quarkiverse.langchain4j.ModelName;
+import io.quarkus.logging.Log;
+import jakarta.inject.Inject;
 
 /**
  * Agent that creates disposition proposals for vehicles requiring disposition.
  * This agent analyzes the vehicle and creates a proposal that will be reviewed
  * by the HumanApprovalAgent if the vehicle value exceeds the threshold.
  */
-public interface DispositionProposalAgent {
+public class DispositionProposalAgent {
+
+    private static final int HIGH_VALUE_THRESHOLD = 30000;
+
+    @Inject
+    ChatModel baseModel;
+
+    @Inject
+    @ModelName("advancedModel")
+    ChatModel advancedModel;
 
     @SystemMessage("""
         You are a car disposition specialist for a car rental company.
@@ -54,7 +65,7 @@ public interface DispositionProposalAgent {
         Provide your disposition proposal with clear reasoning.
         """)
     @Agent(outputKey = "dispositionProposal", description = "Creates disposition proposals for vehicles requiring disposition")
-    String createDispositionProposal(
+    public native String createDispositionProposal(
             String carMake,
             String carModel,
             Integer carYear,
@@ -64,8 +75,23 @@ public interface DispositionProposalAgent {
             String feedback);
 
     @ChatModelSupplier
-    static ChatModel chatModel(@CdiBean DynamicModelSelector modelSelector, String carValue) {
-        return modelSelector.select(carValue);
+    ChatModel chatModel(String carValue) {
+        if (parseValue(carValue) > HIGH_VALUE_THRESHOLD) {
+            Log.info("Selecting advanced model for high-value car estimated " + carValue);
+            return advancedModel;
+        }
+        return baseModel;
+    }
+
+    private static int parseValue(String carValue) {
+        if (carValue == null) {
+            return 0;
+        }
+        String digits = carValue.replaceAll("[^0-9]", "");
+        if (digits.isEmpty()) {
+            return 0;
+        }
+        return Integer.parseInt(digits);
     }
 }
 

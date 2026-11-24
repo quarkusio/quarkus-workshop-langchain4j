@@ -189,7 +189,7 @@ For files that already exist in the previous step, tell the reader to update the
 
 Split long classes into focused excerpts at useful editing boundaries, keeping every required change visible. A collapsed "Complete updated file" box can provide the full class for comparison. New, short files can be shown in full without breaking them into excerpts.
 
-Prefer the repository's source includes (`--8<--`) so snippets match the completed step. For excerpts, use the supported `path:start:end` syntax and recheck the range whenever the source changes. Make it clear when an excerpt shows only a method declaration whose body should stay unchanged.
+Prefer the repository's source includes (`--8<--`) so snippets match the completed step. For excerpts, use the supported `{snippet:insert("path:start", "end")}` line-range form and recheck the range whenever the source changes. Make it clear when an excerpt shows only a method declaration whose body should stay unchanged.
 
 When a chapter adds several settings to the same properties file, give the reader one clear edit at the point where the settings are needed. If later text refers to a setting already shown, explain its purpose there without instructing the reader to add it again. Check that each properties snippet renders the intended lines in the site.
 

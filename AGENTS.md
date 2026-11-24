@@ -16,7 +16,7 @@ The workshop uses Java 21 with the latest stable Quarkus release and the corresp
 
 This is a multi-module Maven project organized into three sections. The first section contains 11 steps focused on AI-infused applications, covering topics from basic LLM integration and AI Services through prompt engineering, structured outputs, guardrails, RAG patterns, MCP integration, and observability. These steps are located in `section-1/step-XX/` directories, with the final state available in `section-1/step-11/`.
 
-The second section contains 9 steps dedicated to agentic systems, exploring agentic workflows, multi-agent collaboration, supervisor patterns, and Agent-to-Agent (A2A) communication. Steps 01–07 are located in `section-2/step-XX/` directories. Step 09 is a bonus Kubernetes/OpenShift deployment step (`section-2/step-09/`) that uses a JBang script rather than a Maven module — it deploys the Section 2 multi-agent system and remote A2A agent to a cluster with a single command.
+The second section contains 9 steps dedicated to agentic systems, exploring agentic workflows, multi-agent collaboration, supervisor patterns, and Agent-to-Agent (A2A) communication. Steps 01–07 are single Maven modules located in `section-2/step-XX/` directories. Step 08 and the bonus Step 09 each hold two modules, `multi-agent-system` and `remote-a2a-agent`. Step 09 is a Kubernetes/OpenShift deployment step (`section-2/step-09/`) whose JBang script deploys the Section 2 multi-agent system and remote A2A agent to a cluster with a single command.
 
 The third section contains 7 steps (plus a step-00 baseline) dedicated to enterprise agentic AI patterns, built around the Customer Trip Planner narrative. Topics include agent skills and dynamic discovery, guardrails and compliance, persistent state with event-driven workflows (Quarkus Flow + Kafka), voting and loop patterns with adaptive model selection, MCP integration with deterministic `@McpClientAgent` invocation, and AI-powered testing, evaluation, and observability. A2A communication is covered by Section 2 Step 08, not Section 3. These steps are located in `section-3/step-XX/` directories (steps `00`–`07`).
 
@@ -42,7 +42,7 @@ For the documentation, run `./mvnw -f docs quarkus:dev` from the root (Docker mu
 
 AI Services are defined as interfaces annotated with `@RegisterAiService`. These services are typically `@SessionScoped` to maintain conversation continuity across multiple interactions.
 
-In Sections 2 and 3, agents are defined as interfaces where each method carries the `@Agent` annotation alongside `@UserMessage` (and optionally `@SystemMessage`) to define behavior and prompts. Tools are classes with methods annotated with `@Tool` and are registered via `@ToolBox`.
+In Sections 2 and 3, agents are defined as interfaces where each method carries the `@Agent` annotation alongside `@UserMessage` (and optionally `@SystemMessage`) to define behavior and prompts. Section 2 also declares a few agents as CDI bean classes, as described under Key Architectural Patterns. Tools are classes with methods annotated with `@Tool` and are registered via `@ToolBox`.
 
 The package structure differs between sections. Section 1 uses the simpler `dev.langchain4j.quarkus.workshop` package. Section 2 uses `com.carmanagement` with subpackages for `agentic`, `model`, `resource`, and `service`. Section 3 uses `com.tripplanner` with the same subpackage layout (`agentic`, `model`, `resource`, `service`).
 
@@ -52,7 +52,7 @@ LLM configuration is handled in `application.properties`, and each step may have
 
 Each step builds incrementally on the previous one, and the step directories contain the final state of that step. Participants can start from any step by copying or opening that directory directly. When working with the workshop, make changes in a working copy rather than directly in the step directories.
 
-The workshop is designed for progressive learning, with earlier steps being simpler and later steps introducing more advanced concepts. When helping with workshop content, always check the corresponding documentation in `docs/docs/section-X/step-XX.md` for context and instructions.
+The workshop is designed for progressive learning, with earlier steps being simpler and later steps introducing more advanced concepts. When helping with workshop content, always check the corresponding documentation in `docs/content/section-X/step-XX.md` for context and instructions.
 
 ## Key Architectural Patterns
 
@@ -77,6 +77,26 @@ public interface MyAgent {
     MyResult doSomething(String input);
 }
 ```
+
+In Section 2, an agent becomes a CDI bean class in the step where one of its helper methods first needs an injected bean or configuration value. The agentic method is then `public native`, the helpers (`@SupervisorRequest`, `@ChatModelSupplier`, ...) are instance methods instead of `static` ones, and the class carries no scope annotation because `@ApplicationScoped` is the default:
+
+```java
+public class MyAgent {
+
+    @ConfigProperty(name = "my.threshold")
+    int threshold;
+
+    @SupervisorAgent(outputKey = "result", subAgents = { OtherAgent.class })
+    public native String supervise(String input);
+
+    @SupervisorRequest
+    String request(String input) {
+        return "Handle " + input + " with threshold " + threshold;
+    }
+}
+```
+
+Every other agent stays an interface with `static` helpers. `@A2AClientAgent` and `@HumanInTheLoop` agents stay interfaces too: with the extension version in use their class form fails, the first at runtime and the second at build time, so a `static` method takes a `@CdiBean` parameter when it needs a bean.
 
 Tools follow a simple pattern:
 
