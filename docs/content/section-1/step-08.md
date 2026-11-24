@@ -30,8 +30,11 @@ Let's create a Quarkus MCP server from scratch (or, you can use the step-08-mcp-
 In your terminal, make sure you're in the main directory of the workshop, and then execute the following command:
 
 ```shell
- quarkus create app dev.langchain4j.quarkus.workshop:quarkus-workshop-langchain4j-08-mcp-server:1.0-SNAPSHOT -x quarkus-mcp-server-sse -x quarkus-rest-client-jackson
+ quarkus create app dev.langchain4j.quarkus.workshop:quarkus-workshop-langchain4j-08-mcp-server:1.0-SNAPSHOT -P io.quarkus.platform:quarkus-bom:3.39.5 -x quarkus-mcp-server-http -x quarkus-rest-client-jackson
 ```
+
+The `-P` option selects the Quarkus version of the new project.
+The MCP server extension is not available for Quarkus 4 yet, so the weather server stays on Quarkus 3, which is fine because it runs as a separate application.
 
 You should now see a new `quarkus-workshop-langchain4j-08-mcp-server` folder. In it, create a new `src/main/java/dev/langchain4j/quarkus/workshop/WeatherClient.java` file. This will be our REST client to call the remote weather API. <mark>Populate it with the below code:</mark>
 
@@ -96,15 +99,16 @@ The LangChain4j MCP dependency will allow us to call remote MCP servers. Remembe
 
 ## Configuring the MCP client
 
-Now that we have the dependency, we just need to configure it to call our MCP server using the http transport-type. You can do that in the `src/main/resources/application.properties` file:
+Now that we have the dependency, we just need to configure it to call our MCP server using the `streamable-http` transport type. You can do that in the `src/main/resources/application.properties` file:
 
 **application.properties**
 ```properties
-quarkus.langchain4j.mcp.weather.transport-type=http
-quarkus.langchain4j.mcp.weather.url=http://localhost:8081/mcp/sse/
+{snippet:insert("section-1/step-08/src/main/resources/application.properties", "mcp")}
 ```
 
 Notice that we have used the "weather" name. We will reference this in the AI service to use this particular MCP server. 
+The `protocol-version` property selects the version of the MCP protocol that our weather server understands.
+Without it, the client first tries a newer version of the protocol and logs an error before it falls back to this one.
 
 We'll add a `@McpToolBox("weather")` annotation to our AI Service to reference the available MCP server. And we'll add some instructions to the prompt to make the model calls retrieve the current weather for a car rental location, and provide suggestions on what special equipment the driver might need.
 

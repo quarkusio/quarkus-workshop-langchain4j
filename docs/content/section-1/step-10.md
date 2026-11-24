@@ -61,17 +61,15 @@ the url, headers, and in the body, the model you called, the messages, temperatu
 - url: https://api.openai.com/v1/chat/completions
 - headers: [Accept: application/json], [Authorization: Be...1B], [Content-Type: application/json], [User-Agent: langchain4j-openai], [content-length: 2335]
 - body: \{
-  "model" : "gpt-4o",
+  "model" : "gpt-4.1",
   "messages" : [ \{
     "role" : "system",
-    "content" : "You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n\nToday is 2025-01-10.\n"
+    "content" : "You are a customer support agent of a car rental company 'Miles of Smiles'.\nYou are friendly, polite and concise.\nIf the question is unrelated to car rental, you should politely redirect the customer to the right department.\n\nWhen calling tools or functions, strictly use JSON objects,\ndo not wrap in quotes or use plain strings.\n\nWhen asked to provide details about a reservation,\nprovide weather details and gently try to upsell the customer based on this info.\n\nToday is 2025-01-10.\n"
   }, \{
     "role" : "user",
     "content" : "what services are available?\nPlease, only use the following information:\n- United States of America.\n2. The Services\n- from within any country in the world, of applications, websites, content, products, and services\n- liable for any modification, suspension or discontinuation of the Services.\n"
   } ],
   "temperature" : 1.0,
-  "top_p" : 1.0,
-  "max_tokens" : 1000,
   "presence_penalty" : 0.0,
   "frequency_penalty" : 0.0,
   "tools" : [ \{
@@ -134,6 +132,26 @@ the url, headers, and in the body, the model you called, the messages, temperatu
         "required" : [ "bookingId", "customerFirstName", "customerLastName" ]
       }
     }
+  }, \{
+    "type" : "function",
+    "function" : \{
+      "name" : "getForecast",
+      "description" : "Get weather forecast for a location.",
+      "parameters" : \{
+        "type" : "object",
+        "properties" : \{
+          "latitude" : \{
+            "type" : "number",
+            "description" : "Latitude of the location"
+          },
+          "longitude" : \{
+            "type" : "number",
+            "description" : "Longitude of the location"
+          }
+        },
+        "required" : [ "latitude", "longitude" ]
+      }
+    }
   } ]
 }
 
@@ -144,7 +162,7 @@ the url, headers, and in the body, the model you called, the messages, temperatu
   "id": "chatcmpl-Ao51CDrgIYFN25RIK4GJAdvQjp5tY",
   "object": "chat.completion",
   "created": 1736499054,
-  "model": "gpt-4o-2024-08-06",
+  "model": "gpt-4.1-2025-04-14",
   "choices": [
     \{
       "index": 0,
@@ -391,7 +409,7 @@ Now all we have to do is annotate our `dev.langchain4j.quarkus.workshop.Customer
 following annotations:
 
 **CustomerSupportAgent.java**
-```java hl_lines="7-11 29-30 34-36 37-39 42-50"
+```java hl_lines="3 8-12 38-40 43-51"
 {snippet:insert("section-1/step-10/src/main/java/dev/langchain4j/quarkus/workshop/CustomerSupportAgent.java")}
 ```
 

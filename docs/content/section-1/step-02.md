@@ -28,7 +28,9 @@ The application is configured from the `src/main/resources/application.propertie
 
 The `quarkus.langchain4j.openai.api-key` property is the OpenAI API key. In our case we are configuring it to read from the `OPENAI_API_KEY` environment variable.
 
-The rest of the configuration indicates which model is used (`gpt-4o`) and whether to log the requests and responses to the model in the terminal.
+The rest of the configuration indicates which model is used (`gpt-4.1`) and whether to log the requests and responses to the model in the terminal.
+The `mode` property selects the OpenAI API that the application calls.
+We use the Chat Completions API, whose requests and responses you saw in the terminal in the previous step.
 
 > [!IMPORTANT]
 > **Reloading**

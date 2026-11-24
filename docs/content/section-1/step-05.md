@@ -40,6 +40,16 @@ Add the following dependency to your `pom.xml` file:
 > ./mvnw quarkus:add-extension -Dextension=easy-rag
 > ```
 
+With the current release of Quarkus LangChain4j, the application needs one more dependency to start in dev mode.
+<mark>Add it to your `pom.xml` file as well:</mark>
+
+**pom.xml**
+```xml
+{snippet:insert("section-1/step-05/pom.xml", "easy-rag-poi")}
+```
+
+This is a temporary addition that a later release will make unnecessary.
+
 > [!NOTE]
 > **Reloading**
 > If your application is running in dev mode, it will automatically restart with the new dependency.
