@@ -354,20 +354,20 @@ Fixed the brakes, car could use a wash now
 
 ### Check the Logs
 
-Watch the console output to see the workflow execution:
+Watch the console output while the application processes a return. For the first scenario it contains these messages:
 
 ```bash
 FeedbackWorkflow executing...
   ├─ CleaningFeedbackAgent analyzing...
   └─ MaintenanceFeedbackAgent analyzing...
 CarAssignmentWorkflow evaluating conditions...
-  └─ MaintenanceAgent activated
+CarAssignmentDecisionAgent decided: MAINTENANCE
 CarConditionFeedbackAgent updating...
 ```
 
-Notice how the parallel agents execute simultaneously, then the conditional workflow activates the agent selected by the decision.
+The line that starts with `CarAssignmentDecisionAgent decided` is the one that tells you what the agents did. The `@Output` method of `CarProcessingWorkflow` logs the `CarAssignment` that the decision agent stored in the `AgenticScope`, so it shows `MAINTENANCE`, `CLEANING` or `NONE` depending on the feedback you entered. The other lines are progress messages that `CarManagementService` prints before it calls the workflow and after the workflow returns, which is why they look the same for every car. When a car goes to cleaning you will also see a `CleaningAgent activated` line, which the `CleaningTool` logs when the cleaning agent calls it.
 
-The answer of the decision agent is not among these messages. You can read it from the status of the car in the Fleet Status grid, because `CarManagementService` sets the status from the `CarAssignment` value returned by the workflow. The car ends up In Maintenance for `MAINTENANCE`, At Cleaning for `CLEANING`, and Available to Rent for `NONE`.
+`CarManagementService` sets the status of the car from the same `CarAssignment` value, so the Fleet Status grid confirms the decision. The car ends up In Maintenance for `MAINTENANCE`, At Cleaning for `CLEANING`, and Available to Rent for `NONE`.
 
 ---
 
@@ -683,7 +683,7 @@ We'll also update the `outputKey` and the output method, which now returns the a
 Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java`:
 
 **CarProcessingWorkflow.java**
-```java hl_lines="20-21 28-31"
+```java hl_lines="21-22 29-33"
 {snippet:insert("section-2/step-03/src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.java")}
 ```
 
@@ -693,7 +693,7 @@ Update `src/main/java/com/carmanagement/agentic/workflow/CarProcessingWorkflow.j
 - Sub-agents can be **other workflows** (FeedbackWorkflow, CarAssignmentWorkflow)
 - All agents share the same `AgenticScope`
 
-The `@Output` method takes `carCondition` and `carAssignment` from the `AgenticScope` and returns them together as a `CarConditions` record. It contains no routing logic of its own, because the decision agent has already determined what needs to happen next.
+The `@Output` method takes `carCondition` and `carAssignment` from the `AgenticScope`, logs the assignment so that the answer of the decision agent shows up in the console, and returns both values together as a `CarConditions` record. It contains no routing logic of its own, because the decision agent has already determined what needs to happen next.
 
 #### Update the Service Layer
 

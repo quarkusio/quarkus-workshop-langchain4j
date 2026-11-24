@@ -7,6 +7,7 @@ import com.carmanagement.model.CarAssignment;
 import com.carmanagement.model.CarInfo;
 import dev.langchain4j.agentic.declarative.Output;
 import dev.langchain4j.agentic.declarative.SequenceAgent;
+import io.quarkus.logging.Log;
 
 /**
  * Workflow for processing car returns using a sequence of agents.
@@ -27,6 +28,7 @@ public interface CarProcessingWorkflow {
 
     @Output
     static CarConditions output(String carCondition, CarAssignment carAssignment) {
+        Log.infof("CarAssignmentDecisionAgent decided: %s", carAssignment);
         return new CarConditions(carCondition, carAssignment);
     }
 }
