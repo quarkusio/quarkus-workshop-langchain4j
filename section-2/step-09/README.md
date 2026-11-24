@@ -141,6 +141,8 @@ data:
   OPENAI_MODEL_NAME: "gpt-4.1"
 ```
 
+Both values apply to the default chat model only. The advanced model used for cars estimated above $30,000 keeps the `gpt-5.1` name from `application.properties` and the default OpenAI endpoint. To change those as well, add the `QUARKUS_LANGCHAIN4J_OPENAI_ADVANCEDMODEL_CHAT_MODEL_MODEL_NAME` and `QUARKUS_LANGCHAIN4J_OPENAI_ADVANCEDMODEL_BASE_URL` environment variables to the `miles-and-smiles` Deployment in `kubernetes/main-app.yaml`.
+
 ### A2A Agent Configuration
 
 The main application connects to the remote A2A pricing agent using the Agent-to-Agent protocol. The A2A client discovers the agent's endpoint by fetching the agent card from `/.well-known/agent-card.json`.
@@ -175,13 +177,22 @@ This ensures the agent card returns the Kubernetes service URL in production, al
 
 #### Client Configuration
 
-The main application's `PricingAgent` interface specifies where to fetch the agent card:
+The main application reads the URL of the A2A agent from its `application.properties`:
+
+**Main application** (`multi-agent-system/src/main/resources/application.properties`):
+```properties
+# URL of the remote pricing agent, returned by the @A2AServerUrlSupplier method of PricingAgent
+car-management.pricing-agent.url=http://localhost:8888
+%prod.car-management.pricing-agent.url=http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local
+```
+
+The `PricingAgent` interface returns this value from its `@A2AServerUrlSupplier` method, which replaces the `a2aServerUrl` attribute of `@A2AClientAgent`:
 
 ```java
-@A2AClientAgent(
-    a2aServerUrl = "http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local",
-    ...
-)
+@A2AServerUrlSupplier
+static String a2aServerUrl() {
+    return ConfigProvider.getConfig().getValue("car-management.pricing-agent.url", String.class);
+}
 ```
 
 The A2A client fetches the agent card from this URL, extracts the actual endpoint URL from the card, and uses that for all subsequent communication.

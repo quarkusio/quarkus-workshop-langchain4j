@@ -1,6 +1,8 @@
 package com.carmanagement.agentic.agents;
 
 import dev.langchain4j.agentic.declarative.A2AClientAgent;
+import dev.langchain4j.agentic.declarative.A2AServerUrlSupplier;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 /**
  * Agent that estimates the market value of a vehicle.
@@ -8,8 +10,12 @@ import dev.langchain4j.agentic.declarative.A2AClientAgent;
  */
 public interface PricingAgent {
 
-    @A2AClientAgent(a2aServerUrl = "http://miles-and-smiles-a2a.miles-and-smiles.svc.cluster.local",
-        outputKey = "carValue",
+    @A2AClientAgent(outputKey = "carValue",
         description = "Pricing specialist that estimates vehicle market value based on make, model, year, and condition")
     String estimateValue(String carMake, String carModel, Integer carYear, String carCondition);
+
+    @A2AServerUrlSupplier
+    static String a2aServerUrl() {
+        return ConfigProvider.getConfig().getValue("car-management.pricing-agent.url", String.class);
+    }
 }

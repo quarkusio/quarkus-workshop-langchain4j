@@ -339,7 +339,7 @@ flowchart TD
 
 #### Scenario 3: Maintenance Return
 
-Find the Honda Civic (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
+Find the BMW X5 (status: In Maintenance) in the Fleet Status grid and enter in its feedback field:
 
 ```text
 Fixed the brakes, car could use a wash now
