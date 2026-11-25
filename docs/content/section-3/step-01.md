@@ -37,9 +37,7 @@ flowchart LR
 
 To keep the focus on the new concepts of this step, the workshop provides starter code with all the UI components already built for the trip planner form. 
 
-<figure markdown="span">
-  ![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](../../images/section-3-trip-form.png)\{ width="400", style="border: 1px solid #e5e7eb; border-radius: 4px;" }
-</figure>
+![Trip planner form with destination, dates, travelers, trip type, budget, and preferences](../../images/section-3-trip-form.png)
 
 This starter code also has an existing set of agents to plan a basic trip. When the customer creates a trip, the top level trip planner agent will call 2 agents in parallel to recommend a vehicle, and plan an itinerary. Based on that data, a cost estimator agent will come up with an estimate, and finally the trip plan will be assembled and sent back to the UI.
 

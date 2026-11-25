@@ -63,6 +63,9 @@ public class RoqSiteTest {
         // absolute /images/... paths would break under the GitHub Pages root path
         when().get("/section-1/step-01/").then().statusCode(200)
                 .body(containsString("src=\"../../images/"));
+        when().get("/section-3/step-01/").then().statusCode(200)
+                .body(containsString("src=\"../../images/section-3-trip-form.png\""))
+                .body(not(containsString("![Trip planner form")));
     }
 
     @Test
