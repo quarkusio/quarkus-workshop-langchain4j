@@ -282,9 +282,7 @@ Now let's hop over to the Dev UI to inspect what has just happened.
 
 <mark>Open the Dev UI at [http://localhost:8080/q/dev](http://localhost:8080/q/dev). You'll notice a new Quarkus Workflows card. Click on it and then select **Workflows**</mark>. Inspect `trip-planner-flow`. Its diagram shows the planning task, the approval publication, the wait, and the outcome branches.
 
-<figure markdown="span">
-  ![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](../../images/section-3-step-04-flow-diagram.png)\{ width="600" }
-</figure>
+![Quarkus Flow Dev UI diagram of trip-planner-flow, from planTrip through the approval wait to the confirmation, rejection, and failure branches](../../images/section-3-step-04-flow-diagram.png)
 
 <mark>Go back to the main Dev UI page and open **Apache Kafka Client > Topics**</mark>. Inspect `flow-in`. Find the `com.tripplanner.trip.requested` and `com.tripplanner.trip.approval.done` events for the approved trip. The first has the request ID and original trip details in its payload; the second has the workflow identifier in its `ce_flowinstanceid` header and decision payload.
 
