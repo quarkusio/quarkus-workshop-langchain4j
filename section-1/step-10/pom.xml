@@ -16,14 +16,14 @@
 
         <compiler-plugin.version>3.16.0</compiler-plugin.version>
 
-        <quarkus.platform.version>4.0.0</quarkus.platform.version>
+        <quarkus.platform.version>4.0.1</quarkus.platform.version>
         <quarkus-langchain4j.version>2.0.0.CR1</quarkus-langchain4j.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.quarkus</groupId>
+                <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-bom</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
@@ -139,7 +139,7 @@
             </plugin>
 
             <plugin>
-                <groupId>io.quarkus</groupId>
+                <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <extensions>true</extensions>
